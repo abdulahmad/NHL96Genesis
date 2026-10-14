@@ -4,6 +4,57 @@ NHL **96** adds a **skill level** option on the game options screen. NHL **95G**
 
 This option is **not** the playoff round counter **`gamelevel`** (`$FFFFCFCA`), which season and playoff code use for bracket progress. Skill level only affects on-ice physics constants derived from the player’s menu choice.
 
+## Names in this doc (generic IDA labels vs source names)
+
+This disassembly started from an IDA Pro listing (`lst/nhl96.bin.lst`). Many symbols still use IDA’s automatic prefixes. Renames live in source and in `docs/name_map.csv` (columns: address, current name, `ida_name`, old name, module). When reading code or the listing, the same address may appear under two names.
+
+| Pattern | Meaning | Skill-level examples |
+| --- | --- | --- |
+| `sub_XXXXXX` | IDA “subroutine at address” | `SetSkillLevel` was `sub_1E1AA8` |
+| `unk_XXXXXX` | IDA “unknown data” | `SkillLevelTbl` / `SkillLevelPalTbl` were `unk_1E1AC8` / `unk_1E1ACE` |
+| `word_FFFFFFXX` | IDA RAM word at `$FFFFxxxx` (no semantic name yet) | `word_FFD284`, `word_FFD286` — still only `equ` lines in `src/ram96.asm`, **not** rows in `name_map.csv` yet |
+| `word_FFD268` | Same pattern; this one **was** renamed | Source: **`OptSkill`** (`ida_name` = `word_FFD268` in the map) |
+| `loc_XXXXXX` | IDA local label inside a function | Options screen still has internal `.0` / `.16` labels; no skill-specific `loc_` |
+| `dc.b` under a named label | Listing did not decode as instructions; bytes kept verbatim | **`SkillItem`** (and sibling `FightingItem`, `PenaltyItem`, …) |
+| `byte_FF…` / `dword_FF…` | Same as `word_FF…` for other sizes | Not used on the skill path |
+
+**Already named in source** (safe to use in new comments): `OptSkill`, `SetSkillLevel`, `SkillLevelTbl`, `SkillLevelPalTbl`, `SkillText`, `SkillItem` (label only; body is still bytes), `OptionsScreen`, `SetPlayMode`, `puckvzadj`, `updateplayers`, `pfjoycon`.
+
+**Still generic in source** (describe by role until a symbols pass renames them): `word_FFD284` / `word_FFD286` — runtime NTSC/PAL gravity multipliers filled by `SetSkillLevel`. Comments in `logic96_timer.asm` call them “Gravity”.
+
+**Easy to confuse (not difficulty):**
+
+- **`SkaterSkillLabels` / `GoalieSkillLabels`** (`create96.asm`) — create-a-player **attribute** row titles (shot, passing, etc.), not the options “skill level”.
+- **`PrintRecordName`** (`summary96.asm`) — record holders screen; **not** what `SkillItem` calls.
+- **`SkipStrings`** (`$01D7F2`, `hockey96_inter.asm`) — walks a `String` table: given `a1` = base and `d0` = index, advance `a1` to the chosen line and return. Every `*Item` row in `options96.asm` ends with `jsr SkipStrings` after loading `a1` = `SkillText` (or `FightingText`, …) and `d0` = `OptSkill`.
+
+## Does the switch actually do anything?
+
+**Yes, but only through physics tuning** — not through separate goalie, save, or AI difficulty logic.
+
+A full-tree search of converted source shows:
+
+- **`OptSkill`** is read in: options UI, SRAM defaults, `SetSkillLevel`, and one branch in **`updateplayers`** (rookie + human skater).
+- **`word_FFD284` / `word_FFD286`** are read in exactly **`puckvzadj`** and **`updateplayers`** (plus written in `OptionsScreen` / `SetSkillLevel`).
+
+There is **no** reference that ties skill level to goalie save probability, reaction time, AI aggression, line logic, pass/shot accuracy tables, or player ratings. Those systems use other RAM and tables.
+
+What **does** change:
+
+| Effect | Where | What changes |
+| --- | --- | --- |
+| Top-shelf shot **vertical puck speed** (`puckvz`) | `doshot` → `puckvzadj` | Uses the gravity word in a distance/height formula; not general `puckvx`/`pucky` speed for every shot |
+| **Skater** friction and velocity integration | `updateplayers` in `control96.asm` | Ice damping, multiply `Xvel`/`Yvel` by the gravity word, Z fall while airborne / on ice |
+| **Rookie only**, **your** skaters | Same block | If `OptSkill` = 2 and `pfjoycon`, add **+2** to the multiplier before those integrators |
+
+**Pro vs all-star:** `SkillLevelTbl` and `SkillLevelPalTbl` store **identical** values for indices 0 and 1. In this ROM, those two menu labels are **the same difficulty**; only **rookie** (index 2) changes the table, plus the extra human-only +2 on rookie.
+
+**Goals and saves:** There is no “rookie goalie” flag. Any difference in scoring or saves would be **indirect** (puck arcs, skater speed/turning on ice), not a dedicated goal/save difficulty mode.
+
+**Shootout:** `SetSkillLevel` is **not** called when starting shootout from options, so `OptSkill` does not refresh the gravity words on that path (they stay at whatever `OptionsScreen` set on entry — default pro/all-star constants).
+
+**Confidence:** This is complete for **all labelled references in `src/`**. Undecoded `dc.b` elsewhere could in theory touch the same RAM words without using the symbol names; nothing in the listing grep for those addresses suggests extra readers. If a future decode finds another use, this doc should be updated.
+
 ## Where it appears
 
 | Piece | Location |
@@ -89,16 +140,20 @@ So on **rookie**, user-controlled skaters get **+2** added to the gravity multip
 
 No other source references to `OptSkill` were found besides options UI, SRAM defaults, and this rookie branch.
 
-## Related symbols (not renamed yet)
+## Related symbols (rename status)
 
-| Address / name | Role |
-| --- | --- |
-| `word_FFD284` | NTSC skill gravity scale (set by `SetSkillLevel`) |
-| `word_FFD286` | PAL skill gravity scale |
-| `SkillItem` | Menu row bytecode (`dc.b`) |
-| `PrintRecordName` (`$01D7F2`) | Helper `SkillItem` calls to map index → `SkillText` string |
+| Address | Source name | IDA / generic | Notes |
+| ---: | --- | --- | --- |
+| `$FFFFD268` | `OptSkill` | `word_FFD268` | In `name_map.csv` |
+| `$FFFFD284` | `word_FFD284` | (no map row) | NTSC gravity multiplier |
+| `$FFFFD286` | `word_FFD286` | (no map row) | PAL gravity multiplier |
+| `$1E13CA` | `SkillItem` | — | Body still `dc.b` |
+| `$1E1AA8` | `SetSkillLevel` | `sub_1E1AA8` | |
+| `$1E1AC8` | `SkillLevelTbl` | `unk_1E1AC8` | |
+| `$1E1ACE` | `SkillLevelPalTbl` | `unk_1E1ACE` | |
+| `$01D7F2` | `SkipStrings` | `sub_1D7F2` | Index into `SkillText` for menu display |
 
-Future symbols pass may equate the gravity words to clearer names once all uses are converted; see `docs/align95_plan.md` finish plan step 7.
+Finish plan step 7 in `docs/align95_plan.md` may rename `word_FFD284` / `word_FFD286` once every use is converted to a shared equate.
 
 ## Quick contrast: skill vs playoff round
 
