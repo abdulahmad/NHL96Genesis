@@ -2,7 +2,7 @@
 
 > **Work in progress:** this disassembly is unfinished and unpolished, and is being actively worked on. Expect labels, file layout and docs to change.
 
-Current status:
+## 🚧 Current Status
 
 - Still very raw.
 - StaticEck is taking it on and cleaning it up.
