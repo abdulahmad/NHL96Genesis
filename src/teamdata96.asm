@@ -2,39 +2,40 @@
 ;	96 has no All-Star teams: the two All-Star slots of TeamList point to Boston and Montreal.
 ;	VBjsr, the vertical blank vector's jump through vbint, sits in front of the team data.
 
-VBjsr	;Vertical blank interrupt (level 6), jumps through the vbint RAM vector
-	move.l	(vbint).l,-(sp)	;push handler address
-	rts	;and "return" into it
+VBjsr								;Vertical blank interrupt (level 6), jumps through the vbint RAM vector
+	move.l	(vbint).l,-(sp)			;push handler address
+	rts								;and "return" into it
 
-TeamList	;Team number = index (ANH 0 ... WPG 25, then the All-Star slots ASE 26 and ASW 27)
-	dc.l	Anaheim	;0 ANH
-	dc.l	Boston	;1 BOS
-	dc.l	Buffalo	;2 BUF
-	dc.l	Calgary	;3 CGY
-	dc.l	Chicago	;4 CHI
-	dc.l	Dallas	;5 DAL
-	dc.l	Detroit	;6 DET
-	dc.l	Edmonton	;7 EDM
-	dc.l	Florida	;8 FLA
-	dc.l	Hartford	;9 HFD
-	dc.l	LosAngeles	;10 LA
-	dc.l	Montreal	;11 MTL
-	dc.l	NewJersey	;12 NJ
-	dc.l	NYIslanders	;13 NYI
-	dc.l	NYRangers	;14 NYR
-	dc.l	Ottawa	;15 OTW
-	dc.l	Philadelphia	;16 PHI
-	dc.l	Pittsburgh	;17 PIT
-	dc.l	Quebec	;18 QUE
-	dc.l	SanJose	;19 SJ
-	dc.l	StLouis	;20 STL
-	dc.l	TampaBay	;21 TB
-	dc.l	Toronto	;22 TOR
-	dc.l	Vancouver	;23 VAN
-	dc.l	Washington	;24 WSH
-	dc.l	Winnipeg	;25 WPG
-	dc.l	Boston	;26 ASE slot
-	dc.l	Montreal	;27 ASW slot
+TeamList							;Team number = index (ANH 0 ... WPG 25, then the All-Star slots ASE 26 and
+									;ASW 27)
+	dc.l	Anaheim					;0 ANH
+	dc.l	Boston					;1 BOS
+	dc.l	Buffalo					;2 BUF
+	dc.l	Calgary					;3 CGY
+	dc.l	Chicago					;4 CHI
+	dc.l	Dallas					;5 DAL
+	dc.l	Detroit					;6 DET
+	dc.l	Edmonton				;7 EDM
+	dc.l	Florida					;8 FLA
+	dc.l	Hartford				;9 HFD
+	dc.l	LosAngeles				;10 LA
+	dc.l	Montreal				;11 MTL
+	dc.l	NewJersey				;12 NJ
+	dc.l	NYIslanders				;13 NYI
+	dc.l	NYRangers				;14 NYR
+	dc.l	Ottawa					;15 OTW
+	dc.l	Philadelphia			;16 PHI
+	dc.l	Pittsburgh				;17 PIT
+	dc.l	Quebec					;18 QUE
+	dc.l	SanJose					;19 SJ
+	dc.l	StLouis					;20 STL
+	dc.l	TampaBay				;21 TB
+	dc.l	Toronto					;22 TOR
+	dc.l	Vancouver				;23 VAN
+	dc.l	Washington				;24 WSH
+	dc.l	Winnipeg				;25 WPG
+	dc.l	Boston					;26 ASE slot
+	dc.l	Montreal				;27 ASW slot
 
 NumofTeams	=	(*-TeamList)/4
 Playerdata	=	0
@@ -45,11 +46,11 @@ ScoutReport	=	8
 ScoreOdds	=	10
 
 ;------------------------
-; Team block: 6 offset words (the equates above), .pad home and visitor palettes (16 colours each, incbin <team>h96 /
-; <team>v96), .sr, .sodds, .ls lines of 8 player numbers (1 = first .pld entry), .pld players ended by an empty
-; String, then 4 Strings: city, abbreviation, nickname, arena, then .pos.
-; .pos: one nibble per player in .pld order, the player's slot in .ls order (0 G, 1 LD, 2 RD, 3 LW, 4 C, 5 RW),
-; padded with $F nibbles (Toronto has no pad).
+; Team block: 6 offset words (the equates above), .pad home and visitor palettes (16 colours each, incbin
+; <team>h96 / <team>v96), .sr, .sodds, .ls lines of 8 player numbers (1 = first .pld entry), .pld players
+; ended by an empty String, then 4 Strings: city, abbreviation, nickname, arena, then .pos.
+; .pos: one nibble per player in .pld order, the player's slot in .ls order (0 G, 1 LD, 2 RD, 3 LW, 4 C, 5
+; RW), padded with $F nibbles (Toronto has no pad).
 ; Blocks are in ROM order: Dallas sits between LA and MTL, and WSH comes before WPG.
 ;------------------------
 ; Player ratings (Player macro: name, then 16 nibbles unwl,sodp,chga,eytm)
@@ -71,7 +72,7 @@ ScoreOdds	=	10
 ;m - aggressiveness (PIM) / NA
 ;------------------------
 
-Anaheim	;ANH
+Anaheim								;ANH
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -86,7 +87,7 @@ Anaheim	;ANH
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,20,17,13,04,07,11,00	;line 1 Sc1
 	dc.b	01,20,23,13,03,07,06,00	;line 2 Sc2
 	dc.b	01,21,17,14,04,08,11,00	;line 3 Chk
@@ -95,7 +96,7 @@ Anaheim	;ANH
 	dc.b	01,20,18,14,03,07,11,00	;line 6 PK1
 	dc.b	01,21,17,13,04,11,06,00	;line 7 PK2
 	dc.b	01,20,23,10,09,11,06,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Guy Hebert',	3164,3232,0000,3233	;1
 	Player	'Mikhail Shtalenkov',	3563,2222,0000,2223	;2
 	Player	'Patrik Carnback',	2172,2322,0422,2421	;3
@@ -120,19 +121,19 @@ Anaheim	;ANH
 	Player	'Randy Ladouceur',	29B3,2141,3421,4118	;22
 	Player	'Tom Kurvers',	2483,3424,2631,4431	;23
 	Player	'Don McSween',	0682,1223,2622,2222	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Anaheim'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'ANH'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Mighty Ducks'
-.ar	;Arena
+.ar									;Arena
 	String	'Arrowhead Pond Of Anaheim'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$55,$55,$55,$33,$33,$22,$21,$11,$11,$FF,$FF
 
-Boston	;BOS
+Boston								;BOS
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -147,7 +148,7 @@ Boston	;BOS
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,24,17,11,03,06,07,00	;line 1 Sc1
 	dc.b	01,21,17,11,03,06,07,00	;line 2 Sc2
 	dc.b	01,22,18,12,04,07,13,00	;line 3 Chk
@@ -156,7 +157,7 @@ Boston	;BOS
 	dc.b	01,23,19,13,04,08,16,00	;line 6 PK1
 	dc.b	01,21,17,14,03,05,07,00	;line 7 PK2
 	dc.b	01,22,19,11,04,07,05,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Blaine Lacher',	3184,4434,0020,4444	;1
 	Player	'Vincent Riendeau',	3763,3222,0050,2222	;2
 	Player	'Adam Oates',	1275,4653,3554,5661	;3
@@ -181,19 +182,19 @@ Boston	;BOS
 	Player	'Alexei Kasatonov',	0694,3233,3232,3531	;22
 	Player	'Jon Rohloff',	38A3,2234,3322,3138	;23
 	Player	'Al Iafrate',	43B4,3446,4A32,3243	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Boston'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'BOS'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Bruins'
-.ar	;Arena
+.ar									;Arena
 	String	'Boston Garden'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$45,$55,$55,$33,$33,$33,$22,$22,$11,$11,$FF,$FF
 
-Buffalo	;BUF
+Buffalo								;BUF
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -208,7 +209,7 @@ Buffalo	;BUF
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,22,18,04,03,08,11,00	;line 1 Sc1
 	dc.b	01,22,18,11,03,08,04,00	;line 2 Sc2
 	dc.b	01,23,19,12,04,09,07,00	;line 3 Chk
@@ -217,7 +218,7 @@ Buffalo	;BUF
 	dc.b	01,23,22,12,04,09,03,00	;line 6 PK1
 	dc.b	01,22,18,12,04,03,07,00	;line 7 PK2
 	dc.b	01,24,20,08,07,03,04,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Dominik Hasek',	3946,4454,0030,6666	;1
 	Player	'Robb Stauber',	3562,3443,0030,3333	;2
 	Player	'Pat LaFontaine',	1655,4644,2944,4452	;3
@@ -242,19 +243,19 @@ Buffalo	;BUF
 	Player	'Garry Galley',	0373,3342,3431,3541	;22
 	Player	'Richard Smehlik',	42A3,2344,3232,3338	;23
 	Player	'Charlie Huddy',	22A3,2243,3432,3534	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Buffalo'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'BUF'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Sabres'
-.ar	;Arena
+.ar									;Arena
 	String	'Memorial Auditorium'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$45,$55,$33,$33,$33,$32,$22,$21,$11,$FF,$FF
 
-Calgary	;CGY
+Calgary								;CGY
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -269,7 +270,7 @@ Calgary	;CGY
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,22,18,14,03,09,04,00	;line 1 Sc1
 	dc.b	01,22,18,14,03,09,04,00	;line 2 Sc2
 	dc.b	01,23,19,15,04,10,05,00	;line 3 Chk
@@ -278,7 +279,7 @@ Calgary	;CGY
 	dc.b	01,19,18,15,04,10,08,00	;line 6 PK1
 	dc.b	01,22,18,09,03,04,08,00	;line 7 PK2
 	dc.b	01,23,19,15,05,04,08,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Trevor Kidd',	3734,4323,0000,3444	;1
 	Player	'Rick Tabaracci',	3163,3212,0030,2232	;2
 	Player	'Joe Nieuwendyk',	2584,3544,3644,4241	;3
@@ -303,19 +304,19 @@ Calgary	;CGY
 	Player	'Steve Chiasson',	2193,3444,3432,4441	;22
 	Player	'Frank Musil',	0393,4142,3821,3422	;23
 	Player	'Trent Yawney',	1873,3142,3831,3533	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Calgary'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'CGY'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Flames'
-.ar	;Arena
+.ar									;Arena
 	String	'Olympic Saddledome'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$44,$55,$55,$53,$33,$32,$22,$21,$11,$FF,$FF
 
-Chicago	;CHI
+Chicago								;CHI
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -330,7 +331,7 @@ Chicago	;CHI
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,22,18,09,03,08,07,00	;line 1 Sc1
 	dc.b	01,21,18,13,03,08,07,00	;line 2 Sc2
 	dc.b	01,22,19,14,04,09,06,00	;line 3 Chk
@@ -339,7 +340,7 @@ Chicago	;CHI
 	dc.b	01,21,19,15,04,09,16,00	;line 6 PK1
 	dc.b	01,21,18,09,03,04,12,00	;line 7 PK2
 	dc.b	01,22,19,10,04,12,11,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Ed Belfour',	3066,4565,0020,5565	;1
 	Player	'Jeff Hackett',	3152,3112,0010,2233	;2
 	Player	'Jeremy Roenick',	2745,5545,4544,5356	;3
@@ -364,19 +365,19 @@ Chicago	;CHI
 	Player	'Gary Suter',	2075,4444,4642,5541	;22
 	Player	'Cam Russell',	0853,3132,5821,322A	;23
 	Player	'Keith Carney',	0492,3212,3422,1221	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Chicago'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'CHI'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Blackhawks'
-.ar	;Arena
+.ar									;Arena
 	String	'United Center'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$45,$55,$55,$33,$33,$32,$22,$11,$11,$FF,$FF
 
-Detroit	;DET
+Detroit								;DET
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -391,7 +392,7 @@ Detroit	;DET
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,21,22,04,03,08,05,00	;line 1 Sc1
 	dc.b	01,21,18,13,03,08,06,00	;line 2 Sc2
 	dc.b	01,22,19,14,04,09,07,00	;line 3 Chk
@@ -400,7 +401,7 @@ Detroit	;DET
 	dc.b	01,22,19,05,04,09,03,00	;line 6 PK1
 	dc.b	01,21,18,10,03,04,05,00	;line 7 PK2
 	dc.b	01,22,19,15,04,03,05,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Mike Vernon',	2944,4444,0030,4454	;1
 	Player	'Chris Osgood',	3034,3343,0010,3344	;2
 	Player	'Sergei Fedorov',	9176,6554,2265,5451	;3
@@ -425,19 +426,19 @@ Detroit	;DET
 	Player	'Nicklas Lidstrom',	0554,3444,2232,4541	;22
 	Player	'Terry Carkner',	02A1,2132,3621,3529	;23
 	Player	'Vachslav Fetisov',	44A3,3333,2432,3431	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Detroit'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'DET'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Red Wings'
-.ar	;Arena
+.ar									;Arena
 	String	'Joe Louis Sports Arena'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$45,$55,$55,$33,$33,$32,$22,$11,$11,$FF,$FF
 
-Edmonton	;EDM
+Edmonton							;EDM
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -452,7 +453,7 @@ Edmonton	;EDM
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,22,15,11,03,09,06,00	;line 1 Sc1
 	dc.b	01,21,15,11,03,08,06,00	;line 2 Sc2
 	dc.b	01,22,16,12,04,09,07,00	;line 3 Chk
@@ -461,7 +462,7 @@ Edmonton	;EDM
 	dc.b	01,23,15,12,04,15,07,00	;line 6 PK1
 	dc.b	01,22,15,08,05,04,10,00	;line 7 PK2
 	dc.b	01,23,16,13,03,04,17,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Bill Ranford',	3045,4435,0020,4455	;1
 	Player	'Fred Brathwaite',	3152,2222,0010,1222	;2
 	Player	'Jason Arnott',	0784,4434,3534,4348	;3
@@ -486,19 +487,19 @@ Edmonton	;EDM
 	Player	'Boris Mironov',	0274,3312,1532,3534	;22
 	Player	'Luke Richardson',	22B3,3132,4620,332A	;23
 	Player	'Ken Sutton',	4083,2242,1822,3233	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Edmonton'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'EDM'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Oilers'
-.ar	;Arena
+.ar									;Arena
 	String	'Northlands Coliseum'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$45,$55,$33,$33,$22,$22,$22,$11,$11,$FF,$FF
 
-Florida	;FLA
+Florida								;FLA
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -513,7 +514,7 @@ Florida	;FLA
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,24,17,15,06,10,09,00	;line 1 Sc1
 	dc.b	01,21,17,11,03,07,06,00	;line 2 Sc2
 	dc.b	01,22,18,12,04,08,06,00	;line 3 Chk
@@ -522,7 +523,7 @@ Florida	;FLA
 	dc.b	01,24,18,15,03,10,06,00	;line 6 PK1
 	dc.b	01,21,17,12,04,10,11,00	;line 7 PK2
 	dc.b	01,22,18,09,06,10,11,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'John Vanbiesbrk',	3454,3454,0010,4455	;1
 	Player	'Mark Fitzpatrik',	3073,3223,0010,4434	;2
 	Player	'Stu Barnes',	1453,3433,2333,3431	;3
@@ -547,19 +548,19 @@ Florida	;FLA
 	Player	'Brian Benning',	0783,3323,2642,4541	;22
 	Player	'Paul Laus',	0392,2132,5521,342A	;23
 	Player	'Magnus Svensson',	2853,3322,2432,3531	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Florida'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'FLA'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Panthers'
-.ar	;Arena
+.ar									;Arena
 	String	'Miami Arena'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$55,$55,$33,$33,$33,$22,$22,$11,$11,$FF,$FF
 
-Hartford	;HFD
+Hartford							;HFD
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -574,7 +575,7 @@ Hartford	;HFD
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,19,16,15,05,07,03,00	;line 1 Sc1
 	dc.b	01,19,16,12,03,07,06,00	;line 2 Sc2
 	dc.b	01,20,17,13,04,08,06,00	;line 3 Chk
@@ -583,7 +584,7 @@ Hartford	;HFD
 	dc.b	01,20,18,12,05,15,06,00	;line 6 PK1
 	dc.b	01,19,16,09,05,06,07,00	;line 7 PK2
 	dc.b	01,21,17,12,06,07,08,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Sean Burke',	01A4,3423,0040,4455	;1
 	Player	'Jeff Reese',	3542,3322,0010,2222	;2
 	Player	'Andrew Cassels',	2173,3442,2643,4641	;3
@@ -608,19 +609,19 @@ Hartford	;HFD
 	Player	'Alexnder Godynyuk',	05A2,3232,3622,3511	;22
 	Player	'Glen Feathrston',	06B2,2132,4421,242B	;23
 	Player	'Marek Malik',	2362,2233,3621,3322	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Hartford'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'HFD'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Whalers'
-.ar	;Arena
+.ar									;Arena
 	String	'Hartford Civic Center'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$55,$55,$53,$33,$32,$22,$11,$11,$11,$FF,$FF
 
-LosAngeles	;LA
+LosAngeles							;LA
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -635,7 +636,7 @@ LosAngeles	;LA
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,21,16,12,03,08,07,00	;line 1 Sc1
 	dc.b	01,20,16,12,03,07,06,00	;line 2 Sc2
 	dc.b	01,21,17,13,04,08,07,00	;line 3 Chk
@@ -644,7 +645,7 @@ LosAngeles	;LA
 	dc.b	01,21,17,13,04,08,03,00	;line 6 PK1
 	dc.b	01,20,16,14,03,04,07,00	;line 7 PK2
 	dc.b	01,21,17,08,05,04,03,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Kelly Hrudey',	3264,2344,0020,3333	;1
 	Player	'Grant Fuhr',	3174,2353,0130,2244	;2
 	Player	'Wayne Gretzky',	9946,4643,1464,5561	;3
@@ -669,19 +670,19 @@ LosAngeles	;LA
 	Player	'Chris Snell',	2983,3312,2432,2531	;22
 	Player	'Denis Tsygurov',	0373,3322,2632,2431	;23
 	Player	'Rob Cowie',	7773,3322,2432,2432	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Los Angeles'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'LA'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Kings'
-.ar	;Arena
+.ar									;Arena
 	String	'Great Western Forum'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$55,$55,$53,$33,$32,$22,$21,$11,$11,$FF,$FF
 
-Dallas	;DAL
+Dallas								;DAL
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -696,7 +697,7 @@ Dallas	;DAL
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,22,17,13,03,09,04,00	;line 1 Sc1
 	dc.b	01,21,17,13,03,08,04,00	;line 2 Sc2
 	dc.b	01,22,18,14,04,09,05,00	;line 3 Chk
@@ -705,7 +706,7 @@ Dallas	;DAL
 	dc.b	01,22,18,14,04,09,03,00	;line 6 PK1
 	dc.b	01,21,17,16,09,04,03,00	;line 7 PK2
 	dc.b	01,22,18,10,03,04,05,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Darcy Wakaluk',	3463,3233,0010,3333	;1
 	Player	'Andy Moog',	3543,3323,0030,3333	;2
 	Player	'Mike Modano',	0975,5645,2444,5341	;3
@@ -730,19 +731,19 @@ Dallas	;DAL
 	Player	'Derian Hatcher',	0293,2234,4631,4329	;22
 	Player	'Doug Zmolek',	0584,3232,3231,3348	;23
 	Player	'Mike Lalor',	1872,2132,3821,3122	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Dallas'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'DAL'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Stars'
-.ar	;Arena
+.ar									;Arena
 	String	'Reunion Arena'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$45,$55,$55,$33,$33,$22,$22,$11,$11,$FF,$FF
 
-Montreal	;MTL
+Montreal							;MTL
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -757,7 +758,7 @@ Montreal	;MTL
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,23,19,12,03,06,05,00	;line 1 Sc1
 	dc.b	01,22,19,12,03,06,04,00	;line 2 Sc2
 	dc.b	01,23,20,13,04,07,05,00	;line 3 Chk
@@ -766,7 +767,7 @@ Montreal	;MTL
 	dc.b	01,24,20,13,05,07,06,00	;line 6 PK1
 	dc.b	01,22,19,12,05,04,03,00	;line 7 PK2
 	dc.b	01,23,20,07,03,04,05,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Patrick Roy',	3366,4455,0000,6566	;1
 	Player	'Ron Tugnutt',	0122,3232,0010,2222	;2
 	Player	'Pierre Turgeon',	7795,4524,0444,4541	;3
@@ -791,19 +792,19 @@ Montreal	;MTL
 	Player	'Lyle Odelein',	2493,2233,4322,322A	;22
 	Player	'Yves Racine',	2964,4334,3632,4432	;23
 	Player	'J.J. Daigneault',	4864,3332,1632,3431	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Montreal'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'MTL'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Canadiens'
-.ar	;Arena
+.ar									;Arena
 	String	'Montreal Forum'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$45,$55,$55,$53,$33,$33,$33,$22,$21,$11,$FF,$FF
 
-NewJersey	;NJ
+NewJersey							;NJ
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -818,7 +819,7 @@ NewJersey	;NJ
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,21,18,16,04,09,03,00	;line 1 Sc1
 	dc.b	01,21,18,15,03,09,04,00	;line 2 Sc2
 	dc.b	01,22,19,12,04,10,05,00	;line 3 Chk
@@ -827,7 +828,7 @@ NewJersey	;NJ
 	dc.b	01,23,21,11,04,10,03,00	;line 6 PK1
 	dc.b	01,22,19,09,05,04,03,00	;line 7 PK2
 	dc.b	01,21,18,10,16,04,03,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Martin Brodeur',	3075,3344,0020,5556	;1
 	Player	'Chris Terreri',	3124,4443,0030,4443	;2
 	Player	'Neal Broten',	0943,3353,2642,4442	;3
@@ -853,19 +854,19 @@ NewJersey	;NJ
 	Player	'Tommy Albelin',	0673,2232,2231,3331	;23
 	Player	'Jaroslav Modry',	0583,3122,2421,3321	;24
 	Player	'Shawn Chambers',	2992,2332,2632,3331	;25
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'New Jersey'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'NJ'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Devils'
-.ar	;Arena
+.ar									;Arena
 	String	'Byrne Meadowlands Arena'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$44,$55,$55,$55,$33,$32,$22,$11,$11,$1F,$FF
 
-NYIslanders	;NYI
+NYIslanders							;NYI
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -880,7 +881,7 @@ NYIslanders	;NYI
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,20,17,13,03,08,04,00	;line 1 Sc1
 	dc.b	01,20,23,13,03,08,04,00	;line 2 Sc2
 	dc.b	01,21,17,14,04,09,03,00	;line 3 Chk
@@ -889,7 +890,7 @@ NYIslanders	;NYI
 	dc.b	01,23,20,10,04,09,03,00	;line 6 PK1
 	dc.b	01,20,23,13,07,04,03,00	;line 7 PK2
 	dc.b	01,21,18,08,05,04,03,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Tommy Soderstrom',	3033,3342,0020,3232	;1
 	Player	'Jamie McLennan',	2973,3222,0000,2222	;2
 	Player	'Steve Thomas',	3264,4435,4434,423A	;3
@@ -914,19 +915,19 @@ NYIslanders	;NYI
 	Player	'Dennis Vaske',	37A2,2222,3422,2422	;22
 	Player	'Darius Kasparitis',	1174,3233,5632,2338	;23
 	Player	'Brent Severyn',	24A2,2133,3622,3223	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'New York'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'NYI'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Islanders'
-.ar	;Arena
+.ar									;Arena
 	String	'Nassau Coliseum'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$45,$55,$55,$33,$33,$22,$21,$11,$11,$FF,$FF
 
-NYRangers	;NYR
+NYRangers							;NYR
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -941,7 +942,7 @@ NYRangers	;NYR
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,21,18,08,03,04,05,00	;line 1 Sc1
 	dc.b	01,21,17,11,03,07,04,00	;line 2 Sc2
 	dc.b	01,22,18,12,04,08,05,00	;line 3 Chk
@@ -950,7 +951,7 @@ NYRangers	;NYR
 	dc.b	01,22,19,04,05,09,06,00	;line 6 PK1
 	dc.b	01,21,17,11,03,04,05,00	;line 7 PK2
 	dc.b	01,22,18,08,09,04,05,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Mike Richter',	3576,3343,0000,5666	;1
 	Player	'Glenn Healy',	3053,3533,0000,3332	;2
 	Player	'Mark Messier',	1195,4543,4453,5455	;3
@@ -975,19 +976,19 @@ NYRangers	;NYR
 	Player	'Kevin Lowe',	0483,2242,3431,3434	;22
 	Player	'Jay Wells',	24A2,2132,4421,2426	;23
 	Player	'Mattius Norstrom',	0583,2132,4222,4334	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'New York'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'NYR'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Rangers'
-.ar	;Arena
+.ar									;Arena
 	String	'Madison Square Garden'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$55,$55,$33,$33,$33,$22,$22,$11,$11,$FF,$FF
 
-Ottawa	;OTW
+Ottawa								;OTW
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -1002,7 +1003,7 @@ Ottawa	;OTW
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,23,18,04,03,10,05,00	;line 1 Sc1
 	dc.b	01,21,18,14,03,09,04,00	;line 2 Sc2
 	dc.b	01,22,19,15,04,10,05,00	;line 3 Chk
@@ -1011,7 +1012,7 @@ Ottawa	;OTW
 	dc.b	01,23,22,11,04,10,05,00	;line 6 PK1
 	dc.b	01,22,19,16,10,03,04,00	;line 7 PK2
 	dc.b	01,23,18,15,03,04,05,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Don Beaupre',	3143,3333,0030,3333	;1
 	Player	'Darrin Madeley',	3042,2112,0020,2121	;2
 	Player	'Alexei Yashin',	1995,4524,2354,3351	;3
@@ -1036,19 +1037,19 @@ Ottawa	;OTW
 	Player	'Kerry Huffman',	0593,3223,3821,3323	;22
 	Player	'Stan Neckar',	9474,3222,2432,3437	;23
 	Player	'Daniel Laperriere',	2471,3223,2621,3321	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Ottawa'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'OTW'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Senators'
-.ar	;Arena
+.ar									;Arena
 	String	'Ottawa Civic Center'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$44,$55,$55,$53,$33,$32,$22,$11,$11,$FF,$FF
 
-Philadelphia	;PHI
+Philadelphia						;PHI
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -1063,7 +1064,7 @@ Philadelphia	;PHI
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,21,18,14,03,10,04,00	;line 1 Sc1
 	dc.b	01,21,18,14,03,10,04,00	;line 2 Sc2
 	dc.b	01,22,19,15,04,11,05,00	;line 3 Chk
@@ -1072,7 +1073,7 @@ Philadelphia	;PHI
 	dc.b	01,23,19,15,04,11,03,00	;line 6 PK1
 	dc.b	01,22,19,04,03,05,06,00	;line 7 PK2
 	dc.b	01,21,18,11,05,04,03,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Ron Hextall',	2773,3443,0040,3322	;1
 	Player	'Dominic Roussel',	3363,3333,0010,3232	;2
 	Player	'Eric Lindros',	88C4,4656,6756,526A	;3
@@ -1097,19 +1098,19 @@ Philadelphia	;PHI
 	Player	'Kevin Haller',	0553,2243,3422,3222	;22
 	Player	'Chris Therien',	06B3,3332,2422,2431	;23
 	Player	'Karl Dykhuis',	2493,2222,2432,2434	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Philadelphia'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'PHI'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Flyers'
-.ar	;Arena
+.ar									;Arena
 	String	'Spectrum'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$44,$45,$55,$53,$33,$32,$22,$11,$11,$FF,$FF
 
-Pittsburgh	;PIT
+Pittsburgh							;PIT
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -1124,7 +1125,7 @@ Pittsburgh	;PIT
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,20,16,12,03,09,08,00	;line 1 Sc1
 	dc.b	01,20,16,12,03,09,08,00	;line 2 Sc2
 	dc.b	01,21,17,13,04,10,08,00	;line 3 Chk
@@ -1133,7 +1134,7 @@ Pittsburgh	;PIT
 	dc.b	01,20,18,13,03,10,08,00	;line 6 PK1
 	dc.b	01,20,16,09,03,08,04,00	;line 7 PK2
 	dc.b	01,22,17,14,07,08,05,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Tom Barrasso',	35A4,4554,0140,4444	;1
 	Player	'Ken Wregget',	3183,3333,0020,3333	;2
 	Player	'Ron Francis',	1094,3553,4243,5551	;3
@@ -1158,19 +1159,19 @@ Pittsburgh	;PIT
 	Player	'Norm Maciver',	2263,3423,2632,4531	;22
 	Player	'Francois Leroux',	18B3,2132,4421,3229	;23
 	Player	'Peter Taglianeti',	3291,2133,4820,3324	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Pittsburgh'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'PIT'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Penguins'
-.ar	;Arena
+.ar									;Arena
 	String	'Civic Arena'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$44,$55,$53,$33,$32,$22,$21,$11,$11,$FF,$FF
 
-Quebec	;QUE
+Quebec								;QUE
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -1185,7 +1186,7 @@ Quebec	;QUE
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,20,17,13,03,09,04,00	;line 1 Sc1
 	dc.b	01,20,17,12,03,08,04,00	;line 2 Sc2
 	dc.b	01,21,18,13,04,09,05,00	;line 3 Chk
@@ -1194,7 +1195,7 @@ Quebec	;QUE
 	dc.b	01,20,10,12,05,13,06,00	;line 6 PK1
 	dc.b	01,20,18,10,05,03,06,00	;line 7 PK2
 	dc.b	01,21,19,13,03,05,06,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Jocelyn Thibault',	4155,3324,0020,5555	;1
 	Player	'Stephane Fiset',	3554,3333,0010,4343	;2
 	Player	'Joe Sakic',	1964,3644,2455,5461	;3
@@ -1219,19 +1220,19 @@ Quebec	;QUE
 	Player	'Steven Finn',	2982,2143,3422,3438	;22
 	Player	'Alexei Gusarov',	0563,3333,2432,3431	;23
 	Player	'Janne Laukkanen',	2253,3312,1432,2431	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Quebec'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'QUE'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Nordiques'
-.ar	;Arena
+.ar									;Arena
 	String	'Colisee de Quebec'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$45,$55,$53,$33,$33,$22,$21,$11,$11,$FF,$FF
 
-SanJose	;SJ
+SanJose								;SJ
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -1246,7 +1247,7 @@ SanJose	;SJ
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,19,17,10,04,07,05,00	;line 1 Sc1
 	dc.b	01,19,16,12,03,07,05,00	;line 2 Sc2
 	dc.b	01,20,17,13,04,08,06,00	;line 3 Chk
@@ -1255,7 +1256,7 @@ SanJose	;SJ
 	dc.b	01,20,16,12,03,07,06,00	;line 6 PK1
 	dc.b	01,19,16,07,03,04,05,00	;line 7 PK2
 	dc.b	01,20,18,09,04,05,06,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Arturs Irbe',	3254,3443,0020,3434	;1
 	Player	'Wade Flaherty',	3143,3323,0010,3233	;2
 	Player	'Jeff Friesen',	3963,4423,2444,3241	;3
@@ -1280,19 +1281,19 @@ SanJose	;SJ
 	Player	'Ilya Byakin',	0373,2322,0432,2541	;22
 	Player	'Vlastmil Kroupa',	2663,3322,1432,3331	;23
 	Player	'Shawn Cronin',	44A1,1111,2411,211A	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'San Jose'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'SJ'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Sharks'
-.ar	;Arena
+.ar									;Arena
 	String	'San Jose Arena'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$55,$55,$53,$33,$32,$22,$11,$11,$11,$FF,$FF
 
-StLouis	;STL
+StLouis								;STL
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -1307,7 +1308,7 @@ StLouis	;STL
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,19,18,14,09,13,10,00	;line 1 Sc1
 	dc.b	01,22,18,13,03,09,10,00	;line 2 Sc2
 	dc.b	01,23,19,14,04,10,11,00	;line 3 Chk
@@ -1316,7 +1317,7 @@ StLouis	;STL
 	dc.b	01,19,20,13,03,10,04,00	;line 6 PK1
 	dc.b	01,22,18,13,09,04,05,00	;line 7 PK2
 	dc.b	01,19,20,14,05,06,07,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Curtis Joseph',	3165,3464,0010,4445	;1
 	Player	'Jon Casey',	3023,3343,0010,3233	;2
 	Player	'Todd Elik',	1473,4333,2623,3231	;3
@@ -1341,19 +1342,19 @@ StLouis	;STL
 	Player	'Murray Baron',	34A3,3132,3621,222A	;22
 	Player	'Jeff Norton',	0565,4432,1632,4541	;23
 	Player	'Bill Houlder',	33B2,2323,2233,3331	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'St. Louis'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'STL'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Blues'
-.ar	;Arena
+.ar									;Arena
 	String	'Kiel Center'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$44,$55,$55,$33,$33,$32,$22,$21,$11,$FF,$FF
 
-TampaBay	;TB
+TampaBay							;TB
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -1368,7 +1369,7 @@ TampaBay	;TB
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,19,15,11,03,08,06,00	;line 1 Sc1
 	dc.b	01,19,15,11,03,08,06,00	;line 2 Sc2
 	dc.b	01,20,16,12,04,09,06,00	;line 3 Chk
@@ -1377,7 +1378,7 @@ TampaBay	;TB
 	dc.b	01,17,16,04,05,09,06,00	;line 6 PK1
 	dc.b	01,19,15,12,04,05,06,00	;line 7 PK2
 	dc.b	01,21,16,13,07,06,05,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Daren Puppa',	9394,3454,0100,4444	;1
 	Player	'J.C. Bergeron',	3072,2221,0010,2121	;2
 	Player	'Brian Bradley',	1944,4434,2533,4342	;3
@@ -1401,19 +1402,19 @@ TampaBay	;TB
 	Player	'Bob Halkidis',	2182,1122,3621,3229	;21
 	Player	'Chris LiPuma',	2651,2122,3411,3129	;22
 	Player	'Enrico Ciccone',	3992,1223,3412,322A	;23
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Tampa Bay'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'TB'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Lightning'
-.ar	;Arena
+.ar									;Arena
 	String	'Thunderdome'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$45,$55,$33,$33,$22,$22,$11,$11,$1F,$FF,$FF
 
-Toronto	;TOR
+Toronto								;TOR
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -1428,7 +1429,7 @@ Toronto	;TOR
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,23,20,09,03,08,05,00	;line 1 Sc1
 	dc.b	01,22,19,13,03,08,06,00	;line 2 Sc2
 	dc.b	01,23,20,14,04,09,07,00	;line 3 Chk
@@ -1437,7 +1438,7 @@ Toronto	;TOR
 	dc.b	01,22,20,14,04,09,05,00	;line 6 PK1
 	dc.b	01,24,21,14,03,04,05,00	;line 7 PK2
 	dc.b	01,22,19,08,04,05,06,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Felix Potvin',	2965,3364,0000,5555	;1
 	Player	'Damian Rhodes',	0153,3223,0000,4343	;2
 	Player	'Doug Gilmour',	9345,4554,3243,6542	;3
@@ -1462,19 +1463,19 @@ Toronto	;TOR
 	Player	'Todd Gill',	2363,3332,3832,4533	;22
 	Player	'Dave Ellett',	0495,4434,3432,4442	;23
 	Player	'Jamie Macoun',	3483,3244,4421,4248	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Toronto'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'TOR'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Maple Leafs'
-.ar	;Arena
+.ar									;Arena
 	String	'Maple Leaf Gardens'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$45,$55,$55,$33,$33,$33,$22,$21,$11
 
-Vancouver	;VAN
+Vancouver							;VAN
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -1489,7 +1490,7 @@ Vancouver	;VAN
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,22,18,07,03,08,13,00	;line 1 Sc1
 	dc.b	01,21,18,13,03,07,10,00	;line 2 Sc2
 	dc.b	01,22,19,14,04,08,11,00	;line 3 Chk
@@ -1498,7 +1499,7 @@ Vancouver	;VAN
 	dc.b	01,21,19,15,04,08,05,00	;line 6 PK1
 	dc.b	01,23,19,08,03,05,06,00	;line 7 PK2
 	dc.b	01,22,18,07,04,05,06,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Kirk McLean',	0165,4444,0000,4444	;1
 	Player	'Kay Whitmore',	3553,3453,0000,3232	;2
 	Player	'Trevor Linden',	1693,3444,4144,4346	;3
@@ -1523,19 +1524,19 @@ Vancouver	;VAN
 	Player	'Jyrki Lumme',	2175,4442,1231,4541	;22
 	Player	'Dave Babych',	44A2,2343,3621,4432	;23
 	Player	'Jassen Cullimore',	34B3,2232,3422,3222	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Vancouver'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'VAN'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Canucks'
-.ar	;Arena
+.ar									;Arena
 	String	'General Motors Place'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$55,$55,$55,$33,$33,$32,$22,$11,$11,$FF,$FF
 
-Washington	;WSH
+Washington							;WSH
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -1550,7 +1551,7 @@ Washington	;WSH
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,22,18,14,03,11,04,00	;line 1 Sc1
 	dc.b	01,21,18,14,03,11,04,00	;line 2 Sc2
 	dc.b	01,22,19,15,04,12,05,00	;line 3 Chk
@@ -1559,7 +1560,7 @@ Washington	;WSH
 	dc.b	01,21,19,05,04,12,05,00	;line 6 PK1
 	dc.b	01,22,19,15,05,06,07,00	;line 7 PK2
 	dc.b	01,21,18,16,11,06,07,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Jim Carey',	3065,4344,0000,5565	;1
 	Player	'Olaf Kolzig',	3782,2222,0010,2121	;2
 	Player	'Joe Juneau',	9054,5533,1553,4651	;3
@@ -1584,19 +1585,19 @@ Washington	;WSH
 	Player	'Calle Johansson',	0694,4443,2432,4441	;22
 	Player	'Joe Reekie',	29A3,2242,3422,3325	;23
 	Player	'Igor Ulanov',	0592,2132,4421,4523	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Washington'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'WSH'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Capitals'
-.ar	;Arena
+.ar									;Arena
 	String	'US Air Arena'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$44,$44,$55,$53,$33,$32,$22,$11,$11,$FF,$FF
 
-Winnipeg	;WPG
+Winnipeg							;WPG
 .0
 	dc.w	.pld-.0
 	dc.w	.pad-.0
@@ -1611,7 +1612,7 @@ Winnipeg	;WPG
 	dc.w	$0000,$0000
 .sodds
 	dc.b	193,0
-.ls	;		-G,LD,RD,LW,-C,RW,XA,00
+.ls									;		-G,LD,RD,LW,-C,RW,XA,00
 	dc.b	01,22,17,13,03,09,04,00	;line 1 Sc1
 	dc.b	01,21,17,13,03,09,04,00	;line 2 Sc2
 	dc.b	01,22,18,14,04,10,05,00	;line 3 Chk
@@ -1620,7 +1621,7 @@ Winnipeg	;WPG
 	dc.b	01,23,18,14,04,10,05,00	;line 6 PK1
 	dc.b	01,22,18,14,09,05,06,00	;line 7 PK2
 	dc.b	01,23,17,13,10,05,06,00	;line 8
-.pld	;							unwl,sodp,chga,eytm
+.pld								;							unwl,sodp,chga,eytm
 	Player	'Tim Cheveldae',	2963,4443,0020,2222	;1
 	Player	'Nikolai Khabibulin',	3553,3223,0000,2232	;2
 	Player	'Alexei Zhamnov',	1075,4544,2455,4451	;3
@@ -1645,19 +1646,19 @@ Winnipeg	;WPG
 	Player	'Dave Manson',	0393,4325,4421,433B	;22
 	Player	'Darryl Shannon',	2492,2132,3421,3223	;23
 	Player	'Oleg Mikulchik',	4282,2313,2332,2434	;24
-	dc.w	2	;end of the player list: an empty String
-.tn	;City
+	dc.w	2						;end of the player list: an empty String
+.tn									;City
 	String	'Winnipeg'
-.ta	;Abbreviation
+.ta									;Abbreviation
 	String	'WPG'
-.tm	;Nickname
+.tm									;Nickname
 	String	'Jets'
-.ar	;Arena
+.ar									;Arena
 	String	'Winnipeg Arena'
-.pos	;Position slot of each player
+.pos								;Position slot of each player
 	dc.b	$00,$44,$44,$44,$55,$55,$33,$33,$22,$22,$11,$11,$FF,$FF
 
-playoffseats	;Playoff seeding: rows of 16 team numbers
+playoffseats						;Playoff seeding: rows of 16 team numbers
 	dc.b	TOR,DET,STL,CHI, LA,CGY,WPG,VAN, BUF,BOS,MTL,QUE, NYI,WSH,NJ,PIT
 	dc.b	CGY,TOR,LA,VAN, STL,DET,DAL,CHI, NYI,BUF,TB,MTL, QUE,PIT,NYR,BOS
 	dc.b	DAL,TOR,EDM,CHI, SJ,VAN,LA,DET, NJ,PIT,PHI,BUF, HFD,MTL,WSH,BOS

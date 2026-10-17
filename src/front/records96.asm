@@ -1,6 +1,7 @@
 ;	User name entry and the name log.
 
-NameEntryScreen	;Name entry screen for pad slot a5: the name log, then edit or pick a name with the pad
+NameEntryScreen						;Name entry screen for pad slot a5: the name log, then edit or pick a name
+									;with the pad
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	#$EDE,d0
 	moveq	#$70,d1
@@ -195,13 +196,13 @@ NameEntryScreen	;Name entry screen for pad slot a5: the name log, then edit or p
 	String	$8F,$01,$11
 	move.w	#$15,d0
 	move.w	#7,d1
-	move.w	#$7FF,d2	;blank char
+	move.w	#$7FF,d2				;blank char
 	jsr	(eraser).l
 	jsr	(printz).l
 	String	$8F,$17,$0D
 	move.w	#$10,d0
 	move.w	#$B,d1
-	move.w	#$7FF,d2	;blank char
+	move.w	#$7FF,d2				;blank char
 	jsr	(eraser).l
 	bchg	#0,(NameEntryMode+1).w
 	bne.w	.20
@@ -268,7 +269,7 @@ NameEntryScreen	;Name entry screen for pad slot a5: the name log, then edit or p
 	bsr.w	NameEntryHelp
 	bra.s	.17
 
-NameEntryHelp	;Name entry: name log key help text
+NameEntryHelp						;Name entry: name log key help text
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printcurz).l
 	String	$8F,$03,$13,'{}=select name'
@@ -279,7 +280,8 @@ NameEntryHelp	;Name entry: name log key help text
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-PrintNamePrompt	;Name entry: print EnterNameTxt for an empty name log slot namelogsel, else SelectNameTxt
+PrintNamePrompt						;Name entry: print EnterNameTxt for an empty name log slot namelogsel,
+									;else SelectNameTxt
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(namelogsel).w,d0
 	mulu.w	#$A,d0
@@ -294,7 +296,8 @@ PrintNamePrompt	;Name entry: print EnterNameTxt for an empty name log slot namel
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-SyncLetterCursor	;Name entry: grid cursor d5 = grid index of the current letter (FindLetter), 0 if not in the grid
+SyncLetterCursor					;Name entry: grid cursor d5 = grid index of the current letter
+									;(FindLetter), 0 if not in the grid
 	movem.l	d0-d4/a0-a6,-(sp)
 	move.b	(NameEntryBuf).w,d0
 	bsr.w	FindLetter
@@ -313,7 +316,7 @@ SyncLetterCursor	;Name entry: grid cursor d5 = grid index of the current letter 
 	movem.l	(sp)+,d0-d4/a0-a6
 	rts
 
-FindLetter	;d0 = index of letter d0 in the letter grid, $1E when not found
+FindLetter							;d0 = index of letter d0 in the letter grid, $1E when not found
 	movem.l	d1-d3/a0-a6,-(sp)
 	movea.l	#CreateLetterGrid,a0
 	move.b	d0,d1
@@ -329,7 +332,7 @@ FindLetter	;d0 = index of letter d0 in the letter grid, $1E when not found
 	movem.l	(sp)+,d1-d3/a0-a6
 	rts
 
-PrintNameCursor	;Name entry: position the name cursor, " < " with NameEntryMode set
+PrintNameCursor						;Name entry: position the name cursor, " < " with NameEntryMode set
 	jsr	(printz).l
 	String	$8F,$03,$15
 	add.w	d4,(printx).w
@@ -338,10 +341,10 @@ PrintNameCursor	;Name entry: position the name cursor, " < " with NameEntryMode 
 	jsr	(printcurz).l
 	String	' < '
 
-rtsNameCursor	;Shared rts of PrintNameCursor
+rtsNameCursor						;Shared rts of PrintNameCursor
 	rts
 
-PrintCurLetter	;Name entry: print grid letter d5 when the cursor is on
+PrintCurLetter						;Name entry: print grid letter d5 when the cursor is on
 	tst.w	(NameEntryMode).w
 	beq.s	rtsNameCursor
 	movea.l	#ThreeStars,a1
@@ -352,7 +355,7 @@ PrintCurLetter	;Name entry: print grid letter d5 when the cursor is on
 	move.b	d0,2(a1)
 	jmp	printcur
 
-LetterGridPos	;Name entry: printx / printy of grid letter d5 (10 a row)
+LetterGridPos						;Name entry: printx / printy of grid letter d5 (10 a row)
 	jsr	(printz).l
 	String	$8F,$1A,$0F
 	move.w	d5,d0
@@ -363,13 +366,13 @@ LetterGridPos	;Name entry: printx / printy of grid letter d5 (10 a row)
 	add.w	d0,(printx).w
 	rts
 
-EnterNameTxt	;Name entry prompt for an empty name log slot
+EnterNameTxt						;Name entry prompt for an empty name log slot
 	String	$8F,$01,$12,'  Enter new name: '
 
-SelectNameTxt	;Name entry prompt for a used name log slot
+SelectNameTxt						;Name entry prompt for a used name log slot
 	String	$8F,$01,$12,'Select or replace:'
 
-PrintNameLog	;Name entry: print the 7-row name log list
+PrintNameLog						;Name entry: print the 7-row name log list
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(NameEntryLen).w,-(sp)
 	move.w	(namelogsel).w,-(sp)
@@ -400,7 +403,7 @@ PrintNameLog	;Name entry: print the 7-row name log list
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-GetNameLength	;Name entry: NameEntryLen = length of the name in the entry buffer
+GetNameLength						;Name entry: NameEntryLen = length of the name in the entry buffer
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	#9,d3
 	movea.l	#NameEntryBuf,a0
@@ -416,7 +419,8 @@ GetNameLength	;Name entry: NameEntryLen = length of the name in the entry buffer
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-PrintNameField	;Name entry: print the name field at a1 ("-" pads) and the current letter when the cursor is on
+PrintNameField						;Name entry: print the name field at a1 ("-" pads) and the current letter
+									;when the cursor is on
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#ThreeStars,a0
 	move.w	(NameEntryLen).w,d0
@@ -441,11 +445,12 @@ PrintNameField	;Name entry: print the name field at a1 ("-" pads) and the curren
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-CreateLetterGrid	;Name entry letter grid (the create player screen uses it too)
+CreateLetterGrid					;Name entry letter grid (the create player screen uses it too)
 	dc.b	$41,$42,$43,$44,$45,$46,$47,$48,$49,$4A,$4B,$4C,$4D,$4E,$4F,$50
 	dc.b	$51,$52,$53,$54,$55,$56,$57,$58,$59,$5A,$2E,$31,$32,$20,$2D,$FF
 
-GetLogName	;Copy name log entry namelogsel to a1 ("-" for blanks), NameEntryLen = its length
+GetLogName							;Copy name log entry namelogsel to a1 ("-" for blanks), NameEntryLen = its
+									;length
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#namelog,a0
 	move.w	(namelogsel).w,d2
@@ -467,7 +472,8 @@ GetLogName	;Copy name log entry namelogsel to a1 ("-" for blanks), NameEntryLen 
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-StoreUserName	;Name entry: store the edited name in the name log slot; if changed, save and clear its old record
+StoreUserName						;Name entry: store the edited name in the name log slot; if changed, save
+									;and clear its old record
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#namelog,a0
 	move.w	(namelogsel).w,d0
@@ -517,7 +523,8 @@ StoreUserName	;Name entry: store the edited name in the name log slot; if change
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-ClearNameRecord	;Clear the 16-byte record of name slot namelogsel in save RAM ($ECE + slot * 16)
+ClearNameRecord						;Clear the 16-byte record of name slot namelogsel in save RAM ($ECE + slot
+									;* 16)
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	#$ECE,d0
 	move.w	(namelogsel).w,d3
@@ -538,7 +545,8 @@ ClearNameRecord	;Clear the 16-byte record of name slot namelogsel in save RAM ($
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-UserNameEntry	;With user records on (OptUserRec 0): the name entry (NameEntryScreen) for each pad in use
+UserNameEntry						;With user records on (OptUserRec 0): the name entry (NameEntryScreen) for
+									;each pad in use
 	tst.w	(OptUserRec).w
 	bne.w	.x
 	clr.w	(pad1user).w
@@ -588,7 +596,8 @@ UserNameEntry	;With user records on (OptUserRec 0): the name entry (NameEntryScr
 .x
 	rts
 
-CountTeamPads	;d2 = the number of pads (cont1team ... cont4team) on team d0 (1 home, 2 away)
+CountTeamPads						;d2 = the number of pads (cont1team ... cont4team) on team d0 (1 home, 2
+									;away)
 	clr.w	d2
 	cmp.w	(cont1team).w,d0
 	bne.w	.0
@@ -608,7 +617,8 @@ CountTeamPads	;d2 = the number of pads (cont1team ... cont4team) on team d0 (1 h
 .x
 	rts
 
-SkipOtherUserName	;Step namelogsel past the name the other team's pad picked, in the direction of the word on the stack
+SkipOtherUserName					;Step namelogsel past the name the other team's pad picked, in the
+									;direction of the word on the stack
 	movem.w	d0,-(sp)
 	move.w	(pad2user).w,d0
 	tst.w	(nameentryvis).w
@@ -628,8 +638,9 @@ SkipOtherUserName	;Step namelogsel past the name the other team's pad picked, in
 	movem.w	(sp)+,d0
 	rts
 
-NameEntryGfx	;Name entry: vram, fonts, the screen bitmaps, the pad icon (NameEntryPadIcons), the team block and the
-	;heading
+NameEntryGfx						;Name entry: vram, fonts, the screen bitmaps, the pad icon
+									;(NameEntryPadIcons), the team block and the
+									;heading
 	bset	#5,(sflags12).w
 	move.l	#VBlank_Menus,(vbint).w
 	bclr	#dfok,(disflags).w
@@ -738,10 +749,10 @@ NameEntryGfx	;Name entry: vram, fonts, the screen bitmaps, the pad icon (NameEnt
 	String	$F8,$04,$01,$04,$05,'name',$FD,$0C,'w   l   t'
 	rts
 
-NameEntryPadIcons	;NameEntryGfx: the pad icon map of each pad slot
+NameEntryPadIcons					;NameEntryGfx: the pad icon map of each pad slot
 	dc.l	PadIconMap1,PadIconMap2,PadIconMap3,PadIconMap4
 
-PrintNameLogRecords	;Name entry: the record columns of the 7 name log rows (ThreeStars)
+PrintNameLogRecords					;Name entry: the record columns of the 7 name log rows (ThreeStars)
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#setupvalues,a0
 	move.w	#6,d7

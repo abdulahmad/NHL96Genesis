@@ -1,8 +1,9 @@
 ;	The computer goalie pull. ChkGoalies pulls him on a delayed penalty, and CPgoalie
 ;	pulls him late in a game the computer is losing. The puck checks follow.
 
-ChkGoalies	;A computer team down with its goalie in: pull him on a delayed penalty, else CPgoalie
-	btst	#gmclock,(gmode).w	;check if clock running
+ChkGoalies							;A computer team down with its goalie in: pull him on a delayed penalty,
+									;else CPgoalie
+	btst	#gmclock,(gmode).w		;check if clock running
 	bne.w	rtss2
 	movea.w	#(tmstruct-M68K_RAM),a2
 	lea	$39E(a2),a1
@@ -11,20 +12,20 @@ ChkGoalies	;A computer team down with its goalie in: pull him on a delayed penal
 	moveq	#2,d0
 	exg	a1,a2
 .chkgoalie
-	tst.w	$26(a2)	;check for goalie
+	tst.w	$26(a2)					;check for goalie
 	bmi.w	rtss2
-	move.w	(puckc).w,d1	;move puck carrier SCnum into d1
+	move.w	(puckc).w,d1			;move puck carrier SCnum into d1
 	bmi.w	rtss2
 	subq.w	#6,d1
 	cmpa.w	#(tmstruct-M68K_RAM),a2
 	beq.w	.chkpen
-	not.w	d1	;makes d1 negative if away team
+	not.w	d1						;makes d1 negative if away team
 .chkpen
 	tst.w	d1
 	bpl.w	rtss2
-	btst	#gmpendel,(gmode).w	;#gmpendel - delayed penalty called
+	btst	#gmpendel,(gmode).w		;#gmpendel - delayed penalty called
 	beq.w	.nopen
-	st	$26(a2)	;sets to FFFF (no goalie)
+	st	$26(a2)						;sets to FFFF (no goalie)
 	bra.w	setpersonel
 .nopen
 	cmp.w	(cont1team).w,d0
@@ -34,38 +35,38 @@ ChkGoalies	;A computer team down with its goalie in: pull him on a delayed penal
 	move.w	(pucky).w,d1
 	bra.w	CPgoalie
 
-ReturnGoalies	;If the computer pulled its goalie, see if it should return him.
-	;Code the listing does not decode: kept as bytes
+ReturnGoalies						;If the computer pulled its goalie, see if it should return him.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$34,$7C,$C7,$26,$43,$EA,$03,$9E,$70,$01,$61,$00,$00,$06,$70,$02
 	dc.b	$C3,$4A,$0C,$6A,$FF,$FF,$00,$26,$67,$00,$60,$46,$42,$2A,$00,$26
 	dc.b	$B0,$78,$C3,$90,$67,$00,$60,$3A,$B0,$78,$C3,$92,$67,$00,$60,$32
 	dc.b	$32,$38,$BF,$E4
 
-CPgoalie	;See if the computer should pull its goalie: third period, behind by 1, a minute left, the puck in the
-	;other end
-	cmpi.w	#2,(gsp).w	;check if 3rd period
+CPgoalie							;See if the computer should pull its goalie: third period, behind by 1, a
+									;minute left, the puck in the other end
+	cmpi.w	#2,(gsp).w				;check if 3rd period
 	bne.w	rtss2
-	move.w	tmscore(a1),d0	;tmscore
+	move.w	tmscore(a1),d0			;tmscore
 	sub.w	$C(a2),d0
 	bmi.w	rtss2
 	cmp.w	#1,d0
 	bne.w	rtss2
-	cmpi.w	#$3C,(gameclock).w	;#60
+	cmpi.w	#$3C,(gameclock).w		;#60
 	bgt.w	rtss2
 	move.l	a0,-(sp)
-	movea.w	$22(a2),a0	;moves a player struct address into a0
-	btst	#pfgoal,$62(a0)	;#pfgoal
+	movea.w	$22(a2),a0				;moves a player struct address into a0
+	btst	#pfgoal,$62(a0)			;#pfgoal
 	movea.l	(sp)+,a0
 	bne.w	.0
-	neg.w	d1	;if shooting on bottom goal, make d1 negative
+	neg.w	d1						;if shooting on bottom goal, make d1 negative
 .0
 	tst.w	d1
 	bmi.w	rtss2
-	st	$26(a2)	;set to FFFF (no goalie)
+	st	$26(a2)						;set to FFFF (no goalie)
 	bra.w	setpersonel
 
-CompLine	;The computer picks a line for team a2 (a1 = other team).
-	;Code the listing does not decode: kept as bytes
+CompLine							;The computer picks a line for team a2 (a1 = other team).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$E0,$80,$70,$03,$32,$2A,$00,$24,$92,$69,$00,$24,$67,$00
 	dc.b	$00,$2A,$6A,$00,$00,$04,$54,$40,$3F,$00,$61,$00,$39,$18,$32,$00
 	dc.b	$30,$17,$52,$40,$61,$00,$39,$0E,$B2,$40,$6C,$00,$00,$04,$52,$57
@@ -83,8 +84,8 @@ CompLine	;The computer picks a line for team a2 (a1 = other team).
 	dc.b	$52,$C9,$FF,$F4,$35,$60,$00,$16,$60,$00,$FF,$4A,$00,$00,$00,$01
 	dc.b	$00,$02,$00,$00,$00,$02,$00,$01,$00,$00,$00,$01,$00,$00
 
-AssignPads	;Give each pad on a team a player.
-	;Code the listing does not decode: kept as bytes
+AssignPads							;Give each pad on a team a player.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$31,$FC,$FF,$FF,$C3,$84,$31,$FC,$FF,$FF,$C3,$86,$31,$FC,$FF,$FF
 	dc.b	$C3,$88,$31,$FC,$FF,$FF,$C3,$8A,$4A,$78,$C3,$90,$67,$00,$00,$5E
 	dc.b	$08,$38,$00,$03,$C3,$4E,$67,$00,$00,$4C,$0C,$78,$00,$01,$C3,$90
@@ -113,8 +114,9 @@ AssignPads	;Give each pad on a team a player.
 	dc.b	$00,$01,$68,$B8,$38,$3C,$00,$06,$4E,$B9,$00,$01,$6C,$74,$4C,$DF
 	dc.b	$09,$01,$60,$00,$00,$0A,$78,$06,$4E,$B9,$00,$01,$6A,$46,$4E,$75
 
-updatefaceoff	;Faceoff drop countdown: the fofdata frame from temp1; at 0 erase the faceoff box at fodropx / fodropy
-	;Code the listing does not decode: kept as bytes
+updatefaceoff						;Faceoff drop countdown: the fofdata frame from temp1; at 0 erase the
+									;faceoff box at fodropx / fodropy
+									;Code the listing does not decode: kept as bytes
 	dc.b	$30,$2B,$00,$40,$67,$00,$00,$1A,$5C,$40,$E6,$48,$B0,$7C,$00,$02
 	dc.b	$6E,$00,$5D,$22,$44,$40,$06,$40,$00,$0A,$31,$C0,$BD,$C6,$4E,$75
 	dc.b	$08,$B8,$00,$04,$BF,$B2,$61,$00,$20,$50,$00,$06,$BF,$00,$00,$00
@@ -122,8 +124,8 @@ updatefaceoff	;Faceoff drop countdown: the fofdata frame from temp1; at 0 erase 
 	dc.b	$30,$38,$B0,$4C,$04,$40,$00,$44,$E6,$40,$31,$C0,$B0,$42,$70,$0C
 	dc.b	$72,$0D,$34,$3C,$07,$FF,$60,$00,$1E,$08
 
-pucknorm	;asstab entry: the puck: follow the carrier, icing / offsides checks.
-	;Code the listing does not decode: kept as bytes
+pucknorm							;asstab entry: the puck: follow the carrier, icing / offsides checks.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$02,$C3,$40,$67,$00,$00,$06,$61,$00,$FB,$16,$08,$AB
 	dc.b	$00,$01,$00,$62,$67,$00,$00,$0C,$42,$6B,$00,$40,$37,$7C,$00,$78
 	dc.b	$00,$42,$32,$7C,$BF,$1A,$9F,$69,$00,$02,$9F,$69,$00,$06,$9F,$6B
@@ -139,8 +141,8 @@ pucknorm	;asstab entry: the puck: follow the carrier, icing / offsides checks.
 	dc.b	$00,$08,$37,$7C,$00,$78,$00,$42,$4A,$2B,$00,$2C,$66,$00,$53,$BC
 	dc.b	$4A,$6B,$00,$18,$66,$00,$53,$B4,$61,$00,$02,$CA,$60,$00,$53,$AC
 
-ChkOffsides	;Offsides.
-	;Code the listing does not decode: kept as bytes
+ChkOffsides							;Offsides.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$05,$C3,$38,$67,$00,$5B,$F2,$08,$38,$00,$02,$C3,$40
 	dc.b	$66,$00,$5B,$E8,$32,$7C,$C7,$26,$45,$E9,$03,$9E,$61,$00,$00,$9E
 	dc.b	$C3,$4A,$61,$00,$00,$98,$30,$3C,$00,$72,$B0,$6B,$00,$14,$6E,$00
@@ -158,8 +160,9 @@ ChkOffsides	;Offsides.
 	dc.b	$00,$04,$44,$40,$D0,$FC,$00,$80,$B0,$7C,$00,$76,$5E,$C9,$FF,$DE
 	dc.b	$6E,$00,$5B,$08,$08,$AA,$00,$04,$00,$30,$4E,$75
 
-a2offsides	;Offsides on a2 when his team is offside and the puck is past the blue line.
-	;Code the listing does not decode: kept as bytes
+a2offsides							;Offsides on a2 when his team is offside and the puck is past the blue
+									;line.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$05,$C3,$38,$67,$00,$5A,$F6,$30,$38,$B7,$72,$08,$2A
 	dc.b	$00,$07,$00,$62,$66,$00,$00,$04,$44,$40,$B0,$7C,$00,$86,$6D,$00
 	dc.b	$5A,$DE,$30,$7C,$C7,$26,$08,$2A,$00,$06,$00,$62,$67,$00,$00,$06
@@ -167,7 +170,8 @@ a2offsides	;Offsides on a2 when his team is offside and the puck is past the blu
 	dc.b	$00,$04,$C3,$38,$66,$00,$5A,$B8,$C5,$4B,$70,$10,$4E,$B9,$00,$01
 	dc.b	$C1,$92,$C5,$4B,$4E,$75
 
-a2touchpuck	;Player a2 touched the puck: last touch, scorer / assist slots, offsides, icing
+a2touchpuck							;Player a2 touched the puck: last touch, scorer / assist slots, offsides,
+									;icing
 	dc.b	$31,$D2,$BF,$B6,$31,$EA,$00,$14,$BF,$B8
 	dc.b	$31,$EA,$00,$52,$BF,$B4,$30,$7C,$C7,$26,$08,$2A,$00,$06,$00,$62
 	dc.b	$67,$00,$00,$06,$41,$E8,$03,$9E,$42,$40,$10,$2A,$00,$67,$08,$2A
@@ -183,17 +187,18 @@ a2touchpuck	;Player a2 touched the puck: last touch, scorer / assist slots, offs
 	dc.b	$26,$5F,$4E,$75,$08,$2A,$00,$07,$00,$62,$67,$DA,$61,$00,$00,$04
 	dc.b	$4E,$75
 
-ArmIcing	;Icing start for a2: iflags cleared, icingPlayer, direction; bit 2 when shot from his own half and not short
-	;handed
-	;Code the listing does not decode: kept as bytes
+ArmIcing							;Icing start for a2: iflags cleared, icingPlayer, direction; bit 2 when
+									;shot from his own half and not short
+									;handed
+									;Code the listing does not decode: kept as bytes
 	dc.b	$42,$38,$BF,$BA,$11,$EA,$00,$53,$BF,$BB,$30,$38,$B7,$72,$08,$2A
 	dc.b	$00,$07,$00,$62,$67,$00,$00,$0A,$08,$F8,$00,$01,$BF,$BA,$44,$40
 	dc.b	$6B,$00,$59,$BA,$30,$38,$C7,$4A,$90,$78,$CA,$E8,$08,$2A,$00,$06
 	dc.b	$00,$62,$67,$00,$00,$04,$44,$40,$6B,$00,$59,$A2,$08,$F8,$00,$02
 	dc.b	$BF,$BA,$4E,$75
 
-puckIChk	;Icing check.
-	;Code the listing does not decode: kept as bytes
+puckIChk							;Icing check.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$02,$BF,$BA,$67,$00,$59,$90,$08,$38,$00,$00,$BF,$BA
 	dc.b	$66,$00,$59,$86,$4A,$78,$B7,$BE,$6A,$00,$59,$7E,$30,$3C,$01,$1E
 	dc.b	$08,$38,$00,$01,$BF,$BA,$66,$00,$00,$0E,$44,$40,$B0,$78,$B7,$72
@@ -202,8 +207,8 @@ puckIChk	;Icing check.
 	dc.b	$00,$0A,$08,$B8,$00,$02,$BF,$BA,$4E,$75,$08,$F8,$00,$00,$BF,$BA
 	dc.b	$4E,$75
 
-puckunflip	;asstab entry: stop the spinning puck.
-	;Code the listing does not decode: kept as bytes
+puckunflip							;asstab entry: stop the spinning puck.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$0C,$6B,$00,$08,$00,$5A,$6D,$00,$00,$12,$0C,$6B,$00,$18,$00,$5A
 	dc.b	$6C,$00,$00,$08,$0A,$6B,$00,$02,$00,$54,$00,$6B,$00,$04,$00,$54
 	dc.b	$42,$6B,$00,$5A,$50,$EB,$00,$5C,$4E,$75

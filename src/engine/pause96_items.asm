@@ -1,7 +1,8 @@
 ;	The pause, pregame, intermission and game-over menus.
 
-ShootoutPauseMenu	;Menu item lists (InitMenuState): String control entries ($F9 / $FE), then each item as its String
-	;and the routine it runs, ended by String $FF. The pause menu in a shootout
+ShootoutPauseMenu					;Menu item lists (InitMenuState): String control entries ($F9 / $FE), then
+									;each item as its String and the routine it runs, ended by String $FF. The
+									;pause menu in a shootout
 	String	$F9,$01
 	String	$F9,$02
 	String	'   RESUME GAME    '
@@ -16,7 +17,7 @@ ShootoutPauseMenu	;Menu item lists (InitMenuState): String control entries ($F9 
 	dc.l	AbortGame
 	String	$FF
 
-PauseMenu	;The pause menu
+PauseMenu							;The pause menu
 	String	$F9,$01
 	String	$F9,$02
 	String	'   RESUME GAME    '
@@ -49,7 +50,7 @@ PauseMenu	;The pause menu
 	dc.l	AbortGame
 	String	$FF
 
-PauseMenuNoTimeout	;The pause menu once the team has used its timeout (team struct $30 bit 2)
+PauseMenuNoTimeout					;The pause menu once the team has used its timeout (team struct $30 bit 2)
 	String	$F9,$01
 	String	$F9,$02
 	String	'   Resume Game    '
@@ -80,7 +81,7 @@ PauseMenuNoTimeout	;The pause menu once the team has used its timeout (team stru
 	dc.l	AbortGame
 	String	$FF
 
-ShootoutIntermissionMenu	;The intermission menu before a shootout
+ShootoutIntermissionMenu			;The intermission menu before a shootout
 	String	$F9,$01
 	String	$F9,$02
 	String	'  Start Shootout  '
@@ -95,7 +96,7 @@ ShootoutIntermissionMenu	;The intermission menu before a shootout
 	dc.l	AbortGame
 	String	$FF
 
-PregameMenu	;The intermission menus by gsp (IntermissionMenus): before the game
+PregameMenu							;The intermission menus by gsp (IntermissionMenus): before the game
 	String	$F9,$01
 	String	$F9,$02
 	String	'    Start Game    '
@@ -112,7 +113,7 @@ PregameMenu	;The intermission menus by gsp (IntermissionMenus): before the game
 	dc.l	AbortGame
 	String	$FF
 
-PlayoffPregameMenu	;Before a playoff game
+PlayoffPregameMenu					;Before a playoff game
 	String	$F9,$01
 	String	$F9,$02
 	String	'    Start Game    '
@@ -131,7 +132,7 @@ PlayoffPregameMenu	;Before a playoff game
 	dc.l	AbortGame
 	String	$FF
 
-IntermissionMenu	;Between periods
+IntermissionMenu					;Between periods
 	String	$F9,$01
 	String	$F9,$02
 	String	'   Resume Game    '
@@ -158,7 +159,7 @@ IntermissionMenu	;Between periods
 	dc.l	AbortGame
 	String	$FF
 
-GameOverMenu	;After the game
+GameOverMenu						;After the game
 	String	$F9,$01
 	String	$F9,$02
 	String	'    quit Game     '
@@ -179,7 +180,7 @@ GameOverMenu	;After the game
 	dc.l	PeriodStatsScreen
 	String	$FF
 
-PlayoffGameOverMenu	;After a playoff game
+PlayoffGameOverMenu					;After a playoff game
 	String	$F9,$01
 	String	$F9,$02
 	String	'    quit Game     '

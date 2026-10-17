@@ -3,9 +3,10 @@
 ;	assfight and assfwatch run the fighters and the players around them. The assignment
 ;	bytes are what the listing left undecoded.
 
-checkfight	;Look for the start of a fight between players a2 and a3 (impact $A or more on both, no
-	;animation lock, no goalie, no faceoff): SetInst both ways, then startfight for both and the other
-	;players watch (assignment $15)
+checkfight							;Look for the start of a fight between players a2 and a3 (impact $A or
+									;more on both, no animation lock, no goalie, no faceoff): SetInst both
+									;ways, then startfight for both and the other players watch (assignment
+									;$15)
 	tst.w	(OptFighting).w
 	bne.w	.5
 	btst	#5,(GameFlags).w
@@ -92,7 +93,7 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 .2
 	btst	#pf2fight,pflags2(a3)
 	bne.w	.3
-	tst.w	position(a3)	;check if goalie
+	tst.w	position(a3)			;check if goalie
 	beq.w	.3
 	btst	#pf2unav,pflags2(a3)
 	bne.w	.3
@@ -116,8 +117,8 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 .5
 	rts
 
-startfight	;Start the fight for player a3 against a2: AddPenalty2 $2E, setd0player, assignment $14,
-	;push a3 back by facing, the fight SPA and Pencntdwn $140
+startfight							;Start the fight for player a3 against a2: AddPenalty2 $2E, setd0player,
+									;assignment $14, push a3 back by facing, the fight SPA and Pencntdwn $140
 	move.w	SCnum(a2),impactp(a3)
 	move.w	#$2E,d0
 	jsr	(AddPenalty2).l
@@ -142,8 +143,9 @@ startfight	;Start the fight for player a3 against a2: AddPenalty2 $2E, setd0play
 	move.w	#SPAfight,d1
 	jmp	SetSPA
 
-SetInst	;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 bit 0 (fighting) on both;
-	;Z clear when a3 was already fighting
+SetInst								;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 bit 0
+									;(fighting) on both;
+									;Z clear when a3 was already fighting
 	cmpi.b	#1,$75(a3)
 	blt.w	rtsfight
 	cmpi.b	#1,$75(a2)
@@ -174,11 +176,11 @@ SetInst	;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 bit 0 (f
 	dc.b	$00,$2A,$4E,$B9,$00,$01,$C1,$D2,$26,$4C,$4E,$75,$D6,$FC,$00,$80
 	dc.b	$51,$C8,$FF,$CA,$26,$4C
 
-rtsfight	;The shared rts of the fight routines
+rtsfight							;The shared rts of the fight routines
 	rts
 
-assfight	;Assignment $14: the fighter. Not decoded in the listing: kept as bytes, with the rest of the
-	;fight code it calls
+assfight							;Assignment $14: the fighter. Not decoded in the listing: kept as bytes,
+									;with the rest of the fight code it calls
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$F6,$4A,$78,$C3,$E8,$6A,$00,$00,$08
 	dc.b	$4E,$F9,$00,$01,$73,$1E,$08,$AB,$00,$01,$00,$62,$67,$00,$00,$30
 	dc.b	$08,$B8,$00,$07,$C3,$56,$42,$40,$10,$2B,$00,$75,$D0,$40,$56,$40
@@ -307,7 +309,7 @@ loc_C068
 	movem.l	(sp)+,d0-d3
 	rts
 
-ClearMessageLine	;Clear the message line
+ClearMessageLine					;Clear the message line
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),0,1,0
@@ -336,7 +338,8 @@ ClearMessageLine	;Clear the message line
 	dc.b	$32,$4B,$30,$11,$E2,$48,$44,$40,$06,$40,$00,$10,$31,$C0,$B0,$40
 	dc.b	$4E,$75
 
-assfwatch	;Assignment $15: a player watching the fight. Not decoded in the listing: kept as bytes
+assfwatch							;Assignment $15: a player watching the fight. Not decoded in the listing:
+									;kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$F7,$B6,$08,$2B,$00,$03,$00,$62
 	dc.b	$66,$00,$F7,$AC,$08,$AB,$00,$01,$00,$62,$67,$00,$00,$06,$42,$6B
 	dc.b	$00,$40,$9F,$6B,$00,$40,$6A,$00,$00,$64,$06,$6B,$00,$3C,$00,$40
@@ -349,7 +352,7 @@ assfwatch	;Assignment $15: a player watching the fight. Not decoded in the listi
 	dc.b	$32,$2B,$00,$46,$41,$FA,$F7,$28,$4E,$B9,$00,$01,$A0,$50,$4E,$F9
 	dc.b	$00,$01,$8D,$32
 
-fightinput	;Controller processing for fighting
+fightinput							;Controller processing for fighting
 	btst	#2,(sflags10).w
 	beq.w	.1
 	movem.w	d0,-(sp)
@@ -550,7 +553,8 @@ fightinput	;Controller processing for fighting
 .34
 	jmp	SetSPA
 
-SetFightingMajors	;Both fighters' roughing minors in PenBuf become fighting majors; Pencntdwn $B40
+SetFightingMajors					;Both fighters' roughing minors in PenBuf become fighting majors;
+									;Pencntdwn $B40
 	movem.l	a1,-(sp)
 	movea.w	#(PenBuf-2-M68K_RAM),a1
 .0

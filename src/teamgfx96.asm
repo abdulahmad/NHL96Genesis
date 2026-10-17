@@ -1,7 +1,8 @@
 ;	Team graphics pointers. TeamBlockPtrs, TeamLogoPtrs and SmallLogoPtrs are one long per team.
 ;	VBlank_Menus is the front-end vertical blank handler, kept as bytes. nullsub_2 is an rts.
 
-TeamBlockPtrs	;The setup team block bitmap of each team, a long pointer per team (DrawSetupTeamBlock)
+TeamBlockPtrs						;The setup team block bitmap of each team, a long pointer per team
+									;(DrawSetupTeamBlock)
 	dc.l	TeamBlockANH,TeamBlockBOS,TeamBlockBUF,TeamBlockCGY
 	dc.l	TeamBlockCHI,TeamBlockDAL,TeamBlockDET,TeamBlockEDM
 	dc.l	TeamBlockFLA,TeamBlockHFD,TeamBlockLA,TeamBlockMTL
@@ -10,7 +11,8 @@ TeamBlockPtrs	;The setup team block bitmap of each team, a long pointer per team
 	dc.l	TeamBlockSTL,TeamBlockTB,TeamBlockTOR,TeamBlockVAN
 	dc.l	TeamBlockWSH,TeamBlockWPG,TeamBlockWSH,TeamBlockWSH
 
-TeamLogoPtrs	;The team logo bitmap of each team, a long pointer per team (DrawTeamLogoD7)
+TeamLogoPtrs						;The team logo bitmap of each team, a long pointer per team
+									;(DrawTeamLogoD7)
 	dc.l	TeamLogoANH,TeamLogoBOS,TeamLogoBUF,TeamLogoCGY
 	dc.l	TeamLogoCHI,TeamLogoDAL,TeamLogoDET,TeamLogoEDM
 	dc.l	TeamLogoFLA,TeamLogoHFD,TeamLogoLA,TeamLogoMTL
@@ -19,7 +21,8 @@ TeamLogoPtrs	;The team logo bitmap of each team, a long pointer per team (DrawTe
 	dc.l	TeamLogoSTL,TeamLogoTB,TeamLogoTOR,TeamLogoVAN
 	dc.l	TeamLogoWSH,TeamLogoWPG,TeamLogoCHI,TeamLogoCHI
 
-SmallLogoPtrs	;The small team logo of each team, a long pointer per team (read by CupChampionsScreen)
+SmallLogoPtrs						;The small team logo of each team, a long pointer per team (read by
+									;CupChampionsScreen)
 	dc.l	SmallLogoANH,SmallLogoBOS,SmallLogoBUF,SmallLogoCGY
 	dc.l	SmallLogoCHI,SmallLogoDAL,SmallLogoDET,SmallLogoEDM
 	dc.l	SmallLogoFLA,SmallLogoHFD,SmallLogoLA,SmallLogoMTL
@@ -28,8 +31,9 @@ SmallLogoPtrs	;The small team logo of each team, a long pointer per team (read b
 	dc.l	SmallLogoSTL,SmallLogoTB,SmallLogoTOR,SmallLogoVAN
 	dc.l	SmallLogoWSH,SmallLogoWPG
 
-VBlank_Menus	;The front-end vbint (most menu screens): sprites (dfok), cramfade, the menu background scroll, the music
-	;Code the listing does not decode: kept as bytes
+VBlank_Menus						;The front-end vbint (most menu screens): sprites (dfok), cramfade, the
+									;menu background scroll, the music
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$18,$08,$B8
 	dc.b	$00,$00,$BF,$B2,$67,$00,$00,$08,$4E,$B9,$00,$02,$03,$1C,$4E,$B9
 	dc.b	$00,$01,$AF,$D6,$52,$78,$B0,$52,$61,$00,$F8,$AC,$4E,$B9,$00,$02

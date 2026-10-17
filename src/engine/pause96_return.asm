@@ -1,10 +1,11 @@
 ;	Back to the game from a menu.
 
-ReturnToGame	;Back to the game after a menu: restart the sound driver, RestoreGameScreen, the window registers,
-	;setvideo, team struct $30 bit 0 from bit 1 for both teams, then fade in
+ReturnToGame						;Back to the game after a menu: restart the sound driver,
+									;RestoreGameScreen, the window registers,
+									;setvideo, team struct $30 bit 0 from bit 1 for both teams, then fade in
 	jsr	(forceblack).l
-	jsr	(stop_current_song).l	;stop the song
-	move.w	#9,d0	;restart the sound driver as Begin does
+	jsr	(stop_current_song).l		;stop the song
+	move.w	#9,d0					;restart the sound driver as Begin does
 	jsr	(SoundCmd).l
 	move.w	#0,d0
 	move.w	#$1B24,d1
@@ -44,8 +45,9 @@ ReturnToGame	;Back to the game after a menu: restart the sound driver, RestoreGa
 	move.w	(vcount).w,(oldvcount).w
 	rts
 
-RestoreGameScreen	;Rebuild the game screen: the vdp maps, palettes, vram, framer, fonts, energy bar and EASN tiles,
-	;the face off screen (disflags bit 4) or the ref tiles, the home team graphics and the replay icon
+RestoreGameScreen					;Rebuild the game screen: the vdp maps, palettes, vram, framer, fonts,
+									;energy bar and EASN tiles, the face off screen (disflags bit 4) or the
+									;ref tiles, the home team graphics and the replay icon
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	#$FFFFFFFF,(padcont).w
 	move.l	#$FFFFFFFF,(padcont+4).w
@@ -146,7 +148,8 @@ RestoreGameScreen	;Rebuild the game screen: the vdp maps, palettes, vram, framer
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-ClearOldFrames	;Oldframe = -1 for the 16 sort objects, the 4 sso and the 8 pads, so addframe2 sends their tiles again
+ClearOldFrames						;Oldframe = -1 for the 16 sort objects, the 4 sso and the 8 pads, so
+									;addframe2 sends their tiles again
 	movem.l	d0-d1/a0-a3,-(sp)
 	movea.l	#SortCords,a0
 	move.w	#$80,d0
@@ -172,9 +175,9 @@ ClearOldFrames	;Oldframe = -1 for the 16 sort objects, the 4 sso and the 8 pads,
 	movem.l	(sp)+,d0-d1/a0-a3
 	rts
 
-PauseScreenDraw	;Draw the pause screen: its own vbint, the background, period name, clock, team names, scores, shots and
-	;penalties
-	;Code the listing does not decode: kept as bytes
+PauseScreenDraw						;Draw the pause screen: its own vbint, the background, period name, clock,
+									;team names, scores, shots and penalties
+									;Code the listing does not decode: kept as bytes
 	dc.b	$2F,$0A,$4E,$B9,$00,$08,$85,$FC,$46,$FC,$27,$00,$23,$FC,$00,$1E
 	dc.b	$2E,$76,$FF,$FF,$D2,$44,$08,$B8,$00,$00,$BF,$B2,$08,$F8,$00,$02
 	dc.b	$BF,$B2,$08,$B8,$00,$01,$BF,$B2,$31,$FC,$00,$00,$B0,$00,$31,$FC
@@ -248,7 +251,7 @@ PauseScreenDraw	;Draw the pause screen: its own vbint, the background, period na
 	dc.b	$30,$02,$4E,$B9,$00,$01,$BD,$84,$4E,$B9,$00,$01,$BC,$84,$31,$DF
 	dc.b	$B0,$40,$52,$78,$B0,$42,$4E,$75
 
-PeriodText	;PauseScreenDraw: the period names
+PeriodText							;PauseScreenDraw: the period names
 	String	'1st period'
 	String	'2nd period'
 	String	'3rd period'
@@ -257,7 +260,7 @@ PeriodText	;PauseScreenDraw: the period names
 	String	'          '
 	String	'          '
 
-DigitText	;The digits 0-9
+DigitText							;The digits 0-9
 	String	$30
 	String	$31
 	String	$32
@@ -269,7 +272,7 @@ DigitText	;The digits 0-9
 	String	$38
 	String	$39
 
-PrintDigit	;Print digit d0 (DigitText)
-	;Code the listing does not decode: kept as bytes
+PrintDigit							;Print digit d0 (DigitText)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$22,$7C,$00,$1E,$2E,$3C,$4E,$B9,$00,$01,$D7,$F2,$4E,$F9,$00,$01
 	dc.b	$BE,$E8

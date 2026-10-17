@@ -1,6 +1,6 @@
 ;	The line editor exit menus.
 
-LineMenu1	;The line editor exit menus
+LineMenu1							;The line editor exit menus
 	String	$FE,$06,$F9,$01
 	String	$FE,$04,$F9,$01
 	String	'       Exit       '

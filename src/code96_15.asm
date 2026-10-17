@@ -1,13 +1,14 @@
 ;	Loads for the replay icon and the home team graphics, the hi-score
 ;	screen, and clearing the penalties.
 
-LoadReplayIcon	;Load the replay icon tiles (ReplayIconMap+8) at char d4 (ReplayIconChars)
+LoadReplayIcon						;Load the replay icon tiles (ReplayIconMap+8) at char d4 (ReplayIconChars)
 	move.w	d4,(ReplayIconChars).w
 	movea.l	#ReplayIconMap+8,a2
 	jmp	DecompressGraphicsPlain
 
-LoadHomeTeamGfx	;Load the HomeTeam graphics of TeamGfxList to VRAM d4 - $18 (DecompressGraphicsPlain). Called from setupice
-	;and ClrHor
+LoadHomeTeamGfx						;Load the HomeTeam graphics of TeamGfxList to VRAM d4 - $18
+									;(DecompressGraphicsPlain). Called from setupice
+									;and ClrHor
 	move.w	d0,-(sp)
 	subi.w	#$18,d4
 	movea.l	#TeamGfxList,a2
@@ -19,7 +20,8 @@ LoadHomeTeamGfx	;Load the HomeTeam graphics of TeamGfxList to VRAM d4 - $18 (Dec
 	move.w	(sp)+,d0
 	rts
 
-TeamGfxList	;The team graphics map of each team (LoadHomeTeamGfx), a long pointer per team
+TeamGfxList							;The team graphics map of each team
+									;(LoadHomeTeamGfx), a long pointer per team
 	dc.l	$1419D2,$1465CC,$141CDC,$141FE6
 	dc.l	$1422F0,$1425FA,$142904,$142C0E
 	dc.l	$142F18,$143222,$14352C,$143836
@@ -28,20 +30,20 @@ TeamGfxList	;The team graphics map of each team (LoadHomeTeamGfx), a long pointe
 	dc.l	$145390,$14569A,$1459A4,$145CAE
 	dc.l	$145FB8,$1462C2
 
-PrintPlayerAssists	;Print " (" and the assists of player d0 of team a2 (PrintParenNumber)
+PrintPlayerAssists					;Print " (" and the assists of player d0 of team a2 (PrintParenNumber)
 	movem.l	d0/a2,-(sp)
 	jsr	(printz).l
 	String	' ('
 	adda.w	#$DC,a2
 	bra.w	PrintParenNumber
 
-PrintPlayerGoals	;Print " (" and the goals of player d0 of team a2
+PrintPlayerGoals					;Print " (" and the goals of player d0 of team a2
 	movem.l	d0/a2,-(sp)
 	jsr	(printz).l
 	String	' ('
 	adda.w	#$C0,a2
 
-PrintParenNumber	;Print the number at d0 of a2 (1 to 3 digits) and ")"
+PrintParenNumber					;Print the number at d0 of a2 (1 to 3 digits) and ")"
 	move.b	(a2,d0.w),d0
 	ext.w	d0
 	move.w	#1,d1
@@ -134,13 +136,13 @@ PlaceBoardFall
 .11
 	rts
 
-getFgtbyte	;d0 = $75(a2) / 4
-	clr.w	d0	;clear d0
-	move.b	$75(a2),d0	;move H/F bit into d0 (this is always even)
-	lsr.w	#2,d0	;shift 2 right (divide by 4)
+getFgtbyte							;d0 = $75(a2) / 4
+	clr.w	d0						;clear d0
+	move.b	$75(a2),d0				;move H/F bit into d0 (this is always even)
+	lsr.w	#2,d0					;shift 2 right (divide by 4)
 	rts
 
-chkFgtBit1	;Z set when $77(a2) is 2 or less (d0 kept)
+chkFgtBit1							;Z set when $77(a2) is 2 or less (d0 kept)
 	cmpi.b	#2,$77(a2)
 	ble.w	.0
 	movem.w	d0,-(sp)
@@ -162,7 +164,8 @@ chkFgtBit1	;Z set when $77(a2) is 2 or less (d0 kept)
 	dc.b	$00,$24,$90,$69,$00,$24,$67,$00,$00,$12,$6A,$00,$00,$04,$C1,$49
 	dc.b	$0C,$68,$00,$06,$00,$28,$66,$00,$00,$02,$4C,$DF,$07,$07,$4E,$75
 
-HiScoreScreen	;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up to $50 * 4 frames or a button (waitx)
+HiScoreScreen						;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up to $50 * 4
+									;frames or a button (waitx)
 	move.l	#vb2,(vbint).w
 	bclr	#df32c,(disflags).w
 	move.w	#5,(Map3col1).w
@@ -224,7 +227,7 @@ HiScoreScreen	;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up to $50
 	dc.b	$24,$7C,$FF,$FF,$C7,$26,$B4,$6A,$00,$28,$67,$00,$00,$08,$24,$7C
 	dc.b	$FF,$FF,$CA,$C4,$4E,$75
 
-sub_1D920A	;Called before setpassmode / SetShotMode (input96)
+sub_1D920A							;Called before setpassmode / SetShotMode (input96)
 	movem.l	d1-d7/a0,-(sp)
 	btst	#gmclock,(gmode).w
 	bne.w	.0
@@ -246,7 +249,7 @@ sub_1D920A	;Called before setpassmode / SetShotMode (input96)
 	dc.b	$62,$79,$20,$00,$00,$02,$22,$7C,$00,$1D,$92,$D6,$60,$E2,$48,$E7
 	dc.b	$FF,$BE,$30,$38,$D2,$4A,$60,$00,$FF,$6A
 
-SetSflags8Bit1	;Always sets sflags8 bit 1 (the bclr is skipped)
+SetSflags8Bit1						;Always sets sflags8 bit 1 (the bclr is skipped)
 	bra.w	.0
 	dc.b	$08,$B8,$00,$01,$C3,$4C,$60,$00,$00,$08
 .0
@@ -258,8 +261,9 @@ SetSflags8Bit1	;Always sets sflags8 bit 1 (the bclr is skipped)
 	dc.b	$30,$38,$B7,$72,$90,$6B,$00,$14,$B0,$7C,$00,$1E,$6E,$00,$00,$0C
 	dc.b	$32,$38,$B7,$88,$B3,$40,$02,$40,$80,$00,$4C,$9F,$00,$03,$4E,$75
 
-ReadGoaliePulled	;Z clear when the team of a3 pulled its goalie ($26 of the team struct). Called from doshot, assdefo asspuckc
-	;and assnearest
+ReadGoaliePulled					;Z clear when the team of a3 pulled its goalie ($26 of the team struct).
+									;Called from doshot, assdefo asspuckc
+									;and assnearest
 	movem.l	a1,-(sp)
 	movea.l	#tmstruct,a1
 	btst	#pfteam,pflags(a3)
@@ -270,7 +274,8 @@ ReadGoaliePulled	;Z clear when the team of a3 pulled its goalie ($26 of the team
 	movem.l	(sp)+,a1
 	rts
 
-EndOneTimer	;End a one-timer for a3: the one-timer bits cleared, onetimerplayer = -1, SetSPA $856
+EndOneTimer							;End a one-timer for a3: the one-timer bits cleared, onetimerplayer = -1,
+									;SetSPA $856
 	movem.l	d0/a0,-(sp)
 	bclr	#pf3onetimer,pflags3(a3)
 	bclr	#pfalock,pflags(a3)
@@ -278,7 +283,7 @@ EndOneTimer	;End a one-timer for a3: the one-timer bits cleared, onetimerplayer 
 	clr.w	(onetimerflags).w
 	st	(onetimerplayer).w
 	move.w	d1,-(sp)
-	move.w	#$856,d1	;SPA
+	move.w	#$856,d1				;SPA
 	jsr	(SetSPA).l
 	tst.w	$34(a3)
 	bpl.w	.0
@@ -293,7 +298,7 @@ EndOneTimer	;End a one-timer for a3: the one-timer bits cleared, onetimerplayer 
 	movem.l	(sp)+,d0/a0
 	rts
 
-TeamLogoPalettes	;Team logo palettes, 16 colors per team
+TeamLogoPalettes					;Team logo palettes, 16 colors per team
 	dc.b	$0E,$EA,$00,$00,$00,$42,$0E,$EA,$0E,$EA,$0E,$EE,$00,$00,$08,$88
 	dc.b	$0A,$AA,$00,$68,$00,$8A,$00,$CE,$02,$60,$00,$40,$06,$64,$0E,$8E
 	dc.b	$0E,$E8,$00,$8C,$00,$00,$0A,$0A,$0A,$0A,$0E,$EE,$00,$00,$0C,$8C
@@ -351,10 +356,11 @@ TeamLogoPalettes	;Team logo palettes, 16 colors per team
 	dc.b	$0E,$E8,$00,$00,$00,$4A,$0E,$E8,$0E,$E8,$0E,$EE,$00,$00,$06,$88
 	dc.b	$04,$64,$02,$44,$02,$22,$00,$4E,$00,$0A,$00,$22,$0A,$AA,$00,$00
 
-LeadSong	;Not in a shootout (gmode2 bit 1) and one team has more players on ice (tmap): once (sflags2 bit 5) ChooseSong
-	;with SongIndex 1 (home) or 4, and sflags8 bit 6; sflags2 bit 6 keeps which team. sflags2 is put back on exit.
-	;Called from puckfaceoff2.
-	;Code the listing does not decode: kept as bytes
+LeadSong							;Not in a shootout (gmode2 bit 1) and one team has more players on ice
+									;(tmap): once (sflags2 bit 5) ChooseSong
+									;with SongIndex 1 (home) or 4, and sflags8 bit 6; sflags2 bit 6 keeps
+									;which team. sflags2 is put back on exit. Called from puckfaceoff2.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$80,$F0,$3F,$38,$C3,$3C,$08,$38,$00,$01,$C3,$48,$66,$00
 	dc.b	$00,$92,$34,$7C,$C7,$26,$47,$EA,$03,$9E,$30,$2A,$00,$24,$90,$6B
 	dc.b	$00,$24,$67,$00,$00,$7E,$6A,$00,$00,$1A,$08,$38,$00,$06,$C3,$3C
@@ -367,7 +373,8 @@ LeadSong	;Not in a shootout (gmode2 bit 1) and one team has more players on ice 
 	dc.b	$D4,$8E,$4E,$B9,$00,$08,$86,$88,$60,$E2,$08,$B8,$00,$05,$C3,$3C
 	dc.b	$4E,$75,$31,$DF,$C3,$3C,$4C,$DF,$0F,$01,$4E,$75
 
-ClearPenalties	;Clear the penalties: PBnum, Penaltytimer, Pencntdwn, PenBuf and both teams' penalty slots (clrTmPdst)
+ClearPenalties						;Clear the penalties: PBnum, Penaltytimer, Pencntdwn, PenBuf and both
+									;teams' penalty slots (clrTmPdst)
 	movem.l	d0/a0,-(sp)
 	clr.w	(PBnum).w
 	clr.w	(Penaltytimer).w
@@ -384,17 +391,18 @@ ClearPenalties	;Clear the penalties: PBnum, Penaltytimer, Pencntdwn, PenBuf and 
 	movem.l	(sp)+,d0/a0
 	rts
 
-clrTmPdst	;Set the 26 tmpdst words of team a0 to -2 (bench), then -1
-	move.w	#$1B,d0	;19 = 25 decimal (max roster size)
+clrTmPdst							;Set the 26 tmpdst words of team a0 to -2 (bench), then -1
+	move.w	#$1B,d0					;19 = 25 decimal (max roster size)
 	adda.w	#$6C,a0
 .loop
-	move.w	#$FFFE,(a0)+	;-2 = bench
+	move.w	#$FFFE,(a0)+			;-2 = bench
 	dbf	d0,.loop
 	move.w	#$FFFF,(a0)
 	rts
 
-SetMenuPadSide	;sflags bit 1 set when the team of pad menupadnum is above 1, else cleared. Called from ManualGoalieMenu and
-	;PrintMenuItem
+SetMenuPadSide						;sflags bit 1 set when the team of pad menupadnum is above 1, else
+									;cleared. Called from ManualGoalieMenu and
+									;PrintMenuItem
 	movem.l	d0/a0-a1,-(sp)
 	movea.l	#padteams,a0
 	move.w	(menupadnum).w,d0
@@ -410,7 +418,7 @@ SetMenuPadSide	;sflags bit 1 set when the team of pad menupadnum is above 1, els
 .exit
 	rts
 
-padteams	;The team word of each pad: cont1team ... cont4team
+padteams							;The team word of each pad: cont1team ... cont4team
 	dc.b	$FF,$FF,$C3,$90,$FF,$FF,$C3,$92,$FF,$FF,$C3,$94,$FF,$FF,$C3,$96
 	dc.b	$08,$38,$00,$03,$C3,$3A,$66,$00,$00,$2E,$48,$E7,$A0,$80,$10,$2B
 	dc.b	$00,$62,$12,$38,$C3,$64,$B3,$00,$08,$00,$00,$06,$67,$00,$00,$44
@@ -420,12 +428,14 @@ padteams	;The team word of each pad: cont1team ... cont4team
 	dc.b	$B5,$00,$08,$00,$00,$06,$67,$00,$00,$0A,$32,$3C,$09,$9A,$60,$00
 	dc.b	$00,$02,$4C,$DF,$01,$05,$4E,$75
 
-CanBlock	;Ne when joystick player a3 may block the shot (SPAblock): pfalock clear, sflags sfssdir set and GameFlags bit
-	;2 clear (one block per shot; cleared while sfssdir is clear), a3 at y $56 or more toward the goal it shoots
-	;at, the puck carrier on the other team, the direction (vtoa) from a3 to the puck the same as from the goal at
-	;y $10B to the puck, a3 on the puck's side of x 0 and within y $B2 of it, and a3 facing that direction or one
-	;next to it. d0 is restored.
-	;Code the listing does not decode: kept as bytes
+CanBlock							;Ne when joystick player a3 may block the shot (SPAblock): pfalock clear,
+									;sflags sfssdir set and GameFlags bit
+									;2 clear (one block per shot; cleared while sfssdir is clear), a3 at y $56
+									;or more toward the goal it shoots at, the puck carrier on the other team,
+									;the direction (vtoa) from a3 to the puck the same as from the goal at y
+									;$10B to the puck, a3 on the puck's side of x 0 and within y $B2 of it,
+									;and a3 facing that direction or one next to it. d0 is restored.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$F0,$E0,$08,$2B,$00,$05,$00,$62,$66,$00,$00,$F8,$08,$38
 	dc.b	$00,$03,$C3,$3A,$66,$00,$00,$08,$08,$B8,$00,$03,$C3,$52,$08,$38
 	dc.b	$00,$03,$C3,$52,$66,$00,$00,$DE,$30,$2B,$00,$14,$08,$2B,$00,$07

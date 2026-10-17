@@ -1,32 +1,34 @@
 ;	Between periods and back to the title. IntermissionStart ends a period,
 ;	Opening runs the title, and EASportsScreen is the logo.
 
-PeriodOver	;End of period: next period, overtime or game over (gsp 4); forceblack, then into IntermissionStart
-	;Code the listing does not decode: kept as bytes
+PeriodOver							;End of period: next period, overtime or game over (gsp 4); forceblack,
+									;then into IntermissionStart
+									;Code the listing does not decode: kept as bytes
 	dc.b	$52,$78,$C4,$BC,$08,$78,$00,$01,$C3,$38,$0C,$78,$00,$03,$C4,$BC
 	dc.b	$6D,$00,$00,$2C,$67,$00,$00,$16,$31,$FC,$00,$03,$C4,$BC,$4A,$78
 	dc.b	$D2,$54,$66,$00,$00,$08,$31,$FC,$00,$04,$C4,$BC,$30,$38,$C7,$32
 	dc.b	$90,$78,$CA,$D0,$67,$00,$00,$08,$31,$FC,$00,$04,$C4,$BC,$61,$00
 	dc.b	$99,$36
 
-IntermissionStart	;The end of a period: ResetClock, restart the sound driver, Intermission, then GameOver or StartPer
+IntermissionStart					;The end of a period: ResetClock, restart the sound driver, Intermission,
+									;then GameOver or StartPer
 	jsr	(ResetClock).l
 	move.w	d0,-(sp)
 	move.w	(vcount).w,d0
 .vb
 	cmp.w	(vcount).w,d0
-	beq.s	.vb	;wait for the next vblank
+	beq.s	.vb						;wait for the next vblank
 	jsr	(SoundOff).l
 	move.w	d0,-(sp)
 	move.w	(vcount).w,d0
 .loop
 	cmp.w	(vcount).w,d0
-	beq.s	.loop	;wait for the next vblank
+	beq.s	.loop					;wait for the next vblank
 	move.w	(sp)+,d0
-	jsr	(stop_current_song).l	;stop the song
-	move.w	#9,d0	;restart the sound driver as Begin does
+	jsr	(stop_current_song).l		;stop the song
+	move.w	#9,d0					;restart the sound driver as Begin does
 	jsr	(SoundCmd).l
-	move.w	#0,d0	;command 0: load the Z80 program
+	move.w	#0,d0					;command 0: load the Z80 program
 	move.w	#$1B24,d1
 	movea.l	#Z80Program,a0
 	jsr	(SoundCmd).l
@@ -38,13 +40,13 @@ IntermissionStart	;The end of a period: ResetClock, restart the sound driver, In
 	move.w	#0,d1
 	jsr	(SoundCmd).l
 	bsr.w	UpdateScores
-	cmpi.w	#4,(gsp).w	;check if cont playoffs
+	cmpi.w	#4,(gsp).w				;check if cont playoffs
 	bne.w	.4
 	bsr.w	AddPlayoffTeamStats
 .4
 	bsr.w	Intermission
 	cmpi.w	#4,(gsp).w
-	beq.w	.0	;finished playoffs
+	beq.w	.0						;finished playoffs
 	bset	#5,(sflags11).w
 	jsr	(ReturnToGame).l
 	jmp	StartPer
@@ -62,15 +64,15 @@ IntermissionStart	;The end of a period: ResetClock, restart the sound driver, In
 .1
 	jmp	*+6
 
-ExitToOpening	;Back to the title (Opening2)
+ExitToOpening						;Back to the title (Opening2)
 	bra.w	Opening2
 
-Opening	;Title screen, then into Opening2
+Opening								;Title screen, then into Opening2
 	bsr.w	KillCrowd
-	jsr	(stop_current_song).l	;stop the song
-	move.w	#9,d0	;restart the sound driver as Begin does
+	jsr	(stop_current_song).l		;stop the song
+	move.w	#9,d0					;restart the sound driver as Begin does
 	jsr	(SoundCmd).l
-	move.w	#0,d0	;command 0: load the Z80 program
+	move.w	#0,d0					;command 0: load the Z80 program
 	move.w	#$1B24,d1
 	movea.l	#Z80Program,a0
 	jsr	(SoundCmd).l
@@ -85,11 +87,12 @@ Opening	;Title screen, then into Opening2
 	jsr	(TitleScreen).l
 	bra.w	OpeningClear
 
-Opening2	;Restart the sound, reset the stack and clear the variables, then the main menu and the season flow
-	jsr	(stop_current_song).l	;stop the song
-	move.w	#9,d0	;restart the sound driver as Begin does
+Opening2							;Restart the sound, reset the stack and clear the variables, then the main
+									;menu and the season flow
+	jsr	(stop_current_song).l		;stop the song
+	move.w	#9,d0					;restart the sound driver as Begin does
 	jsr	(SoundCmd).l
-	move.w	#0,d0	;command 0: load the Z80 program
+	move.w	#0,d0					;command 0: load the Z80 program
 	move.w	#$1B24,d1
 	movea.l	#Z80Program,a0
 	jsr	(SoundCmd).l
@@ -112,7 +115,8 @@ Opening2	;Restart the sound, reset the stack and clear the variables, then the m
 	move.w	#0,-(sp)
 	jsr	(song).l
 
-OpeningClear	;Reset the stack and clear the game variables (keeping the season data), then the options or the season flow
+OpeningClear						;Reset the stack and clear the game variables (keeping the season data),
+									;then the options or the season flow
 	movea.w	#(Stack-M68K_RAM),sp
 	btst	#7,(GameFlags).w
 	beq.w	.3
@@ -129,7 +133,7 @@ OpeningClear	;Reset the stack and clear the game variables (keeping the season d
 	movea.w	#(VSCRLPM-M68K_RAM),a0
 .0
 	clr.l	(a0)+
-	cmpa.w	#$D240,a0	;clear from VSCRLPM to gamevarend
+	cmpa.w	#$D240,a0				;clear from VSCRLPM to gamevarend
 	blt.s	.0
 	movea.l	#$FFFF0000,a0
 	movea.l	#$FFFFCF44,a1
@@ -260,13 +264,13 @@ OpeningClear	;Reset the stack and clear the game variables (keeping the season d
 	bclr	#7,(GameFlags).w
 	bra.w	Opening2
 
-AbortGame	;The "ABORT GAME" menu item: back to the title (Opening2).
-	;Code the listing does not decode: kept as bytes
+AbortGame							;The "ABORT GAME" menu item: back to the title (Opening2).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$B8,$00,$04,$C3,$3A,$31,$FC,$FF,$FF,$C0,$64,$21,$FC,$FF,$FF
 	dc.b	$00,$00,$B0,$4E,$50,$F8,$D2,$76,$4E,$F9,$00,$02,$17,$4A
 
-EASportsScreen	;Called from Begin. Show the EA Sports screen until a button or a time out
-	move.l	#vb2,(vbint).w	;vblank handler
+EASportsScreen						;Called from Begin. Show the EA Sports screen until a button or a time out
+	move.l	#vb2,(vbint).w			;vblank handler
 	bclr	#df32c,(disflags).w
 	move.w	#5,(Map3col1).w
 	move.w	#$A000,(VmMap2).w
@@ -277,7 +281,7 @@ EASportsScreen	;Called from Begin. Show the EA Sports screen until a button or a
 	move.w	#$F800,(VSPRITES).w
 	move.w	#$FC00,(VSCRLPM).w
 	movea.w	#(palfadenew-M68K_RAM),a0
-	moveq	#$1F,d1	;32 longs: all 64 colours black
+	moveq	#$1F,d1					;32 longs: all 64 colours black
 .clr
 	clr.l	(a0)+
 	dbf	d1,.clr
@@ -313,8 +317,8 @@ EASportsScreen	;Called from Begin. Show the EA Sports screen until a button or a
 	move	#$2700,sr
 	rts
 
-UpdatePlayoffLevel	;Set pojoy from the number of players for the playoff modes.
-	;Code the listing does not decode: kept as bytes
+UpdatePlayoffLevel					;Set pojoy from the number of players for the playoff modes.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$0C,$78,$00,$02,$D2,$54,$6D,$00,$DD,$46,$0C,$78,$00,$04,$D2,$54
 	dc.b	$67,$00,$DD,$3C,$70,$07,$4A,$78,$D2,$50,$67,$00,$00,$06,$30,$3C
 	dc.b	$00,$0B,$90,$78,$D2,$56,$31,$C0,$CF,$CE,$4E,$75,$61,$00,$00,$0E

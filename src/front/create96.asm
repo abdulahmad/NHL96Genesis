@@ -1,13 +1,14 @@
 ;	The create-player screen and the created-player list.
 
-CreatePlayer	;The create player screen (roster menu item Create Players)
-	;Code the listing does not decode: kept as bytes
+CreatePlayer						;The create player screen (roster menu item Create Players) Code the
+									;listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$B8,$00,$06,$C3,$56,$08,$B8,$00,$07,$C3,$58
 	dc.b	$42,$40,$10,$39,$00,$20,$1B,$B9,$B0,$7C,$00,$14,$6D,$00,$00,$08
 	dc.b	$08,$F8,$00,$07,$C3,$58
 
-.redraw	;Redraw the create screen: reset the field row and the mode, read and draw the name list
-	;Code the listing does not decode: kept as bytes
+.redraw								;Redraw the create screen: reset the field row and the mode, read and draw
+									;the name list
+									;Code the listing does not decode: kept as bytes
 	dc.b	$42,$78,$D4,$84,$42,$78,$D4,$86,$42,$78,$D3,$12,$61,$00,$09,$D0
 	dc.b	$20,$7C,$00,$19,$4C,$48,$4E,$B9,$00,$01,$21,$8A,$4E,$B9,$00,$1D
 	dc.b	$BB,$92,$31,$FC,$00,$18,$BD,$3C,$08,$B8,$00,$02,$BF,$B2,$61,$00
@@ -29,13 +30,14 @@ CreatePlayer	;The create player screen (roster menu item Create Players)
 	dc.b	$00,$04,$66,$00,$03,$B4,$60,$00,$FF,$7A,$20,$7C,$00,$1D,$DA,$78
 	dc.b	$30,$38,$D4,$86,$E5,$40,$20,$70,$00,$00,$4E,$D0
 
-.fieldjumps	;Field routine of each create row, then: next field, after the last one finish the name
+.fieldjumps							;Field routine of each create row, then: next field, after the last one
+									;finish the name
 	dc.l	.namefield,.posfield,.handfield,.weightfield,.jerseyfield
 	dc.b	$52,$78,$D4,$86,$0C,$78,$00,$05,$D4,$86,$6D,$00,$FF,$46,$4E,$F9
 	dc.b	$00,$1D,$DD,$F0
 
-.posfield	;Position field: left / right change the position slot 0-5
-	;Code the listing does not decode: kept as bytes
+.posfield							;Position field: left / right change the position slot 0-5 Code the
+									;listing does not decode: kept as bytes
 	dc.b	$08,$01,$00,$07,$66,$E6,$08,$01,$00,$04,$66,$00,$03,$68,$08,$01
 	dc.b	$00,$02,$67,$00,$00,$1A,$10,$39,$FF,$FF,$56,$08,$48,$80,$53,$40
 	dc.b	$6B,$00,$FF,$24,$13,$C0,$FF,$FF,$56,$08,$60,$00,$FF,$12,$08,$01
@@ -43,14 +45,14 @@ CreatePlayer	;The create player screen (roster menu item Create Players)
 	dc.b	$B0,$7C,$00,$05,$6E,$00,$FF,$00,$13,$C0,$FF,$FF,$56,$08,$60,$00
 	dc.b	$FE,$EE
 
-.handfield	;Hand field: left / right toggle the shooting hand
-	;Code the listing does not decode: kept as bytes
+.handfield							;Hand field: left / right toggle the shooting hand Code the listing does
+									;not decode: kept as bytes
 	dc.b	$08,$01,$00,$07,$66,$94,$08,$01,$00,$04,$66,$00,$03,$16,$08,$01
 	dc.b	$00,$02,$67,$00,$00,$0E,$0A,$39,$00,$01,$FF,$FF,$56,$04,$60,$00
 	dc.b	$FE,$CC,$08,$01,$00,$03,$67,$00,$FE,$CC,$60,$EA
 
-.weightfield	;Weight field: left / right change the weight
-	;Code the listing does not decode: kept as bytes
+.weightfield						;Weight field: left / right change the weight
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$01,$00,$07,$66,$00,$FF,$68,$08,$01,$00,$04,$66,$00,$02,$E8
 	dc.b	$08,$01,$00,$02,$67,$00,$00,$2C,$10,$39,$FF,$FF,$56,$01,$E8,$48
 	dc.b	$02,$40,$00,$0F,$67,$00,$FE,$A2,$53,$00,$E9,$08,$02,$40,$00,$F0
@@ -59,8 +61,8 @@ CreatePlayer	;The create player screen (roster menu item Create Players)
 	dc.b	$E8,$48,$02,$40,$00,$0F,$B0,$7C,$00,$0F,$67,$00,$FE,$6C,$52,$00
 	dc.b	$60,$C8
 
-.jerseyfield	;Jersey field: left / right change the BCD jersey number
-	;Code the listing does not decode: kept as bytes
+.jerseyfield						;Jersey field: left / right change the BCD jersey number Code the listing
+									;does not decode: kept as bytes
 	dc.b	$08,$01,$00,$07,$66,$00,$FF,$06,$08,$01,$00,$04,$66,$00,$02,$86
 	dc.b	$08,$01,$00,$02,$67,$00,$00,$2E,$10,$39,$FF,$FF,$56,$00,$67,$00
 	dc.b	$FE,$46,$12,$00,$02,$41,$00,$0F,$66,$00,$00,$0E,$04,$00,$00,$10
@@ -70,8 +72,9 @@ CreatePlayer	;The create player screen (roster menu item Create Players)
 	dc.b	$B2,$3C,$00,$09,$66,$00,$00,$0C,$06,$00,$00,$10,$02,$00,$00,$F0
 	dc.b	$60,$C8,$52,$00,$60,$C4
 
-.namefield	;Name field: the pads edit the name (grid), start checks it (BuildEnteredName) and goes to the next field
-	;Code the listing does not decode: kept as bytes
+.namefield							;Name field: the pads edit the name (grid), start checks it
+									;(BuildEnteredName) and goes to the next field
+									;Code the listing does not decode: kept as bytes
 	dc.b	$70,$FF,$08,$01,$00,$07,$67,$00,$00,$9E,$61,$00,$0C,$B8,$6B,$00
 	dc.b	$00,$34,$61,$00,$02,$FA,$4E,$B9,$00,$01,$BA,$2E,$00,$24,$FE,$07
 	dc.b	$FF,$01,$FD,$18,$FC,$13,$5B,$5D,$2D,$73,$65,$6C,$65,$63,$74,$69
@@ -88,8 +91,8 @@ CreatePlayer	;The create player screen (roster menu item Create Players)
 	dc.b	$66,$00,$00,$DE,$44,$40,$08,$01,$00,$00,$66,$00,$00,$D4,$08,$01
 	dc.b	$00,$04,$67,$00,$FD,$04,$60,$00,$01,$36
 
-CreateListMove	;CreatePlayer: move in the name list
-	;Code the listing does not decode: kept as bytes
+CreateListMove						;CreatePlayer: move in the name list
+									;Code the listing does not decode: kept as bytes
 	dc.b	$D1,$78,$D3,$C2,$32,$38,$D3,$C2,$B2,$79,$FF,$FF,$55,$F0,$6F,$00
 	dc.b	$00,$06,$91,$78,$D3,$C2,$4A,$78,$D3,$C2,$66,$00,$00,$06,$91,$78
 	dc.b	$D3,$C2,$30,$38,$D3,$C2,$53,$40,$B0,$79,$FF,$FF,$55,$F4,$6C,$00
@@ -108,30 +111,32 @@ CreateListMove	;CreatePlayer: move in the name list
 	dc.b	$67,$00,$00,$02,$61,$00,$00,$68,$20,$7C,$FF,$FF,$D3,$AC,$22,$7C
 	dc.b	$00,$1E,$6B,$04,$10,$31,$50,$00,$11,$80,$40,$00,$60,$00,$FB,$F0
 
-CreateNameDone	;All fields done: SaveCreateName (fail: redraw), InitCreateRecord, the checksum, then ModifyRatings
-	;Code the listing does not decode: kept as bytes
+CreateNameDone						;All fields done: SaveCreateName (fail: redraw), InitCreateRecord, the
+									;checksum, then ModifyRatings
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$09,$82,$6B,$00,$00,$18,$61,$00,$0B,$92,$08,$B8,$00,$06
 	dc.b	$C3,$50,$4E,$B9,$00,$02,$41,$AA,$4E,$F9,$00,$1D,$EA,$5A,$4E,$F9
 	dc.b	$00,$1D,$D9,$3C,$4C,$DF,$7F,$FF,$4E,$75,$48,$E7,$FF,$FE,$08,$78
 	dc.b	$00,$00,$D4,$85,$66,$00,$00,$0C,$61,$00,$01,$42,$4C,$DF,$7F,$FF
 	dc.b	$4E,$75,$22,$7C,$FF,$FF,$D3,$AC,$61,$00,$04,$8A,$60,$EE
 
-PrintGridLetter	;If grid mode, print letter d5 of the grid table (cursor letter)
-	;Code the listing does not decode: kept as bytes
+PrintGridLetter						;If grid mode, print letter d5 of the grid table (cursor letter) Code the
+									;listing does not decode: kept as bytes
 	dc.b	$4A,$78,$D4,$84,$67,$D4,$22,$7C,$FF,$FF,$D1,$30,$32,$BC,$00,$04
 	dc.b	$13,$7C,$00,$00,$00,$03,$20,$7C,$00,$1E,$6B,$04,$10,$30,$50,$00
 	dc.b	$13,$40,$00,$02,$4E,$F9,$00,$01,$BC,$84,$4E,$B9,$00,$01,$BC,$72
 	dc.b	$00,$06,$AF,$1A,$0F,$00,$30,$05,$48,$C0,$80,$FC,$00,$0A,$D1,$78
 	dc.b	$B0,$42,$48,$40,$D1,$78,$B0,$40,$70,$01,$72,$01,$4E,$75
 
-FixFirstLetter	;Normalize first letter of name buffer to a letter grid char (unknown -> A)
-	;Code the listing does not decode: kept as bytes
+FixFirstLetter						;Normalize first letter of name buffer to a
+									;letter grid char (unknown -> A)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$F8,$FE,$10,$38,$D3,$AC,$61,$00,$00,$24,$B0,$7C,$00,$1E
 	dc.b	$6D,$00,$00,$08,$42,$45,$60,$00,$00,$10,$3A,$00,$20,$7C,$00,$1E
 	dc.b	$6B,$04,$11,$F0,$50,$00,$D3,$AC,$4C,$DF,$7F,$1F,$4E,$75
 
-FindGridLetter	;Find char d0 in letter grid table, return index in d0 ($1E if not found)
-	;Code the listing does not decode: kept as bytes
+FindGridLetter						;Find char d0 in letter grid table, return index in d0 ($1E if not found)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$70,$FE,$20,$7C,$00,$1E,$6B,$04,$12,$00,$42,$40,$36,$3C
 	dc.b	$00,$1E,$B2,$30,$00,$00,$67,$00,$00,$0C,$52,$40,$51,$CB,$FF,$F4
 	dc.b	$30,$3C,$00,$1E,$4C,$DF,$7F,$0E,$4E,$75,$4E,$B9,$00,$01,$BB,$8E
@@ -159,8 +164,8 @@ FindGridLetter	;Find char d0 in letter grid table, return index in d0 ($1E if no
 	dc.b	$2E,$20,$20,$20,$20,$8F,$11,$08,$70,$72,$65,$73,$73,$20,$73,$74
 	dc.b	$61,$72,$74,$20,$74,$6F,$20,$65,$78,$69,$74,$2E
 
-DrawCreateList	;Draw list of up to 6 player names starting at player CreateListTop
-	;Code the listing does not decode: kept as bytes
+DrawCreateList						;Draw list of up to 6 player names starting at player CreateListTop Code
+									;the listing does not decode: kept as bytes
 	dc.b	$60,$00,$00,$62,$3F,$38,$D3,$C0,$3F,$38,$D3,$C2,$4E,$B9,$00,$01
 	dc.b	$BC,$72,$00,$06,$8F,$13,$06,$00,$3E,$3C,$00,$03,$BE,$79,$FF,$FF
 	dc.b	$55,$F0,$6D,$00,$00,$08,$3E,$39,$FF,$FF,$55,$F0,$53,$47,$31,$F9
@@ -170,8 +175,8 @@ DrawCreateList	;Draw list of up to 6 player names starting at player CreateListT
 	dc.b	$31,$DF,$D3,$C0,$4C,$DF,$7F,$FF,$4E,$75,$48,$E7,$FF,$FE,$08,$38
 	dc.b	$00,$06,$C3,$56,$66,$00,$00,$2C,$08,$38,$00,$07,$C3,$58
 
-MoveListMarkers	;Move selection arrows to the current list row if it changed
-	;Code the listing does not decode: kept as bytes
+MoveListMarkers						;Move selection arrows to the current list row if it changed Code the
+									;listing does not decode: kept as bytes
 	dc.b	$66,$00,$00,$22,$30,$38,$D3,$C2,$B0,$78,$D3,$C4,$67,$00,$00,$16
 	dc.b	$22,$7C,$00,$1D,$E1,$44,$61,$00,$00,$12,$22,$7C,$00,$1D,$E1,$3C
 	dc.b	$61,$00,$00,$08,$4C,$DF,$7F,$FF,$4E,$75,$4A,$78,$D3,$C4,$67,$00
@@ -180,23 +185,24 @@ MoveListMarkers	;Move selection arrows to the current list row if it changed
 	dc.b	$22,$5F,$D2,$D1,$31,$FC,$00,$26,$B0,$40,$4E,$B9,$00,$01,$BC,$84
 	dc.b	$31,$F8,$D3,$C2,$D3,$C4,$4E,$75
 
-ListMarkers	;Row markers ] and [
+ListMarkers							;Row markers ] and [
 	String	']'
 	String	'['
 
-ListMarkersOff	;Blanks over the row markers
+ListMarkersOff						;Blanks over the row markers
 	String	' '
 	String	' '
 
-CountNameLength	;Count name length of name buffer NameEntryBuf into NameEntryLen
-	;Code the listing does not decode: kept as bytes
+CountNameLength						;Count name length of name buffer NameEntryBuf into NameEntryLen Code the
+									;listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$36,$3C,$00,$11,$20,$7C,$FF,$FF,$D3,$AC,$42,$78
 	dc.b	$D3,$C0,$0C,$10,$00,$2D,$66,$00,$00,$08,$4A,$18,$60,$00,$00,$0C
 	dc.b	$4A,$18,$67,$00,$00,$0A,$52,$78,$D3,$C0,$51,$CB,$FF,$E6,$4C,$DF
 	dc.b	$7F,$FF,$4E,$75
 
-PrintEditName	;Print 18-char name from a1 with - padding, highlight cursor char d4 in grid mode
-	;Code the listing does not decode: kept as bytes
+PrintEditName						;Print 18-char name from a1 with - padding, highlight cursor char d4 in
+									;grid mode
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$3F,$38,$D3,$C0,$31,$FC,$00,$12,$D3,$C0,$20,$7C
 	dc.b	$FF,$FF,$D1,$30,$30,$38,$D3,$C0,$36,$3C,$00,$00,$30,$FC,$00,$16
 	dc.b	$B6,$7C,$00,$08,$66,$00,$00,$06,$10,$FC,$00,$20,$12,$31,$30,$00
@@ -219,8 +225,9 @@ PrintEditName	;Print 18-char name from a1 with - padding, highlight cursor char 
 	dc.b	$42,$B9,$FF,$FF,$56,$00,$42,$B9,$FF,$FF,$56,$04,$42,$39,$FF,$FF
 	dc.b	$56,$08,$60,$E6
 
-GetCreateName	;Copy player name (CreateListRow-1)*18 from M68K_RAM to a1, 0->-, length to NameEntryLen
-	;Code the listing does not decode: kept as bytes
+GetCreateName						;Copy player name (CreateListRow-1)*18 from M68K_RAM to a1, 0->-, length
+									;to NameEntryLen
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$00,$00,$34,$38,$D3,$C2,$53,$42
 	dc.b	$C4,$FC,$00,$12,$31,$FC,$00,$00,$D3,$C0,$36,$3C,$00,$11,$10,$30
 	dc.b	$20,$00,$67,$00,$00,$06,$60,$00,$00,$10,$10,$3C,$00,$2D,$53,$78
@@ -254,8 +261,8 @@ GetCreateName	;Copy player name (CreateListRow-1)*18 from M68K_RAM to a1, 0->-, 
 	dc.b	$73,$6C,$6F,$74,$8F,$03,$08,$42,$2D,$63,$61,$6E,$63,$65,$6C,$00
 	dc.b	$31,$DF,$B0,$1C,$46,$FC,$25,$00,$4E,$75
 
-ReadCreatedPlayers	;Read the created players from save RAM into name records and ids
-	;Code the listing does not decode: kept as bytes
+ReadCreatedPlayers					;Read the created players from save RAM into name records and ids Code the
+									;listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$42,$79,$FF,$FF,$55,$F0,$20,$7C,$FF,$FF,$13,$88
 	dc.b	$20,$3C,$00,$00,$0D,$B4,$72,$28,$4E,$B9,$00,$02,$41,$E8,$3C,$3C
 	dc.b	$00,$14,$26,$7C,$FF,$FF,$4E,$20,$24,$7C,$FF,$FF,$00,$00,$3A,$3C
@@ -268,8 +275,9 @@ ReadCreatedPlayers	;Read the created players from save RAM into name records and
 	dc.b	$00,$11,$14,$FC,$00,$00,$51,$C8,$FF,$FA,$36,$BC,$80,$00,$52,$79
 	dc.b	$FF,$FF,$55,$F0,$4C,$DF,$7F,$FF,$4E,$75
 
-FormatNameRecord	;Format name string at a1 into an 18-byte record at a2: first name padded to 8 and last name to 10 with dashes
-	;Code the listing does not decode: kept as bytes
+FormatNameRecord					;Format name string at a1 into an 18-byte record at a2: first name padded
+									;to 8 and last name to 10 with dashes
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$60,$3E,$19,$57,$47,$3C,$3C,$00,$07,$0C,$11,$00,$20
 	dc.b	$67,$00,$00,$0C,$10,$19,$14,$C0,$53,$47,$51,$CE,$FF,$F0,$4A,$46
 	dc.b	$6B,$00,$00,$0A,$14,$FC,$00,$2D,$51,$CE,$FF,$FA,$52,$49,$53,$47
@@ -302,7 +310,7 @@ FormatNameRecord	;Format name string at a1 into an 18-byte record at a2: first n
 	dc.b	$66,$00,$00,$0C,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$05,$61,$00
 	dc.b	$F9,$78,$4E,$75
 
-PosText	;Position texts (code96_04 and the create player screen)
+PosText								;Position texts (code96_04 and the create player screen)
 	String	'G '
 	String	'LD'
 	String	'RD'
@@ -310,12 +318,13 @@ PosText	;Position texts (code96_04 and the create player screen)
 	String	'C '
 	String	'RW'
 
-HandNames	;Shooting hand texts
+HandNames							;Shooting hand texts
 	String	'LEFT '
 	String	'RIGHT'
 
-SaveCreateName	;Save entered name to the created-player record (new or existing); invalid name -> message; d0=0 ok/-1
-	;Code the listing does not decode: kept as bytes
+SaveCreateName						;Save entered name to the created-player record (new or existing); invalid
+									;name -> message; d0=0 ok/-1
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$61,$00,$01,$40,$6B,$00,$01,$22,$30,$38,$D3,$C2
 	dc.b	$53,$40,$D0,$40,$20,$7C,$FF,$FF,$4E,$20,$4A,$70,$00,$00,$6B,$00
 	dc.b	$00,$7A,$48,$E7,$70,$40,$22,$7C,$00,$20,$1B,$68,$34,$3C,$00,$00
@@ -326,14 +335,15 @@ SaveCreateName	;Save entered name to the created-player record (new or existing)
 	dc.b	$EB,$41,$D2,$41,$20,$7C,$00,$20,$25,$9C,$D0,$C1,$61,$00,$00,$06
 	dc.b	$60,$00,$00,$9E
 
-CopyNameWords	;Copy the length-prefixed name at StatWork into a0 as words
-	;Code the listing does not decode: kept as bytes
+CopyNameWords						;Copy the length-prefixed name at StatWork into a0 as words Code the
+									;listing does not decode: kept as bytes
 	dc.b	$22,$7C,$FF,$FF,$BF,$54,$30,$11,$53,$40,$42,$41,$12,$19,$30,$C1
 	dc.b	$51,$C8,$FF,$FA,$4E,$75
 
-SaveNewName	;SaveCreateName, new player: take a free SRCreatedPlayers slot, store the name and add it to the free agent
-	;list
-	;Code the listing does not decode: kept as bytes
+SaveNewName							;SaveCreateName, new player: take a free SRCreatedPlayers slot, store the
+									;name and add it to the free agent
+									;list
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$01,$4C,$6B,$00,$00,$88,$20,$7C,$00,$20,$25,$9C,$42,$46
 	dc.b	$3A,$3C,$00,$13,$4A,$28,$00,$01,$66,$00,$00,$0A,$4A,$28,$00,$03
 	dc.b	$67,$00,$00,$12,$D1,$FC,$00,$00,$00,$40,$52,$46,$51,$CD,$FF,$E6
@@ -345,14 +355,16 @@ SaveNewName	;SaveCreateName, new player: take a free SRCreatedPlayers slot, stor
 	dc.b	$52,$79,$00,$20,$1B,$B8,$60,$00,$00,$1C,$60,$00,$00,$06,$60,$00
 	dc.b	$00,$02
 
-SaveNameError	;SaveCreateName: back to font 0, d0 = -1
-	;Code the listing does not decode: kept as bytes
+SaveNameError						;SaveCreateName: back to font 0, d0 = -1
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$BA,$2E,$00,$04,$F9,$00,$30,$3C,$FF,$FF,$60,$00
 	dc.b	$00,$04,$42,$40,$4C,$DF,$7F,$FF,$4E,$75
 
-BuildEnteredName	;Build the entered name (from NameEntryBuf, spaces/dashes dropped, space after first name) as a length-word
-	;string at StatWork and check it has a first and last name; d0 = 0 ok, -1 invalid
-	;Code the listing does not decode: kept as bytes
+BuildEnteredName					;Build the entered name (from NameEntryBuf, spaces/dashes dropped, space
+									;after first name) as a length-word
+									;string at StatWork and check it has a first and last name; d0 = 0 ok, -1
+									;invalid
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$BF,$56,$22,$7C,$FF,$FF,$D3,$AC
 	dc.b	$30,$38,$D3,$C0,$53,$40,$42,$45,$42,$46,$BC,$7C,$00,$08,$66,$00
 	dc.b	$00,$08,$10,$FC,$00,$20,$52,$45,$12,$19,$B2,$3C,$00,$20,$67,$00
@@ -367,15 +379,16 @@ BuildEnteredName	;Build the entered name (from NameEntryBuf, spaces/dashes dropp
 	dc.b	$00,$14,$6D,$00,$00,$0A,$30,$3C,$FF,$FF,$60,$00,$00,$06,$30,$3C
 	dc.b	$00,$01,$4C,$9F,$00,$01,$4E,$75
 
-NewCreateRecord	;Same as InitCreateRecord but with bit 2 of sflags8 set (skips the read)
+NewCreateRecord						;Same as InitCreateRecord but with bit 2 of sflags8 set (skips the read)
 	bset	#2,(sflags8).w
 	bra.w	InitCreateRecord2
 
-InitCreateRecord	;Read the create record for CreateIndex from save RAM. NewCreateRecord skips that read
+InitCreateRecord					;Read the create record for CreateIndex from save RAM.
+									;NewCreateRecord skips that read
 	bclr	#2,(sflags8).w
 
-InitCreateRecord2	;InitCreateRecord without the bclr (NewCreateRecord enters here)
-	;Code the listing does not decode: kept as bytes
+InitCreateRecord2					;InitCreateRecord without the bclr (NewCreateRecord enters here) Code the
+									;listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$75,$38,$42,$80,$30,$39,$FF,$FF
 	dc.b	$55,$FE,$EB,$40,$48,$C0,$06,$80,$00,$00,$12,$CE,$72,$20,$48,$E7
 	dc.b	$C0,$80,$08,$38,$00,$02,$C3,$4C,$66,$00,$00,$08,$4E,$B9,$00,$02
@@ -389,14 +402,15 @@ InitCreateRecord2	;InitCreateRecord without the bclr (NewCreateRecord enters her
 	dc.b	$00,$FE,$00,$04,$81,$28,$00,$04,$4C,$DF,$01,$03,$4E,$B9,$00,$02
 	dc.b	$41,$88,$4C,$DF,$7F,$FF,$4E,$75
 
-CreateRecordTail1	;8 byte record tail (record byte $1F clear)
+CreateRecordTail1					;8 byte record tail (record byte $1F clear)
 	dc.b	$20,$82,$22,$22,$00,$00,$22,$22
 
-CreateRecordTail2	;8 byte record tail (record byte $1F set)
+CreateRecordTail2					;8 byte record tail (record byte $1F set)
 	dc.b	$20,$82,$22,$22,$22,$22,$22,$27
 
-ModifyRatings	;Modify Ratings screen: up / down pick a rating, A / B lower / raise it (EditField), start commits the player
-	;Code the listing does not decode: kept as bytes
+ModifyRatings						;Modify Ratings screen: up / down pick a rating, A / B lower / raise it
+									;(EditField), start commits the player
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$0C,$B0,$20,$7C,$00,$19,$69,$B4,$4E,$B9,$00,$01,$21,$8A
 	dc.b	$4E,$B9,$00,$1D,$BB,$92,$31,$FC,$00,$18,$BD,$3C,$08,$B8,$00,$02
 	dc.b	$BF,$B2,$61,$00,$0A,$F4,$61,$00,$0B,$0A,$61,$00,$0B,$4A,$61,$00
@@ -454,150 +468,150 @@ ModifyRatings	;Modify Ratings screen: up / down pick a rating, A / B lower / rai
 	dc.b	$00,$00,$24,$7C,$FF,$FF,$75,$38,$D4,$D2,$4E,$90,$4C,$DF,$7F,$FF
 	dc.b	$4E,$75
 
-FieldSpeed	;Create player field: Speed
-	;Code the listing does not decode: kept as bytes
+FieldSpeed							;Create player field: Speed
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$03,$3A,$61,$00,$00,$22,$28,$39,$00,$02,$34,$98,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$03,$0A
 
-FieldPrintSetup	;Set print target a4 / a0 and the number print table a6 for a field value
-	;Code the listing does not decode: kept as bytes
+FieldPrintSetup						;Set print target a4 / a0 and the number print table a6 for a field value
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$7C,$FF,$FF,$C8,$F2,$20,$4A,$50,$48,$2C,$7C,$00,$1D,$FA,$0C
 	dc.b	$4E,$75
 
-FieldAgility	;Create player field: Agility
-	;Code the listing does not decode: kept as bytes
+FieldAgility						;Create player field: Agility
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$03,$00,$61,$E8,$28,$39,$00,$02,$34,$82,$4E,$B9,$00,$1D
 	dc.b	$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9,$00,$01
 	dc.b	$BA,$40,$60,$00,$02,$D2
 
-FieldEndurance	;Create player field: Endurance
-	;Code the listing does not decode: kept as bytes
+FieldEndurance						;Create player field: Endurance
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$02,$DA,$61,$C2,$28,$39,$00,$02,$35,$5E,$4E,$B9,$00,$1D
 	dc.b	$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9,$00,$01
 	dc.b	$BA,$40,$60,$00,$02,$AC
 
-FieldOffAware	;Create player field: OffAware
-	;Code the listing does not decode: kept as bytes
+FieldOffAware						;Create player field: OffAware
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$02,$B4,$61,$9C,$28,$39,$00,$02,$34,$C4,$4E,$B9,$00,$1D
 	dc.b	$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9,$00,$01
 	dc.b	$BA,$40,$60,$00,$02,$86
 
-FieldDefAware	;Create player field: DefAware
-	;Code the listing does not decode: kept as bytes
+FieldDefAware						;Create player field: DefAware
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$02,$8E,$61,$00,$FF,$76,$28,$39,$00,$02,$34,$DA,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$02,$5E
 
-FieldStickhandling	;Create player field: Stickhandling
-	;Code the listing does not decode: kept as bytes
+FieldStickhandling					;Create player field: Stickhandling
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$02,$66,$61,$00,$FF,$4E,$28,$39,$00,$02,$35,$32,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$02,$36
 
-FieldWeight	;Create player field: Weight
-	;Code the listing does not decode: kept as bytes
+FieldWeight							;Create player field: Weight
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$02,$3E,$61,$00,$FF,$26,$28,$39,$00,$02,$35,$48,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$E7,$40,$06,$40,$00,$8C,$32,$3C,$00,$03,$4E,$B9
 	dc.b	$00,$01,$BE,$1C,$4E,$B9,$00,$01,$BA,$40,$60,$00,$02,$08
 
-FieldShotPower	;Create player field: ShotPower
-	;Code the listing does not decode: kept as bytes
+FieldShotPower						;Create player field: ShotPower
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$02,$10,$61,$00,$FE,$F8,$28,$39,$00,$02,$34,$F0,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$01,$E0
 
-FieldShotAcc	;Create player field: ShotAcc
-	;Code the listing does not decode: kept as bytes
+FieldShotAcc						;Create player field: ShotAcc
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$01,$E8,$61,$00,$FE,$D0,$28,$39,$00,$02,$35,$06,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$01,$B8
 
-FieldPassAcc	;Create player field: PassAcc
-	;Code the listing does not decode: kept as bytes
+FieldPassAcc						;Create player field: PassAcc
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$01,$C0,$61,$00,$FE,$A8,$28,$39,$00,$02,$35,$1C,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$01,$90
 
-FieldChecking	;Create player field: Checking
-	;Code the listing does not decode: kept as bytes
+FieldChecking						;Create player field: Checking
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$01,$98,$61,$00,$FE,$80,$28,$39,$00,$02,$35,$8A,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 
-FieldBlank2	;Create player field: Blank2
-	;Code the listing does not decode: kept as bytes
+FieldBlank2							;Create player field: Blank2
+									;Code the listing does not decode: kept as bytes
 	dc.b	$00,$01,$BA,$40,$60,$00,$01,$68
 
-FieldJersey	;Create player field: Jersey
-	;Code the listing does not decode: kept as bytes
+FieldJersey							;Create player field: Jersey
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$01,$70,$42,$44,$18,$12,$E8,$4C,$C8,$FC,$00,$0A,$10,$12
 	dc.b	$02,$00,$00,$0F,$D0,$04,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C
 	dc.b	$4E,$B9,$00,$01,$BA,$40,$60,$00,$01,$3E
 
-FieldGAgility	;Create player field: GAgility
-	;Code the listing does not decode: kept as bytes
+FieldGAgility						;Create player field: GAgility
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$01,$46,$61,$00,$FE,$2E,$28,$39,$00,$02,$35,$CE,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$01,$16
 
-FieldGDefAware	;Create player field: GDefAware
-	;Code the listing does not decode: kept as bytes
+FieldGDefAware						;Create player field: GDefAware
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$01,$1E,$61,$00,$FE,$06,$28,$39,$00,$02,$36,$10,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$00,$EE
 
-FieldGPuckCtrl	;Create player field: GPuckCtrl
-	;Code the listing does not decode: kept as bytes
+FieldGPuckCtrl						;Create player field: GPuckCtrl
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$00,$F6,$61,$00,$FD,$DE,$28,$39,$00,$02,$36,$3C,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$00,$C6
 
-FieldGStickR	;Create player field: GStickR
-	;Code the listing does not decode: kept as bytes
+FieldGStickR						;Create player field: GStickR
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$00,$CE,$61,$00,$FD,$B6,$28,$39,$00,$02,$36,$52,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$00,$9E
 
-FieldGStickL	;Create player field: GStickL
-	;Code the listing does not decode: kept as bytes
+FieldGStickL						;Create player field: GStickL
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$00,$A6,$61,$00,$FD,$8E,$28,$39,$00,$02,$36,$68,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$00,$76
 
-FieldGGloveR	;Create player field: GGloveR
-	;Code the listing does not decode: kept as bytes
+FieldGGloveR						;Create player field: GGloveR
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$00,$7E,$61,$00,$FD,$66,$28,$39,$00,$02,$36,$7E,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$00,$4E
 
-FieldGGloveL	;Create player field: GGloveL
-	;Code the listing does not decode: kept as bytes
+FieldGGloveL						;Create player field: GGloveL
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$00,$56,$61,$00,$FD,$3E,$28,$39,$00,$02,$36,$94,$4E,$B9
 	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$60,$00,$00,$26
 
-FieldHand	;Create player field: Hand
-	;Code the listing does not decode: kept as bytes
+FieldHand							;Create player field: Hand
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$00,$2E,$10,$2A,$00,$04,$02,$40,$00,$01,$22,$7C,$00,$1D
 	dc.b	$F0,$F4,$4E,$B9,$00,$01,$D7,$EA,$60,$00,$00,$0A
 
-HandText	;FieldHand: the hand letters
+HandText							;FieldHand: the hand letters
 	String	'L'
 	String	'R'
 	dc.b	$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$07,$4E,$75,$4E,$B9,$00,$01
 	dc.b	$BA,$2E,$00,$04,$FE,$07,$BE,$79,$FF,$FF,$75,$32,$66,$00,$00,$0C
 	dc.b	$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$05,$4E,$75
 
-SkaterFieldList	;The field routine of each skater rating row
+SkaterFieldList						;The field routine of each skater rating row
 	dc.l	FieldAgility,FieldSpeed,FieldOffAware,FieldDefAware,FieldShotPower,FieldChecking
 	dc.l	FieldStickhandling,FieldShotAcc,FieldEndurance,FieldPassAcc
 
-GoalieFieldList	;The field routine of each goalie rating row
+GoalieFieldList						;The field routine of each goalie rating row
 	dc.l	FieldGAgility,FieldSpeed,FieldOffAware,FieldGDefAware,FieldGPuckCtrl,FieldGStickR
 	dc.l	FieldGStickL,FieldGGloveR,FieldGGloveL
 
-DrawField	;Draw one create player field: label then value, all registers saved
-	;Code the listing does not decode: kept as bytes
+DrawField							;Draw one create player field: label then value, all registers saved Code
+									;the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$61,$00,$00,$0C,$61,$00,$FC,$1C,$4C,$DF,$7F,$FF
 	dc.b	$4E,$75,$48,$E7,$C0,$C0,$22,$7C,$00,$1D,$F1,$DA,$4A,$79,$FF,$FF
 	dc.b	$75,$34,$66,$00,$00,$08,$22,$7C,$00,$1D,$F2,$A2,$30,$07,$48,$E7
@@ -606,7 +620,7 @@ DrawField	;Draw one create player field: label then value, all registers saved
 	dc.b	$4C,$DF,$02,$01,$4E,$B9,$00,$01,$D7,$F2,$4E,$B9,$00,$01,$BA,$40
 	dc.b	$4C,$DF,$03,$03,$4E,$75
 
-SkaterSkillLabels	;The skater rating labels
+SkaterSkillLabels					;The skater rating labels
 	String	$FD,$02,$FC,$0D,'Agility',$FD,$13
 	String	$FD,$02,$FC,$0E,'Speed',$FD,$13
 	String	$FD,$02,$FC,$0F,'Off.Awareness',$FD,$13
@@ -618,7 +632,7 @@ SkaterSkillLabels	;The skater rating labels
 	String	$FD,$02,$FC,$15,'Endurance',$FD,$13
 	String	$FD,$02,$FC,$16,'Pass Accuracy',$FD,$13
 
-GoalieSkillLabels	;The goalie rating labels
+GoalieSkillLabels					;The goalie rating labels
 	String	$FD,$02,$FC,$0D,'Agility',$FD,$13
 	String	$FD,$02,$FC,$0E,'Speed',$FD,$13
 	String	$FD,$02,$FC,$0F,'Off.Awareness',$FD,$13
@@ -629,31 +643,33 @@ GoalieSkillLabels	;The goalie rating labels
 	String	$FD,$02,$FC,$14,'Glove Right',$FD,$13
 	String	$FD,$02,$FC,$15,'Glove Left',$FD,$13
 
-LastFieldRow	;d4 = the last row index for the player type (CreateType)
-	;Code the listing does not decode: kept as bytes
+LastFieldRow						;d4 = the last row index for the player type (CreateType) Code the listing
+									;does not decode: kept as bytes
 	dc.b	$48,$E7,$02,$80,$38,$3C,$00,$08,$4A,$79,$FF,$FF,$75,$34,$67,$00
 	dc.b	$00,$06,$38,$3C,$00,$09
 
-EditField	;Run the edit routine of the cursor row (CreateCursorY) for the player type
-	;Code the listing does not decode: kept as bytes
+EditField							;Run the edit routine of the cursor row
+									;(CreateCursorY) for the player type
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4C,$DF,$01,$40,$4E,$75,$20,$7C,$00,$1D,$F3,$8E,$4A,$79,$FF,$FF
 	dc.b	$75,$34,$67,$00,$00,$08,$20,$7C,$00,$1D,$F3,$B2,$32,$39,$FF,$FF
 	dc.b	$75,$32,$E5,$41,$20,$70,$10,$00,$4E,$90,$4E,$75
 
-GoalieEditList	;The edit routine of each goalie rating row
+GoalieEditList						;The edit routine of each goalie rating row
 	dc.l	EditGAgility,EditSpeed,EditOffAware,EditGDefAware,EditGPuckCtrl,EditGStickR
 	dc.l	EditGStickL,EditGGloveR,EditGGloveL
 
-SkaterEditList	;The edit routine of each skater rating row
+SkaterEditList						;The edit routine of each skater rating row
 	dc.l	EditAgility,EditSpeed,EditOffAware,EditDefAware,EditShotPower,EditChecking
 	dc.l	EditStickhandling,EditShotAcc,EditEndurance,EditPassAcc
 
-EditGAgility	;Create player edit: GAgility
-	;Code the listing does not decode: kept as bytes
+EditGAgility						;Create player edit: GAgility
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$35,$CE
 
-AdjustAttrib	;Adjust attribute selected by d4 bit by d0, paying from points pool CreatePoints
-	;Code the listing does not decode: kept as bytes
+AdjustAttrib						;Adjust attribute selected by d4 bit by d0, paying from points pool
+									;CreatePoints
+									;Code the listing does not decode: kept as bytes
 	dc.b	$32,$39,$FF,$FF,$75,$36,$31,$C1,$C4,$C8,$34,$00,$44,$42,$D2,$42
 	dc.b	$6B,$00,$00,$44,$33,$C1,$FF,$FF,$75,$36,$20,$7C,$FF,$FF,$C8,$E2
 	dc.b	$48,$44,$08,$04,$00,$0F,$66,$00,$00,$08,$52,$48,$E3,$44,$60,$F2
@@ -661,42 +677,42 @@ AdjustAttrib	;Adjust attribute selected by d4 bit by d0, paying from points pool
 	dc.b	$4C,$9F,$00,$0C,$6F,$00,$00,$08,$D1,$10,$60,$00,$00,$0A,$33,$F8
 	dc.b	$C4,$C8,$FF,$FF,$75,$36,$4E,$75
 
-EditGDefAware	;Create player edit: GDefAware
-	;Code the listing does not decode: kept as bytes
+EditGDefAware						;Create player edit: GDefAware
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$36,$10,$60,$A0
 
-EditGPuckCtrl	;Create player edit: GPuckCtrl
-	;Code the listing does not decode: kept as bytes
+EditGPuckCtrl						;Create player edit: GPuckCtrl
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$36,$3C,$60,$98
 
-EditWeight	;Create player edit: Weight
-	;Code the listing does not decode: kept as bytes
+EditWeight							;Create player edit: Weight
+									;Code the listing does not decode: kept as bytes
 	dc.b	$20,$7C,$FF,$FF,$75,$38,$D0,$D0,$42,$41,$12,$28,$00,$01,$E8,$49
 	dc.b	$02,$41,$00,$0F,$D2,$40,$6B,$D6,$B2,$7C,$00,$0F,$6E,$D0,$E9,$49
 	dc.b	$10,$28,$00,$01,$02,$40,$00,$0F,$80,$41,$11,$40,$00,$01,$4E,$75
 
-EditGStickR	;Create player edit: GStickR
-	;Code the listing does not decode: kept as bytes
+EditGStickR							;Create player edit: GStickR
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$36,$52,$60,$00,$FF,$60
 
-EditGStickL	;Create player edit: GStickL
-	;Code the listing does not decode: kept as bytes
+EditGStickL							;Create player edit: GStickL
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$36,$68,$60,$00,$FF,$56
 
-EditGGloveR	;Create player edit: GGloveR
-	;Code the listing does not decode: kept as bytes
+EditGGloveR							;Create player edit: GGloveR
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$36,$7E,$60,$00,$FF,$4C
 
-EditGGloveL	;Create player edit: GGloveL
-	;Code the listing does not decode: kept as bytes
+EditGGloveL							;Create player edit: GGloveL
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$36,$94,$60,$00,$FF,$42
 
-EditHand	;Create player edit: Hand
-	;Code the listing does not decode: kept as bytes
+EditHand							;Create player edit: Hand
+									;Code the listing does not decode: kept as bytes
 	dc.b	$20,$7C,$FF,$FF,$75,$38,$D0,$D0,$0A,$28,$00,$01,$00,$04,$4E,$75
 
-EditJersey	;Create player edit: Jersey
-	;Code the listing does not decode: kept as bytes
+EditJersey							;Create player edit: Jersey
+									;Code the listing does not decode: kept as bytes
 	dc.b	$20,$7C,$FF,$FF,$75,$38,$D0,$D0,$42,$41,$12,$10,$02,$41,$00,$0F
 	dc.b	$42,$42,$14,$10,$E8,$4A,$C4,$FC,$00,$0A,$D2,$42,$D0,$01,$6A,$00
 	dc.b	$00,$06,$30,$3C,$00,$63,$4A,$00,$66,$00,$00,$06,$30,$3C,$00,$63
@@ -704,72 +720,74 @@ EditJersey	;Create player edit: Jersey
 	dc.b	$00,$06,$30,$3C,$00,$01,$02,$80,$00,$00,$00,$FF,$80,$FC,$00,$0A
 	dc.b	$32,$00,$E9,$49,$48,$40,$82,$00,$10,$81,$4E,$75
 
-EditSpeed	;Create player edit: Speed
-	;Code the listing does not decode: kept as bytes
+EditSpeed							;Create player edit: Speed
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$34,$98,$60,$00,$FE,$CC
 
-EditAgility	;Create player edit: Agility
-	;Code the listing does not decode: kept as bytes
+EditAgility							;Create player edit: Agility
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$34,$82,$60,$00,$FE,$C2
 
-EditEndurance	;Create player edit: Endurance
-	;Code the listing does not decode: kept as bytes
+EditEndurance						;Create player edit: Endurance
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$35,$5E,$60,$00,$FE,$B8
 
-EditOffAware	;Create player edit: OffAware
-	;Code the listing does not decode: kept as bytes
+EditOffAware						;Create player edit: OffAware
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$34,$C4,$60,$00,$FE,$AE
 
-EditDefAware	;Create player edit: DefAware
-	;Code the listing does not decode: kept as bytes
+EditDefAware						;Create player edit: DefAware
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$34,$DA,$60,$00,$FE,$A4
 
-EditStickhandling	;Create player edit: Stickhandling
-	;Code the listing does not decode: kept as bytes
+EditStickhandling					;Create player edit: Stickhandling
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$35,$32,$60,$00,$FE,$9A
 
-EditShotPower	;Create player edit: ShotPower
-	;Code the listing does not decode: kept as bytes
+EditShotPower						;Create player edit: ShotPower
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$34,$F0,$60,$00,$FE,$90
 
-EditShotAcc	;Create player edit: ShotAcc
-	;Code the listing does not decode: kept as bytes
+EditShotAcc							;Create player edit: ShotAcc
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$35,$06,$60,$00,$FE,$86
 
-EditPassAcc	;Create player edit: PassAcc
-	;Code the listing does not decode: kept as bytes
+EditPassAcc							;Create player edit: PassAcc
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$35,$1C,$60,$00,$FE,$7C
 
-EditChecking	;Create player edit: Checking
-	;Code the listing does not decode: kept as bytes
+EditChecking						;Create player edit: Checking
+									;Code the listing does not decode: kept as bytes
 	dc.b	$28,$39,$00,$02,$35,$8A,$60,$00,$FE,$72
 
-EditNone	;Create player edit: nothing
-	;Code the listing does not decode: kept as bytes
+EditNone							;Create player edit: nothing
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$75
 
-ClearAttribDeltas	;Clear 16-byte attribute buffer AttribDeltas
-	;Code the listing does not decode: kept as bytes
+ClearAttribDeltas					;Clear 16-byte attribute buffer AttribDeltas
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$C8,$E2,$30,$3C,$00,$03,$42,$98
 	dc.b	$51,$C8,$FF,$FC,$4C,$DF,$7F,$FF,$4E,$75
 
-LoadCreateTemplate	;Copy 32-word player template (index CreateIndex) from SRCreatedPlayers into byte record CreateRecord, set
-	;CreateType from last byte
-	;Code the listing does not decode: kept as bytes
+LoadCreateTemplate					;Copy 32-word player template (index CreateIndex) from SRCreatedPlayers
+									;into byte record CreateRecord, set
+									;CreateType from last byte
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$30,$3C,$00,$1F,$20,$7C,$00,$20,$25,$9C,$32,$39
 	dc.b	$FF,$FF,$55,$FE,$EB,$41,$D2,$41,$D0,$C1,$22,$7C,$FF,$FF,$75,$38
 	dc.b	$34,$18,$12,$C2,$51,$C8,$FF,$FA,$42,$79,$FF,$FF,$75,$34,$22,$7C
 	dc.b	$FF,$FF,$75,$38,$D2,$D1,$13,$E9,$00,$08,$FF,$FF,$75,$35,$4C,$DF
 	dc.b	$7F,$FF,$4E,$75
 
-SetPointsPool	;CreatePoints for a goalie or a skater
-	;Code the listing does not decode: kept as bytes
+SetPointsPool						;CreatePoints for a goalie or a skater
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$33,$FC,$01,$E0,$FF,$FF,$75,$36,$4A,$79,$FF,$FF
 	dc.b	$75,$34,$67,$00,$00,$0A,$33,$FC,$01,$C2,$FF,$FF,$75,$36,$4C,$DF
 	dc.b	$7F,$FF,$4E,$75
 
-CommitCreatedPlayer	;Commit the created player: the attribute deltas into the record (CommitAttribJumps), then save RAM
-	;Code the listing does not decode: kept as bytes
+CommitCreatedPlayer					;Commit the created player: the attribute deltas into the record
+									;(CommitAttribJumps), then save RAM
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$75,$38,$D0,$D0,$24,$7C,$FF,$FF
 	dc.b	$C8,$E2,$30,$3C,$00,$0F,$32,$00,$E2,$49,$48,$E7,$40,$80,$42,$42
 	dc.b	$42,$43,$16,$30,$10,$00,$14,$32,$00,$00,$08,$00,$00,$00,$66,$00
@@ -782,34 +800,35 @@ CommitCreatedPlayer	;Commit the created player: the attribute deltas into the re
 	dc.b	$72,$20,$4E,$B9,$00,$02,$41,$88,$08,$B8,$00,$06,$C3,$50,$4E,$B9
 	dc.b	$00,$02,$41,$AA,$4C,$DF,$7F,$FF,$4E,$75
 
-CommitAttribJumps	;CommitCreatedPlayer: the routine of each attribute
+CommitAttribJumps					;CommitCreatedPlayer: the routine of each attribute
 	dc.l	CommitNone1,CommitNone1,CommitNone2,CrScale,CrScale,CrScale
 	dc.l	CrScale,CrScale,CrScale,CrScaleEven,CrScaleLookup,CrScale
 	dc.l	CrScale,CrScale,CrScale,CrScale
 
-CrScale	;d3 += d2/14 (signed)
-	;Code the listing does not decode: kept as bytes
+CrScale								;d3 += d2/14 (signed)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$C2,$85,$FC,$00,$0E,$D6,$42,$4E,$75
 
-CommitNone1	;Nothing to commit
-	;Code the listing does not decode: kept as bytes
+CommitNone1							;Nothing to commit
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$75
 
-CommitNone2	;Nothing to commit
-	;Code the listing does not decode: kept as bytes
+CommitNone2							;Nothing to commit
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$75
 
-CrScaleEven	;Scale even part of d3 via CrScale, keep low bit of d3
-	;Code the listing does not decode: kept as bytes
+CrScaleEven							;Scale even part of d3 via CrScale, keep low bit of d3 Code the listing
+									;does not decode: kept as bytes
 	dc.b	$3F,$03,$02,$43,$00,$FE,$4E,$B9,$00,$1D,$F6,$DE,$34,$03,$36,$1F
 	dc.b	$02,$43,$00,$01,$02,$42,$00,$FE,$86,$42,$4E,$75
 
-CrScaleLookup	;CrScale
-	;Code the listing does not decode: kept as bytes
+CrScaleLookup						;CrScale
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$D4,$4E,$75
 
-CreateRatingsGfx	;Set up the create player ratings screen: vram, fonts, the bitmaps and the help lines
-	;Code the listing does not decode: kept as bytes
+CreateRatingsGfx					;Set up the create player ratings screen: vram, fonts, the bitmaps and the
+									;help lines
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$F8,$00,$05,$C3,$56,$21,$FC,$00,$01,$2D,$46,$D2,$44,$08,$B8
 	dc.b	$00,$00,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$08,$B8,$00,$01,$BF,$B2
 	dc.b	$31,$FC,$00,$00,$B0,$00,$31,$FC,$B4,$00,$B0,$02,$31,$FC,$B8,$00
@@ -837,8 +856,9 @@ CreateRatingsGfx	;Set up the create player ratings screen: vram, fonts, the bitm
 	dc.b	$1A,$14,$62,$3D,$69,$6E,$63,$72,$65,$61,$73,$65,$8F,$1A,$15,$73
 	dc.b	$74,$61,$72,$74,$3D,$64,$6F,$6E,$65,$00,$46,$FC,$25,$00,$4E,$75
 
-CalcAttribRating	;The rating sum of CalcAttrib: d0 / d1 = weighted sum of the attributes in d4 bits (weights a6), d1 the
-	;maximum. With AttribWgtList (create player) it clamps the attribute to 0-$63 and adjusts CreatePoints
+CalcAttribRating					;The rating sum of CalcAttrib: d0 / d1 = weighted sum of the attributes in
+									;d4 bits (weights a6), d1 the maximum. With AttribWgtList (create player)
+									;it clamps the attribute to 0-$63 and adjusts CreatePoints
 	clr.w	(attribsum).w
 	clr.w	(attribcount).w
 	clr.w	d0
@@ -940,7 +960,8 @@ CalcAttribRating	;The rating sum of CalcAttrib: d0 / d1 = weighted sum of the at
 	bsr.w	MinOverallRating
 	rts
 
-MinOverallRating	;For an overall rating (d4 = PAttribOverallMask or GAttribOverallMask): d0 at least (d1 + 3) / 4
+MinOverallRating					;For an overall rating (d4 = PAttribOverallMask or GAttribOverallMask): d0
+									;at least (d1 + 3) / 4
 	cmp.l	(PAttribOverallMask).l,d4
 	beq.w	.0
 	cmp.l	(GAttribOverallMask).l,d4
@@ -957,16 +978,16 @@ MinOverallRating	;For an overall rating (d4 = PAttribOverallMask or GAttribOvera
 .2
 	rts
 
-OvrPlayerWgtList2	;Skater attribute weights for the overall rating (CalcAttribRating)
+OvrPlayerWgtList2					;Skater attribute weights for the overall rating (CalcAttribRating)
 	dc.b	$02,$02,$02,$02,$04,$06,$02,$04,$02,$04,$06,$06,$04,$02,$02,$02
 
-OvrGoalWgtList2	;Goalie attribute weights
+OvrGoalWgtList2						;Goalie attribute weights
 	dc.b	$02,$02,$02,$02,$02,$02,$02,$02,$09,$09,$02,$02,$09,$02,$02,$02
 
-AttribWgtList2	;Single attribute weights (create player)
+AttribWgtList2						;Single attribute weights (create player)
 	dc.b	$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02
 
-ClearFreeAgentStats	;Clear the saved stat words of the free agent slots in save RAM
+ClearFreeAgentStats					;Clear the saved stat words of the free agent slots in save RAM
 	movem.l	d0-d1/a0,-(sp)
 	move.l	#$DE6,d0
 	moveq	#$78,d1
@@ -974,7 +995,8 @@ ClearFreeAgentStats	;Clear the saved stat words of the free agent slots in save 
 	movem.l	(sp)+,d0-d1/a0
 	rts
 
-ClearCreatedPlayers	;Clear the created players list at M68K_RAM+$DB4 (20 x $8000 + 0 terminator)
+ClearCreatedPlayers					;Clear the created players list at M68K_RAM+$DB4 (20 x $8000 + 0
+									;terminator)
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#M68K_RAM+$DB4,a0
 	move.w	#$13,d6
@@ -985,8 +1007,9 @@ ClearCreatedPlayers	;Clear the created players list at M68K_RAM+$DB4 (20 x $8000
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-DeleteCreatedPlayer	;Delete created player #TempWord1: remove it from the save RAM records, roster list and team lines
-	;Code the listing does not decode: kept as bytes
+DeleteCreatedPlayer					;Delete created player #TempWord1: remove it from the save RAM records,
+									;roster list and team lines
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$3E,$3C,$00,$1C,$08,$F8,$00,$06,$C3,$50,$30,$38
 	dc.b	$BF,$46,$02,$40,$00,$FF,$48,$A7,$81,$00,$4E,$B9,$00,$1D,$FB,$54
 	dc.b	$34,$C0,$4C,$9F,$00,$81,$4E,$B9,$00,$01,$02,$B8,$34,$F8,$DD,$AA
@@ -1004,24 +1027,24 @@ DeleteCreatedPlayer	;Delete created player #TempWord1: remove it from the save R
 	dc.b	$22,$3C,$00,$00,$6E,$E8,$4E,$B9,$00,$1D,$D4,$B6,$4C,$DF,$7F,$FF
 	dc.b	$4E,$B9,$00,$02,$41,$AA,$4C,$DF,$7F,$FF,$4E,$75
 
-GetCreatedId	;The player id word of created entry d0
-	;Code the listing does not decode: kept as bytes
+GetCreatedId						;The player id word of created entry d0
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$7F,$FE,$20,$7C,$00,$20,$1B,$68,$D0,$40,$D0,$40,$D0,$C0
 	dc.b	$30,$28,$00,$02,$02,$40,$00,$FF,$3E,$10,$E1,$4F,$02,$47,$FF,$00
 	dc.b	$80,$47,$4C,$DF,$7F,$FE,$4E,$75
 
-ReadCreateList	;Read the created players list from save RAM
-	;Code the listing does not decode: kept as bytes
+ReadCreateList						;Read the created players list from save RAM
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$C0,$00,$20,$3C,$00,$00,$0D,$B4,$72,$29,$4E,$B9,$00,$02
 	dc.b	$41,$E8,$4C,$DF,$00,$03,$4E,$75
 
-WriteCreateList	;Write the created players list to save RAM
-	;Code the listing does not decode: kept as bytes
+WriteCreateList						;Write the created players list to save RAM
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$C0,$00,$20,$3C,$00,$00,$0D,$B4,$72,$29,$4E,$B9,$00,$02
 	dc.b	$41,$88,$4C,$DF,$00,$03,$4E,$75
 
-SignFreeAgents	;The sign free agents screen (roster menu item Sign Free Agents)
-	;Code the listing does not decode: kept as bytes
+SignFreeAgents						;The sign free agents screen (roster menu item Sign Free Agents) Code the
+									;listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$AF,$52,$61,$00,$06,$C2,$20,$7C,$00,$19,$76,$2A
 	dc.b	$4E,$B9,$00,$01,$21,$8A,$4E,$B9,$00,$1E,$0D,$66,$61,$00,$08,$CE
 	dc.b	$30,$3C,$00,$03,$20,$7C,$FF,$FF,$C8,$E2,$42,$98,$51,$C8,$FF,$FC
@@ -1072,8 +1095,8 @@ SignFreeAgents	;The sign free agents screen (roster menu item Sign Free Agents)
 	dc.b	$53,$79,$FF,$FF,$27,$10,$60,$00,$FD,$54,$60,$00,$FD,$BC,$4E,$B9
 	dc.b	$00,$01,$57,$74,$B0,$7C,$00,$03,$4E,$75
 
-FreeAgentArrows	;Draw scroll up/down arrows for the list
-	;Code the listing does not decode: kept as bytes
+FreeAgentArrows						;Draw scroll up/down arrows for the list
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$07,$30,$39
 	dc.b	$FF,$FF,$27,$12,$D0,$79,$FF,$FF,$27,$10,$67,$00,$00,$14,$4E,$B9
 	dc.b	$00,$01,$BA,$2E,$00,$08,$FD,$02,$FC,$10,$7B,$00,$60,$00,$00,$10
@@ -1088,8 +1111,8 @@ FreeAgentArrows	;Draw scroll up/down arrows for the list
 	dc.b	$53,$54,$45,$52,$20,$52,$55,$4C,$45,$53,$61,$00,$01,$54,$61,$00
 	dc.b	$05,$22,$60,$00,$FC,$CA
 
-DrawFreeAgents	;Draw visible free agent rows (pos, name, rating)
-	;Code the listing does not decode: kept as bytes
+DrawFreeAgents						;Draw visible free agent rows (pos, name, rating) Code the listing does
+									;not decode: kept as bytes
 	dc.b	$3A,$39,$FF,$FF,$27,$10,$2A,$7C,$FF,$FF,$27,$12,$28,$7C,$FF,$FF
 	dc.b	$3A,$98,$26,$7C,$FF,$FF,$4E,$20,$31,$FC,$00,$10,$B0,$42,$3E,$3C
 	dc.b	$00,$1C,$3F,$38,$B0,$42,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$8F,$00
@@ -1123,12 +1146,12 @@ DrawFreeAgents	;Draw visible free agent rows (pos, name, rating)
 	dc.b	$4C,$9F,$00,$07,$22,$7C,$00,$1E,$01,$78,$4E,$B9,$00,$01,$D7,$F2
 	dc.b	$4E,$B9,$00,$01,$BC,$84,$61,$00,$FF,$52,$60,$D4
 
-FreeAgentMsgText	;SignFreeAgents: the message when there are no free agents
+FreeAgentMsgText					;SignFreeAgents: the message when there are no free agents
 	String	$8F,$18,$06,'No free agents.',$8F,$17,$07,'Press Any button',$8F,$16,$08,'to exit.'
 	dc.b	$4E,$75
 
-BuildFreeAgentList	;Copy the free agent list from save RAM to a work table and an index list
-	;Code the listing does not decode: kept as bytes
+BuildFreeAgentList					;Copy the free agent list from save RAM to a work table and an index list
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$30,$39,$00,$20,$1B,$B8,$02,$40,$00,$FF,$67,$00
 	dc.b	$00,$30,$53,$40,$20,$7C,$00,$20,$1B,$68,$22,$7C,$FF,$FF,$3A,$98
 	dc.b	$2A,$7C,$FF,$FF,$4E,$20,$42,$46,$22,$18,$14,$01,$02,$42,$00,$FF
@@ -1187,8 +1210,8 @@ BuildFreeAgentList	;Copy the free agent list from save RAM to a work table and a
 	dc.b	$BB,$8E,$00,$06,$8F,$14,$10,$00,$34,$3C,$07,$FF,$30,$3C,$00,$10
 	dc.b	$32,$3C,$00,$0A,$4E,$F9,$00,$01,$B9,$76
 
-ReleasePlayers	;The release player screen (roster menu item Release Player)
-	;Code the listing does not decode: kept as bytes
+ReleasePlayers						;The release player screen (roster menu item Release Player) Code the
+									;listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$AF,$52,$4E,$B9,$00,$1E,$0B,$76,$20,$7C,$00,$19
 	dc.b	$97,$AE,$4E,$B9,$00,$01,$21,$8A,$4E,$B9,$00,$1E,$0D,$66,$61,$00
 	dc.b	$07,$A8,$42,$79,$FF,$FF,$27,$16,$42,$79,$FF,$FF,$27,$10,$31,$FC
@@ -1242,12 +1265,13 @@ ReleasePlayers	;The release player screen (roster menu item Release Player)
 	dc.b	$61,$00,$FC,$A2,$4A,$79,$FF,$FF,$27,$10,$67,$00,$00,$08,$53,$79
 	dc.b	$FF,$FF,$27,$10,$60,$00,$FD,$1A,$60,$00,$FD,$94
 
-CheckMinGoalies	;Z if team d7 has only 2 goalies (GetGoalieCountD7), so none can be released
-	;Code the listing does not decode: kept as bytes
+CheckMinGoalies						;Z if team d7 has only 2 goalies
+									;(GetGoalieCountD7), so none can be released
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$57,$74,$B0,$7C,$00,$02,$4E,$75
 
-ReleaseArrows	;Draw scroll arrows ({ above / } below) beside the roster list
-	;Code the listing does not decode: kept as bytes
+ReleaseArrows						;Draw scroll arrows ({ above / } below) beside the roster list Code the
+									;listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$07,$30,$39
 	dc.b	$FF,$FF,$27,$12,$D0,$79,$FF,$FF,$27,$10,$67,$00,$00,$14,$4E,$B9
 	dc.b	$00,$01,$BA,$2E,$00,$08,$FD,$02,$FC,$10,$7B,$00,$60,$00,$00,$10
@@ -1262,8 +1286,9 @@ ReleaseArrows	;Draw scroll arrows ({ above / } below) beside the roster list
 	dc.b	$52,$4F,$53,$54,$45,$52,$20,$52,$55,$4C,$45,$53,$61,$00,$01,$08
 	dc.b	$61,$00,$03,$BE,$60,$00,$FC,$A8,$40,$E7
 
-DrawReleaseRoster	;Draw the visible roster rows (pos letter, name, rating) with highlight on cursor row
-	;Code the listing does not decode: kept as bytes
+DrawReleaseRoster					;Draw the visible roster rows (pos letter, name, rating) with highlight on
+									;cursor row
+									;Code the listing does not decode: kept as bytes
 	dc.b	$3A,$39,$FF,$FF,$27,$10,$2A,$7C,$FF,$FF,$27,$12,$28,$7C,$FF,$FF
 	dc.b	$3A,$98,$31,$FC,$00,$10,$B0,$42,$3E,$39,$FF,$FF,$27,$16,$3F,$38
 	dc.b	$B0,$42,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$8F,$00,$00,$00,$31,$DF
@@ -1292,7 +1317,7 @@ DrawReleaseRoster	;Draw the visible roster rows (pos letter, name, rating) with 
 	dc.b	$F9,$58,$4C,$9F,$00,$07,$22,$7C,$00,$1E,$0A,$F6,$4E,$B9,$00,$01
 	dc.b	$D7,$F2,$4E,$B9,$00,$01,$BC,$84,$61,$00,$FF,$52,$60,$D4
 
-ReleaseMsgText	;ReleasePlayers: the message when the free agent list is full
+ReleaseMsgText						;ReleasePlayers: the message when the free agent list is full
 	String	$8F,$18,$06,'Free agent list',$8F,$17,$07,'is full.',$8F,$16,$08,'Press any button',$8F,$15,$09,'to exit.'
 	dc.b	$48,$E7,$FF,$FE,$4E,$B9,$00,$01,$57,$B2,$55,$40,$3A,$00,$20,$7C
 	dc.b	$FF,$FF,$3A,$98,$38,$05,$42,$46,$10,$28,$00,$01,$B0,$28,$00,$05
@@ -1300,8 +1325,9 @@ ReleaseMsgText	;ReleasePlayers: the message when the free agent list is full
 	dc.b	$20,$82,$58,$48,$51,$CC,$FF,$E2,$4A,$46,$66,$D2,$4C,$DF,$7F,$FF
 	dc.b	$4E,$75
 
-ReleaseGfx	;Release Player screen video set up: fonts, bitmaps and the pos / overall headers
-	;Code the listing does not decode: kept as bytes
+ReleaseGfx							;Release Player screen video set up: fonts, bitmaps and the pos / overall
+									;headers
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$F8,$00,$05,$C3,$56,$21,$FC,$00,$01,$2D,$46,$D2,$44,$08,$B8
 	dc.b	$00,$00,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$08,$B8,$00,$01,$BF,$B2
 	dc.b	$31,$FC,$00,$00,$B0,$00,$31,$FC,$B8,$00,$B0,$02,$31,$FC,$B8,$00
@@ -1334,13 +1360,14 @@ ReleaseGfx	;Release Player screen video set up: fonts, bitmaps and the pos / ove
 	dc.b	$6C,$61,$79,$65,$72,$FD,$15,$FA,$01,$61,$2F,$62,$2D,$73,$77,$69
 	dc.b	$74,$63,$68,$20,$74,$65,$61,$6D,$73,$00,$4C,$DF,$7F,$FF,$4E,$75
 
-PStatsPalette2	;The PStatsPalette palette to palfadenew+$40 (sign free agents and release screens)
-	;Code the listing does not decode: kept as bytes
+PStatsPalette2						;The PStatsPalette palette to palfadenew+$40 (sign free agents and release
+									;screens)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$00,$C0,$20,$7C,$00,$17,$C2,$AE,$22,$7C,$FF,$FF,$BD,$7E
 	dc.b	$30,$3C,$00,$07,$22,$D8,$51,$C8,$FF,$FC,$4C,$DF,$03,$00,$4E,$75
 
-sub_1E0D86	;Called from ExecuteTrade, SignFreeAgents and ReleasePlayers
-	;Code the listing does not decode: kept as bytes
+sub_1E0D86							;Called from ExecuteTrade, SignFreeAgents and ReleasePlayers Code the
+									;listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$30,$39,$00,$20,$00,$00,$53,$00,$B0,$07,$66,$00
 	dc.b	$00,$06,$61,$00,$00,$2C,$30,$39,$00,$20,$18,$72,$53,$00,$B0,$07
 	dc.b	$66,$00,$00,$06,$61,$00,$00,$24,$4C,$DF,$7F,$FF,$4E,$75,$48,$E7

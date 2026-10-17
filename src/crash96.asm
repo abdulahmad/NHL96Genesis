@@ -1,7 +1,7 @@
 ;	The exception screen. Address error, illegal instruction and divide by zero
 ;	print the pc and hang.
 
-AdrErr	;Vector 3: "Address Error", the access address and the pc (crash)
+AdrErr								;Vector 3: "Address Error", the access address and the pc (crash)
 	move	#$2700,sr
 	jsr	(printcurz).l
 	String	$BD,$00,$00,'Address Error'
@@ -9,7 +9,7 @@ AdrErr	;Vector 3: "Address Error", the access address and the pc (crash)
 	move.l	2(sp),d1
 	bra.w	crash
 
-InvOpCode	;Vector 4: "Illegal Instruction" and the pc (crash)
+InvOpCode							;Vector 4: "Illegal Instruction" and the pc (crash)
 	move	#$2700,sr
 	bsr.w	printcurz
 	String	$BD,$00,$00,'Illegal Instruction'
@@ -17,15 +17,16 @@ InvOpCode	;Vector 4: "Illegal Instruction" and the pc (crash)
 	move.l	d0,d1
 	bra.w	crash
 
-DivBy0	;Vector 5: "Division by zero" and the pc, falls into crash
+DivBy0								;Vector 5: "Division by zero" and the pc, falls into crash
 	move	#$2700,sr
 	bsr.w	printcurz
 	String	$BD,$00,$00,'Division by zero'
 	move.l	2(sp),d0
 	move.l	d0,d1
 
-crash	;Print d1 then d0 as hex, set the vdp up, copy 8 longs from the Rinktilelist palette + $20 to cram $20 and
-	;hang. Branched to from AdrErr and InvOpCode, falls in from DivBy0
+crash								;Print d1 then d0 as hex, set the vdp up, copy 8 longs from the
+									;Rinktilelist palette + $20 to cram $20 and
+									;hang. Branched to from AdrErr and InvOpCode, falls in from DivBy0
 	movea.w	#(mesarea-M68K_RAM),a0
 	move.w	#$18,(a0)+
 	move.b	#$BD,(a0)+

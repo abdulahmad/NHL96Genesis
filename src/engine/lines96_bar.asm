@@ -1,7 +1,7 @@
 ;	The line energy bar. linebar draws one line, and SetupTeamLine puts that
 ;	line back on the ice.
 
-linebar	;Draw the energy bar of line d0 for team a2 at printx / printy
+linebar								;Draw the energy bar of line d0 for team a2 at printx / printy
 	movem.l	d0-d5/a0-a2,-(sp)
 	bsr.w	getlinee
 	move.w	(printa).w,-(sp)
@@ -27,7 +27,7 @@ linebar	;Draw the energy bar of line d0 for team a2 at printx / printy
 	movem.l	(sp)+,d0-d5/a0-a2
 	rts
 
-getlinee	;d0 = line number, a2 = team struct. Return d0 = energy level of this line
+getlinee							;d0 = line number, a2 = team struct. Return d0 = energy level of this line
 	movem.l	d1-d5/a0-a3,-(sp)
 	lea	$184(a2),a1
 	asl.w	#3,d0
@@ -52,14 +52,15 @@ getlinee	;d0 = line number, a2 = team struct. Return d0 = energy level of this l
 	movem.l	(sp)+,d1-d5/a0-a3
 	rts
 
-AvgCline	;Average energy of the current line.
-	;Code the listing does not decode: kept as bytes
+AvgCline							;Average energy of the current line.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$70,$80,$42,$80,$42,$41,$74,$05,$30,$6A,$00,$22,$4A,$68
 	dc.b	$00,$34,$6F,$00,$00,$10,$42,$43,$16,$28,$00,$67,$D6,$43,$D0,$72
 	dc.b	$30,$34,$52,$41,$D0,$FC,$00,$80,$51,$CA,$FF,$E4,$4A,$41,$67,$00
 	dc.b	$00,$04,$80,$C1,$4C,$DF,$01,$0E,$4E,$75
 
-ChkShotStat	;Determine if a shot was taken and add it to the stats (crowd, team, shooter and goalie)
+ChkShotStat							;Determine if a shot was taken and add it to the stats (crowd, team,
+									;shooter and goalie)
 	btst	#gmclock,(gmode).w
 	bne.w	rtss2
 	btst	#gmhl,(gmode).w
@@ -138,7 +139,7 @@ ChkShotStat	;Determine if a shot was taken and add it to the stats (crowd, team,
 	movem.l	(sp)+,d0-d1/a1-a3
 	rts
 
-loadTeamStruct	;a2 = the team struct of player a3
+loadTeamStruct						;a2 = the team struct of player a3
 	movea.w	#(tmstruct-M68K_RAM),a2
 	lea	$39E(a2),a1
 	btst	#6,$62(a3)
@@ -146,14 +147,14 @@ loadTeamStruct	;a2 = the team struct of player a3
 	exg	a1,a2
 	rts
 
-SetupTeamForIntermission	;Reset the bench (ResetBench), then for each team SetupTeamLine
+SetupTeamForIntermission			;Reset the bench (ResetBench), then for each team SetupTeamLine
 	bsr.w	ResetBench
 	movea.w	#(tmstruct-M68K_RAM),a2
 	lea	$39E(a2),a3
 	bsr.w	SetupTeamLine
 	exg	a2,a3
 
-SetupTeamLine	;The line of team a3 back on the ice (reenergizeteam first)
+SetupTeamLine						;The line of team a3 back on the ice (reenergizeteam first)
 	bsr.w	reenergizeteam
 	clr.w	$16(a3)
 	tst.w	(OptLine).w
@@ -167,14 +168,15 @@ SetupTeamLine	;The line of team a3 back on the ice (reenergizeteam first)
 	move.w	#5,$16(a3)
 	rts
 
-RestoreTeamEnergy	;Restore the energy of team a2.
-	;Code the listing does not decode: kept as bytes
+RestoreTeamEnergy					;Restore the energy of team a2.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$70,$36,$0C,$72,$FF,$FD,$00,$6C,$66,$00,$00,$10,$0C,$72,$FF,$FC
 	dc.b	$00,$6C,$66,$00,$00,$06,$60,$00,$00,$08,$35,$BC,$10,$00,$00,$34
 	dc.b	$55,$40,$6A,$DE,$4E,$75
 
-reenergizeteam	;a2 = team: energy $1000 for every player not out for the game (-4); out for the period (-3) back to the bench
-	;(-2)
+reenergizeteam						;a2 = team: energy $1000 for every player not out for the game (-4); out
+									;for the period (-3) back to the bench
+									;(-2)
 	moveq	#$36,d0
 .0
 	cmpi.w	#$FFFC,$6C(a2,d0.w)

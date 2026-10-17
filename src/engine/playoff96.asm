@@ -1,7 +1,7 @@
 ;	The playoff tree and the saved series. ContinuePlayoffs reads the bits,
 ;	maketree builds the bracket, and ResolveGames picks the winners.
 
-ContinuePlayoffs	;Continue the playoffs: read the saved bits (ReadPassBits)
+ContinuePlayoffs					;Continue the playoffs: read the saved bits (ReadPassBits)
 	movem.l	d0-d7/a0-a3,-(sp)
 	movea.l	#$FFFFD296,a3
 	bsr.w	ReadPassBits
@@ -36,7 +36,7 @@ ContinuePlayoffs	;Continue the playoffs: read the saved bits (ReadPassBits)
 	movem.l	(sp)+,d0-d7/a0-a3
 	rts
 
-NewPO	;New playoff tree
+NewPO								;New playoff tree
 	btst	#7,(GameFlags).w
 	beq.w	.1
 	jsr	(BeginPlayoffs).l
@@ -97,8 +97,10 @@ NewPO	;New playoff tree
 .4
 	clr.w	(WinBits).w
 
-maketree	;Make the playoff tree (potree) from the playoff seeds and WinBits, then FigureJoy; with GameFlags bit 7
-	;the seeds come from save RAM. Called after ResolveGames, ResolveDayGames and BeginPlayoffs
+maketree							;Make the playoff tree (potree) from the playoff seeds and WinBits, then
+									;FigureJoy; with GameFlags bit 7
+									;the seeds come from save RAM. Called after ResolveGames, ResolveDayGames
+									;and BeginPlayoffs
 	movem.l	d0-d4/a0-a3,-(sp)
 	btst	#7,(GameFlags).w
 	beq.w	.0
@@ -291,10 +293,12 @@ maketree	;Make the playoff tree (potree) from the playoff seeds and WinBits, the
 	movem.l	(sp)+,d0-d4/a0-a3
 	rts
 
-FirstRoundSeeds	;The seed of each first round team in tree order (1-8, 4-5, 3-6, 2-7), both conferences; maketree copies it
+FirstRoundSeeds						;The seed of each first round team in tree order (1-8, 4-5, 3-6, 2-7),
+									;both conferences; maketree copies it
 	dc.b	$08,$01,$05,$04,$06,$03,$07,$02,$08,$01,$05,$04,$06,$03,$07,$02
 
-SetTreeGameTeams	;Put the two teams at a0 in game a1: flipped (gsstruct flags bit 0) except for bosgames 2, 3 and 5
+SetTreeGameTeams					;Put the two teams at a0 in game a1: flipped (gsstruct flags bit 0) except
+									;for bosgames 2, 3 and 5
 	cmpi.w	#2,(bosgames).w
 	beq.w	.noflip
 	cmpi.w	#3,(bosgames).w
@@ -311,7 +315,7 @@ SetTreeGameTeams	;Put the two teams at a0 in game a1: flipped (gsstruct flags bi
 	move.b	(a0)+,3(a1)
 	rts
 
-FigureJoy	;Set cont1team ... cont4team
+FigureJoy							;Set cont1team ... cont4team
 	movem.l	d0-d3/a0-a1,-(sp)
 	clr.w	(cont1team).w
 	clr.w	(cont2team).w
@@ -395,11 +399,11 @@ FigureJoy	;Set cont1team ... cont4team
 	move.w	#0,(cont4team).w
 	bra.w	.ex
 
-.9	;FigureJoy table
+.9									;FigureJoy table
 	dc.b	$00,$01,$00,$00,$00,$01,$00,$01,$00,$01,$00,$02,$00,$02,$00,$01
 	dc.b	$00,$02,$00,$00,$00,$02,$00,$02,$00,$02,$00,$01,$00,$01,$00,$02
 
-.10	;FigureJoy table
+.10									;FigureJoy table
 	dc.b	$00,$01,$00,$00,$00,$01,$00,$02,$00,$01,$00,$02,$00,$01,$00,$01
 	dc.b	$00,$01,$00,$02,$00,$02,$00,$00,$00,$02,$00,$01,$00,$02,$00,$01
 	dc.b	$00,$02,$00,$02,$00,$02,$00,$01
@@ -415,13 +419,14 @@ FigureJoy	;Set cont1team ... cont4team
 	movem.l	(sp)+,d0-d3/a0-a1
 	rts
 
-NOPJoyTbl	;FigureJoy: cont1team, cont2team by OptNOP when it is not a playoff game
+NOPJoyTbl							;FigureJoy: cont1team, cont2team by OptNOP when it is not a playoff game
 	dc.b	$00,$00,$00,$00,$00,$01,$00,$00,$00,$02,$00,$00,$00,$01,$00,$01
 	dc.b	$00,$01,$00,$02,$00,$01,$00,$02,$00,$01,$00,$02
 	btst	#7,(GameFlags).w
 	bne.w	rtsInitGames
 
-InitializeGameStructures	;Random team pairs for all 8 gsstruct games, none of them HomeTeam or VisTeam
+InitializeGameStructures			;Random team pairs for all 8 gsstruct games, none of them HomeTeam or
+									;VisTeam
 	st	(gamenum).w
 	clr.l	d3
 	move.w	(HomeTeam).w,d1
@@ -439,19 +444,20 @@ InitializeGameStructures	;Random team pairs for all 8 gsstruct games, none of th
 	dbf	d2,.loop
 	rts
 
-GetRandomUnusedTeam	;d0 = a random team 0-25 not yet set in d3, and set its bit
+GetRandomUnusedTeam					;d0 = a random team 0-25 not yet set in d3, and set its bit
 	moveq	#$1A,d0
 	bsr.w	randomd0
 	bset	d0,d3
 	bne.s	GetRandomUnusedTeam
-rtsInitGames	;GameFlags bit 7 skips the random pairs and returns here
+rtsInitGames						;GameFlags bit 7 skips the random pairs and returns here
 	rts
 
-ReadPassBits	;Translate the saved bits at a3 (5 words) to the playoff variables; the 5 words are kept
+ReadPassBits						;Translate the saved bits at a3 (5 words) to the playoff variables; the 5
+									;words are kept
 	moveq	#4,d0
 	lea	$A(a3),a0
 .save
-	move.w	-(a0),-(sp)	;SuperDiv destroys the bits
+	move.w	-(a0),-(sp)				;SuperDiv destroys the bits
 	dbf	d0,.save
 	moveq	#7,d2
 	movea.w	#(gsstruct+$70-M68K_RAM),a1
@@ -505,11 +511,11 @@ ReadPassBits	;Translate the saved bits at a3 (5 words) to the playoff variables;
 	moveq	#4,d0
 	lea	(a3),a0
 .restore
-	move.w	(sp)+,(a0)+	;put the bits back
+	move.w	(sp)+,(a0)+				;put the bits back
 	dbf	d0,.restore
 	rts
 
-EncodePW	;After a playoff game compute winners and save the bits if needed
+EncodePW							;After a playoff game compute winners and save the bits if needed
 	tst.w	(OptNOP).w
 	beq.w	rtss2
 	tst.w	(OptPlayMode).w
@@ -517,12 +523,12 @@ EncodePW	;After a playoff game compute winners and save the bits if needed
 	cmpi.w	#4,(OptPlayMode).w
 	beq.w	rtss2
 	bset	#6,(GameFlags).w
-	move.w	#1,(OptPlayMode).w	;continue playoffs
+	move.w	#1,(OptPlayMode).w		;continue playoffs
 	move.w	#1,(TempOptPlayMode).w
 	bsr.w	ResolveGames
 	bsr.w	maketree
 	cmpi.w	#4,(gamelevel).w
-	beq.w	.2	;finished playoffs
+	beq.w	.2						;finished playoffs
 	btst	#7,(GameFlags).w
 	bne.w	.0
 	tst.w	(gamenum).w
@@ -552,15 +558,15 @@ EncodePW	;After a playoff game compute winners and save the bits if needed
 	bclr	#sfwrap,(sflags).w
 	move.w	#$FFFF,(lastsfx).w
 	move.l	#$FFFF0000,(recbpr).w
-	move.w	#2,(OptPlayMode).w	;new playoffs
+	move.w	#2,(OptPlayMode).w		;new playoffs
 	move.w	#2,(TempOptPlayMode).w
 	cmpi.w	#7,(bosgames).w
 	beq.w	rtss2
-	move.w	#3,(OptPlayMode).w	;new playoffs best of 7
+	move.w	#3,(OptPlayMode).w		;new playoffs best of 7
 	move.w	#3,(TempOptPlayMode).w
 	rts
 
-ReadPassData	;Read pwddatabuffer from save RAM (GameFlags bit 7: the season copy)
+ReadPassData						;Read pwddatabuffer from save RAM (GameFlags bit 7: the season copy)
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	#$E5E,d0
 	btst	#7,(GameFlags).w
@@ -573,8 +579,9 @@ ReadPassData	;Read pwddatabuffer from save RAM (GameFlags bit 7: the season copy
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-WritePassData	;Write pwddatabuffer to save RAM and its checksum (GameFlags bit 7: the season copy, only with
-	;SeasonDay bit 2)
+WritePassData						;Write pwddatabuffer to save RAM and its checksum (GameFlags bit 7:
+									;the season copy, only with
+									;SeasonDay bit 2)
 	movem.l	d0-d1/a0,-(sp)
 	move.l	#$E5E,d0
 	btst	#7,(GameFlags).w
@@ -591,7 +598,7 @@ WritePassData	;Write pwddatabuffer to save RAM and its checksum (GameFlags bit 7
 	movem.l	(sp)+,d0-d1/a0
 	rts
 
-WritePassBits	;Transfer the game variables to the bits at a3
+WritePassBits						;Transfer the game variables to the bits at a3
 	bsr.w	ClrPassBits
 	move.w	(postarts).w,d0
 	moveq	#$20,d1
@@ -623,7 +630,7 @@ WritePassBits	;Transfer the game variables to the bits at a3
 	dbf	d2,.0
 	rts
 
-PushBits	;Bits = bits * d1 + d0. d1 = range 2^1-2^15, d0 = data
+PushBits							;Bits = bits * d1 + d0. d1 = range 2^1-2^15, d0 = data
 	movem.l	d0-d1,-(sp)
 	exg	d0,d1
 	bsr.w	SuperMult
@@ -633,7 +640,7 @@ PushBits	;Bits = bits * d1 + d0. d1 = range 2^1-2^15, d0 = data
 	movem.l	(sp)+,d0-d1
 	rts
 
-ClrPassBits	;Clear the 5 words of bits at a3
+ClrPassBits							;Clear the 5 words of bits at a3
 	movea.w	a3,a0
 	moveq	#4,d0
 .0
@@ -641,20 +648,20 @@ ClrPassBits	;Clear the 5 words of bits at a3
 	dbf	d0,.0
 	rts
 
-SuperAdd	;1 long (d0.L) added to the 5 words at a3
+SuperAdd							;1 long (d0.L) added to the 5 words at a3
 	movem.l	d1/a0,-(sp)
 	lea	$A(a3),a0
 	moveq	#3,d1
 	add.l	d0,-(a0)
 	bra.w	.1
 .0
-	addq.w	#1,-(a0)	;carry into the next word up
+	addq.w	#1,-(a0)				;carry into the next word up
 .1
 	dbcc	d1,.0
 	movem.l	(sp)+,d1/a0
 	rts
 
-SuperMult	;1 word (d0) multiplied by the 5 words at a3
+SuperMult							;1 word (d0) multiplied by the 5 words at a3
 	movem.l	d1-d4/a0,-(sp)
 	movea.w	a3,a0
 	moveq	#4,d4
@@ -680,7 +687,7 @@ SuperMult	;1 word (d0) multiplied by the 5 words at a3
 	movem.l	(sp)+,d1-d4/a0
 	rts
 
-SuperDiv	;5 words at a3 divided by 1 word (d0); d0 = remainder on exit
+SuperDiv							;5 words at a3 divided by 1 word (d0); d0 = remainder on exit
 	movem.l	d1-d2/a0,-(sp)
 	movea.w	a3,a0
 	moveq	#4,d1
@@ -695,7 +702,7 @@ SuperDiv	;5 words at a3 divided by 1 word (d0); d0 = remainder on exit
 	movem.l	(sp)+,d1-d2/a0
 	rts
 
-GetShifter	;Returns d1 = number of games - 1, d2 = first bit of WinBits
+GetShifter							;Returns d1 = number of games - 1, d2 = first bit of WinBits
 	move.l	d0,-(sp)
 	moveq	#-16,d2
 	moveq	#$10,d1
@@ -708,8 +715,9 @@ GetShifter	;Returns d1 = number of games - 1, d2 = first bit of WinBits
 	move.l	(sp)+,d0
 	rts
 
-AddPlayoffTeamStats	;Add the po team's game stats to its playoff totals in statsbuffer (ReadTeamStats) and write them back
-	;to save RAM
+AddPlayoffTeamStats					;Add the po team's game stats to its playoff totals in statsbuffer
+									;(ReadTeamStats) and write them back
+									;to save RAM
 	btst	#7,(GameFlags).w
 	bne.w	.2
 	cmpi.w	#1,(OptPlayMode).w
@@ -771,7 +779,8 @@ AddPlayoffTeamStats	;Add the po team's game stats to its playoff totals in stats
 .2
 	rts
 
-ReadTeamStats	;Read the playoff stat totals of the po team from save RAM into statsbuffer words
+ReadTeamStats						;Read the playoff stat totals of the po team from save RAM into
+									;statsbuffer words
 	movea.w	#(potree-M68K_RAM),a0
 	move.w	(potreeteam).w,d2
 	move.b	(a0,d2.w),d2
@@ -809,7 +818,7 @@ ReadTeamStats	;Read the playoff stat totals of the po team from save RAM into st
 	jsr	(ReadSRAMBitWords).l
 	rts
 
-ResolveGames	;Compute winners and losers for playoff matchups
+ResolveGames						;Compute winners and losers for playoff matchups
 	tst.w	(gamenum).w
 	bmi.w	.1
 	move.w	(gamenum).w,d0
@@ -861,7 +870,7 @@ ResolveGames	;Compute winners and losers for playoff matchups
 	cmpi.w	#4,6(a0)
 	bne.w	rtss2
 .cround
-	cmpi.w	#3,(gamelevel).w	;finish off rest of round games here
+	cmpi.w	#3,(gamelevel).w		;finish off rest of round games here
 	bge.w	.nextround
 	btst	#7,(GameFlags).w
 	bne.w	rtss2
@@ -878,7 +887,7 @@ ResolveGames	;Compute winners and losers for playoff matchups
 	cmpi.w	#4,6(a0)
 	beq.w	.crn
 	addq.w	#1,4(a0)
-	move.l	#$C8,d0	;200
+	move.l	#$C8,d0					;200
 	jsr	(randomd0).l
 	andi.w	#1,d0
 	beq.s	.cr0
@@ -892,7 +901,7 @@ ResolveGames	;Compute winners and losers for playoff matchups
 	bsr.w	WritePassBits
 	bset	#sf3alttree,(sflags3).w
 .nextround
-	clr.w	(bosgames).w	;advance to next round
+	clr.w	(bosgames).w			;advance to next round
 	bsr.w	GetShifter
 	movea.w	#(gsstruct-M68K_RAM),a0
 	moveq	#$10,d3
@@ -917,7 +926,7 @@ ResolveGames	;Compute winners and losers for playoff matchups
 	addq.w	#1,(gamelevel).w
 	rts
 .notbos
-	clr.w	d3	;solve for no best of 7 playoffs (much simpler)
+	clr.w	d3						;solve for no best of 7 playoffs (much simpler)
 .loop3
 	move.w	$A(a0),d0
 	cmp.w	$C(a0),d0

@@ -1,7 +1,8 @@
 ;	The screen and the printers. Palette fades, the pads, dma, the graphics
 ;	decompressor, and printsmall, print and printbig.
 
-remap	;Write d0 chars at a0 to vram d1, each pixel through the colour map at a1. Reached from DecompressGraphics
+remap								;Write d0 chars at a0 to vram d1, each pixel through the colour map at a1.
+									;Reached from DecompressGraphics
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
 	movem.l	d0-d4/a0-a2,-(sp)
@@ -33,7 +34,7 @@ remap	;Write d0 chars at a0 to vram d1, each pixel through the colour map at a1.
 	move.w	(sp)+,(disflags).w
 	rts
 
-forceblack	;Fade the screen to black and wait for it
+forceblack							;Fade the screen to black and wait for it
 	movem.l	d0/a0,-(sp)
 	movea.w	#(palfadenew-M68K_RAM),a0
 	moveq	#$1F,d0
@@ -50,13 +51,15 @@ forceblack	;Fade the screen to black and wait for it
 	movem.l	(sp)+,d0/a0
 	rts
 
-forceblack2	;Forceblack with palcount $64 (one step, CopyPaletteToCRAM). Nothing calls it.
-	;Code the listing does not decode: kept as bytes
+forceblack2							;Forceblack with palcount $64 (one step,
+									;CopyPaletteToCRAM). Nothing calls it.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$80,$80,$30,$7C,$BD,$3E,$70,$1F,$2F,$10,$42,$98,$51,$C8
 	dc.b	$FF,$FA,$31,$FC,$00,$64,$BD,$3C,$61,$00,$00,$10,$70,$1F,$21,$1F
 	dc.b	$51,$C8,$FF,$FC,$4C,$DF,$01,$01,$4E,$75
 
-forcefade	;Run the palette fade to the end: vbint = vb2 (fades only), interrupts on, wait for palcount to go negative
+forcefade							;Run the palette fade to the end: vbint = vb2 (fades only), interrupts on,
+									;wait for palcount to go negative
 	move	sr,-(sp)
 	move.l	(vbint).w,-(sp)
 	move.w	(disflags).w,-(sp)
@@ -71,8 +74,9 @@ forcefade	;Run the palette fade to the end: vbint = vb2 (fades only), interrupts
 	move	(sp)+,sr
 	rts
 
-cramfade	;Step the palette fade (palcount) and copy the palette to cram. Called from the vblank handlers.
-	;Code the listing does not decode: kept as bytes
+cramfade							;Step the palette fade (palcount) and copy the palette to cram. Called
+									;from the vblank handlers.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4A,$78,$BD,$3C,$6B,$00,$48,$6E,$0C,$78,$00,$64,$BD,$3C,$67,$00
 	dc.b	$00,$7E,$53,$78,$BD,$3C,$6B,$00,$48,$5C,$42,$80,$30,$38,$BD,$3C
 	dc.b	$B0,$7C,$00,$18,$6E,$00,$48,$4E,$80,$FC,$00,$03,$48,$40,$E5,$40
@@ -83,13 +87,14 @@ cramfade	;Step the palette fade (palcount) and copy the palette to cram. Called 
 	dc.b	$CE,$44,$8E,$40,$20,$3C,$00,$00,$C0,$00,$10,$06,$48,$40,$21,$40
 	dc.b	$00,$04,$30,$87,$54,$46,$BC,$7C,$00,$80,$66,$BE,$4E,$75
 
-CopyPaletteToCRAM	;Copy all 64 palfadenew colours to colour ram (dfng set), then palcount = -1
+CopyPaletteToCRAM					;Copy all 64 palfadenew colours to colour ram
+									;(dfng set), then palcount = -1
 	movem.l	d0/a0-a1,-(sp)
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
 	movea.w	#(palfadenew-M68K_RAM),a1
 	movea.l	#Vdata,a0
-	move.l	#$C0000000,4(a0)	;cram write, address 0
+	move.l	#$C0000000,4(a0)		;cram write, address 0
 	moveq	#$1F,d0
 .0
 	move.l	(a1)+,(a0)
@@ -99,14 +104,14 @@ CopyPaletteToCRAM	;Copy all 64 palfadenew colours to colour ram (dfng set), then
 	movem.l	(sp)+,d0/a0-a1
 	rts
 
-randomd0s	;d0 = random number from -d0 to d0-1 (randomd0(d0*2) - d0)
+randomd0s							;d0 = random number from -d0 to d0-1 (randomd0(d0*2) - d0)
 	move.w	d0,-(sp)
 	asl.w	#1,d0
 	bsr.w	randomd0
 	sub.w	(sp)+,d0
 	rts
 
-randomd0	;d0 = random number 0 to d0-1 (seed * $BB40E62D + 1)
+randomd0							;d0 = random number 0 to d0-1 (seed * $BB40E62D + 1)
 	movem.l	d0-d2,-(sp)
 	move.w	(seed+2).w,d0
 	move.w	d0,d1
@@ -127,10 +132,11 @@ randomd0	;d0 = random number 0 to d0-1 (seed * $BB40E62D + 1)
 	movem.l	(sp)+,d1-d2
 	rts
 
-sroot	;d0 = square root of d0 (long). Small values by odd subtraction, else Newton steps, else a binary search
+sroot								;d0 = square root of d0 (long). Small values by odd subtraction, else
+									;Newton steps, else a binary search
 	tst.l	d0
 	beq.w	rtss2
-	cmp.l	#$640,d0	;#40^2
+	cmp.l	#$640,d0				;#40^2
 	bhi.w	.m2
 	move.l	d1,-(sp)
 	moveq	#-1,d1
@@ -144,7 +150,7 @@ sroot	;d0 = square root of d0 (long). Small values by odd subtraction, else Newt
 	rts
 .m2
 	movem.l	d1-d4,-(sp)
-	moveq	#9,d3	;max number of reps
+	moveq	#9,d3					;max number of reps
 	move.w	#$8000,d1
 	cmp.l	#$F00000,d0
 	bhi.w	.big
@@ -182,7 +188,8 @@ sroot	;d0 = square root of d0 (long). Small values by odd subtraction, else Newt
 	move.w	d4,d1
 	bra.s	.bs
 
-waitx	;Wait -d0 frames, or until a button on any pad (waitxpad = the buttons held)
+waitx								;Wait -d0 frames, or until a button on any pad
+									;(waitxpad = the buttons held)
 	clr.w	(waitxpad).w
 	neg.w	d0
 	move.w	d0,(vcount).w
@@ -230,7 +237,8 @@ waitx	;Wait -d0 frames, or until a button on any pad (waitxpad = the buttons hel
 	dc.b	$0F,$F0,$4E,$75,$30,$38,$B0,$52,$B0,$78,$B0,$52,$67,$FA,$61,$00
 	dc.b	$00,$48,$67,$F0,$4E,$75
 
-FindHeldMenuPad	;menupadnum = the first pad (1-4, 3 and 4 with FourWayPlay) with buttons held
+FindHeldMenuPad						;menupadnum = the first pad (1-4, 3 and 4 with
+									;FourWayPlay) with buttons held
 	clr.w	(menupadnum).w
 	bsr.w	ReadJoy1
 	tst.w	d3
@@ -250,7 +258,7 @@ FindHeldMenuPad	;menupadnum = the first pad (1-4, 3 and 4 with FourWayPlay) with
 .0
 	rts
 
-orjoy	;The new presses of pads 1 and 2 in d1 (orjoy4way with FourWayPlay)
+orjoy								;The new presses of pads 1 and 2 in d1 (orjoy4way with FourWayPlay)
 	tst.w	(FourWayPlay).w
 	bne.w	orjoy4way
 	bsr.w	ReadJoy1
@@ -259,7 +267,7 @@ orjoy	;The new presses of pads 1 and 2 in d1 (orjoy4way with FourWayPlay)
 	or.w	(sp)+,d1
 	rts
 
-orjoy4way	;orjoy for pads 1-4
+orjoy4way							;orjoy for pads 1-4
 	bsr.w	ReadJoy1
 	move.w	d1,-(sp)
 	bsr.w	ReadJoy2
@@ -272,7 +280,8 @@ orjoy4way	;orjoy for pads 1-4
 	or.w	(sp)+,d1
 	rts
 
-nodiag	;Diagonal presses are ignored: clear the directions of d1 when d3 holds more than one
+nodiag								;Diagonal presses are ignored: clear the directions of d1 when d3 holds
+									;more than one
 	movem.l	d0/d4-d5,-(sp)
 	moveq	#3,d4
 	move.w	d3,d0
@@ -289,7 +298,7 @@ nodiag	;Diagonal presses are ignored: clear the directions of d1 when d3 holds m
 	movem.l	(sp)+,d0/d4-d5
 	rts
 
-ProcessInputWithRepeat	;nodiag, then key repeat on d1-d3: the held buttons again every 4 frames
+ProcessInputWithRepeat				;nodiag, then key repeat on d1-d3: the held buttons again every 4 frames
 	bsr.s	nodiag
 	tst.w	d3
 	beq.w	rtss2
@@ -304,7 +313,7 @@ ProcessInputWithRepeat	;nodiag, then key repeat on d1-d3: the held buttons again
 	move.w	#$F,(repeatdelayframes).w
 	rts
 
-ReadJoy1	;d1 = the new presses of pad 1, d3 the buttons held (lj1)
+ReadJoy1							;d1 = the new presses of pad 1, d3 the buttons held (lj1)
 	move.b	(pad4way1).w,d0
 	bsr.w	ReadJoy
 	move.w	(lj1).w,d2
@@ -314,7 +323,7 @@ ReadJoy1	;d1 = the new presses of pad 1, d3 the buttons held (lj1)
 	and.w	d2,d1
 	rts
 
-ReadJoy2	;The same for pad 2 (lj2)
+ReadJoy2							;The same for pad 2 (lj2)
 	move.b	(pad4way2).w,d0
 	bsr.w	ReadJoy
 	move.w	(lj2).w,d2
@@ -324,7 +333,7 @@ ReadJoy2	;The same for pad 2 (lj2)
 	and.w	d2,d1
 	rts
 
-ReadJoy3	;The same for pad 3 (lj3)
+ReadJoy3							;The same for pad 3 (lj3)
 	move.b	(pad4way3).w,d0
 	bsr.w	ReadJoy
 	move.w	(lj3).w,d2
@@ -334,7 +343,7 @@ ReadJoy3	;The same for pad 3 (lj3)
 	and.w	d2,d1
 	rts
 
-ReadJoy4	;The same for pad 4 (lj4)
+ReadJoy4							;The same for pad 4 (lj4)
 	move.b	(pad4way4).w,d0
 	bsr.w	ReadJoy
 	move.w	(lj4).w,d2
@@ -344,7 +353,8 @@ ReadJoy4	;The same for pad 4 (lj4)
 	and.w	d2,d1
 	rts
 
-ReadJoy	;d0 = pad byte: buttons to the high nibble, direction 0-8 (jdtab) in the low nibble, d1 = the buttons
+ReadJoy								;d0 = pad byte: buttons to the high nibble, direction 0-8 (jdtab) in the
+									;low nibble, d1 = the buttons
 	not.b	d0
 	clr.w	d1
 	move.b	d0,d1
@@ -357,18 +367,18 @@ ReadJoy	;d0 = pad byte: buttons to the high nibble, direction 0-8 (jdtab) in the
 	move.w	(sp)+,d1
 	rts
 
-jdtab	;ReadJoy: pad directions to the directions 0-7, 8 for none
+jdtab								;ReadJoy: pad directions to the directions 0-7, 8 for none
 	dc.b	8,0,4,8,6,7,5,8,2,1,3,8,8,8,8,8
 
-DoDMApro	;DoDMA protected from vblank (dfng set)
+DoDMApro							;DoDMA protected from vblank (dfng set)
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
 	bsr.w	DoDMA
 	move.w	(sp)+,(disflags).w
 	rts
 
-DoDMA	;Dma d0 words from a0 to vram d1 (two transfers when the source crosses a 64K boundary), the sound
-	;driver paused
+DoDMA								;Dma d0 words from a0 to vram d1 (two transfers when the source crosses a
+									;64K boundary), the sound driver paused
 	movem.l	d2/a1,-(sp)
 	move.w	d0,-(sp)
 	move.w	#$D,d0
@@ -379,7 +389,7 @@ DoDMA	;Dma d0 words from a0 to vram d1 (two transfers when the source crosses a 
 	add.w	a0,d2
 	bcc.w	.nd
 	beq.w	.nd
-	lsr.w	#1,d2	;do 2 transers if source address crosses 64k boundary
+	lsr.w	#1,d2					;do 2 transers if source address crosses 64k boundary
 	sub.w	d2,d0
 	move.w	d0,-(sp)
 	bsr.w	.dd
@@ -433,8 +443,8 @@ DoDMA	;Dma d0 words from a0 to vram d1 (two transfers when the source crosses a 
 	movem.l	(sp)+,d2/a1
 	rts
 
-DoDMA_nd2	;Vram to vram copy by dma, protected from vblank.
-	;Code the listing does not decode: kept as bytes
+DoDMA_nd2							;Vram to vram copy by dma, protected from vblank.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$F0,$40,$3F,$38,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$43,$F9
 	dc.b	$00,$C0,$00,$04,$32,$BC,$81,$54,$32,$BC,$8F,$01,$36,$3C,$93,$00
 	dc.b	$16,$00,$32,$83,$36,$3C,$94,$00,$E0,$48,$16,$00,$32,$83,$36,$3C
@@ -445,7 +455,7 @@ DoDMA_nd2	;Vram to vram copy by dma, protected from vblank.
 	dc.b	$32,$BC,$81,$64,$32,$BC,$8F,$02,$30,$3C,$00,$0E,$4E,$B9,$00,$08
 	dc.b	$83,$9E,$31,$DF,$BF,$B2,$4C,$DF,$02,$0F,$4E,$75
 
-DoFill	;Fill d0 bytes of vram at d1 with the word d2
+DoFill								;Fill d0 bytes of vram at d1 with the word d2
 	movem.l	d3/a1,-(sp)
 	movea.l	#Vdata,a1
 	andi.l	#$FFFF,d1
@@ -467,14 +477,14 @@ DoFill	;Fill d0 bytes of vram at d1 with the word d2
 	movem.l	(sp)+,d3/a1
 	rts
 
-WaitDMA	;Wait for the vdp dma busy bit to clear
+WaitDMA								;Wait for the vdp dma busy bit to clear
 	move.w	(Vctrl).l,-(sp)
 	btst	#1,1(sp)
 	addq.w	#2,sp
 	bne.s	WaitDMA
 	rts
 
-setVram	;Fade every colour to d0, then fall into setVram_0
+setVram								;Fade every colour to d0, then fall into setVram_0
 	movea.w	#(palfadenew-M68K_RAM),a0
 	moveq	#$3F,d1
 .0
@@ -483,7 +493,8 @@ setVram	;Fade every colour to d0, then fall into setVram_0
 	move.w	#$18,(palcount).w
 	bsr.w	forcefade
 
-setVram_0	;Second half of setVram without the fade: clear vram and set the VDP registers from disflags
+setVram_0							;Second half of setVram without the fade: clear vram and set the VDP
+									;registers from disflags
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
 	move.w	#$8F02,(Vctrl).l
@@ -494,19 +505,19 @@ setVram_0	;Second half of setVram without the fade: clear vram and set the VDP r
 .9
 	move.l	d1,(a0)
 	dbf	d0,.9
-	move.w	#$8C00,d0	;8 for shadow mode
+	move.w	#$8C00,d0				;8 for shadow mode
 	btst	#5,(disflags).w
 	beq.w	.0
-	move.w	#$8C08,d0	;8 for shadow mode
+	move.w	#$8C08,d0				;8 for shadow mode
 .0
 	btst	#df32c,(disflags).w
 	bne.w	.i32
 	ori.w	#$81,d0
 .i32
-	move.w	d0,4(a0)	;40 col mode, no interlace, normal brightness
-	move.w	#$8004,4(a0)	;512 color palette enable
+	move.w	d0,4(a0)				;40 col mode, no interlace, normal brightness
+	move.w	#$8004,4(a0)			;512 color palette enable
 	move.w	#$8164,4(a0)
-	move.w	#$9001,d0	;playfield is 64x32
+	move.w	#$9001,d0				;playfield is 64x32
 	cmpi.w	#6,(Map1col1).w
 	beq.w	.i64
 	move.w	#$9003,d0
@@ -534,12 +545,12 @@ setVram_0	;Second half of setVram without the fade: clear vram and set the VDP r
 	move.b	(VSCRLPM).w,d0
 	lsr.b	#2,d0
 	move.w	d0,4(a0)
-	move.w	#$9100,4(a0)	;disable plane 3 graphics
-	move.w	#$9200,4(a0)	;disable plane 3 graphics
-	move.w	#$8700,4(a0)	;Palette # 0 is border/transparent
-	move.w	#$8B00,4(a0)	;Scroll mode (entire scroll)
-	move.l	#$40000010,4(a0)	;vsram
-	move.l	#0,(a0)	;playfield 1/2
+	move.w	#$9100,4(a0)			;disable plane 3 graphics
+	move.w	#$9200,4(a0)			;disable plane 3 graphics
+	move.w	#$8700,4(a0)			;Palette # 0 is border/transparent
+	move.w	#$8B00,4(a0)			;Scroll mode (entire scroll)
+	move.l	#$40000010,4(a0)		;vsram
+	move.l	#0,(a0)					;playfield 1/2
 	move.w	(sp)+,(disflags).w
 	rts
 
@@ -553,7 +564,8 @@ Vmaddr
 	move.l	d0,4(a0)
 	rts
 
-dobitmap	;Copy the palettes flagged in d5 to palfadenew, then write the map at a1 to the screen at printx / printy
+dobitmap							;Copy the palettes flagged in d5 to palfadenew, then write the map at a1
+									;to the screen at printx / printy
 	move.w	(printy).w,-(sp)
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
@@ -578,8 +590,8 @@ dobitmap	;Copy the palettes flagged in d5 to palfadenew, then write the map at a
 	subq.w	#1,d2
 .loop2
 	bsr.w	xyVmMap
-	move.w	d6,d0	;y start
-	mulu.w	(a1),d0	;map width
+	move.w	d6,d0					;y start
+	mulu.w	(a1),d0					;map width
 	add.w	2(sp),d0
 	asl.w	#1,d0
 	move.w	$A(sp),d1
@@ -603,16 +615,16 @@ dobitmap	;Copy the palettes flagged in d5 to palfadenew, then write the map at a
 	move.w	(sp)+,(printy).w
 	rts
 
-DecompressGraphicsWithCallback	;DecompressGraphics, then return 8 bytes past the call (callback data)
+DecompressGraphicsWithCallback		;DecompressGraphics, then return 8 bytes past the call (callback data)
 	move.l	(sp),(callbackPtr).w
 	bsr.w	DecompressGraphics
 	addq.l	#8,(sp)
 	rts
 
-DecompressGraphicsPlain	;Clear callbackPtr, fall into DecompressGraphics
+DecompressGraphicsPlain				;Clear callbackPtr, fall into DecompressGraphics
 	clr.l	(callbackPtr).w
 
-DecompressGraphics	;a2 = graphics data, d4 = start char
+DecompressGraphics					;a2 = graphics data, d4 = start char
 	movem.l	d0-d1/a0-a6,-(sp)
 	movea.l	a2,a0
 	move.w	d4,d1
@@ -635,7 +647,7 @@ DecompressGraphics	;a2 = graphics data, d4 = start char
 	movem.l	(sp)+,d0-d1/a0-a6
 	rts
 
-DecompressBytecode	;Unpack a0 into the 256 byte ring buffer at ThreeStars
+DecompressBytecode					;Unpack a0 into the 256 byte ring buffer at ThreeStars
 	movea.w	#(ThreeStars-M68K_RAM),a1
 	movea.w	#(ThreeStars-M68K_RAM),a3
 	movea.w	#(callbackPtr-M68K_RAM),a4
@@ -654,7 +666,7 @@ DecompressBytecode	;Unpack a0 into the 256 byte ring buffer at ThreeStars
 	jsr	(a2,d0.w)
 	bra.s	.0
 
-jump_table	;DecompressBytecode handler offsets, one per opcode high nibble
+jump_table							;DecompressBytecode handler offsets, one per opcode high nibble
 	dc.w	Opcode_CopyLiteral-jump_table	;0
 	dc.w	Opcode_CopyLiteral-jump_table	;1
 	dc.w	Opcode_ClearBytes-jump_table	;2
@@ -672,77 +684,77 @@ jump_table	;DecompressBytecode handler offsets, one per opcode high nibble
 	dc.w	Opcode_CopyBackwardReverseMedium-jump_table	;E
 	dc.w	Opcode_CopyBackwardReverseLong-jump_table	;F
 
-Opcode_CopyLiteral	;Opcodes 0-1, copy (low 5 bits)+1 bytes from the data.
-	;Code the listing does not decode: kept as bytes
+Opcode_CopyLiteral					;Opcodes 0-1, copy (low 5 bits)+1 bytes from the data.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$28,$FF,$FF,$02,$40,$00,$1F,$13,$98,$10,$00,$52,$01,$66,$00
 	dc.b	$00,$06,$61,$00,$01,$3E,$51,$C8,$FF,$F0,$4E,$75
 
-Opcode_ClearBytes	;Opcode 2, write (low 4 bits)+1 zero bytes.
-	;Code the listing does not decode: kept as bytes
+Opcode_ClearBytes					;Opcode 2, write (low 4 bits)+1 zero bytes.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$28,$FF,$FF,$02,$40,$00,$0F,$42,$31,$10,$00,$52,$01,$66,$00
 	dc.b	$00,$06,$61,$00,$01,$22,$51,$C8,$FF,$F0,$4E,$75
 
-Opcode_Fillbytes	;Opcode 3, write the next data byte (low 4 bits)+3 times.
-	;Code the listing does not decode: kept as bytes
+Opcode_Fillbytes					;Opcode 3, write the next data byte (low 4 bits)+3 times.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$28,$FF,$FF,$02,$40,$00,$0F,$54,$40,$14,$18,$13,$82,$10,$00
 	dc.b	$52,$01,$66,$00,$00,$06,$61,$00,$01,$02,$51,$C8,$FF,$F0,$4E,$75
 
-Opcode_CopyBackwardShort	;Opcodes 4-7, copy from back in the output buffer.
-	;Code the listing does not decode: kept as bytes
+Opcode_CopyBackwardShort			;Opcodes 4-7, copy from back in the output buffer.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$28,$FF,$FF,$02,$40,$00,$07,$52,$40,$14,$28,$FF,$FF,$E6,$4A
 	dc.b	$02,$42,$00,$07,$52,$42
 
-CopyBackwardRun	;Shared copy loop, d0 = count-1, d2 = distance back.
-	;Code the listing does not decode: kept as bytes
+CopyBackwardRun						;Shared copy loop, d0 = count-1, d2 = distance back.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$44,$02,$D4,$01,$13,$B1,$20,$00,$10,$00,$52,$02,$52,$01,$66,$00
 	dc.b	$00,$06,$61,$00,$00,$D0,$51,$C8,$FF,$EC,$4E,$75
 
-Opcode_CopyBackwardMedium	;Opcode 8.
-	;Code the listing does not decode: kept as bytes
+Opcode_CopyBackwardMedium			;Opcode 8.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$28,$FF,$FF,$02,$40,$00,$0F,$54,$40,$14,$18,$60,$D6
 
-Opcode_CopyBackwardLong	;Opcode 9.
-	;Code the listing does not decode: kept as bytes
+Opcode_CopyBackwardLong				;Opcode 9.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$10,$E3,$00,$10,$28,$FF,$FF,$E3,$10,$02,$40,$00,$1F,$54,$40
 	dc.b	$14,$18,$02,$42,$00,$7F,$52,$42,$60,$BC
 
-Opcode_CopyBackwardExtended1	;Opcode A.
-	;Code the listing does not decode: kept as bytes
+Opcode_CopyBackwardExtended1		;Opcode A.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$28,$FF,$FF,$E1,$40,$10,$10,$EC,$48,$02,$40,$00,$3F,$54,$40
 	dc.b	$14,$18,$02,$42,$00,$3F,$52,$42,$60,$A2
 
-Opcode_CopyBackwardExtended2	;Opcode B.
-	;Code the listing does not decode: kept as bytes
+Opcode_CopyBackwardExtended2		;Opcode B.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$28,$FF,$FF,$E1,$40,$10,$10,$EA,$48,$02,$40,$00,$7F,$54,$40
 	dc.b	$14,$18,$02,$42,$00,$1F,$52,$42,$60,$88
 
-Opcode_CopyBackwardReverseShort	;Opcodes C-D, copy backwards through the source.
-	;Code the listing does not decode: kept as bytes
+Opcode_CopyBackwardReverseShort		;Opcodes C-D, copy backwards through the source.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$28,$FF,$FF,$02,$40,$00,$03,$52,$40,$14,$28,$FF,$FF,$E4,$4A
 	dc.b	$02,$42,$00,$07,$52,$42
 
-CopyBackwardReverseRun	;Shared reverse copy loop.
-	;Code the listing does not decode: kept as bytes
+CopyBackwardReverseRun				;Shared reverse copy loop.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$44,$02,$D4,$01,$13,$B1,$20,$00,$10,$00,$53,$02,$52,$01,$66,$00
 	dc.b	$00,$06,$61,$00,$00,$42,$51,$C8,$FF,$EC,$4E,$75
 
 Opcode_CopyBackwardReverseMedium	;Opcode E. Distance 0 is the end code.
-	;Code the listing does not decode: kept as bytes
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$28,$FF,$FF,$02,$40,$00,$0F,$54,$40,$14,$18,$66,$D6,$4A,$41
 	dc.b	$67,$00,$00,$06,$61,$00,$00,$24,$58,$4F,$4C,$DF,$07,$0F,$4E,$75
 
-Opcode_CopyBackwardReverseLong	;Opcode F.
-	;Code the listing does not decode: kept as bytes
+Opcode_CopyBackwardReverseLong		;Opcode F.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$10,$E3,$00,$10,$28,$FF,$FF,$E3,$10,$02,$40,$00,$1F,$54,$40
 	dc.b	$14,$18,$02,$42,$00,$7F,$52,$42,$60,$AA
 
-FlushOutputBuffer	;Write the full ring buffer to vram.
-	;Code the listing does not decode: kept as bytes
+FlushOutputBuffer					;Write the full ring buffer to vram.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$C0,$C0,$30,$01,$66,$00,$00,$06,$30,$3C,$01,$00,$E2,$48
 	dc.b	$32,$03,$D6,$40,$D6,$40,$20,$49,$4A,$94,$67,$00,$00,$0A,$22,$54
 	dc.b	$4E,$95,$60,$00,$00,$04,$4E,$96,$4C,$DF,$03,$03,$4E,$75
 
-xyVmMap	;Set the vdp write address to printx, printy in the map at VmMap1 + printm
+xyVmMap								;Set the vdp write address to printx, printy in the map at VmMap1 + printm
 	movem.l	d0-d2,-(sp)
 	move.w	(printx).w,d0
 	move.w	(printy).w,d1
@@ -757,7 +769,7 @@ xyVmMap	;Set the vdp write address to printx, printy in the map at VmMap1 + prin
 	movem.l	(sp)+,d0-d2
 	rts
 
-eraser	;Fill a d0 x d1 rectangle with char d2 at printx / printy / printm
+eraser								;Fill a d0 x d1 rectangle with char d2 at printx / printy / printm
 	movem.l	d0-d2/a0,-(sp)
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
@@ -778,7 +790,7 @@ eraser	;Fill a d0 x d1 rectangle with char d2 at printx / printy / printm
 	movem.l	(sp)+,d0-d2/a0
 	rts
 
-Framer	;Draw a d0 x d1 frame at printx / printy from the framer map
+Framer								;Draw a d0 x d1 frame at printx / printy from the framer map
 	movem.l	d0-d4/a0-a1,-(sp)
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
@@ -822,7 +834,7 @@ Framer	;Draw a d0 x d1 frame at printx / printy from the framer map
 	move.w	d3,(a0)
 	rts
 
-printsmallz	;printsmall with the String after the call
+printsmallz							;printsmall with the String after the call
 	move.l	a1,-(sp)
 	movea.l	4(sp),a1
 	bsr.w	printsmall
@@ -830,8 +842,9 @@ printsmallz	;printsmall with the String after the call
 	movea.l	(sp)+,a1
 	rts
 
-printsmall	;print String a1 at printx / printy with the small font chars (smallfontchars, or word_FFBF88 with
-	;sflags6 bit 3): a negative byte is a control code (ControlCodeJumpTable)
+printsmall							;print String a1 at printx / printy with the small font chars
+									;(smallfontchars, or word_FFBF88 with
+									;sflags6 bit 3): a negative byte is a control code (ControlCodeJumpTable)
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
 	movem.l	d0-d3/a0/a2-a3,-(sp)
@@ -889,51 +902,51 @@ printsmall	;print String a1 at printx / printy with the small font chars (smallf
 	bsr.w	xyVmMap
 	bra.s	.4
 
-ControlCodeJumpTable	;Printsmall control codes, indexed by -byte
-	dc.l	rtss2	;0: no-op
-	dc.l	ControlCode_SetMap	;-1
+ControlCodeJumpTable				;Printsmall control codes, indexed by -byte
+	dc.l	rtss2					;0: no-op
+	dc.l	ControlCode_SetMap		;-1
 	dc.l	ControlCode_SetAttribute	;-2
-	dc.l	ControlCode_SetX	;-3
-	dc.l	ControlCode_SetY	;-4
-	dc.l	ControlCode_AddX	;-5
-	dc.l	ControlCode_AddY	;-6
-	dc.l	ControlCode_SetFont	;-7
+	dc.l	ControlCode_SetX		;-3
+	dc.l	ControlCode_SetY		;-4
+	dc.l	ControlCode_AddX		;-5
+	dc.l	ControlCode_AddY		;-6
+	dc.l	ControlCode_SetFont		;-7
 	dc.l	ControlCode_SetMapAndPosition	;-8
 
-ControlCode_SetMapAndPosition	;Control code -8, next 4 bytes = attribute, map, x, y.
-	;Code the listing does not decode: kept as bytes
+ControlCode_SetMapAndPosition		;Control code -8, next 4 bytes = attribute, map, x, y.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$00,$22,$61,$00,$00,$0A,$61,$00,$00,$2A,$60,$00,$00,$34
 
-ControlCode_SetMap	;Control code -1, next byte = map number -> printm.
-	;Code the listing does not decode: kept as bytes
+ControlCode_SetMap					;Control code -1, next byte = map number -> printm.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$19,$53,$43,$02,$40,$00,$03,$E5,$40,$59,$40,$31,$C0,$B0,$46
 	dc.b	$60,$00,$FE,$14
 
-ControlCode_SetAttribute	;Control code -2, next byte = palette/priority -> printa.
-	;Code the listing does not decode: kept as bytes
+ControlCode_SetAttribute			;Control code -2, next byte = palette/priority -> printa.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$14,$19,$02,$42,$00,$07,$53,$43,$E6,$5A,$31,$C2,$B0,$44,$4E,$75
 
-ControlCode_SetX	;Control code -3, next byte = printx.
-	;Code the listing does not decode: kept as bytes
+ControlCode_SetX					;Control code -3, next byte = printx.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$42,$40,$10,$19,$53,$43,$31,$C0,$B0,$40,$60,$00,$FD,$F6
 
-ControlCode_SetY	;Control code -4, next byte = printy.
-	;Code the listing does not decode: kept as bytes
+ControlCode_SetY					;Control code -4, next byte = printy.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$42,$40,$10,$19,$53,$43,$31,$C0,$B0,$42,$60,$00,$FD,$E8
 
-ControlCode_AddX	;Control code -5, add the next (signed) byte to printx.
-	;Code the listing does not decode: kept as bytes
+ControlCode_AddX					;Control code -5, add the next (signed) byte to printx.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$19,$48,$80,$53,$43,$D1,$78,$B0,$40,$60,$00,$FD,$DA
 
-ControlCode_AddY	;Control code -6, add the next (signed) byte to printy.
-	;Code the listing does not decode: kept as bytes
+ControlCode_AddY					;Control code -6, add the next (signed) byte to printy.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$19,$48,$80,$53,$43,$D1,$78,$B0,$42,$60,$00,$FD,$CC
 
-ControlCode_SetFont	;Control code -7, next byte = char set index.
-	;Code the listing does not decode: kept as bytes
+ControlCode_SetFont					;Control code -7, next byte = char set index.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$42,$40,$10,$19,$53,$43,$E3,$40,$31,$C0,$B0,$48,$4E,$75
 
-printz	;print with the String after the call
+printz								;print with the String after the call
 	move.l	a1,-(sp)
 	movea.l	4(sp),a1
 	bsr.w	print
@@ -941,8 +954,10 @@ printz	;print with the String after the call
 	movea.l	(sp)+,a1
 	rts
 
-print	;print String a1 at printx / printy with the font map SmallFontMap: a negative byte sets printa / printm /
-	;printx / printy from the next bytes, $40 a blank, $5E a new line, lower case printed as upper case
+print								;print String a1 at printx / printy with the font map SmallFontMap: a
+									;negative byte sets printa / printm /
+									;printx / printy from the next bytes, $40 a blank, $5E a new line, lower
+									;case printed as upper case
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
 	movem.l	d0-d3/a0/a2,-(sp)
@@ -1013,7 +1028,7 @@ print	;print String a1 at printx / printy with the font map SmallFontMap: a nega
 	bsr.w	xyVmMap
 	bra.s	.4
 
-printcurz	;printcur with the String after the call
+printcurz							;printcur with the String after the call
 	move.l	a1,-(sp)
 	movea.l	4(sp),a1
 	bsr.w	printcur
@@ -1021,7 +1036,7 @@ printcurz	;printcur with the String after the call
 	movea.l	(sp)+,a1
 	rts
 
-printcur	;print with the font map at smallfontptr
+printcur							;print with the font map at smallfontptr
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
 	movem.l	d0-d3/a0/a2,-(sp)
@@ -1079,7 +1094,7 @@ printcur	;print with the font map at smallfontptr
 .2
 	add.w	(smallfontchars).w,d0
 .p
-	add.w	d2,d0	;for alternate palettes
+	add.w	d2,d0					;for alternate palettes
 	move.w	d0,(a0)
 	addq.w	#1,(printx).w
 .4
@@ -1092,18 +1107,19 @@ printcur	;print with the font map at smallfontptr
 	bsr.w	xyVmMap
 	bra.s	.4
 
-FormatAndPrintTime	;d0 bits 14-15 = period, bits 0-13 = seconds: print the period (PeriodLabelTable) and the time.
-	;Code the listing does not decode: kept as bytes
+FormatAndPrintTime					;d0 bits 14-15 = period, bits 0-13 = seconds: print the period
+									;(PeriodLabelTable) and the time.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$40,$42,$40,$E5,$98,$22,$7C,$00,$01,$BD,$74,$61,$00,$1A,$88
 	dc.b	$54,$78,$B0,$40,$48,$40,$E4,$48,$61,$00,$00,$16,$60,$00,$FC,$CE
 
-PeriodLabelTable	;String list for FormatAndPrintTime
+PeriodLabelTable					;String list for FormatAndPrintTime
 	String	' 1'
 	String	' 2'
 	String	' 3'
 	String	'OT'
 
-PushTime	;a1 = String "M:SS" of the time d0 (seconds), built back from mesarea+30
+PushTime							;a1 = String "M:SS" of the time d0 (seconds), built back from mesarea+30
 	movea.w	#(mesarea+30-M68K_RAM),a1
 	move.l	d0,-(sp)
 	move.l	a1,-(sp)
@@ -1144,58 +1160,59 @@ PushTime	;a1 = String "M:SS" of the time d0 (seconds), built back from mesarea+3
 	move.l	(sp)+,d0
 	rts
 
-PushNumber	;a1 = String of the decimal number d0, built back from PushNumberBuf.
-	;Code the listing does not decode: kept as bytes
+PushNumber							;a1 = String of the decimal number d0, built back from PushNumberBuf.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$32,$7C,$C0,$5E,$2F,$00,$2F,$09,$48,$C0,$80,$FC,$00,$0A,$48,$40
 	dc.b	$06,$40,$00,$30,$13,$00,$48,$40,$4A,$40,$66,$EC,$20,$1F,$90,$89
 	dc.b	$54,$40,$08,$00,$00,$00,$67,$00,$00,$06,$42,$21,$52,$40,$33,$00
 	dc.b	$20,$1F,$4E,$75
 
-PushNumberWidth	;Right-justified number
-	movem.l	d0-d3,-(sp)	;push to stack
+PushNumberWidth						;Right-justified number
+	movem.l	d0-d3,-(sp)				;push to stack
 	movea.w	#(PushWidthBuf+2-M68K_RAM),a1
-	moveq	#1,d2	;move 1 into d2
-	sub.w	d2,d1	;sub d2 from d1
+	moveq	#1,d2					;move 1 into d2
+	sub.w	d2,d1					;sub d2 from d1
 	bra.w	.loop
 .mul
-	mulu.w	#$A,d2	;mult d2 by 10 dec
+	mulu.w	#$A,d2					;mult d2 by 10 dec
 .loop
 	dbf	d1,.mul
-	moveq	#$20,d3	;move 20 into d3
+	moveq	#$20,d3					;move 20 into d3
 .loop2
-	ext.l	d0	;sign extend d0
-	divu.w	d2,d0	;divide d2 into d0
+	ext.l	d0						;sign extend d0
+	divu.w	d2,d0					;divide d2 into d0
 	bne.w	.3
-	cmp.w	#1,d2	;compare d2 to 1
+	cmp.w	#1,d2					;compare d2 to 1
 	beq.w	.3
-	move.w	d3,d0	;move d3 into d0
+	move.w	d3,d0					;move d3 into d0
 	bra.w	.put
 .3
-	moveq	#$30,d3	;move 48 dec into d3
-	add.w	d3,d0	;add d3 to d0
+	moveq	#$30,d3					;move 48 dec into d3
+	add.w	d3,d0					;add d3 to d0
 .put
-	move.b	d0,(a1)+	;move d0 into a1 and increment a1
-	swap	d0	;swap d0 words
-	divu.w	#$A,d2	;divide d2 by 10 dec
+	move.b	d0,(a1)+				;move d0 into a1 and increment a1
+	swap	d0						;swap d0 words
+	divu.w	#$A,d2					;divide d2 by 10 dec
 	bne.s	.loop2
-	move.l	a1,d0	;move a1 into d0
+	move.l	a1,d0					;move a1 into d0
 	subi.w	#$C056,d0
-	btst	#0,d0	;test bit 0 of d0
+	btst	#0,d0					;test bit 0 of d0
 	beq.w	.even
-	clr.b	(a1)+	;clear byte at a1 and increment
-	addq.w	#1,d0	;add 1 to d0
+	clr.b	(a1)+					;clear byte at a1 and increment
+	addq.w	#1,d0					;add 1 to d0
 .even
 	movea.w	#(PushWidthBuf-M68K_RAM),a1
-	move.w	d0,(a1)	;move d0 into a1 address location
-	movem.l	(sp)+,d0-d3	;push from stack
+	move.w	d0,(a1)					;move d0 into a1 address location
+	movem.l	(sp)+,d0-d3				;push from stack
 	rts
 
-appendz	;appstring with the String after the call
+appendz								;appstring with the String after the call
 	movea.l	(sp)+,a1
 	bsr.w	appstring
 	jmp	(a1)
 
-appstring	;Append String a1 to String a3 (the 0 pad byte dropped, the result padded to an even length)
+appstring							;Append String a1 to String a3 (the 0 pad byte dropped, the result padded
+									;to an even length)
 	movem.l	d0/a0,-(sp)
 	lea	2(a3),a0
 	move.w	(a3),d0
@@ -1227,12 +1244,12 @@ appstring	;Append String a1 to String a3 (the 0 pad byte dropped, the result pad
 	movem.l	(sp)+,d0/a0
 	rts
 
-printbigcurz	;printbigcur with the String after the call.
-	;Code the listing does not decode: kept as bytes
+printbigcurz						;printbigcur with the String after the call.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$2F,$09,$22,$6F,$00,$04,$61,$00,$00,$1C,$2F,$49,$00,$04,$22,$5F
 	dc.b	$4E,$75
 
-printbigz	;printbig with the String after the call
+printbigz							;printbig with the String after the call
 	move.l	a1,-(sp)
 	movea.l	4(sp),a1
 	bsr.w	printbig
@@ -1240,16 +1257,18 @@ printbigz	;printbig with the String after the call
 	movea.l	(sp)+,a1
 	rts
 
-printbigcur	;printbigtext with the font map already at bigfontptr
+printbigcur							;printbigtext with the font map already at bigfontptr
 	bra.w	printbigtext
 
-printbig	;print String a1 with the big font at printx / printy: BigFontMap2, BigFontMap4 with sflags11 bit 2
+printbig							;print String a1 with the big font at printx / printy: BigFontMap2,
+									;BigFontMap4 with sflags11 bit 2
 	move.l	#BigFontMap2,(bigfontptr).l
 	btst	#2,(sflags11).w
 	beq.w	printbigtext
 	move.l	#BigFontMap4,(bigfontptr).l
 
-printbigtext	;Print with the font map at bigfontptr. Lower case is printed as upper case
+printbigtext						;Print with the font map at bigfontptr. Lower
+									;case is printed as upper case
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
 	movem.l	d0-d7/a0/a2,-(sp)

@@ -1,7 +1,7 @@
 ;	The penalties. Big-print sits in front of AddPenalty. PenaltyManager runs
 ;	the referee, the penalty box and the power play.
 
-PrintBigChar	;Print big font char d0 (printbigtext)
+PrintBigChar						;Print big font char d0 (printbigtext)
 	subi.w	#$20,d0
 	btst	#6,(sflags13).w
 	beq.w	.0
@@ -35,7 +35,7 @@ PrintBigChar	;Print big font char d0 (printbigtext)
 	dbf	d2,.loop
 	rts
 
-PutBigTile	;Write tile d3 + d6 at column d4, row d5 of the map at VmMap1 + printm
+PutBigTile							;Write tile d3 + d6 at column d4, row d5 of the map at VmMap1 + printm
 	add.w	d6,d3
 	movem.l	d1/a0,-(sp)
 	move.w	d5,d0
@@ -51,7 +51,8 @@ PutBigTile	;Write tile d3 + d6 at column d4, row d5 of the map at VmMap1 + print
 	movem.l	(sp)+,d1/a0
 	rts
 
-BigControlCodeJumpTable	;printbigtext control codes indexed by -byte (as ControlCodeJumpTable); the handlers follow
+BigControlCodeJumpTable				;printbigtext control codes indexed by -byte (as ControlCodeJumpTable);
+									;the handlers follow
 	dc.b	$00,$01,$F8,$4A,$00,$01,$C0,$50,$00,$01,$C0,$62,$00,$01,$C0,$88
 	dc.b	$00,$01,$C0,$9A,$00,$01,$C0,$AC,$00,$01,$C0,$BE,$00,$01,$C0,$D0
 	dc.b	$00,$01,$C0,$40,$61,$00,$00,$20,$61,$00,$00,$0A,$61,$00,$00,$3E
@@ -69,7 +70,7 @@ BigControlCodeJumpTable	;printbigtext control codes indexed by -byte (as Control
 	dc.b	$23,$FC,$00,$1B,$9E,$D8,$FF,$FF,$B0,$10,$4E,$75,$31,$F8,$B0,$18
 	dc.b	$B0,$14,$23,$FC,$00,$1B,$94,$16,$FF,$FF,$B0,$10,$4E,$75
 
-printbigz1	;printbig1 with the String after the call
+printbigz1							;printbig1 with the String after the call
 	move.l	a1,-(sp)
 	movea.l	4(sp),a1
 	bsr.w	printbig1
@@ -77,7 +78,7 @@ printbigz1	;printbig1 with the String after the call
 	movea.l	(sp)+,a1
 	rts
 
-printbigz2	;printbig2 with the String after the call
+printbigz2							;printbig2 with the String after the call
 	move.l	a1,-(sp)
 	movea.l	4(sp),a1
 	bsr.w	printbig2
@@ -85,13 +86,13 @@ printbigz2	;printbig2 with the String after the call
 	movea.l	(sp)+,a1
 	rts
 
-printbig1	;printbigcur with the font map BigFontMap (chars bigfont1chars)
+printbig1							;printbigcur with the font map BigFontMap (chars bigfont1chars)
 	bclr	#2,(sflags11).w
 	move.l	#BigFontMap,(bigfontptr).l
 	move.w	(bigfont1chars).w,(printbigchars).w
 	jmp	printbigcur
 
-printbig2	;printbigcur with the font map BigFontMap3 (chars BigFontChars)
+printbig2							;printbigcur with the font map BigFontMap3 (chars BigFontChars)
 	bclr	#2,(sflags11).w
 	move.l	#BigFontMap3,(bigfontptr).l
 	move.w	(BigFontChars).w,(printbigchars).w
@@ -100,12 +101,13 @@ printbig2	;printbigcur with the font map BigFontMap3 (chars BigFontChars)
 	;Code the listing does not decode: kept as bytes
 	dc.b	$31,$C4,$B0,$1C,$24,$7C,$00,$17,$9A,$7E,$60,$00,$F5,$AE
 
-AddFramer	;Load the framer tiles (Framermap+8) at char d4, framercset = d4
+AddFramer							;Load the framer tiles (Framermap+8) at char d4, framercset = d4
 	movea.l	#Framermap+8,a2
 	move.w	d4,(framercset).w
 	bra.w	DecompressGraphicsPlain
 
-AddPenalty	;Add penalty d0 (Penaltylist offset) for player a3. Ignored while the clock is stopped
+AddPenalty							;Add penalty d0 (Penaltylist offset) for player a3. Ignored while the
+									;clock is stopped
 	btst	#gmclock,(gmode).w
 	bne.w	rtss2
 	cmp.w	#$C,d0
@@ -122,26 +124,27 @@ AddPenalty	;Add penalty d0 (Penaltylist offset) for player a3. Ignored while the
 	cmp.w	#$10,d0
 	beq.w	rtss2
 
-AddPenalty2	;Forced penalties like faceoff and game over. d0 = penalty number, a3 = player
+AddPenalty2							;Forced penalties like faceoff and game over. d0 = penalty number, a3 =
+									;player
 	btst	#4,(sflags9).w
 	bne.w	rtss2
 	btst	#sfhor,(sflags).w
 	bne.w	rtss2
 	movem.l	d1/a0-a1,-(sp)
-	cmp.w	#$E,d0	;goal and up
+	cmp.w	#$E,d0					;goal and up
 	blt.w	.nonoise
-	addi.w	#$C8,(crowdlevel).w	;200
+	addi.w	#$C8,(crowdlevel).w		;200
 	addq.w	#5,(ChkCnt).w
-	move.w	#$C,-(sp)	;song $C for the home team
+	move.w	#$C,-(sp)				;song $C for the home team
 	btst	#pfteam,pflags(a3)
 	beq.w	.0
 	addi.w	#$14,(CwdExciteLvl).w	;visitors: +20 excitement
-	move.w	#$B,(sp)	;song $B
+	move.w	#$B,(sp)				;song $B
 .0
 	jsr	(song).l
 .nonoise
 	movea.w	#(PenBuf-M68K_RAM),a1
-	moveq	#$1F,d1	;MaxPen-1
+	moveq	#$1F,d1					;MaxPen-1
 .2
 	tst.w	(a1)+
 	dbeq	d1,.2
@@ -150,7 +153,7 @@ AddPenalty2	;Forced penalties like faceoff and game over. d0 = penalty number, a
 	move.b	d0,-(a1)
 	movea.l	#$E818,a0
 	adda.w	(a0,d0.w),a0
-	tst.b	1(a0)	;penalty minutes
+	tst.b	1(a0)					;penalty minutes
 	beq.w	.noplayer
 	bmi.w	.noplayer
 	btst	#pfteam,pflags(a3)
@@ -160,21 +163,24 @@ AddPenalty2	;Forced penalties like faceoff and game over. d0 = penalty number, a
 .3
 	bset	#2,(sflags9).w
 .setpenflag
-	bset	#pf2pen,pflags2(a3)	;pflags2 bit 4
+	bset	#pf2pen,pflags2(a3)		;pflags2 bit 4
 	beq.w	.noplayer
-	clr.w	(a1)	;player already has a penalty, drop this one
+	clr.w	(a1)					;player already has a penalty, drop this one
 .noplayer
 	movem.l	(sp)+,d1/a0-a1
 	rts
 
-PenaltyManager	;Called periodically. d7 = elapsed time since last call: checkfornewpen, chkprogress, updatepentime, UpdatePA
+PenaltyManager						;Called periodically. d7 = elapsed time since last call: checkfornewpen,
+									;chkprogress, updatepentime, UpdatePA
 	bsr.w	updatepentime
 	bsr.w	checkfornewpen
 	bsr.w	chkprogress
 	bra.w	UpdatePA
 
-chkprogress	;Control the progress of the ref and the game through penalty events. While BA_PS_flags bit 2 is set run
-	;PenaltyShotBox (bit 7) or the msgtimer count down and erase the message area
+chkprogress							;Control the progress of the ref and the game through penalty events.
+									;While BA_PS_flags bit 2 is set run
+									;PenaltyShotBox (bit 7) or the msgtimer count down and erase the message
+									;area
 	btst	#2,(BA_PS_flags).w
 	beq.w	.3
 	btst	#7,(BA_PS_flags).w
@@ -192,9 +198,9 @@ chkprogress	;Control the progress of the ref and the game through penalty events
 	moveq	#8,d1
 	btst	#0,(gmode2).w
 	beq.w	.0
-	move.w	#$C,d1	;12 rows when gmode2 bit 0 is set
+	move.w	#$C,d1					;12 rows when gmode2 bit 0 is set
 .0
-	move.l	#$7FF,d2	;blank tile
+	move.l	#$7FF,d2				;blank tile
 	jsr	(eraser).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	bra.w	.ex
@@ -204,7 +210,7 @@ chkprogress	;Control the progress of the ref and the game through penalty events
 .ex
 	rts
 .3
-	btst	#gmpen,(gmode).w	;gmpen: penalty called
+	btst	#gmpen,(gmode).w		;gmpen: penalty called
 	beq.w	rtss2
 	tst.w	(Pencntdwn).w
 	bmi.w	InProgress
@@ -224,13 +230,13 @@ chkprogress	;Control the progress of the ref and the game through penalty events
 	bclr	#gmpendel,(gmode).w
 	movea.w	#(PenBuf-M68K_RAM),a0
 .4
-	tst.w	(a0)+	;any penalty with minutes
+	tst.w	(a0)+					;any penalty with minutes
 	beq.w	rtss2
 	clr.w	d0
 	move.b	-2(a0),d0
 	movea.l	#$E818,a1
 	adda.w	(a1,d0.w),a1
-	tst.b	1(a1)	;penalty minutes
+	tst.b	1(a1)					;penalty minutes
 	beq.s	.4
 	bmi.s	.4
 	bset	#sf2drec,(sflags2).w
@@ -241,24 +247,25 @@ chkprogress	;Control the progress of the ref and the game through penalty events
 	move.w	#0,(yc1).w
 	bset	#sfslock,(sflags).w
 .5
-	move.w	(ExtraChars).w,d4	;load horizontal ref tiles
+	move.w	(ExtraChars).w,d4		;load horizontal ref tiles
 	movea.l	#RefTilesHor+8,a2
 	bsr.w	DecompressGraphicsPlain
 	st	(puckc).w
 	movea.w	#(puckx-M68K_RAM),a3
 	moveq	#$1A,d0
 	bsr.w	assinsert
-	move.w	#$1C20,temp1(a3)	;temp1 = 120*60
+	move.w	#$1C20,temp1(a3)		;temp1 = 120*60
 	st	(RefStep).w
 	clr.w	(RefCnt).w
 	bsr.w	UpdatePA
-	move.w	#$32,(RefCnt).w	;50
+	move.w	#$32,(RefCnt).w			;50
 	move.w	#5,d0
 	bsr.w	PushRef
 	move.w	#$18,(palcount).w
 	rts
 
-DoubleMinorChk	;Penalty d0 becomes its 4 minute double minor when its DoubleMinorPenalties entry is not negative
+DoubleMinorChk						;Penalty d0 becomes its 4 minute double minor when its
+									;DoubleMinorPenalties entry is not negative
 	movem.l	d1-d3/a0,-(sp)
 	movea.l	#$EBF8,a0
 	move.w	(a0,d0.w),d1
@@ -268,7 +275,8 @@ DoubleMinorChk	;Penalty d0 becomes its 4 minute double minor when its DoubleMino
 	movem.l	(sp)+,d1-d3/a0
 	rts
 
-PenShotChk	;A breakaway shooter hit: a penalty shot when penalty d0 allows one (PenShotPenalties); d0 = the penalty
+PenShotChk							;A breakaway shooter hit: a penalty shot when penalty d0 allows one
+									;(PenShotPenalties); d0 = the penalty
 	movem.l	d1-d3/a0,-(sp)
 	btst	#pf3break,pflags3(a2)	;breakaway
 	beq.w	.loop
@@ -283,7 +291,7 @@ PenShotChk	;A breakaway shooter hit: a penalty shot when penalty d0 allows one (
 	movea.l	#$EBC2,a0
 	move.w	(a0,d0.w),d1
 	bmi.w	.end
-	move.w	SCnum(a2),d2	;SCnum
+	move.w	SCnum(a2),d2			;SCnum
 	movem.w	d0-d1,-(sp)
 	move.w	d2,d0
 	jsr	(getBAplayerInfo).l
@@ -293,12 +301,13 @@ PenShotChk	;A breakaway shooter hit: a penalty shot when penalty d0 allows one (
 	bra.s	.loop
 .found
 	move.w	d1,(pspenalty).w
-	move.w	d1,d0	;return the penalty shot penalty
+	move.w	d1,d0					;return the penalty shot penalty
 .end
 	movem.l	(sp)+,d1-d3/a0
 	rts
 
-getBAplayerInfo	;Keep the breakaway shooter, team, goalie and checker for the penalty shot; N clear when set
+getBAplayerInfo						;Keep the breakaway shooter, team, goalie and checker for the penalty
+									;shot; N clear when set
 	movem.l	d1-d3/a1,-(sp)
 	tst.w	(OptPen).w
 	beq.w	.noPen
@@ -315,16 +324,16 @@ getBAplayerInfo	;Keep the breakaway shooter, team, goalie and checker for the pe
 	jsr	(FindGoalie).l
 	tst.w	d0
 	bpl.w	.goaliein
-	movem.w	(sp)+,d0	;no goalie
+	movem.w	(sp)+,d0				;no goalie
 	bclr	#3,(BA_PS_flags).w
 	bra.w	.end
 .goaliein
-	move.w	d0,d1	;d1 = goalie's SCnum
-	move.w	(sp)+,d0	;d0 now back to player checked on breakaway SCnum
+	move.w	d0,d1					;d1 = goalie's SCnum
+	move.w	(sp)+,d0				;d0 now back to player checked on breakaway SCnum
 	move.w	d0,(BA_Sktr_SCnum).w
 	movea.l	#SortCords,a1
 	move.w	d0,d3
-	asl.w	#scsize,d3	;scsize
+	asl.w	#scsize,d3				;scsize
 	move.w	#0,(BA_Team).w
 	btst	#6,$62(a1,d3.w)
 	beq.w	.2
@@ -333,7 +342,7 @@ getBAplayerInfo	;Keep the breakaway shooter, team, goalie and checker for the pe
 	move.w	#0,(BA_Skater_Offset).w
 	move.b	$67(a1,d3.w),(BA_Skater_Offset+1).w
 	move.w	d1,(BA_Goalie_SCnum).w
-	asl.w	#scsize,d1	;scsize
+	asl.w	#scsize,d1				;scsize
 	move.w	#0,(BA_Goalie_Offset).w
 	move.b	$67(a1,d1.w),(BA_Goalie_Offset+1).w
 	move.w	#0,(BA_Checker_Offset).w
@@ -342,10 +351,10 @@ getBAplayerInfo	;Keep the breakaway shooter, team, goalie and checker for the pe
 	movem.l	(sp)+,d1-d3/a1
 	rts
 .noPen
-	move.w	#$FFFF,d1	;N set: no penalty shot
+	move.w	#$FFFF,d1				;N set: no penalty shot
 	bra.s	.end
 
-InProgress	;Ref in progress: update the graphics, stats and penalty information
+InProgress							;Ref in progress: update the graphics, stats and penalty information
 	tst.w	(RefCnt).w
 	bpl.w	rtss2
 	tst.w	(RefStep).w
@@ -359,12 +368,12 @@ InProgress	;Ref in progress: update the graphics, stats and penalty information
 	tst.w	(a0)+
 	bne.s	.1
 	subq.w	#4,a0
-	bclr	#7,1(a0)	;player who is guilty
+	bclr	#7,1(a0)				;player who is guilty
 	bne.w	.Sa
 	movem.l	a3,-(sp)
 	clr.w	d1
 	move.b	1(a0),d1
-	asl.w	#scsize,d1	;scsize
+	asl.w	#scsize,d1				;scsize
 	movea.w	#(SortCords-M68K_RAM),a3
 	adda.w	d1,a3
 	tst.w	$34(a3)
@@ -379,7 +388,7 @@ InProgress	;Ref in progress: update the graphics, stats and penalty information
 	adda.w	(a1,d0.w),a1
 	bclr	#5,(sflags5).w
 	clr.w	d2
-	move.b	1(a1),d2	;penalty minutes
+	move.b	1(a1),d2				;penalty minutes
 	beq.w	.10
 	bmi.w	.10
 	cmp.b	#5,d2
@@ -394,26 +403,26 @@ InProgress	;Ref in progress: update the graphics, stats and penalty information
 	beq.w	.full
 	addq.w	#4,(PenSumLength).w
 .full
-	move.w	d0,(a4)+	;time
-	move.b	(a0),(a4)+	;penalty
+	move.w	d0,(a4)+				;time
+	move.b	(a0),(a4)+				;penalty
 	clr.w	d1
 	move.b	1(a0),d1
-	asl.w	#scsize,d1	;scsize
+	asl.w	#scsize,d1				;scsize
 	movea.w	#(SortCords-M68K_RAM),a3
 	adda.w	d1,a3
 	clr.w	d0
 	movea.w	#(tmstruct-M68K_RAM),a2
-	lea	$39E(a2),a1	;tmsize: visitors
+	lea	$39E(a2),a1					;tmsize: visitors
 	btst	#6,$62(a3)
 	beq.w	.5
-	bset	#7,-1(a4)	;log: visitors
+	bset	#7,-1(a4)				;log: visitors
 	move.w	#$8000,d0
 	exg	a1,a2
 .5
 	addq.w	#1,6(a2)
 	add.w	d2,8(a2)
 	move.b	$67(a3),d0
-	move.b	d0,(a4)	;log: player
+	move.b	d0,(a4)					;log: player
 	move.w	d0,(TempPlOffset).w
 	ext.w	d0
 	addi.w	#$114,d0
@@ -421,19 +430,19 @@ InProgress	;Ref in progress: update the graphics, stats and penalty information
 	subi.w	#$114,d0
 	asl.w	#1,d0
 	ext.w	d2
-	mulu.w	#$3C,d2	;60
-	bset	#$D,d2	;tmpdst bit 13
+	mulu.w	#$3C,d2					;60
+	bset	#$D,d2					;tmpdst bit 13
 	tst.w	$6C(a2,d0.w)
 	bmi.w	.st
 	btst	#4,$6C(a2,d0.w)
 	beq.w	.st
-	bset	#$C,d2	;keep byte bit 4 (word bit 12) of an old penalty time
+	bset	#$C,d2					;keep byte bit 4 (word bit 12) of an old penalty time
 .st
 	move.w	d2,$6C(a2,d0.w)
 	andi.w	#$EFFF,d2
-	moveq	#$38,d1	;(MaxRos-1)*2+2
+	moveq	#$38,d1					;(MaxRos-1)*2+2
 .ctop
-	subq.w	#2,d1	;same time on the other team
+	subq.w	#2,d1					;same time on the other team
 	bmi.w	.8
 	move.w	$6C(a1,d1.w),d3
 	andi.w	#$EFFF,d3
@@ -482,18 +491,19 @@ InProgress	;Ref in progress: update the graphics, stats and penalty information
 	movem.l	(sp)+,d0/a0-a3
 	rts
 
-coinsearch	;a2 = team. Count the players kept off the ice by penalties (coincidental penalties)
+coinsearch							;a2 = team. Count the players kept off the ice by penalties (coincidental
+									;penalties)
 	moveq	#6,d1
-	moveq	#$36,d0	;(MaxRos-1)*2
+	moveq	#$36,d0					;(MaxRos-1)*2
 .loop
 	tst.w	$6C(a2,d0.w)
 	ble.w	.nap
 	bclr	#5,$6C(a2,d0.w)
-	btst	#6,$6C(a2,d0.w)	;coincidental
+	btst	#6,$6C(a2,d0.w)			;coincidental
 	bne.w	.nap
 	btst	#4,$6C(a2,d0.w)
 	bne.w	.nap
-	cmp.w	#4,d1	;never below 4 players
+	cmp.w	#4,d1					;never below 4 players
 	beq.w	.nap
 	subq.w	#1,d1
 .nap
@@ -502,8 +512,8 @@ coinsearch	;a2 = team. Count the players kept off the ice by penalties (coincide
 	move.w	d1,$24(a2)
 	rts
 
-checkfornewpen	;Look for a new penalty (entered through AddPenalty / AddPenalty2)
-	btst	#sfhor,(sflags).w	;gmclock: clock stopped
+checkfornewpen						;Look for a new penalty (entered through AddPenalty / AddPenalty2)
+	btst	#sfhor,(sflags).w		;gmclock: clock stopped
 	bne.w	rtss2
 	btst	#4,(sflags9).w
 	bne.w	rtss2
@@ -517,12 +527,12 @@ checkfornewpen	;Look for a new penalty (entered through AddPenalty / AddPenalty2
 	move.b	-2(a0),d0
 	movea.l	#$E818,a1
 	adda.w	(a1,d0.w),a1
-	tst.b	1(a1)	;time for penalty
+	tst.b	1(a1)					;time for penalty
 	beq.w	.callit
 	move.w	(puckc).w,d0
 	bmi.w	.3
 	subq.w	#6,d0
-	move.b	-1(a0),d1	;player penalized
+	move.b	-1(a0),d1				;player penalized
 	ext.w	d1
 	subq.w	#6,d1
 	eor.w	d1,d0
@@ -533,11 +543,11 @@ checkfornewpen	;Look for a new penalty (entered through AddPenalty / AddPenalty2
 	bset	#7,-1(a0)
 	bne.s	.0
 	clr.w	d0
-	move.b	-2(a0),d0	;penalty called
+	move.b	-2(a0),d0				;penalty called
 	movea.l	#$E818,a1
 	adda.w	(a1,d0.w),a1
 	clr.w	d1
-	move.b	(a1),d1	;delay for stopping action
+	move.b	(a1),d1					;delay for stopping action
 	asl.w	#5,d1
 	cmp.w	(Pencntdwn).w,d1
 	ble.s	.0
@@ -551,29 +561,30 @@ checkfornewpen	;Look for a new penalty (entered through AddPenalty / AddPenalty2
 	bsr.w	SetPA
 	bra.w	.0
 
-Stop4Pen	;a0 = Penaltylist penalty + 2. Stop the clock, set the faceoff spot from the penalty type, blow the whistle
-	;and start the ref (SetPA)
+Stop4Pen							;a0 = Penaltylist penalty + 2. Stop the clock, set the faceoff spot from
+									;the penalty type, blow the whistle
+									;and start the ref (SetPA)
 	bset	#gmclock,(gmode).w
 	bne.w	.5
 	clr.w	d0
 	clr.w	d1
-	cmpi.b	#$E,-2(a0)	;goal: center ice
+	cmpi.b	#$E,-2(a0)				;goal: center ice
 	beq.w	.0
 	move.w	(ltx).w,d0
 	move.w	(lty).w,d1
-	cmpi.b	#6,-2(a0)	;OOP
+	cmpi.b	#6,-2(a0)				;OOP
 	beq.w	.0
 	move.w	(puckx).w,d0
 	move.w	(pucky).w,d1
-	cmpi.b	#$C,-2(a0)	;icing
+	cmpi.b	#$C,-2(a0)				;icing
 	bne.w	.0
 	move.l	a3,-(sp)
 	movea.w	#(SortCords-M68K_RAM),a3
 	move.b	-1(a0),d1
 	ext.w	d1
-	asl.w	#scsize,d1	;scsize
+	asl.w	#scsize,d1				;scsize
 	adda.w	d1,a3
-	move.w	#$258,d1	;600
+	move.w	#$258,d1				;600
 	btst	#7,$62(a3)
 	movea.l	(sp)+,a3
 	beq.w	.0
@@ -612,19 +623,19 @@ Stop4Pen	;a0 = Penaltylist penalty + 2. Stop the clock, set the faceoff spot fro
 	clr.w	(Pencntdwn).w
 	bset	#gmpen,(gmode).w
 	jsr	(stop_current_song).l
-	move.w	#3,-(sp)	;whistle
+	move.w	#3,-(sp)				;whistle
 	jsr	(sfx).l
 	move.w	#$A,d0
 	bra.w	SetPA
 
-UpdatePA	;Animate the ref in the ref window (RefCnt, SetPA2)
+UpdatePA							;Animate the ref in the ref window (RefCnt, SetPA2)
 	tst.w	(RefCnt).w
 	bmi.w	rtss2
 	sub.w	d7,(RefCnt).w
 	bpl.w	.contplay
 	bsr.w	SetPA2
 .contplay
-	cmpi.w	#4,(RefPen).w	;check if cont playoffs
+	cmpi.w	#4,(RefPen).w			;check if cont playoffs
 	bne.w	.0
 	bsr.w	ShowThreeStars
 .0
@@ -640,7 +651,7 @@ UpdatePA	;Animate the ref in the ref window (RefCnt, SetPA2)
 	sub.w	d0,(printx).w
 	bra.w	print
 
-SetPA	;Start ref animation d0 (penalty number)
+SetPA								;Start ref animation d0 (penalty number)
 	move.w	d0,(RefPen).w
 	cmp.w	#$38,d0
 	blt.w	.0
@@ -648,7 +659,7 @@ SetPA	;Start ref animation d0 (penalty number)
 .0
 	clr.w	(RefStep).w
 	bsr.w	prefmes
-	cmp.w	#$E,d0	;goal
+	cmp.w	#$E,d0					;goal
 	bne.w	.1
 	bsr.w	ShowGoalBox
 .1
@@ -665,9 +676,10 @@ SetPA	;Start ref animation d0 (penalty number)
 	beq.w	SetPA2
 	move.w	#$3C,(penmsgtimer).w	;60
 
-SetPA2	;Update the ref animation: next frame / delay pair from the Penaltylist animation
+SetPA2								;Update the ref animation: next frame / delay pair from the Penaltylist
+									;animation
 	movem.l	d0-d2/a0-a1,-(sp)
-	moveq	#$40,d0	;clear ref window
+	moveq	#$40,d0					;clear ref window
 	tst.w	(RefStep).w
 	bmi.w	.pr
 	move.w	(RefStep).w,d0
@@ -679,7 +691,7 @@ SetPA2	;Update the ref animation: next frame / delay pair from the Penaltylist a
 	adda.w	(a0),a0
 	move.w	(a0,d0.w),d0
 	bpl.w	.0
-	neg.w	d0	;negative = last frame
+	neg.w	d0						;negative = last frame
 	st	(RefStep).w
 .0
 	clr.w	d1
@@ -702,11 +714,11 @@ SetPA2	;Update the ref animation: next frame / delay pair from the Penaltylist a
 	movem.l	(sp)+,d0-d2/a0-a1
 	rts
 
-PushRef	;Tell vblank what to display: ref frame d0
+PushRef								;Tell vblank what to display: ref frame d0
 	movem.l	d0-d2/a0-a1,-(sp)
 	cmp.w	#$40,d0
 	beq.w	.clearit
-	mulu.w	#$70,d0	;refwidth*refheight*2
+	mulu.w	#$70,d0					;refwidth*refheight*2
 	movea.l	#RefTiles,a0
 	btst	#4,(sflags9).w
 	beq.w	.m1
@@ -717,8 +729,8 @@ PushRef	;Tell vblank what to display: ref frame d0
 	adda.w	d0,a0
 	movea.w	#(RefRamMap-M68K_RAM),a1
 	move.w	(ExtraChars).w,d2
-	ori.w	#$8000,d2	;priority
-	moveq	#$37,d0	;(refheight*refwidth)-1
+	ori.w	#$8000,d2				;priority
+	moveq	#$37,d0					;(refheight*refwidth)-1
 .1
 	move.w	(a0)+,(a1)
 	add.w	d2,(a1)+
@@ -731,9 +743,9 @@ PushRef	;Tell vblank what to display: ref frame d0
 	btst	#4,(sflags9).w
 	bne.w	.4
 	movea.w	#(RefRamMap-M68K_RAM),a1
-	moveq	#$37,d0	;(refheight*refwidth)-1
+	moveq	#$37,d0					;(refheight*refwidth)-1
 .3
-	move.w	#$7FF,(a1)+	;blank tile
+	move.w	#$7FF,(a1)+				;blank tile
 	dbf	d0,.3
 	bset	#sf2refref,(sflags2).w
 .4
@@ -743,7 +755,8 @@ PushRef	;Tell vblank what to display: ref frame d0
 	movem.l	(sp)+,d0-d2/a0-a1
 	rts
 
-prefmes	;Print the penalty message: the player, the penalty and its length (PenaltyTimeTxt)
+prefmes								;Print the penalty message: the player, the penalty and its length
+									;(PenaltyTimeTxt)
 	movem.l	d0-d2/a1-a2,-(sp)
 	btst	#sfhor,(sflags).w
 	bne.w	.1
@@ -765,7 +778,7 @@ prefmes	;Print the penalty message: the player, the penalty and its length (Pena
 	adda.w	(a1,d0.w),a1
 	addq.w	#2,a1
 	move.w	(a1),d0
-	subq.w	#2,d0	;empty string
+	subq.w	#2,d0					;empty string
 	beq.w	.8
 	lsr.w	#1,d0
 	sub.w	d0,(printx).w
@@ -861,7 +874,7 @@ prefmes	;Print the penalty message: the player, the penalty and its length (Pena
 	movem.l	(sp)+,d0-d2/a1-a2
 	rts
 
-PenaltyTimeTxt	;prefmes: the penalty lengths
+PenaltyTimeTxt						;prefmes: the penalty lengths
 	String	'penalty error '
 	String	'1 minute minor'
 	String	'2 minute minor'
@@ -869,7 +882,7 @@ PenaltyTimeTxt	;prefmes: the penalty lengths
 	String	'4 minute db minor'
 	String	'5 minute major'
 
-ErasePenaltyMessage	;Erase the penalty message box prefmes draws
+ErasePenaltyMessage					;Erase the penalty message box prefmes draws
 	jsr	(printz).l
 	String	$BF,$0B,$02
 	move.w	#$14,d0
@@ -878,8 +891,10 @@ ErasePenaltyMessage	;Erase the penalty message box prefmes draws
 	jsr	(eraser).l
 	rts
 
-PenGoalStuff	;Do this stuff after a goal: a1 = scored on team, a2 = scoring team. Clears PenBuf, lets the first penalized
-	;player of the scored on team out (RemovePlayerFromList), erases the message box
+PenGoalStuff						;Do this stuff after a goal: a1 = scored on team, a2 = scoring team.
+									;Clears PenBuf, lets the first penalized
+									;player of the scored on team out (RemovePlayerFromList), erases the
+									;message box
 	movem.l	d0-d2/a0,-(sp)
 .0
 	cmpi.w	#6,$24(a1)
@@ -918,7 +933,7 @@ PenGoalStuff	;Do this stuff after a goal: a1 = scored on team, a2 = scoring team
 	movem.l	(sp)+,d0-d2/a0
 	rts
 
-ClearPenaltyBuffer	;Clear PenBuf
+ClearPenaltyBuffer					;Clear PenBuf
 	moveq	#$1F,d0
 	movea.w	#(PenBuf-M68K_RAM),a0
 .loop
@@ -926,8 +941,9 @@ ClearPenaltyBuffer	;Clear PenBuf
 	dbf	d0,.loop
 	rts
 
-updatepentime	;Update the time remaining on all penalized players, once a second (Penaltytimer); sets sflags3 bit 6 on that
-	;tick. chkatop, updatePPTeamTime, then ProcessPenaltyList for both teams
+updatepentime						;Update the time remaining on all penalized players, once a second
+									;(Penaltytimer); sets sflags3 bit 6 on that
+									;tick. chkatop, updatePPTeamTime, then ProcessPenaltyList for both teams
 	bclr	#sf3icetime,(sflags3).w
 	btst	#gmclock,(gmode).w
 	bne.w	rtss2
@@ -941,7 +957,8 @@ updatepentime	;Update the time remaining on all penalized players, once a second
 	bsr.w	ProcessPenaltyList
 	adda.w	#$39E,a2
 
-ProcessPenaltyList	;a2 = team. Walk the penalty box list: count down the penalty time of each player in it
+ProcessPenaltyList					;a2 = team. Walk the penalty box list: count down the penalty time of each
+									;player in it
 	lea	$A4(a2),a0
 	movea.w	#(mesarea-M68K_RAM),a1
 	moveq	#2,d1
@@ -975,7 +992,8 @@ ProcessPenaltyList	;a2 = team. Walk the penalty box list: count down the penalty
 .two
 	move.w	(TextBuffer).w,d0
 
-.5	;ProcessPenaltyList: a player d0 whose time is nearly up beeps; at 0 he is released (releasepl)
+.5									;ProcessPenaltyList: a player d0 whose time is nearly up beeps; at 0 he is
+									;released (releasepl)
 	cmpi.w	#5,$6C(a2,d0.w)
 	bgt.w	rtss2
 	move.w	#1,-(sp)
@@ -998,7 +1016,8 @@ ProcessPenaltyList	;a2 = team. Walk the penalty box list: count down the penalty
 .clr
 	clr.w	$6C(a2,d0.w)
 
-RemovePlayerFromList	;Remove the entry before a0 from a penalty box list by shifting the rest down. Return a0 = removed slot
+RemovePlayerFromList				;Remove the entry before a0 from a penalty box list by shifting the rest
+									;down. Return a0 = removed slot
 	moveq	#-1,d2
 .shift
 	addq.w	#1,d2
@@ -1007,7 +1026,8 @@ RemovePlayerFromList	;Remove the entry before a0 from a penalty box list by shif
 	subq.w	#1,a0
 	rts
 
-chkatop	;Attack time of possession stat update. Called once a second from updatepentime
+chkatop								;Attack time of possession stat update. Called once a second from
+									;updatepentime
 	moveq	#0,d1
 	move.w	(pucky).w,d0
 	cmp.w	#$76,d0
@@ -1025,7 +1045,8 @@ chkatop	;Attack time of possession stat update. Called once a second from update
 	addq.w	#1,$A(a2,d1.w)
 	rts
 
-releasepl	;The player's penalty time is up, so let him out (if appropriate). a2 = team, d0 = player * 2
+releasepl							;The player's penalty time is up, so let him out (if appropriate).
+									;a2 = team, d0 = player * 2
 	movem.l	d0-d3/a0-a3,-(sp)
 	movea.w	$22(a2),a3
 	suba.w	#$80,a3
@@ -1052,7 +1073,8 @@ releasepl	;The player's penalty time is up, so let him out (if appropriate). a2 
 	movem.l	(sp)+,d0-d3/a0-a3
 	rts
 
-GetLowestPen	;a2 = shorthanded team, a3 = team on the power play. d0 = power play time left from the penalty box times
+GetLowestPen						;a2 = shorthanded team, a3 = team on the power play. d0 = power play time
+									;left from the penalty box times
 	clr.w	d0
 	clr.w	d3
 	lea	$A4(a2),a0
@@ -1083,7 +1105,8 @@ GetLowestPen	;a2 = shorthanded team, a3 = team on the power play. d0 = power pla
 	add.w	d3,d0
 	rts
 
-updatepwrplay	;The power play box: the team and the time left (GetLowestPen). Called once a second
+updatepwrplay						;The power play box: the team and the time left
+									;(GetLowestPen). Called once a second
 	btst	#7,(gmode).w
 	bne.w	rtss2
 	btst	#1,(gmode2).w
@@ -1166,14 +1189,15 @@ updatepwrplay	;The power play box: the team and the time left (GetLowestPen). Ca
 	bset	#dfclock,(disflags).w
 	rts
 
-.clrpwrplay	;With sflags2 bit 5 set, clear it and erase the power play box (ErasePowerPlayBox)
+.clrpwrplay							;With sflags2 bit 5 set, clear it and erase the power play box
+									;(ErasePowerPlayBox)
 	bclr	#sf2pwrplay,(sflags2).w
 	beq.w	rtss2
 	bsr.w	ErasePowerPlayBox
 	bset	#dfclock,(disflags).w
 	rts
 
-ErasePowerPlayBox	;Erase the power play box
+ErasePowerPlayBox					;Erase the power play box
 	jsr	(printz).l
 	String	$BF,$13,$18
 	move.w	#$C,d0
@@ -1182,25 +1206,26 @@ ErasePowerPlayBox	;Erase the power play box
 	jsr	(eraser).l
 	rts
 
-DrawPowerPlayBox	;Draw the power play box frame (Framer)
+DrawPowerPlayBox					;Draw the power play box frame (Framer)
 	jsr	(printz).l
 	String	$BF,$13,$18
 	move.w	#$C,d0
 	move.w	#4,d1
 	jmp	Framer
 
-ClrHor	;Back to the vertical rink: reload the rink graphics, SprSort, clear the screen unless paused
-	;Code the listing does not decode: kept as bytes
+ClrHor								;Back to the vertical rink: reload the rink graphics, SprSort, clear the
+									;screen unless paused
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$B8,$00,$07,$C3,$3A,$31,$FC,$03,$E8,$BD,$30
 	dc.b	$4E,$B9,$00,$01,$54,$D8,$61,$00,$43,$78,$08,$38,$00,$00,$C3,$3A
 	dc.b	$66,$00,$00,$1C,$61,$00,$EB,$4A,$00,$06,$FF,$00,$00,$00,$70,$20
 	dc.b	$72,$1C,$34,$3C,$07,$FF,$61,$00,$E9,$20,$61,$00,$00,$08,$4C,$DF
 	dc.b	$7F,$FF,$4E,$75
 
-printscores1	;The scoreboard redraw: an empty rts in 96
+printscores1						;The scoreboard redraw: an empty rts in 96
 	rts
 
-EASNLogo	;Draw the EASN logo
+EASNLogo							;Draw the EASN logo
 	bsr.w	printz
 	String	$BF,$01,$15
 	movea.l	#EASNmap,a1

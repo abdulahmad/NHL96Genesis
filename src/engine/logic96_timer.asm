@@ -1,7 +1,8 @@
 ;	The one-timer. The shot height, the pass, the target and the animation.
 
-puckvzadj	;Set puckvz for a top shelf shot from the distance to the goal line ($11E) over puckvy, at most $7FFF.
-	;Gravity skillspeed (skillspeedpal with PalMode). Called from doshot
+puckvzadj							;Set puckvz for a top shelf shot from the distance to the goal line ($11E)
+									;over puckvy, at most $7FFF.
+									;Gravity skillspeed (skillspeedpal with PalMode). Called from doshot
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(pucky).w,d0
 	bpl.w	.0
@@ -52,8 +53,9 @@ puckvzadj	;Set puckvz for a top shelf shot from the distance to the goal line ($
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-OneTimerPass	;One-timer pass: puckvz = sqrt(12 * onetimerheight), then puckvx / puckvy toward the target onetimertargetx /
-	;onetimertargety in puckvz / 3 frames
+OneTimerPass						;One-timer pass: puckvz = sqrt(12 * onetimerheight), then puckvx / puckvy
+									;toward the target onetimertargetx /
+									;onetimertargety in puckvz / 3 frames
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	#$C,d0
 	move.w	(onetimerheight).w,d1
@@ -87,8 +89,10 @@ OneTimerPass	;One-timer pass: puckvz = sqrt(12 * onetimerheight), then puckvx / 
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-OneTimerTarget	;One-timer pass target for receiver a3: an offset by facing from OneTimerNearTbl / OneTimerFarTbl (skater,
-	;near or far from the goal) or OneTimerGoalieTbl, plus a random 0-9 on each axis
+OneTimerTarget						;One-timer pass target for receiver a3: an offset by facing from
+									;OneTimerNearTbl / OneTimerFarTbl (skater,
+									;near or far from the goal) or OneTimerGoalieTbl, plus a random 0-9 on
+									;each axis
 	movem.l	d0-d7/a0-a6,-(sp)
 	bclr	#2,(sflags6).w
 	tst.w	$34(a3)
@@ -163,20 +167,22 @@ OneTimerTarget	;One-timer pass target for receiver a3: an offset by facing from 
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-OneTimerNearTbl	;OneTimerTarget target offsets (x, y) by facing, receiver near the goal
+OneTimerNearTbl						;OneTimerTarget target offsets (x, y) by facing, receiver near the goal
 	dc.w	110,216,110,216,110,216,110,216
 	dc.w	-110,216,-110,216,-110,216,-110,216
 
-OneTimerFarTbl	;OneTimerTarget target offsets (x, y) by facing, receiver far from the goal
+OneTimerFarTbl						;OneTimerTarget target offsets (x, y) by facing, receiver far from the
+									;goal
 	dc.w	-5,197,-5,197,-5,197,-5,197
 	dc.w	-5,197,-5,197,-5,197,-5,197
 
-OneTimerGoalieTbl	;OneTimerTarget target offsets (x, y) by facing, goalie
+OneTimerGoalieTbl					;OneTimerTarget target offsets (x, y) by facing, goalie
 	dc.w	-5,-31,50,-31,50,-31,50,-31
 	dc.w	-5,-31,-50,-31,-50,-31,-50,-31
 
-assonetimer	;Assignment $23 (asstab), player a3 shooting a one-timer: take control of him.
-	;Code the listing does not decode: kept as bytes
+assonetimer							;Assignment $23 (asstab), player a3 shooting a
+									;one-timer: take control of him.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$AB,$00,$01,$00,$62,$67,$00,$00,$AE,$08,$EB,$00,$03,$00,$64
 	dc.b	$66,$00,$00,$A4,$31,$FC,$00,$2D,$DC,$F4,$08,$B8,$00,$00,$BF,$B0
 	dc.b	$08,$B8,$00,$05,$C3,$4C,$42,$78,$BF,$B0,$42,$78,$BF,$A8,$50,$F8
@@ -221,8 +227,9 @@ assonetimer	;Assignment $23 (asstab), player a3 shooting a one-timer: take contr
 	dc.b	$DC,$F4,$60,$00,$00,$12,$08,$2B,$00,$01,$00,$63,$66,$00,$00,$08
 	dc.b	$4E,$B9,$00,$1D,$93,$76,$4E,$75
 
-setonetimeranim	;The one-timer animation: d1 = $856 or $11BA from the angle to the goal (vtoa, CheckOneTimerFacing).
-	;Code the listing does not decode: kept as bytes
+setonetimeranim						;The one-timer animation: d1 = $856 or $11BA from the angle to the goal
+									;(vtoa, CheckOneTimerFacing).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$03,$C3,$50,$67,$00,$00,$0A,$32,$3C,$08,$56,$60,$00
 	dc.b	$00,$3A,$32,$3C,$11,$BA,$48,$A7,$C0,$00,$30,$13,$44,$40,$32,$3C
 	dc.b	$01,$1E,$08,$2B,$00,$07,$00,$62,$66,$00,$00,$04,$44,$41,$92,$6B

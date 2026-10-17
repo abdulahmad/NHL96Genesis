@@ -5,10 +5,10 @@
 	org	$005F96
 
 ; includes for stubs to replace removed code
-	include	stubinc\ports.inc	;IO_* / VDP_* ports
-	include	stubinc\equals.inc	;VDP status bits
-	include	ram96.asm		;RAM map
-	include	externs96.asm		;outside addresses still in incbin segments. Equates only
+	include	stubinc\ports.inc		;IO_* / VDP_* ports
+	include	stubinc\equals.inc		;VDP status bits
+	include	ram96.asm				;RAM map
+	include	externs96.asm			;outside addresses still in incbin segments. Equates only
 
 ; External addresses outside: none.
 

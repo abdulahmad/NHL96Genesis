@@ -1,6 +1,7 @@
 ;	The roster menu and the trade screen.
 
-RosterMenuList	;The roster menu (PlayoffMenuScreen): each item routine returns its text in a1
+RosterMenuList						;The roster menu (PlayoffMenuScreen): each item
+									;routine returns its text in a1
 	String	$FE,$07,$F9
 	String	$FE,$05,$F9
 	dc.l	.trade,.create,.freeagents,.release,.reset,.rosters,.exit,-1
@@ -26,7 +27,7 @@ RosterMenuList	;The roster menu (PlayoffMenuScreen): each item routine returns i
 	rts
 .exittxt	String	$FD,$12,'Exit'
 
-YesNoMenuList	;A Yes / No menu (PlayoffMenuScreen)
+YesNoMenuList						;A Yes / No menu (PlayoffMenuScreen)
 	String	$FE,$07,$F9
 	String	$FE,$05,$F9
 	dc.l	.yes,.no,-1
@@ -37,20 +38,21 @@ YesNoMenuList	;A Yes / No menu (PlayoffMenuScreen)
 	rts
 .notxt	String	'No'
 
-MenuCreatePlayers	;Roster menu item Create Players
+MenuCreatePlayers					;Roster menu item Create Players
 	jsr	(CreatePlayer).l
 	rts
 
-MenuSignFreeAgents	;Roster menu item Sign Free Agents
+MenuSignFreeAgents					;Roster menu item Sign Free Agents
 	jsr	(SignFreeAgents).l
 	rts
 
-MenuReleasePlayer	;Roster menu item Release Player
+MenuReleasePlayer					;Roster menu item Release Player
 	jsr	(ReleasePlayers).l
 	rts
 
-TradePlayers	;The trade screen (roster menu item Trade Players): the two rosters with position and rating
-	;Code the listing does not decode: kept as bytes
+TradePlayers						;The trade screen (roster menu item Trade Players): the two rosters with
+									;position and rating
+									;Code the listing does not decode: kept as bytes
 	dc.b	$31,$FC,$00,$00,$C3,$A0,$31,$FC,$00,$01,$C3,$A2,$42,$78,$D3,$12
 	dc.b	$61,$00,$0B,$60,$20,$7C,$00,$19,$26,$2C,$4E,$B9,$00,$01,$21,$8A
 	dc.b	$4E,$B9,$00,$1D,$BB,$92,$42,$79,$FF,$FF,$27,$14,$42,$79,$FF,$FF
@@ -119,20 +121,22 @@ TradePlayers	;The trade screen (roster menu item Trade Players): the two rosters
 	dc.b	$88,$B8,$E5,$40,$0A,$30,$00,$01,$00,$00,$60,$00,$FD,$08,$61,$00
 	dc.b	$03,$B2,$66,$00,$01,$48,$31,$FC,$00,$07,$D0,$14,$60,$00,$FC,$82
 
-DrawHomeTradeRoster	;Draw the roster of HomeTeam with the chosen marks; falls into DrawTradeRosterRows
-	;Code the listing does not decode: kept as bytes
+DrawHomeTradeRoster					;Draw the roster of HomeTeam with the chosen marks; falls into
+									;DrawTradeRosterRows
+									;Code the listing does not decode: kept as bytes
 	dc.b	$3A,$39,$FF,$FF,$27,$10,$4A,$79,$FF,$FF,$27,$1C,$67,$00,$00,$06
 	dc.b	$3A,$3C,$FF,$FF,$2A,$7C,$FF,$FF,$27,$14,$28,$7C,$FF,$FF,$3A,$98
 	dc.b	$31,$FC,$00,$07,$B0,$42,$3E,$38,$C3,$A0,$60,$00,$00,$2C
 
-DrawVisTradeRoster	;The same for the visiting team
-	;Code the listing does not decode: kept as bytes
+DrawVisTradeRoster					;The same for the visiting team
+									;Code the listing does not decode: kept as bytes
 	dc.b	$3A,$39,$FF,$FF,$27,$12,$4A,$79,$FF,$FF,$27,$1C,$66,$00,$00,$06
 	dc.b	$3A,$3C,$FF,$FF,$2A,$7C,$FF,$FF,$27,$18,$28,$7C,$FF,$FF,$88,$B8
 	dc.b	$31,$FC,$00,$11,$B0,$42,$3E,$38,$C3,$A2
 
-DrawTradeRosterRows	;Draw the roster rows of team d7 (name, position, rating), * for the chosen players
-	;Code the listing does not decode: kept as bytes
+DrawTradeRosterRows					;Draw the roster rows of team d7 (name, position, rating), * for the
+									;chosen players
+									;Code the listing does not decode: kept as bytes
 	dc.b	$3F,$38,$B0,$42,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$8F,$00,$00,$00
 	dc.b	$31,$DF,$B0,$42,$42,$46,$30,$15,$E5,$40,$48,$C0,$D9,$C0,$4E,$B9
 	dc.b	$00,$01,$BA,$2E,$00,$28,$FD,$02,$20,$20,$20,$20,$20,$20,$20,$20
@@ -149,8 +153,8 @@ DrawTradeRosterRows	;Draw the roster rows of team d7 (name, position, rating), *
 	dc.b	$BA,$40,$58,$8C,$52,$78,$B0,$42,$52,$46,$BC,$7C,$00,$06
 	dc.b	$6D,$00,$FF,$3E,$4E,$75
 
-TradeDone	;After a trade
-	;Code the listing does not decode: kept as bytes
+TradeDone							;After a trade
+									;Code the listing does not decode: kept as bytes
 	dc.b	$22,$7C,$FF,$FF,$D0,$16,$24,$7C,$FF,$FF
 	dc.b	$3A,$98,$3E,$38,$C3,$A0,$3C,$39,$FF,$FF,$2A,$FC,$61,$00,$05,$C4
 	dc.b	$22,$7C,$FF,$FF,$D0,$1E,$24,$7C,$FF,$FF,$88,$B8,$3E,$38,$C3,$A2
@@ -186,27 +190,28 @@ TradeDone	;After a trade
 	dc.b	$08,$01,$00,$07,$67,$E4,$4E,$B9,$00,$1D,$D0,$86,$08,$B8,$00,$06
 	dc.b	$C3,$50,$4E,$B9,$00,$02,$41,$AA,$4E,$75
 
-TradeValue	;d0 = trade value of the d3 players at a0: each rating (byte 3) mapped through TradeRatingSteps /
-	;TradeRatingValues
-	;Code the listing does not decode: kept as bytes
+TradeValue							;d0 = trade value of the d3 players at a0: each rating (byte 3) mapped
+									;through TradeRatingSteps /
+									;TradeRatingValues
+									;Code the listing does not decode: kept as bytes
 	dc.b	$53,$43,$42,$40,$4A,$10,$67,$00,$00,$28,$12,$28,$00,$03,$22,$7C
 	dc.b	$00,$1D,$C9,$10,$24,$7C,$00,$1D,$C9,$1A,$42,$44,$B2,$31,$40,$00
 	dc.b	$6F,$00,$00,$06,$52,$44,$60,$F4,$18,$32,$40,$00,$48,$84,$D0,$44
 	dc.b	$4A,$98,$51,$CB,$FF,$D0,$4E,$75
 
-TradeRatingSteps	;TradeValue: the rating steps
+TradeRatingSteps					;TradeValue: the rating steps
 	dc.b	$28,$32,$3C,$46,$4B,$50,$55,$5A,$5F,$65
 
-TradeRatingValues	;TradeValue: the value of each step
+TradeRatingValues					;TradeValue: the value of each step
 	dc.b	$01,$02,$03,$04,$05,$07,$0A,$0F,$14,$1E
 
-TradeExit	;Leave the trade screen
-	;Code the listing does not decode: kept as bytes
+TradeExit							;Leave the trade screen
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$F9,$00,$02,$17,$4A
 
-CheckTrade	;Check the trade (players chosen on both teams, at most three a team, the roster limits); else the
-	;reason from InvalidTradeText
-	;Code the listing does not decode: kept as bytes
+CheckTrade							;Check the trade (players chosen on both teams, at most three a team, the
+									;roster limits); else the reason from InvalidTradeText Code the listing
+									;does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$BF,$54,$22,$7C,$FF,$FF,$3A,$98
 	dc.b	$30,$39,$FF,$FF,$2A,$FC,$61,$00,$02,$0C,$20,$7C,$FF,$FF,$BF,$5E
 	dc.b	$22,$7C,$FF,$FF,$88,$B8,$30,$39,$FF,$FF,$2B,$02,$61,$00,$01,$F6
@@ -245,19 +250,19 @@ CheckTrade	;Check the trade (players chosen on both teams, at most three a team,
 	dc.b	$4A,$11,$67,$00,$00,$14,$4A,$29,$00,$01,$67,$00,$00,$0A,$52,$68
 	dc.b	$00,$02,$60,$00,$00,$04,$52,$50,$4A,$99,$51,$C8,$FF,$E4,$4E,$75
 
-InvalidTradeText	;CheckTrade: the reasons a trade is refused
+InvalidTradeText					;CheckTrade: the reasons a trade is refused
 	String	$FD,$08,$FC,$09,'no players selected on',$FD,$08,$FC,$0A,'one or more teams'
 	String	$FD,$08,$FC,$09,'Roster Rules Violated.',$FA,$01,$FD,$08,'each team limited to',$FA,$01,$FD,$08,'2-3 goalies with a',$FA,$01,$FD,$08,'maximum of 27 players.'
 	String	$FD,$08,$FC,$09,'no players selected on',$FD,$08,$FC,$0A,'one or more teams'
 	String	$FD,$08,$FC,$09,'more than 3 players',$FA,$01,$FD,$08,'selected for trade on',$FA,$01,$FD,$08,'one or more teams'
 
-WaitMenuFrame	;Wait for the next frame (vcount), then SetMenuScroll; d0 kept
-	;Code the listing does not decode: kept as bytes
+WaitMenuFrame						;Wait for the next frame (vcount), then SetMenuScroll; d0 kept Code the
+									;listing does not decode: kept as bytes
 	dc.b	$3F,$00,$30,$38,$B0,$52,$B0,$78,$B0,$52,$67,$FA,$4E,$B9,$00,$01
 	dc.b	$26,$40,$30,$1F,$4E,$75
 
-BuildTradeList	;Trade list of team d7: the chosen players ($FFFF = none)
-	;Code the listing does not decode: kept as bytes
+BuildTradeList						;Trade list of team d7: the chosen players ($FFFF = none) Code the listing
+									;does not decode: kept as bytes
 	dc.b	$32,$C7,$32,$BC,$FF,$FF,$33,$7C,$FF,$FF,$00,$02,$33,$7C,$FF,$FF
 	dc.b	$00,$04,$53,$46,$4A,$12,$67,$00,$00,$0A,$42,$40,$10,$2A,$00,$02
 	dc.b	$32,$C0,$4A,$9A,$51,$CE,$FF,$EE,$4E,$75,$08,$F8,$00,$05,$C3,$56
@@ -312,8 +317,9 @@ BuildTradeList	;Trade list of team d7: the chosen players ($FFFF = none)
 	dc.b	$72,$74,$2D,$45,$76,$61,$6C,$75,$61,$74,$65,$00,$31,$DF,$B0,$1C
 	dc.b	$4E,$75
 
-EraseBlank	;Erase a d0 x d1 rectangle at printx / printy with the blank char $7FF (eraser)
-	;Code the listing does not decode: kept as bytes
+EraseBlank							;Erase a d0 x d1 rectangle at printx / printy with the blank char $7FF
+									;(eraser)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$F8,$C0,$3F,$38,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$34,$3C
 	dc.b	$07,$FF,$4E,$B9,$00,$01,$B9,$76,$31,$DF,$BF,$B2,$4C,$DF,$03,$1F
 	dc.b	$4E,$75,$2C,$3C,$00,$00,$54,$60,$32,$38,$B0,$52,$92,$78,$B0,$54
@@ -326,9 +332,10 @@ EraseBlank	;Erase a d0 x d1 rectangle at printx / printy with the blank char $7F
 	dc.b	$00,$01,$B3,$20,$4A,$41,$67,$00,$00,$06,$60,$00,$00,$06,$51,$CE
 	dc.b	$FF,$88,$4E,$75
 
-ExecuteTrade	;Do the trade: clear both teams' saved blocks, tag the positions, move each chosen player (ExtractTradedPlayer
-	;/ InsertTradedPlayer)
-	;Code the listing does not decode: kept as bytes
+ExecuteTrade						;Do the trade: clear both teams' saved blocks, tag the positions, move
+									;each chosen player (ExtractTradedPlayer
+									;/ InsertTradedPlayer)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$3E,$38,$D0,$16,$4E,$B9,$00,$1E,$0D,$86,$3E,$38
 	dc.b	$D0,$1E,$4E,$B9
 	dc.b	$00,$1E,$0D,$86,$20,$7C,$FF,$FF,$D0,$16,$61,$00,$00,$F8,$20,$7C
@@ -351,20 +358,22 @@ ExecuteTrade	;Do the trade: clear both teams' saved blocks, tag the positions, m
 	dc.b	$02,$40,$00,$FF,$4E,$B9,$00,$01,$03,$AA,$34,$00,$11,$42,$FF,$FE
 	dc.b	$51,$CE,$FF,$E8,$4E,$75
 
-ShiftTradeUp	;Trade list: the later player numbers at or after an inserted player (TempWord2) go up one
-	;Code the listing does not decode: kept as bytes
+ShiftTradeUp						;Trade list: the later player numbers at or after an inserted player
+									;(TempWord2) go up one
+									;Code the listing does not decode: kept as bytes
 	dc.b	$10,$38,$BF,$49,$4A,$70,$60,$00,$6B,$00,$00,$16,$B0,$30,$60,$01
 	dc.b	$6E,$00,$00,$06,$52,$30,$60,$01,$54,$46,$BC,$7C,$00,$08,$6D,$E4
 	dc.b	$4E,$75
 
-ShiftTradeDown	;Trade list: the later player numbers after a removed player go down one
-	;Code the listing does not decode: kept as bytes
+ShiftTradeDown						;Trade list: the later player numbers after a removed player go down one
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$54,$46,$BC,$7C,$00,$08,$6C,$00,$00,$1E,$4A,$70
 	dc.b	$60,$00,$6B,$00,$00,$16,$B0,$30,$60,$01,$6E,$00,$00,$06,$53,$30
 	dc.b	$60,$01,$54,$46,$BC,$7C,$00,$08,$6D,$E4,$4C,$DF,$7F,$FF,$4E,$75
 
-ExtractTradedPlayer	;Take player TempWord1 out of team TempRawSpd into buffer a2 (roster id, jersey, stats, injury)
-	;Code the listing does not decode: kept as bytes
+ExtractTradedPlayer					;Take player TempWord1 out of team TempRawSpd into buffer a2 (roster id,
+									;jersey, stats, injury)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$2F,$0A,$3E,$38,$BF,$4A,$4E,$B9,$00,$01,$57,$74
 	dc.b	$31,$C0,$D4,$88,$08,$F8,$00,$06,$C3,$50,$30,$38,$BF,$46,$02,$40
 	dc.b	$00,$FF,$3E,$38,$BF,$4A,$48,$A7,$81,$00,$4E,$B9,$00,$1D,$D8,$BE
@@ -409,9 +418,10 @@ ExtractTradedPlayer	;Take player TempWord1 out of team TempRawSpd into buffer a2
 	dc.b	$C3,$58,$61,$00,$00,$10,$08,$B8,$00,$05,$C3,$58,$24,$5F,$4C,$DF
 	dc.b	$7F,$FF,$4E,$75
 
-DeleteStatSlot	;Packed stat block d1 (d2 bits, d3 players, d4 bits a team) of team d7: player TempWord1's value to (a2)+,
-	;later ones down
-	;Code the listing does not decode: kept as bytes
+DeleteStatSlot						;Packed stat block d1 (d2 bits, d3 players, d4 bits a team) of team d7:
+									;player TempWord1's value to (a2)+,
+									;later ones down
+									;Code the listing does not decode: kept as bytes
 	dc.b	$20,$7C,$FF,$FF,$D1,$30,$48,$E7,$78,$80,$4E,$B9,$00,$01,$0F,$02
 	dc.b	$26,$7C,$FF,$FF,$D1,$30,$30,$38,$BF,$46,$02,$40,$00,$FF,$B0,$38
 	dc.b	$D4,$89,$6D,$00,$00,$10,$08,$38,$00,$05,$C3,$58,$66,$00,$00,$06
@@ -419,9 +429,10 @@ DeleteStatSlot	;Packed stat block d1 (d2 bits, d3 players, d4 bits a team) of te
 	dc.b	$53,$43,$D6,$43,$32,$33,$00,$02,$37,$81,$00,$00,$54,$40,$B0,$43
 	dc.b	$6D,$F2,$42,$73,$00,$00,$4C,$DF,$01,$1E,$4E,$F9,$00,$01,$0F,$22
 
-InsertTradedPlayer	;Put the player in the buffer a2 into team TradeToTeam at TempWord2: roster, player stats, saved lines
-	;(FixLinesInserted), jersey number (FixJerseyNumber) and injury slot
-	;Code the listing does not decode: kept as bytes
+InsertTradedPlayer					;Put the player in the buffer a2 into team TradeToTeam at TempWord2:
+									;roster, player stats, saved lines
+									;(FixLinesInserted), jersey number (FixJerseyNumber) and injury slot
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$2F,$0A,$08,$F8,$00,$06,$C3,$50,$3E,$38,$BF,$4C
 	dc.b	$30,$38,$BF,$48,$02,$40,$00,$FF,$20,$7C,$FF,$FF,$D1,$30,$4E,$B9
 	dc.b	$00,$01,$04,$AC,$D0,$40,$36,$3C,$00,$38,$60,$00,$00,$0A,$32,$30
@@ -467,9 +478,10 @@ InsertTradedPlayer	;Put the player in the buffer a2 into team TradeToTeam at Tem
 	dc.b	$BF,$48,$02,$40,$00,$FF,$3E,$38,$BF,$4C,$4E,$B9,$00,$1D,$D8,$32
 	dc.b	$24,$5F,$4E,$B9,$00,$02,$41,$AA,$4C,$DF,$7F,$FF,$4E,$75
 
-InsertStatSlot	;Packed stat block d1 (d2 bits, d3 players, d4 bits a team) of team d7: insert (a2)+ at player TempWord2, later
-	;ones up
-	;Code the listing does not decode: kept as bytes
+InsertStatSlot						;Packed stat block d1 (d2 bits, d3 players, d4 bits a team) of team d7:
+									;insert (a2)+ at player TempWord2, later
+									;ones up
+									;Code the listing does not decode: kept as bytes
 	dc.b	$20,$7C,$FF,$FF,$D1,$30,$48,$E7,$78,$80,$4E,$B9,$00,$01,$0F,$02
 	dc.b	$26,$7C,$FF,$FF,$D1,$30,$30,$38,$BF,$48,$02,$40,$00,$FF,$B0,$38
 	dc.b	$D4,$89,$6D,$00,$00,$10,$08,$38,$00,$05,$C3,$58,$66,$00,$00,$06
@@ -477,8 +489,9 @@ InsertStatSlot	;Packed stat block d1 (d2 bits, d3 players, d4 bits a team) of te
 	dc.b	$37,$81,$30,$00,$55,$43,$B6,$40,$6F,$00,$00,$04,$60,$EE,$32,$1A
 	dc.b	$37,$81,$30,$00,$4C,$DF,$01,$1E,$4E,$F9,$00,$01,$0F,$22
 
-FixJerseyNumber	;Give player d0 of team d7 a jersey number no teammate has: step it up in BCD, 99 wraps to 1
-	;Code the listing does not decode: kept as bytes
+FixJerseyNumber						;Give player d0 of team d7 a jersey number no teammate has: step it up in
+									;BCD, 99 wraps to 1
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$34,$00,$4E,$B9,$00,$01,$57,$B2,$36,$00,$20,$7C
 	dc.b	$FF,$FF,$D1,$30,$CE,$FC,$00,$1B,$48,$C7,$06,$87,$00,$00,$1B,$00
 	dc.b	$20,$07,$72,$1B,$48,$E7,$C0,$80,$4E,$B9,$00,$02,$41,$E8,$18,$30
@@ -489,15 +502,16 @@ FixJerseyNumber	;Give player d0 of team d7 a jersey number no teammate has: step
 	dc.b	$52,$40,$51,$CD,$FF,$C4,$4C,$DF,$01,$03,$4E,$B9,$00,$02,$41,$88
 	dc.b	$4E,$B9,$00,$02,$41,$AA,$4C,$DF,$7F,$FF,$4E,$75
 
-GetRosterId	;d0 = roster id word of player d0 of team d7 (season roster in save RAM SRRosters, or d7 << 8 | d0 outside a
-	;season)
-	;Code the listing does not decode: kept as bytes
+GetRosterId							;d0 = roster id word of player d0 of team d7 (season roster in save RAM
+									;SRRosters, or d7 << 8 | d0 outside a
+									;season)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$43,$80,$08,$38,$00,$04,$C3,$54,$67,$00,$00,$0E,$E1,$47
 	dc.b	$02,$40,$00,$FF,$80,$47,$60,$00,$00,$22,$CE,$FC,$00,$36,$D0,$40
 	dc.b	$48,$C0,$D0,$87,$06,$80,$00,$00,$15,$50,$72,$02,$20,$7C,$FF,$FF
 	dc.b	$BF,$80,$4E,$B9,$00,$02,$41,$E8,$30,$10,$4C,$DF,$01,$C2,$4E,$75
 
-PositionLetters	;The position of a roster row (TradePlayers and code96_17)
+PositionLetters						;The position of a roster row (TradePlayers and code96_17)
 	String	'G'
 	String	'LD'
 	String	'RD'

@@ -1,13 +1,13 @@
 ;	The copyright lines and the credits, as Strings. Credits is ended by String -1; CreditsList is
 ;	shown a page at a time, and an empty String ends each page.
 
-Credits	;The copyright and licence lines
+Credits								;The copyright and licence lines
 	String	'$ 1995 Electronic Arts'
 	String	'Licensed by'
 	String	'Sega Enterprises Ltd.'
 	String	-1
 
-CreditsList	;The legal pages and the credits
+CreditsList							;The legal pages and the credits
 	String	'all nhl and team logos'
 	String	'and other marks'
 	String	'depicted herein are'
@@ -34,7 +34,7 @@ CreditsList	;The legal pages and the credits
 	String	'Product of the National'
 	String	'Hockey League Players'
 	String	'Association'
-	dc.w	2	;end of page 1: an empty String
+	dc.w	2						;end of page 1: an empty String
 
 	String	' '
 	String	' '
@@ -63,7 +63,7 @@ CreditsList	;The legal pages and the credits
 	String	'Dieter Ruehle'
 	String	' '
 	String	' '
-	dc.w	2	;end of page 2: an empty String
+	dc.w	2						;end of page 2: an empty String
 
 	String	' '
 	String	'Executive Producer:'
@@ -91,7 +91,7 @@ CreditsList	;The legal pages and the credits
 	String	'Mike Graben'
 	String	'Dan Sletten'
 	String	' '
-	dc.w	2	;end of page 3: an empty String
+	dc.w	2						;end of page 3: an empty String
 
 	String	'Product Marketing'
 	String	'Manager:'
@@ -119,7 +119,7 @@ CreditsList	;The legal pages and the credits
 	String	'Daniel Lesser'
 	String	'Kurtis Hsu'
 	String	'Pat Harrold'
-	dc.w	2	;end of page 4: an empty String
+	dc.w	2						;end of page 4: an empty String
 
 	String	'"Get Ready For This"'
 	String	'Written By:'
@@ -148,4 +148,4 @@ CreditsList	;The legal pages and the credits
 	String	'the express written'
 	String	'permission of the'
 	String	'copyright owner."'
-	dc.w	2	;end of page 5: an empty String
+	dc.w	2						;end of page 5: an empty String

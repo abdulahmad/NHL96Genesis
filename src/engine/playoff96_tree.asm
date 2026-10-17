@@ -1,7 +1,7 @@
 ;	The playoff tree screen.
 
-PlayoffScreen	;Bring up the playoff screen if in playoff mode (OptPlayMode nonzero): the tree, the series scores and
-	;the team blocks, until start
+PlayoffScreen						;Bring up the playoff screen if in playoff mode (OptPlayMode nonzero): the
+									;tree, the series scores and the team blocks, until start
 	tst.w	(OptPlayMode).w
 	beq.w	rtsPlayoffScreen
 	btst	#7,(GameFlags).w
@@ -162,7 +162,7 @@ PlayoffScreen	;Bring up the playoff screen if in playoff mode (OptPlayMode nonze
 	bsr.w	HandlePlayoffInput
 	bra.s	.9
 
-HandlePlayoffInput	;Read the pads: start leaves PlayoffScreen, right / left scroll the tree
+HandlePlayoffInput					;Read the pads: start leaves PlayoffScreen, right / left scroll the tree
 	jsr	(FindHeldMenuPad).l
 	btst	#7,d3
 	bne.w	PlayoffScreenExit
@@ -174,7 +174,7 @@ HandlePlayoffInput	;Read the pads: start leaves PlayoffScreen, right / left scro
 	beq.w	UpdatePlayoffScroll
 	move.w	#4,(PlayerScrollCtr).w
 
-UpdatePlayoffScroll	;Move the tree one step and stop on a page boundary
+UpdatePlayoffScroll					;Move the tree one step and stop on a page boundary
 	move.w	(PlayerScrollCtr).w,d0
 	beq.w	rtsPlayoffScreen
 	add.w	(DispAttribCtr).w,d0
@@ -221,14 +221,15 @@ UpdatePlayoffScroll	;Move the tree one step and stop on a page boundary
 	clr.w	(PlayerScrollCtr).w
 	rts
 
-PlayoffScreenExit	;Drop HandlePlayoffInput's return address and return from PlayoffScreen
+PlayoffScreenExit					;Drop HandlePlayoffInput's return address and return from PlayoffScreen
 	jsr	(forceblack).l
 	addq.w	#4,sp
 
-rtsPlayoffScreen	;Shared rts of PlayoffScreen and UpdatePlayoffScroll
+rtsPlayoffScreen					;Shared rts of PlayoffScreen and UpdatePlayoffScroll
 	rts
 
-waitxc1	;(was PlayoffScreen_waitvsync) Wait for the next frame; flash a colour each time palcount runs out
+waitxc1								;(was PlayoffScreen_waitvsync) Wait for the next frame; flash a colour
+									;each time palcount runs out
 	tst.w	(palcount).w
 	bpl.w	.wait
 	movem.l	d0-d1/a0-a1,-(sp)
@@ -251,7 +252,7 @@ waitxc1	;(was PlayoffScreen_waitvsync) Wait for the next frame; flash a colour e
 	move.w	d0,(oldvcount).w
 	rts
 
-PrintSeriesScore	;Print best of 7 wins "t-b" for game struct a2 at printx / printy
+PrintSeriesScore					;Print best of 7 wins "t-b" for game struct a2 at printx / printy
 	movea.w	#(mesarea-M68K_RAM),a1
 	move.w	#6,(a1)+
 	move.w	4(a2),d0
@@ -265,10 +266,10 @@ PrintSeriesScore	;Print best of 7 wins "t-b" for game struct a2 at printx / prin
 	movea.w	#(mesarea-M68K_RAM),a1
 	jmp	printcur
 
-DrawTreeArrow	;An rts: no tree arrows
+DrawTreeArrow						;An rts: no tree arrows
 	rts
 
-DrawTeamBlocks	;Draw team block d1 at printx / printy; the user's team gets a frame
+DrawTeamBlocks						;Draw team block d1 at printx / printy; the user's team gets a frame
 	movem.l	d0-d7/a0-a3,-(sp)
 	movea.l	#potree,a0
 	move.w	(potreeteam).w,d0
@@ -322,8 +323,8 @@ DrawTeamBlocks	;Draw team block d1 at printx / printy; the user's team gets a fr
 	movem.l	(sp)+,d0-d7/a0-a3
 	rts
 
-VBlank_Playoff	;The PlayoffScreen vblank handler (vbint)
-	;Code the listing does not decode: kept as bytes
+VBlank_Playoff						;The PlayoffScreen vblank handler (vbint)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$20,$30,$38
 	dc.b	$B0,$00,$4E,$B9,$00,$01,$B6,$78,$30,$3C,$FE,$C0,$D0,$78,$D0,$30
 	dc.b	$30,$80,$31,$40,$00,$02,$4E,$B9,$00,$01,$AF,$D6,$52,$78,$B0,$52
@@ -333,7 +334,7 @@ VBlank_Playoff	;The PlayoffScreen vblank handler (vbint)
 	dc.b	$6C,$73,$00,$08,$46,$69,$6E,$61,$6C,$73,$00,$0C,$43,$68,$61,$6D
 	dc.b	$70,$69,$6F,$6E,$73,$00
 
-PlayoffTreeSetup	;Playoff tree layout by gamelevel. Used by PlayoffScreen
+PlayoffTreeSetup					;Playoff tree layout by gamelevel. Used by PlayoffScreen
 	dc.b	$00,$0A,$00,$41,$00,$84,$00,$CF,$01,$1C,$0F,$01,$02,$01,$04,$01
 	dc.b	$08,$01,$0A,$01,$0E,$01,$10,$01,$14,$01,$16,$66,$02,$66,$04,$66
 	dc.b	$08,$66,$0A,$66,$0E,$66,$10,$66,$14,$66,$16,$01,$39,$00,$45,$0A
@@ -358,12 +359,13 @@ PlayoffTreeSetup	;Playoff tree layout by gamelevel. Used by PlayoffScreen
 	dc.b	$0D,$47,$0B,$47,$0D,$29,$18,$40,$18,$34,$11,$05,$0F,$00,$1D,$02
 	dc.b	$2B,$04,$53,$06,$61,$08,$6F,$0A,$FF,$FF
 
-PlayoffScrollStops	;Playoff tree scroll page positions; the last entry is the scroll limit
+PlayoffScrollStops					;Playoff tree scroll page positions; the last entry is the scroll limit
 	dc.b	$00,$00,$00,$88,$00,$88,$01,$40
 
-PlayoffScrollStopsEnd	;The end of PlayoffScrollStops
+PlayoffScrollStopsEnd				;The end of PlayoffScrollStops
 	dc.b	$01,$40
 
-PlayoffScrollStart	;The start scroll of the playoff tree by gamelevel (negated for the other side)
+PlayoffScrollStart					;The start scroll of the playoff tree by gamelevel (negated for the other
+									;side)
 	dc.b	$01,$40,$01,$40,$00,$88,$00,$00,$00,$00
 
