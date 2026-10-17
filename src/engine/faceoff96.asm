@@ -262,7 +262,7 @@ limitfo	;Limit the faceoff spot to the walls of the rink, for every player in Pe
 .lf
 	move.b	1(a0),d0
 	andi.w	#$7F,d0
-	asl.w	#7,d0	;scsize
+	asl.w	#scsize,d0	;scsize
 	movea.w	#(SortCords-M68K_RAM),a1
 	move.w	#$76,d1
 	btst	#7,pflags(a1,d0.w)
