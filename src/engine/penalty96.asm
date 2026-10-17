@@ -324,7 +324,7 @@ getBAplayerInfo	;Keep the breakaway shooter, team, goalie and checker for the pe
 	move.w	d0,(BA_Sktr_SCnum).w
 	movea.l	#SortCords,a1
 	move.w	d0,d3
-	asl.w	#7,d3	;scsize
+	asl.w	#scsize,d3	;scsize
 	move.w	#0,(BA_Team).w
 	btst	#6,$62(a1,d3.w)
 	beq.w	.2
@@ -333,7 +333,7 @@ getBAplayerInfo	;Keep the breakaway shooter, team, goalie and checker for the pe
 	move.w	#0,(BA_Skater_Offset).w
 	move.b	$67(a1,d3.w),(BA_Skater_Offset+1).w
 	move.w	d1,(BA_Goalie_SCnum).w
-	asl.w	#7,d1	;scsize
+	asl.w	#scsize,d1	;scsize
 	move.w	#0,(BA_Goalie_Offset).w
 	move.b	$67(a1,d1.w),(BA_Goalie_Offset+1).w
 	move.w	#0,(BA_Checker_Offset).w
@@ -364,7 +364,7 @@ InProgress	;Ref in progress: update the graphics, stats and penalty information
 	movem.l	a3,-(sp)
 	clr.w	d1
 	move.b	1(a0),d1
-	asl.w	#7,d1	;scsize
+	asl.w	#scsize,d1	;scsize
 	movea.w	#(SortCords-M68K_RAM),a3
 	adda.w	d1,a3
 	tst.w	$34(a3)
@@ -398,7 +398,7 @@ InProgress	;Ref in progress: update the graphics, stats and penalty information
 	move.b	(a0),(a4)+	;penalty
 	clr.w	d1
 	move.b	1(a0),d1
-	asl.w	#7,d1	;scsize
+	asl.w	#scsize,d1	;scsize
 	movea.w	#(SortCords-M68K_RAM),a3
 	adda.w	d1,a3
 	clr.w	d0
@@ -571,7 +571,7 @@ Stop4Pen	;a0 = Penaltylist penalty + 2. Stop the clock, set the faceoff spot fro
 	movea.w	#(SortCords-M68K_RAM),a3
 	move.b	-1(a0),d1
 	ext.w	d1
-	asl.w	#7,d1	;scsize
+	asl.w	#scsize,d1	;scsize
 	adda.w	d1,a3
 	move.w	#$258,d1	;600
 	btst	#7,$62(a3)

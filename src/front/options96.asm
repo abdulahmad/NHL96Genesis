@@ -123,7 +123,7 @@ OptionsScreen	;The game options screen: play mode, rosters, period length, goali
 	addq.w	#4,(menuitem).w
 	bra.w	.4
 .up
-	btst	#0,d1	;ubut
+	btst	#ubut,d1	;ubut
 	beq.w	.14
 	tst.w	(menuitem).w
 	beq.w	.frame

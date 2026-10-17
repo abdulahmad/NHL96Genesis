@@ -692,7 +692,7 @@ addframe	;a3 = sort cord object. Project it with find3d, then addframe2. a5 = dm
 	move.w	Zpos(a3),d2	;Zpos into d2
 	bmi.w	.0	;exit if Zpos minus
 	bsr.w	find3d	;get position on screen
-	cmp.w	#$4E20,d1	;#osflag into d1
+	cmp.w	#osflag,d1	;#osflag into d1
 	beq.w	.0	;exit if Sort Cord is off screen
 	bsr.w	addframe2
 .0

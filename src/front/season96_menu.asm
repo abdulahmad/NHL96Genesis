@@ -2,7 +2,7 @@
 
 SetSframe	;Draw one sprite frame. a0 = framelist, d0/d1 = x/y cords, d2 = frame, d3 = start char a6 = Satt pointer, d6 =
 	;link counter.
-	cmp.w	#$40,d6	;MaxSprites
+	cmp.w	#MaxSprites,d6	;MaxSprites
 	bge.w	.exit
 	movem.l	d0-d5/a0,-(sp)
 	adda.l	4(a0),a0
