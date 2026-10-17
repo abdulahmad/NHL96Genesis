@@ -3,8 +3,9 @@
 ;	(assfaceoff, assfaceoffpl, puckfaceoff, puckfaceoff2) and Endfaceoff are the bytes the
 ;	listing does not decode.
 
-faceoffinput	;The faceoff player (assignment $17): store the dpad pull (fodir1 / fodir2) and start the faceoff
-	;SPA (SPA2126 with B, else SPA2150)
+faceoffinput						;The faceoff player (assignment $17): store the dpad pull (fodir1 /
+									;fodir2) and start the faceoff
+									;SPA (SPA2126 with B, else SPA2150)
 	btst	#6,(sflags5).w
 	beq.w	.1
 	rts
@@ -14,27 +15,28 @@ faceoffinput	;The faceoff player (assignment $17): store the dpad pull (fodir1 /
 	bne.w	rtss7
 	movea.w	#(fodir1-M68K_RAM),a0	;faceoff direction of puck control variable
 	btst	#pfgoal,pflags(a3)
-	beq.w	.2	;branch if bottom goal
+	beq.w	.2						;branch if bottom goal
 	movea.w	#(fodir2-M68K_RAM),a0
 .2
 	move.w	d0,(a0)
 	btst	#pf2aip,pflags2(a3)
 	bne.w	rtss7
-	btst	#4,d1	;test for b button press
+	btst	#4,d1					;test for b button press
 	beq.w	.3
 	move.w	#SPA2126,d1
-	bset	#pf2aip,pflags2(a3)	;set anim in progress
+	bset	#pf2aip,pflags2(a3)		;set anim in progress
 	jmp	SetSPA
 .3
 	move.w	#SPA2150,d1
 	jmp	SetSPA
 
-assfaceoff	;Assignment: wait for the faceoff to end (sflags2 bit 0), then assexit. Not decoded in the
-	;listing: kept as bytes, as the faceoff routines up to puckfaceoff2
+assfaceoff							;Assignment: wait for the faceoff to end (sflags2 bit 0), then assexit.
+									;Not decoded in the listing: kept as bytes, as the faceoff routines up to
+									;puckfaceoff2
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$00,$0C,$08,$38,$00,$00,$C3,$3C
 	dc.b	$67,$00,$00,$04,$4E,$75,$4E,$F9,$00,$01,$A3,$BE
 
-assfaceoffpl	;Assignment: the faceoff player
+assfaceoffpl						;Assignment: the faceoff player
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$00,$8C,$08,$38,$00,$00,$C3,$3C
 	dc.b	$67,$00,$00,$78,$08,$AB,$00,$01,$00,$62,$67,$00,$00,$06,$42,$6B
 	dc.b	$00,$40,$20,$7C,$FF,$FF,$BD,$BE,$08,$2B,$00,$06,$00,$62,$67,$00
@@ -46,7 +48,7 @@ assfaceoffpl	;Assignment: the faceoff player
 	dc.b	$00,$01,$00,$63,$4E,$F9,$00,$01,$A6,$14,$17,$7C,$00,$14,$00,$5E
 	dc.b	$60,$00,$FF,$68,$4E,$75
 
-puckfaceoff	;Puck assignment: the faceoff set up
+puckfaceoff							;Puck assignment: the faceoff set up
 	dc.b	$50,$F8,$D2,$38,$50,$F8,$D2,$3A,$50,$F8,$D2,$3C,$08,$B8,$00,$04
 	dc.b	$C3,$4C,$08,$38,$00,$00,$C3,$48,$67,$00,$00,$14,$42,$78,$B7,$86
 	dc.b	$42,$78,$B7,$88,$30,$3C,$00,$1E,$4E,$F9,$00,$01,$A3,$DA,$08,$AB
@@ -84,30 +86,31 @@ puckfaceoff	;Puck assignment: the faceoff set up
 	dc.b	$00,$62,$32,$7C,$C7,$26,$45,$E9,$03,$9E,$70,$02,$4E,$B9,$00,$00
 	dc.b	$9D,$0C,$60,$00,$00,$9C
 
-SetFaceoffComputerLine	;Line changes on and team d0 not on a pad: CompLine, SetPersonel
+SetFaceoffComputerLine				;Line changes on and team d0 not on a pad: CompLine, SetPersonel
 	dc.b	$4A,$78,$D2,$64,$66,$00,$00,$44,$08,$38,$00,$04,$C3,$4A,$66,$00
 	dc.b	$00,$22,$B0,$78,$C3,$90,$67,$00,$00,$32,$B0,$78,$C3,$92,$67,$00
 	dc.b	$00,$2A,$B0,$78,$C3,$94,$67,$00,$00,$22,$B0,$78,$C3,$96,$67,$00
 	dc.b	$00,$1A,$4E,$B9,$00,$01,$98,$68,$4E,$B9,$00,$01,$FB,$52,$4E,$B9
 	dc.b	$00,$01,$D0,$62,$31,$FC,$27,$10,$C3,$68,$4E,$75
 
-StartFaceoffLineChange	;Player d0 (sort object) opens the line change box
+StartFaceoffLineChange				;Player d0 (sort object) opens the line change box
 	dc.b	$C5,$4B,$EF,$40,$36,$7C,$B0,$5E,$D6,$C0,$08,$AB,$00,$03,$00,$63
 	dc.b	$2F,$0A,$4E,$B9,$00,$00,$EC,$30,$24,$5F,$08,$2B,$00,$03,$00,$63
 	dc.b	$67,$00,$00,$28,$08,$2B,$00,$06,$00,$62,$67,$00,$00,$12,$35,$7C
 	dc.b	$01,$68,$00,$42,$35,$6B,$00,$52,$00,$46,$60,$00,$00,$0E,$35,$7C
 	dc.b	$02,$58,$00,$40,$35,$6B,$00,$52,$00,$44,$C5,$4B
 
-rtsfaceoff	;The shared rts of the faceoff routines
+rtsfaceoff							;The shared rts of the faceoff routines
 	dc.b	$4E,$75
 
-WaitForFaceoffLineChanges	;Run both line change timers; when both are done set the home computer line
+WaitForFaceoffLineChanges			;Run both line change timers; when both are done set the home computer
+									;line
 	dc.b	$30,$3C,$00,$40,$4E,$B9,$00,$00,$9D,$E6,$30,$3C,$00,$42,$4E,$B9
 	dc.b	$00,$00,$9D,$E6,$4A,$6B,$00,$40,$6A,$96,$4A,$6B,$00,$42,$6A,$90
 	dc.b	$34,$7C,$C7,$26,$43,$EA,$03,$9E,$70,$01,$4E,$B9,$00,$00,$9D,$0C
 	dc.b	$31,$FC,$FF,$FF,$D4,$88,$30,$3C,$00,$1C,$4E,$F9,$00,$01,$A3,$DA
 
-UpdateFaceoffLineChangeTimer	;Line change timer d0 (temp1 / temp2 of the puck)
+UpdateFaceoffLineChangeTimer		;Line change timer d0 (temp1 / temp2 of the puck)
 	dc.b	$4A,$73,$00,$00,$6B,$00,$FF,$6A,$32,$33,$00,$04,$EF,$41,$30,$7C
 	dc.b	$B0,$5E,$34,$7C,$C7,$26,$08,$30,$00,$06,$10,$62,$67,$00,$00,$06
 	dc.b	$D4,$FC,$03,$9E,$08,$30,$00,$03,$10,$63,$66,$00,$00,$0A,$50,$F3
@@ -116,7 +119,7 @@ UpdateFaceoffLineChangeTimer	;Line change timer d0 (temp1 / temp2 of the puck)
 	dc.b	$4E,$B9,$00,$00,$EE,$92,$4E,$B9,$00,$00,$EC,$6E,$26,$5F,$4E,$75
 	dc.b	$4E,$F9,$00,$02,$15,$DC,$4E,$F9,$00,$01,$C7,$84
 
-puckfaceoff2	;Puck assignment: the faceoff
+puckfaceoff2						;Puck assignment: the faceoff
 	dc.b	$08,$AB,$00,$01,$00,$62,$67,$00,$03,$DE,$08,$B8,$00,$01,$C3,$56
 	dc.b	$08,$B8,$00,$02,$C3,$40,$08,$B8,$00,$05,$C3,$40,$08,$B8,$00,$00
 	dc.b	$C3,$42,$08,$B8,$00,$01,$C3,$42,$08,$B8,$00,$00,$C3,$4E,$08,$B8
@@ -183,16 +186,16 @@ puckfaceoff2	;Puck assignment: the faceoff
 	dc.b	$00,$1E,$7A,$78,$08,$B8,$00,$02,$C3,$56,$08,$F8,$00,$03,$C3,$56
 	dc.b	$53,$6B,$00,$40,$6A,$00,$00,$0E,$4E,$B9,$00,$1D,$8A,$C0,$4E,$F9
 	dc.b	$00,$00,$A3,$DC,$4E,$F9,$00,$01,$9B,$16
-.apl	;Faceoff positions of the players by line slot
+.apl								;Faceoff positions of the players by line slot
 	dc.b	0,1,2,3,4,5,6,0
 	dc.b	0,1,5,3,4,2,0,0
 	dc.b	0,3,5,1,4,0,0,0
-.ptab	;Faceoff x / y offsets
+.ptab								;Faceoff x / y offsets
 	dc.w	0,$FEF0,$FFDD,$FFCE,$23,$FFCE,$FFCE,$FFF6
 	dc.w	0,$FFF1,$32,$FFF6,0,$FFC4
 
-DrawFaceoffWindow	;Draw the faceoff window (FaceOffMap) at x $36 or $BE
-	;y $5C, and with line changes on the two line names (linelist)
+DrawFaceoffWindow					;Draw the faceoff window (FaceOffMap) at x $36 or $BE y $5C, and with line
+									;changes on the two line names (linelist)
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),0,0,0
 	moveq	#$36,d0
@@ -249,7 +252,8 @@ DrawFaceoffWindow	;Draw the faceoff window (FaceOffMap) at x $36 or $BE
 .exit
 	rts
 
-limitfo	;Limit the faceoff spot to the walls of the rink, for every player in PenBuf
+limitfo								;Limit the faceoff spot to the walls of the rink, for every player in
+									;PenBuf
 	movem.l	d0-d1/a0-a1,-(sp)
 	movea.w	#(PenBuf-M68K_RAM),a0
 .loop
@@ -262,7 +266,7 @@ limitfo	;Limit the faceoff spot to the walls of the rink, for every player in Pe
 .lf
 	move.b	1(a0),d0
 	andi.w	#$7F,d0
-	asl.w	#scsize,d0	;scsize
+	asl.w	#scsize,d0				;scsize
 	movea.w	#(SortCords-M68K_RAM),a1
 	move.w	#$76,d1
 	btst	#pfgoal,pflags(a1,d0.w)
@@ -286,11 +290,12 @@ limitfo	;Limit the faceoff spot to the walls of the rink, for every player in Pe
 .1
 	rts
 
-rtss7	;The shared rts of faceoffinput and doinput
+rtss7								;The shared rts of faceoffinput and doinput
 	rts
 
-Endfaceoff	;Drop the puck: pick the winner (.ftab) and the puck direction. Not decoded in the listing:
-	;kept as bytes
+Endfaceoff							;Drop the puck: pick the winner (.ftab) and the puck direction.
+									;Not decoded in the listing:
+									;kept as bytes
 	dc.b	$3F,$3C,$00,$2C,$4E,$B9,$00,$08,$84,$70,$08,$B8,$00,$00,$C3,$3C
 	dc.b	$31,$FC,$00,$3C,$D2,$E0,$38,$38,$B0,$3A,$24,$7C,$00,$09,$7E,$7A
 	dc.b	$4E,$B9,$00,$01,$B7,$30,$08,$B8,$00,$02,$C3,$3C,$08,$B8,$00,$00

@@ -1,8 +1,9 @@
 ;	Instant replay. ReplayMode plays a replay back. updatereplay records one frame
 ;	of the players, the puck and the camera. ReadMenuJoy reads the menu pad.
 
-ReplayMode	;Instant replay play-back control and display code. Pause menu INSTANT REPLAY.
-	;Code the listing does not decode: kept as bytes
+ReplayMode							;Instant replay play-back control and display code.
+									;Pause menu INSTANT REPLAY.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$B8,$00,$00,$C3,$44,$61,$00,$57,$2E,$4E,$B9,$00,$08,$85,$FC
 	dc.b	$30,$3C,$00,$09,$4E,$B9,$00,$08,$83,$9E,$30,$3C,$00,$00,$32,$3C
 	dc.b	$1B,$24,$20,$7C,$00,$02,$55,$00,$4E,$B9,$00,$08,$83,$9E,$30,$3C
@@ -81,7 +82,7 @@ ReplayMode	;Instant replay play-back control and display code. Pause menu INSTAN
 	dc.b	$BF,$B2,$67,$00,$00,$0E,$4E,$B9,$00,$02,$11,$08,$4E,$B9,$00,$02
 	dc.b	$10,$FA,$4E,$B9,$00,$02,$03,$4A,$31,$FC,$00,$18,$BD,$3C,$4E,$75
 
-ReadMenuJoy	;Read the menu pad: pad menupadnum (ReadJoy1-4)
+ReadMenuJoy							;Read the menu pad: pad menupadnum (ReadJoy1-4)
 	tst.w	(menupadnum).w
 	beq.w	ReadJoy1
 	cmpi.w	#1,(menupadnum).w
@@ -90,20 +91,21 @@ ReadMenuJoy	;Read the menu pad: pad menupadnum (ReadJoy1-4)
 	beq.w	ReadJoy3
 	bra.w	ReadJoy4
 
-ShowReplayIcon	;Show the replay icon and start the $F0 frame replayicontimer timer.
-	;Code the listing does not decode: kept as bytes
+ShowReplayIcon						;Show the replay icon and start the $F0 frame replayicontimer timer.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$31,$FC,$00,$F0,$DC,$A8,$61,$00,$5E,$8E,$00,$06,$BF,$01,$01,$00
 	dc.b	$42,$40,$42,$41,$74,$0D,$76,$06,$38,$38,$B0,$30,$3A,$3C,$00,$00
 	dc.b	$22,$7C,$00,$14,$0A,$FE,$D3,$E9,$00,$04,$34,$7C,$07,$72,$60,$00
 	dc.b	$59,$6A
 
-EraseReplayIcon	;Erase the replay icon (replayicontimer ran out).
-	;Code the listing does not decode: kept as bytes
+EraseReplayIcon						;Erase the replay icon (replayicontimer ran out).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$01,$01,$00,$30,$3C,$00,$0D
 	dc.b	$32,$3C,$00,$06,$34,$3C,$07,$FF,$4E,$F9,$00,$01,$B9,$76
 
-ShowReplayBanner	;Erase the replay icon, show the replay banner and stop the replayicontimer timer.
-	;Code the listing does not decode: kept as bytes
+ShowReplayBanner					;Erase the replay icon, show the replay banner and stop the
+									;replayicontimer timer.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$5D,$2A,$50,$F8,$DC,$A8,$61,$00,$5E,$3A,$00,$06
 	dc.b	$BF,$02,$00,$00,$70,$00,$72,$00,$74,$14,$76,$08,$38,$38,$B0,$3A
 	dc.b	$3A,$3C,$00,$00,$22,$7C,$00,$14,$12,$28,$D3,$E9,$00,$04,$34,$7C
@@ -113,13 +115,14 @@ ShowReplayBanner	;Erase the replay icon, show the replay banner and stop the rep
 	dc.b	$C1,$2C,$00,$16,$FD,$05,$FC,$05,$73,$74,$61,$72,$74,$20,$2D,$20
 	dc.b	$74,$6F,$20,$67,$61,$6D,$65,$00,$4E,$75
 
-EraseReplayBanner	;Erase the area ShowReplayBanner drew.
-	;Code the listing does not decode: kept as bytes
+EraseReplayBanner					;Erase the area ShowReplayBanner drew.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$02,$00,$00,$30,$3C,$00,$14
 	dc.b	$32,$3C,$00,$08,$34,$3C,$07,$FF,$4E,$F9,$00,$01,$B9,$76
 
-suba4	;a4 = current replay frame. Back up 1 frame and set video parameters for display.
-	;Code the listing does not decode: kept as bytes
+suba4								;a4 = current replay frame. Back up 1 frame and set video parameters for
+									;display.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$B9,$FC,$FF,$FF,$00,$00,$66,$00,$00,$12,$08,$38,$00,$04,$C3,$3A
 	dc.b	$67,$00,$00,$18,$28,$7C,$FF,$FF,$AF,$64,$98,$FC,$00,$64,$B9,$F8
 	dc.b	$B0,$4E,$66,$00,$01,$6C,$D8,$FC,$00,$64,$61,$00,$01,$64,$42,$47
@@ -139,8 +142,9 @@ suba4	;a4 = current replay frame. Back up 1 frame and set video parameters for d
 	dc.b	$61,$00,$00,$8E,$D8,$FC,$00,$64,$B9,$FC,$FF,$FF,$AF,$64,$66,$00
 	dc.b	$03,$FE,$28,$7C,$FF,$FF,$00,$00,$4E,$75
 
-UpdateCameraPos	;Camera struct a5 = object a3 x/y (negated for the reverse angle), Hpos/Vpos clamped.
-	;Code the listing does not decode: kept as bytes
+UpdateCameraPos						;Camera struct a5 = object a3 x/y (negated for the reverse angle),
+									;Hpos/Vpos clamped.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$E0,$00,$30,$13,$08,$38,$00,$07,$C3,$42,$67,$00,$00,$04
 	dc.b	$44,$40,$3A,$80,$32,$2B,$00,$14,$08,$38,$00,$07,$C3,$42,$67,$00
 	dc.b	$00,$04,$44,$41,$3B,$41,$00,$14,$B0,$7C,$00,$3C,$6D,$00,$00,$06
@@ -149,8 +153,9 @@ UpdateCameraPos	;Camera struct a5 = object a3 x/y (negated for the reverse angle
 	dc.b	$B2,$7C,$FF,$18,$6E,$00,$00,$06,$32,$3C,$FF,$18,$31,$C1,$BD,$2E
 	dc.b	$4C,$DF,$00,$07,$4E,$75
 
-RevReplayAdj	;Set sflags4 bit 7 for a reverse angle replay, then fall into the frame restore.
-	;Code the listing does not decode: kept as bytes
+RevReplayAdj						;Set sflags4 bit 7 for a reverse angle replay, then fall into the frame
+									;restore.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$04,$C3,$42,$67,$00,$00,$08,$08,$F8,$00,$07,$C3,$42
 	dc.b	$48,$E7,$E0,$82,$2C,$7C,$00,$1D,$57,$9E,$20,$4C,$72,$0F,$36,$7C
 	dc.b	$B0,$5E,$34,$28,$00,$02,$02,$42,$01,$FF,$08,$02,$00,$08,$67,$00
@@ -189,18 +194,18 @@ RevReplayAdj	;Set sflags4 bit 7 for a reverse angle replay, then fall into the f
 	dc.b	$BD,$2E,$4E,$B9,$00,$01,$61,$A4,$08,$B8,$00,$07,$C3,$42,$4C,$DF
 	dc.b	$41,$07,$4E,$75
 
-ClampReplayView	;Clamp Hpos to -$3C..$3C and Vpos to -$C8..$100.
-	;Code the listing does not decode: kept as bytes
+ClampReplayView						;Clamp Hpos to -$3C..$3C and Vpos to -$C8..$100.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$3F,$00,$30,$3C,$00,$3C,$B0,$78,$BD,$32,$6D,$00,$00,$0E,$30,$3C
 	dc.b	$FF,$C4,$B0,$78,$BD,$32,$6F,$00,$00,$06,$31,$C0,$BD,$32,$30,$3C
 	dc.b	$01,$00,$B0,$78,$BD,$2E,$6D,$00,$00,$0E,$30,$3C,$FF,$38,$B0,$78
 	dc.b	$BD,$2E,$6F,$00,$00,$06,$31,$C0,$BD,$2E,$30,$1F,$4E,$75
 
-updatereplay	;Called every frame to save replay events, d7 = elapsed frames
-	btst	#gmhl,(gmode).w	;check if highlight
-	bne.w	rtss8	;exit if so
+updatereplay						;Called every frame to save replay events, d7 = elapsed frames
+	btst	#gmhl,(gmode).w			;check if highlight
+	bne.w	rtss8					;exit if so
 	btst	#sf2drec,(sflags2).w	;check if replay record disabled
-	beq.w	.0	;branch if not
+	beq.w	.0						;branch if not
 	tst.w	(replaydelay).w
 	beq.w	.rec
 	subq.w	#1,(replaydelay).w
@@ -279,6 +284,6 @@ updatereplay	;Called every frame to save replay events, d7 = elapsed frames
 	move.w	(Hpos).w,(a0)+
 	move.w	(Vpos).w,(a0)+
 
-rtss8	;The shared rts of updatereplay; other routines branch to it
+rtss8								;The shared rts of updatereplay; other routines branch to it
 	rts
 

@@ -1,7 +1,8 @@
 ;	Whether a goalie is in its crease.
 
-GoalieInCrease	;Z set when player a3 is in its crease: x within $17 of the middle, y $100-$126 from the middle at its
-	;end (pflags bit 7: the other end). Called from goalieacc
+GoalieInCrease						;Z set when player a3 is in its crease: x within $17 of the middle, y
+									;$100-$126 from the middle at its
+									;end (pflags bit 7: the other end). Called from goalieacc
 	cmpi.w	#$17,(a3)
 	bgt.w	.1
 	cmpi.w	#$FFE9,(a3)

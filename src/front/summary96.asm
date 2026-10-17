@@ -1,7 +1,8 @@
 ;	The pause-menu summaries: roster, scoring, penalties, the periods,
 ;	the game, the shootout shooters and the record holders.
 
-VBlank_SpriteFade	;vbint for the period summary and the awards screen: the sprite table when dfok is set, then cramfade unless dfng
+VBlank_SpriteFade					;vbint for the period summary and the awards screen: the sprite table when
+									;dfok is set, then cramfade unless dfng
 	movem.l	d0-d7/a0-a6,-(sp)
 	btst	#dfng,(disflags).w
 	bne.w	.nograph
@@ -16,8 +17,9 @@ VBlank_SpriteFade	;vbint for the period summary and the awards screen: the sprit
 	movem.l	(sp)+,d0-d7/a0-a6
 	rte
 
-BlankMenuBox	;Blank the pause menu box (big font rows) and its corners before a submenu is drawn
-	;Code the listing does not decode: kept as bytes
+BlankMenuBox						;Blank the pause menu box (big font rows) and its corners before a submenu
+									;is drawn
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$BA,$2E,$00,$14,$F8,$07,$01,$0A,$06,$20,$FD,$1D
 	dc.b	$20,$FC,$14,$FD,$0A,$20,$FD,$1D,$20,$00,$4E,$B9,$00,$01,$BE,$C4
 	dc.b	$00,$0A,$F8,$04,$01,$0B,$06,$F9,$01,$00,$30,$3C,$00,$07,$4E,$B9
@@ -25,8 +27,8 @@ BlankMenuBox	;Blank the pause menu box (big font rows) and its corners before a 
 	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$FD,$0B,$FA,$02,$51,$C8,$FF,$E0
 	dc.b	$4E,$75
 
-TeamRosterScreen	;Pause menu Team Roster
-	;Code the listing does not decode: kept as bytes
+TeamRosterScreen					;Pause menu Team Roster
+									;Code the listing does not decode: kept as bytes
 	dc.b	$2F,$0A,$3F,$38,$C3,$A0,$3F,$38,$C3,$A2,$08,$38,$00,$06,$C3,$54
 	dc.b	$67,$00,$00,$0E,$42,$78,$C3,$A0,$61,$00,$05,$E2,$60,$00,$00,$24
 	dc.b	$08,$38,$00,$07,$C3,$50,$67,$00,$00,$1A,$08,$38,$00,$04,$C3,$56
@@ -127,8 +129,8 @@ TeamRosterScreen	;Pause menu Team Roster
 	dc.b	$C3,$A0,$E5,$40,$20,$70,$00,$00,$25,$48,$00,$1E,$4E,$B9,$00,$1D
 	dc.b	$F5,$72,$2F,$0A,$4E,$B9,$00,$01,$48,$1A,$24,$5F,$4E,$75
 
-ScoringSummaryScreen	;Pause menu Scoring Summary
-	;Code the listing does not decode: kept as bytes
+ScoringSummaryScreen				;Pause menu Scoring Summary
+									;Code the listing does not decode: kept as bytes
 	dc.b	$42,$78,$D0,$32,$61,$00,$01,$BE,$31,$FC,$00,$18,$BD,$3C,$08,$B8
 	dc.b	$00,$02,$BF,$B2,$61,$00,$00,$5E,$46,$FC,$25,$00,$4E,$B9,$00,$01
 	dc.b	$51,$E0,$4E,$B9,$00,$01,$26,$40,$4E,$B9,$00,$01,$5C,$D8,$4E,$B9
@@ -157,7 +159,7 @@ ScoringSummaryScreen	;Pause menu Scoring Summary
 	dc.b	$00,$18,$B6,$78,$C4,$CA,$6C,$00,$00,$0E,$4E,$B9,$00,$01,$BC,$72
 	dc.b	$00,$06,$8F,$02,$18,$7D,$4C,$DF,$7F,$FF,$4E,$75
 
-GoalTypeTbl	;ScoreSum byte 2 and $7F: SH2, SH, even, PP, PP2
+GoalTypeTbl							;ScoreSum byte 2 and $7F: SH2, SH, even, PP, PP2
 	String	'SH2'
 	String	'SH'
 	String	' '
@@ -196,8 +198,8 @@ GoalTypeTbl	;ScoreSum byte 2 and $7F: SH2, SH, even, PP, PP2
 	dc.b	$74,$20,$20,$20,$70,$2F,$73,$00,$20,$7C,$00,$1A,$45,$4A,$4E,$B9
 	dc.b	$00,$01,$21,$8A,$61,$00,$82,$B2,$24,$5F,$4E,$75
 
-PenaltySummaryScreen	;Pause menu Penalty Summary
-	;Code the listing does not decode: kept as bytes
+PenaltySummaryScreen				;Pause menu Penalty Summary
+									;Code the listing does not decode: kept as bytes
 	dc.b	$42,$78,$D0,$32,$61,$00,$00,$6E,$31,$FC,$00,$18,$BD,$3C,$08,$B8
 	dc.b	$00,$02,$BF,$B2,$61,$00,$02,$56,$46,$FC,$25,$00,$4E,$B9,$00,$01
 	dc.b	$51,$E0,$4E,$B9,$00,$01,$26,$40,$4E,$B9,$00,$01,$5C,$D8,$4E,$B9
@@ -257,8 +259,8 @@ PenaltySummaryScreen	;Pause menu Penalty Summary
 	dc.b	$6C,$00,$00,$0E,$4E,$B9,$00,$01,$BC,$72,$00,$06,$8F,$02,$18,$7D
 	dc.b	$4C,$DF,$7F,$FF,$4E,$75
 
-PeriodStatsScreen	;Pause menu Period Stats
-	;Code the listing does not decode: kept as bytes
+PeriodStatsScreen					;Pause menu Period Stats
+									;Code the listing does not decode: kept as bytes
 	dc.b	$42,$78,$D4,$58,$61,$00,$01,$90,$31,$FC,$00,$18,$BD,$3C,$08,$B8
 	dc.b	$00,$02,$BF,$B2,$61,$00,$00,$42,$46,$FC,$25,$00,$4E,$B9,$00,$01
 	dc.b	$51,$E0,$4E,$B9,$00,$01,$26,$40,$4E,$B9,$00,$01,$5C,$D8,$4E,$B9
@@ -271,14 +273,15 @@ PeriodStatsScreen	;Pause menu Period Stats
 	dc.b	$FF,$FF,$CA,$C4,$31,$FC,$00,$07,$B0,$40,$61,$00,$00,$24,$24,$7C
 	dc.b	$FF,$FF,$C7,$26,$31,$FC,$00,$1E,$B0,$40,$61,$00,$00,$14,$4E,$75
 
-PeriodGoalsTxt	;PeriodStatsScreen caption while it shows goals
+PeriodGoalsTxt						;PeriodStatsScreen caption while it shows goals
 	String	'goals'
 
-PeriodShotsTxt	;PeriodStatsScreen caption while it shows shots
+PeriodShotsTxt						;PeriodStatsScreen caption while it shows shots
 	String	'shots'
 
-PeriodStatsTeam	;PeriodStatsScreen per team: goals or shots by period up to the current one
-	;Code the listing does not decode: kept as bytes
+PeriodStatsTeam						;PeriodStatsScreen per team: goals or shots by
+									;period up to the current one
+									;Code the listing does not decode: kept as bytes
 	dc.b	$41,$EA,$03,$7C,$4A,$78,$D4,$58,$67,$00,$00,$06,$41,$EA,$03,$84
 	dc.b	$42,$78,$D4,$68,$31,$FC,$00,$10,$B0,$42,$61,$00,$00,$7E,$0C,$78
 	dc.b	$00,$01,$C4,$BC,$6D,$00,$00,$3E,$31,$FC,$00,$12,$B0,$42,$61,$00
@@ -323,8 +326,8 @@ PeriodStatsTeam	;PeriodStatsScreen per team: goals or shots by period up to the 
 	dc.b	$73,$00,$20,$7C,$00,$18,$DE,$04,$4E,$B9,$00,$01,$21,$8A,$24,$5F
 	dc.b	$4E,$75
 
-StatsReport	;(was GameStatisticsScreen) Pause menu Game Stats
-	;Code the listing does not decode: kept as bytes
+StatsReport							;(was GameStatisticsScreen) Pause menu Game Stats Code the listing does
+									;not decode: kept as bytes
 	dc.b	$42,$78,$D0,$32,$31,$FC,$00,$10,$D0,$30,$4A,$78,$D2,$62,$66,$00
 	dc.b	$00,$08,$31,$FC,$00,$0C,$D0,$30,$08,$F8,$00,$05,$C3,$56,$61,$00
 	dc.b	$03,$D0,$31,$FC,$00,$18,$BD,$3C,$08,$B8,$00,$02,$BF,$B2,$61,$00
@@ -361,7 +364,8 @@ StatsReport	;(was GameStatisticsScreen) Pause menu Game Stats
 	dc.b	$32,$4B,$30,$11,$E2,$48,$91,$78,$B0,$40,$4E,$F9,$00,$01,$BE,$EC
 	dc.b	$4E,$F9,$00,$01,$BD,$E8,$4E,$F9,$00,$01,$BD,$84
 
-TeamStatTextTbl	;Label, then the team struct stat offset and the second offset ($FFFF none)
+TeamStatTextTbl						;Label, then the team struct stat offset and the second offset ($FFFF
+									;none)
 	dc.b	$00,$08,$53,$63,$6F,$72,$65,$00,$00,$0C,$FF,$FF,$00,$08,$53,$68
 	dc.b	$6F,$74,$73,$00,$00,$00,$FF,$FF,$00,$0E,$53,$68,$6F,$6F,$74,$69
 	dc.b	$6E,$67,$20,$50,$63,$74,$FF,$FF,$FF,$FF,$00,$0C,$50,$6F,$77,$65
@@ -379,7 +383,7 @@ TeamStatTextTbl	;Label, then the team struct stat offset and the second offset (
 	dc.b	$00,$0A,$50,$61,$73,$73,$69,$6E,$67,$00,$00,$14,$00,$12,$00,$0E
 	dc.b	$70,$61,$73,$73,$69,$6E,$67,$20,$70,$63,$74,$00,$FF,$FE,$FF,$FE
 
-TeamStatTextTblNoPen	;The rows without the power play ones, used when penalties are off
+TeamStatTextTblNoPen				;The rows without the power play ones, used when penalties are off
 	dc.b	$00,$08,$53,$63,$6F,$72,$65,$00,$00,$0C,$FF,$FF,$00,$08,$53,$68
 	dc.b	$6F,$74,$73,$00,$00,$00,$FF,$FF,$00,$0E,$53,$68,$6F,$6F,$74,$69
 	dc.b	$6E,$67,$20,$50,$63,$74,$FF,$FF,$FF,$FF,$00,$0C,$42,$72,$65,$61
@@ -421,8 +425,8 @@ TeamStatTextTblNoPen	;The rows without the power play ones, used when penalties 
 	dc.b	$69,$73,$74,$00,$31,$DF,$B0,$1C,$20,$7C,$00,$1A,$98,$A4,$4E,$B9
 	dc.b	$00,$01,$21,$8A,$24,$5F,$4E,$75
 
-ShootoutShooters	;The shootout shooters screen
-	;Code the listing does not decode: kept as bytes
+ShootoutShooters					;The shootout shooters screen
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$00,$C3,$48,$67,$00,$00,$8E,$61,$00,$06,$52,$31,$FC
 	dc.b	$00,$18,$BD,$3C,$08,$B8,$00,$02,$BF,$B2,$42,$78,$D0,$30,$42,$78
 	dc.b	$D0,$34,$61,$00,$04,$9C,$31,$FC,$00,$00,$D0,$3C,$61,$00,$03,$9A
@@ -465,8 +469,8 @@ ShootoutShooters	;The shootout shooters screen
 	dc.b	$FF,$FF,$C7,$26,$67,$00,$00,$08,$20,$7C,$FF,$FF,$D4,$48,$E3,$42
 	dc.b	$31,$80,$20,$00,$60,$00,$FD,$A6
 
-PrintShooterList	;Shootout shooters: the player list rows
-	;Code the listing does not decode: kept as bytes
+PrintShooterList					;Shootout shooters: the player list rows
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$17,$02,$00,$22,$7C,$00,$02
 	dc.b	$34,$44,$0C,$78,$00,$05,$D0,$3C,$66,$00,$00,$08,$22,$7C,$00,$02
 	dc.b	$35,$A6,$30,$38,$D0,$30,$60,$00,$00,$06,$D2,$D1,$58,$49,$4A,$51
@@ -482,20 +486,20 @@ PrintShooterList	;Shootout shooters: the player list rows
 	dc.b	$42,$40,$10,$33,$20,$00,$4E,$B9,$00,$01,$51,$FA,$52,$42,$51,$C9
 	dc.b	$FF,$B4,$4E,$75
 
-ShooterOverallTxt	;PrintShooterList heading, then the attribute long (d4)
+ShooterOverallTxt					;PrintShooterList heading, then the attribute long (d4)
 	dc.b	$00,$12,$20,$20,$20,$20,$4F,$76,$65,$72,$61,$6C,$6C,$20,$20,$20
 	dc.b	$20,$5D,$1F,$3A,$00,$0A
 
-ShooterOverallTxt2	;The same for goalies
+ShooterOverallTxt2					;The same for goalies
 	dc.b	$00,$12,$20,$20,$20,$20,$4F,$76,$65,$72,$61,$6C,$6C,$20,$20,$20
 	dc.b	$20,$5D,$1B,$0F,$00,$0A
 
-ShootersPick	;Shootout shooters: C on a slot
-	;Code the listing does not decode: kept as bytes
+ShootersPick						;Shootout shooters: C on a slot
+									;Code the listing does not decode: kept as bytes
 	dc.b	$B0,$78,$D0,$3C,$67,$00,$FC,$AE,$60,$00,$00,$26
 
-ShootersMove	;Shootout shooters: move the slot cursor
-	;Code the listing does not decode: kept as bytes
+ShootersMove						;Shootout shooters: move the slot cursor
+									;Code the listing does not decode: kept as bytes
 	dc.b	$0C,$78,$00,$05,$D0,$3C,$67,$00,$FC,$A0,$D0,$78,$D0,$3C,$6B,$00
 	dc.b	$00,$10,$B0,$7C,$00,$05,$6D,$00,$00,$0C,$42,$40,$60,$00,$00,$06
 	dc.b	$30,$3C,$00,$04,$31,$C0,$D0,$3C,$61,$00,$02,$16,$61,$00,$01,$A4
@@ -573,8 +577,8 @@ ShootersMove	;Shootout shooters: move the slot cursor
 	dc.b	$1A,$63,$2D,$73,$65,$6C,$65,$63,$74,$20,$70,$6C,$61,$79,$65,$72
 	dc.b	$31,$DF,$B0,$1C,$4E,$75
 
-RecordHoldersScreen	;Pause menu Record Holders
-	;Code the listing does not decode: kept as bytes
+RecordHoldersScreen					;Pause menu Record Holders
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$06,$36,$31,$FC,$00,$18,$BD,$3C,$08,$B8,$00,$02,$BF,$B2
 	dc.b	$4E,$B9,$00,$1D,$7B,$50,$42,$78,$BF,$46,$08,$B8,$00,$06,$C3,$46
 	dc.b	$61,$00,$05,$78,$08,$F8,$00,$06,$C3,$46,$61,$00,$05,$6E,$61,$00
@@ -593,13 +597,13 @@ RecordHoldersScreen	;Pause menu Record Holders
 	dc.b	$BF,$46,$67,$00,$00,$08,$22,$7C,$00,$1E,$4E,$F8,$08,$F8,$00,$02
 	dc.b	$C3,$54,$4E,$B9,$00,$01,$BE,$EC,$4E,$75
 
-RecHeaderWins	;Record screen heading: name, win%, win, loss, tie
+RecHeaderWins						;Record screen heading: name, win%, win, loss, tie
 	String	$F8,$04,$01,$05,$06,'name',$FD,$10,'win% ',$FD,$17,'win',$FD,$1C,'loss',$FD,$21,'tie'
 
-RecHeaderGoals	;Record screen heading: name, goals, teams
+RecHeaderGoals						;Record screen heading: name, goals, teams
 	String	$F8,$04,$01,$05,$06,'name',$FD,$10,'goals',$FD,$1C,'teams'
 
-RecHeaderSaves	;Record screen heading: name, saves, teams
+RecHeaderSaves						;Record screen heading: name, saves, teams
 	String	$F8,$04,$01,$05,$06,'name',$FD,$10,'saves',$FD,$1C,'teams'
 	dc.b	$48,$E7,$FF,$FE,$08,$B8,$00,$02,$C3,$54,$4E,$B9,$00,$01,$BA,$2E
 	dc.b	$00,$08,$F8,$04,$01,$03,$09,$00,$3E,$3C,$00,$06,$20,$7C,$FF,$FF
@@ -646,17 +650,17 @@ RecHeaderSaves	;Record screen heading: name, saves, teams
 	dc.b	$00,$01,$BE,$EC,$54,$78,$B0,$42,$51,$CF,$FF,$0E,$4C,$DF,$7F,$FF
 	dc.b	$4E,$75
 
-RecBlankTxt	;A blank record row
+RecBlankTxt							;A blank record row
 	String	'                                   '
 
-RecHolderByTxt	;"by "
+RecHolderByTxt						;"by "
 	String	'by '
 
-RecHolderVsTxt	;" vs. "
+RecHolderVsTxt						;" vs. "
 	String	' vs. '
 
-PrintRecordName	;Record Holders: print the row number and the user name
-	;Code the listing does not decode: kept as bytes
+PrintRecordName						;Record Holders: print the row number and the user name Code the listing
+									;does not decode: kept as bytes
 	dc.b	$3F,$07,$44,$47,$5E,$47,$06,$47,$00,$30,$22,$7C,$FF,$FF,$BF,$F2
 	dc.b	$32,$BC,$00,$06,$13,$47,$00,$02,$13,$7C,$00,$2E,$00,$03,$13,$7C
 	dc.b	$00,$20,$00,$04,$13,$7C,$00,$00,$00,$05,$4E,$B9,$00,$01,$BE,$EC
@@ -664,8 +668,8 @@ PrintRecordName	;Record Holders: print the row number and the user name
 	dc.b	$00,$07,$C3,$46,$4E,$B9,$00,$1D,$7D,$62,$13,$7C,$00,$20,$00,$0B
 	dc.b	$4E,$F9,$00,$01,$BE,$EC
 
-CalcWinPercents	;The win %, games and ties of the user record blocks
-	;Code the listing does not decode: kept as bytes
+CalcWinPercents						;The win %, games and ties of the user record blocks Code the listing does
+									;not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$D1,$30,$22,$7C,$FF,$FF,$D4,$0A
 	dc.b	$2C,$7C,$FF,$FF,$D4,$12,$2A,$7C,$FF,$FF,$D4,$22,$3E,$3C,$00,$07
 	dc.b	$10,$28,$00,$08,$E1,$48,$10,$28,$00,$09,$12,$28,$00,$0A,$E1,$49
@@ -683,8 +687,8 @@ CalcWinPercents	;The win %, games and ties of the user record blocks
 	dc.b	$10,$11,$12,$29,$FF,$FF,$13,$40,$FF,$FF,$12,$81,$50,$C6,$51,$CF
 	dc.b	$FF,$9E,$4A,$46,$66,$90,$22,$5F,$4C,$DF,$7F,$FF,$4E,$75
 
-ReadTeamRecords	;Read the records from save RAM and sort the rows
-	;Code the listing does not decode: kept as bytes
+ReadTeamRecords						;Read the records from save RAM and sort the rows Code the listing does
+									;not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$20,$3C,$00,$00,$0E,$CE,$22,$3C,$00,$00,$00,$80
 	dc.b	$20,$7C,$FF,$FF,$D1,$30,$4E,$B9,$00,$02,$41,$E8,$22,$7C,$FF,$FF
 	dc.b	$D3,$F2,$08,$38,$00,$06,$C3,$46,$67,$00,$00,$08,$22,$7C,$FF,$FF

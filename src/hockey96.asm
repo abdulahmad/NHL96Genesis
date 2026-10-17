@@ -2,8 +2,9 @@
 ;	StartPer start a game and a period. Gameloop and DoGameFrame run a frame: the crowd, the
 ;	clock, and the bench.
 
-Begin	;Cold start, entered from Start. Clear RAM, init sound and menus, go to the title screen
-	move	#$2700,sr	;interrupts off
+Begin								;Cold start, entered from Start. Clear RAM, init sound and menus, go to
+									;the title screen
+	move	#$2700,sr				;interrupts off
 	movea.w	#(Stack-M68K_RAM),sp
 	movea.w	#(VSCRLPM-M68K_RAM),a0
 .0
@@ -22,9 +23,9 @@ Begin	;Cold start, entered from Start. Clear RAM, init sound and menus, go to th
 	move.w	#$1B24,d1
 	movea.l	#Z80Program,a0
 	jsr	(SoundCmd).l
-	move.w	#9,d0	;command 9
+	move.w	#9,d0					;command 9
 	jsr	(SoundCmd).l
-	move.w	#6,d0	;command 6: the sound data
+	move.w	#6,d0					;command 6: the sound data
 	clr.w	d1
 	movea.l	#SoundBanks,a0
 	jsr	(SoundCmd).l
@@ -43,7 +44,7 @@ Begin	;Cold start, entered from Start. Clear RAM, init sound and menus, go to th
 	jsr	(orjoy).l
 	jmp	Opening
 
-StartGame	;Reset game state for a new game, then start the first period
+StartGame							;Reset game state for a new game, then start the first period
 	move.l	#VBlank,(vbint).l
 	clr.w	(RefStep).w
 	bclr	#5,(GameFlags).w
@@ -77,10 +78,10 @@ StartGame	;Reset game state for a new game, then start the first period
 	clr.w	(gsp).w
 	clr.w	(ChkCnt).w
 	bsr.w	restoreteams
-	jsr	(stop_current_song).l	;stop the song
-	move.w	#9,d0	;restart the sound driver as Begin does
+	jsr	(stop_current_song).l		;stop the song
+	move.w	#9,d0					;restart the sound driver as Begin does
 	jsr	(SoundCmd).l
-	move.w	#0,d0	;command 0: load the Z80 program
+	move.w	#0,d0					;command 0: load the Z80 program
 	move.w	#$1B24,d1
 	movea.l	#Z80Program,a0
 	jsr	(SoundCmd).l
@@ -106,26 +107,28 @@ sub_14804
 	jsr	(MakeSRAMChecksum).l
 	rts
 
-restoreteams	;Both teams: no players in the penalty box, every roster player on the bench
+restoreteams						;Both teams: no players in the penalty box, every roster player on the
+									;bench
 	movea.w	#(tmstruct-M68K_RAM),a2
 	bsr.w	.r
 	adda.w	#$39E,a2
 .r
-	move.w	#6,tmap(a2)	;tmap: no players in pen. box
-	moveq	#$36,d0	;(maxros-1)*2
+	move.w	#6,tmap(a2)				;tmap: no players in pen. box
+	moveq	#$36,d0					;(maxros-1)*2
 .1
 	move.w	#$FFFE,$6C(a2,d0.w)
 	subq.w	#2,d0
 	bpl.s	.1
 	rts
 
-ResetClock	;gameclock = PerTimeTotal = the period length (GetPeriodTime; overtime by OptPlayMode), clock stopped (gmclock)
-	bsr.w	GetPeriodTime	;d0 = period length in seconds
+ResetClock							;gameclock = PerTimeTotal = the period length (GetPeriodTime; overtime by
+									;OptPlayMode), clock stopped (gmclock)
+	bsr.w	GetPeriodTime			;d0 = period length in seconds
 	cmpi.w	#3,(gsp).w
 	blt.w	.2
 	tst.w	(OptPlayMode).w
 	bne.w	.0
-	move.w	#$12C,d0	;OptPlayMode 0 overtime is always 5:00
+	move.w	#$12C,d0				;OptPlayMode 0 overtime is always 5:00
 	bra.w	.2
 .0
 	cmpi.w	#3,(OptPlayMode).w
@@ -148,7 +151,7 @@ ResetClock	;gameclock = PerTimeTotal = the period length (GetPeriodTime; overtim
 	bset	#gmclock,(gmode).w
 	rts
 
-GetPeriodTime	;Return d0 = period length in seconds for the period length option
+GetPeriodTime						;Return d0 = period length in seconds for the period length option
 	move.w	(OptPerlen).w,d0
 	asl.w	#1,d0
 	lea	.times(pc),a0
@@ -157,7 +160,7 @@ GetPeriodTime	;Return d0 = period length in seconds for the period length option
 .times
 	dc.w	$12C,$258,$4B0,$1E
 
-StartPer	;Start a period: reset stack, rink and clock, face off, run the game loop
+StartPer							;Start a period: reset stack, rink and clock, face off, run the game loop
 	cmpi.w	#3,(gsp).w
 	bne.w	.0
 	bset	#1,(sflags7).w
@@ -221,7 +224,7 @@ StartPer	;Start a period: reset stack, rink and clock, face off, run the game lo
 	bge.w	Gameloop
 	bset	#sf3fosong,(sflags3).w
 
-Gameloop	;Main loop for game
+Gameloop							;Main loop for game
 	bsr.w	DoGameFrame
 	bsr.w	demoread
 	btst	#sfpz,(sflags).w
@@ -229,7 +232,7 @@ Gameloop	;Main loop for game
 	bsr.w	Pausemode
 	bra.s	Gameloop
 
-DoGameFrame	;Wait for at least one vblank, then run one frame of game logic
+DoGameFrame							;Wait for at least one vblank, then run one frame of game logic
 	move.w	(vcount).w,d7
 	sub.w	(oldvcount).w,d7
 	beq.s	DoGameFrame
@@ -255,8 +258,8 @@ DoGameFrame	;Wait for at least one vblank, then run one frame of game logic
 	bsr.w	updatereplay
 	jmp	setvideo
 
-DoFrameUpdates	;The frame updates of DoGameFrame: the new puck carrier check, the crowd, the clock, and once a second
-	;(lldisp) the slower updates
+DoFrameUpdates						;The frame updates of DoGameFrame: the new puck carrier check, the crowd,
+									;the clock, and once a second (lldisp) the slower updates
 	move.w	(lastpuckc).w,d0
 	cmp.w	(puckc).w,d0
 	beq.w	.0
@@ -285,12 +288,13 @@ DoFrameUpdates	;The frame updates of DoGameFrame: the new puck carrier check, th
 	bsr.w	CheckInjury
 	jmp	updatepwrplay
 
-CheckInjury	;The injury message when its timer (InjCntDown) runs out (ShowInjuryBox)
+CheckInjury							;The injury message when its timer (InjCntDown) runs out (ShowInjuryBox)
 	subq.w	#1,(InjCntDown).w
 	bne.w	rtss8
 	jmp	ShowInjuryBox
 
-RestoreBenchEnergy	;Unless OptLine: every bench player of both teams gets 9 energy, up to $1000
+RestoreBenchEnergy					;Unless OptLine: every bench player of both teams gets 9 energy, up to
+									;$1000
 	tst.w	(OptLine).w
 	bne.w	.ex
 	movea.w	#(tmstruct-M68K_RAM),a2
@@ -311,8 +315,8 @@ RestoreBenchEnergy	;Unless OptLine: every bench player of both teams gets 9 ener
 .ex
 	rts
 
-updatecrowdf	;Every game loop, d7 = elapsed frames: the crowd level falls (faster when loud); every crowdcnt frames
-	;the next crowd frame
+updatecrowdf						;Every game loop, d7 = elapsed frames: the crowd level falls (faster when
+									;loud); every crowdcnt frames the next crowd frame
 	cmpi.w	#$15E,(crowdlevel).w
 	blt.w	.dec
 	subq.w	#3,(crowdlevel).w
@@ -354,7 +358,8 @@ updatecrowdf	;Every game loop, d7 = elapsed frames: the crowd level falls (faste
 	move.b	d0,(crowdframe).w
 	rts
 
-clockcont	;At the end of the period clock (gameclock 0): the horn, then the end of period or game assignments
+clockcont							;At the end of the period clock (gameclock 0): the horn, then the end of
+									;period or game assignments
 	btst	#gmclock,(gmode).w
 	bne.w	rtss8
 	tst.w	(gameclock).w

@@ -1,7 +1,7 @@
 ;	The end-of-season awards. Nine pictures, and the winner of each.
 
-SeasonAwards	;End of season awards: left / right go through the 9 awards (picture, name, description, winner),
-	;start leaves
+SeasonAwards						;End of season awards: left / right go through the 9 awards (picture,
+									;name, description, winner), start leaves
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(forceblack).l
 	bsr.w	SetPlayoffAwardWinners
@@ -48,7 +48,7 @@ SeasonAwards	;End of season awards: left / right go through the 9 awards (pictur
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-DrawAwardWinnerLogo	;The team logo of the winner of award PlayerScrollCtr
+DrawAwardWinnerLogo					;The team logo of the winner of award PlayerScrollCtr
 	jsr	(printz).l
 	String	$8F,$03,$08
 	bsr.w	GetAwardWinnerTeam
@@ -57,7 +57,7 @@ DrawAwardWinnerLogo	;The team logo of the winner of award PlayerScrollCtr
 	jsr	(DrawTeamLogoD7).l
 	rts
 
-DrawAwardPicture	;Draw the picture of award PlayerScrollCtr (AwardPictures)
+DrawAwardPicture					;Draw the picture of award PlayerScrollCtr (AwardPictures)
 	jsr	(printz).l
 	String	$BF,$19,$09
 	move.w	(PlayerScrollCtr).w,d0
@@ -77,11 +77,11 @@ DrawAwardPicture	;Draw the picture of award PlayerScrollCtr (AwardPictures)
 	jsr	(dobitmap).l
 	rts
 
-AwardPictures	;The award picture bitmaps, one per award
+AwardPictures						;The award picture bitmaps, one per award
 	dc.l	HartPic,ArtRossPic,NorrisPic,VezinaPic,ConnSmythePic
 	dc.l	PresidentsPic,WalesPic,CampbellPic,PearsonPic
 
-PrintAwardName	;Print the name of award PlayerScrollCtr (AwardNames)
+PrintAwardName						;Print the name of award PlayerScrollCtr (AwardNames)
 	jsr	(printz).l
 	String	$BF,$13,$05
 	movea.l	#AwardNames,a1
@@ -95,7 +95,7 @@ PrintAwardName	;Print the name of award PlayerScrollCtr (AwardNames)
 	jsr	(printbig).l
 	rts
 
-AwardNames	;PrintAwardName Strings: the award names
+AwardNames							;PrintAwardName Strings: the award names
 	String	'hart memorial trophy'
 	String	'  art ross trophy   '
 	String	'james norris trophy '
@@ -106,7 +106,7 @@ AwardNames	;PrintAwardName Strings: the award names
 	String	' clarence campbell  '
 	String	' lester b. pearson  '
 
-PrintAwardDesc	;Print the description of award PlayerScrollCtr (AwardDescs)
+PrintAwardDesc						;Print the description of award PlayerScrollCtr (AwardDescs)
 	jsr	(printcurz).l
 	String	$8F,$02,$14,'                ',$8F,$02,$15,'                ',$8F,$02,$16,'                ',$8F,$02,$17,'                ',$8F,$02,$18,'                '
 	movea.l	#AwardDescs,a1
@@ -115,7 +115,7 @@ PrintAwardDesc	;Print the description of award PlayerScrollCtr (AwardDescs)
 	jsr	(printcur).l
 	rts
 
-AwardDescs	;PrintAwardDesc Strings: the award descriptions
+AwardDescs							;PrintAwardDesc Strings: the award descriptions
 	String	$8F,$02,$14,'to the player',$8F,$02,$15,'adjudged to be',$8F,$02,$16,'the most',$8F,$02,$17,'valuable to',$8F,$02,$18,'his team'
 	String	$8F,$02,$14,'to the player',$8F,$02,$15,'who leads the',$8F,$02,$16,'league in points',$8F,$02,$17,'at the end of',$8F,$02,$18,'the reg. season'
 	String	$8F,$02,$14,'to the defensive',$8F,$02,$15,'player showing',$8F,$02,$16,'the greatest all',$8F,$02,$17,'around ability',$8F,$02,$18,'in the position'
@@ -126,7 +126,8 @@ AwardDescs	;PrintAwardDesc Strings: the award descriptions
 	String	$8F,$02,$14,'to the winners',$8F,$02,$15,'of the',$8F,$02,$16,'Western',$8F,$02,$17,'Conference',$8F,$02,$18,'Championship'
 	String	$8F,$02,$14,'to the nhl''s',$8F,$02,$15,'outstanding',$8F,$02,$16,'player chosen by',$8F,$02,$17,'player members',$8F,$02,$18,'of the nhlpa'
 
-PrintAwardWinner	;Print the winner of award PlayerScrollCtr: a team (TeamAwardFlags) or a player "F. Name"
+PrintAwardWinner					;Print the winner of award PlayerScrollCtr: a team (TeamAwardFlags) or a
+									;player "F. Name"
 	bset	#2,(sflags11).w
 	jsr	(printbigz).l
 	String	$F8,$04,$01,$17,$15,'              '
@@ -175,10 +176,10 @@ PrintAwardWinner	;Print the winner of award PlayerScrollCtr: a team (TeamAwardFl
 	jsr	(printbig).l
 	rts
 
-TeamAwardFlags	;Nonzero for a team award
+TeamAwardFlags						;Nonzero for a team award
 	dc.b	0,0,0,0,0,1,1,1,0,$FF
 
-AwardsScreenSetup	;Awards screen setup: vram, fonts and the background bitmaps
+AwardsScreenSetup					;Awards screen setup: vram, fonts and the background bitmaps
 	bset	#5,(sflags12).w
 	move.l	#VBlank_Menus,(vbint).w
 	bclr	#dfok,(disflags).w
@@ -262,13 +263,15 @@ AwardsScreenSetup	;Awards screen setup: vram, fonts and the background bitmaps
 	jsr	(DrawScreenSprite).l
 	rts
 
-GetAwardWinnerTeam	;d7 = the team of the winner of award PlayerScrollCtr (its save RAM award record)
-	;Code the listing does not decode: kept as bytes
+GetAwardWinnerTeam					;d7 = the team of the winner of award PlayerScrollCtr (its save RAM award
+									;record)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$20,$7C,$FF,$FF,$D1,$30,$20,$3C,$00,$00,$0D,$94,$32,$38,$D0,$34
 	dc.b	$B2,$7C,$00,$08,$66,$00,$00,$04,$42,$41,$C2,$FC,$00,$04,$D0,$81
 	dc.b	$32,$3C,$00,$04,$4E,$B9,$00,$02,$41,$E8,$3E,$28,$00,$02,$4E,$75
 
-GetAwardWinner	;d0 = the 4-byte winner record of award PlayerScrollCtr (save RAM $D94 + award * 4, read to ThreeStars)
+GetAwardWinner						;d0 = the 4-byte winner record of award PlayerScrollCtr (save RAM $D94 +
+									;award * 4, read to ThreeStars)
 	movea.l	#ThreeStars,a0
 	move.l	#$D94,d0
 	move.w	(PlayerScrollCtr).w,d1
@@ -283,8 +286,9 @@ GetAwardWinner	;d0 = the 4-byte winner record of award PlayerScrollCtr (save RAM
 	move.l	(a0),d0
 	rts
 
-SetSeasonAwardWinners	;Write the regular season award winners (Hart, Art Ross, Norris, Vezina, Presidents') to save RAM from the
-	;leaders
+SetSeasonAwardWinners				;Write the regular season award winners (Hart, Art Ross, Norris, Vezina,
+									;Presidents') to save RAM from the
+									;leaders
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	#2,(pstatscat).w
 	jsr	(BuildPlayerLeaders).l
@@ -378,7 +382,8 @@ SetSeasonAwardWinners	;Write the regular season award winners (Hart, Art Ross, N
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-SetPlayoffAwardWinners	;Write the Conn Smythe, Wales and Campbell winners to save RAM (the finalists, or the conference standings)
+SetPlayoffAwardWinners				;Write the Conn Smythe, Wales and Campbell winners to save RAM (the
+									;finalists, or the conference standings)
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	#2,(pstatscat).w
 	jsr	(BuildPlayerLeaders).l
@@ -463,7 +468,8 @@ SetPlayoffAwardWinners	;Write the Conn Smythe, Wales and Campbell winners to sav
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-CupChampionsScreen	;The user's team won the Cup: a full screen picture with the team palette, small logo and name, until start
+CupChampionsScreen					;The user's team won the Cup: a full screen picture with the team palette,
+									;small logo and name, until start
 	btst	#3,(SeasonFlags).w
 	beq.w	.3
 	movem.l	d0-d7/a0-a6,-(sp)
@@ -607,9 +613,9 @@ CupChampionsScreen	;The user's team won the Cup: a full screen picture with the 
 .3
 	rts
 
-MightyDucksTxt	;CupChampionsScreen: Anaheim's first name line
+MightyDucksTxt						;CupChampionsScreen: Anaheim's first name line
 	String	'mighty ducks'
 
-OfAnaheimTxt	;CupChampionsScreen: Anaheim's second name line
+OfAnaheimTxt						;CupChampionsScreen: Anaheim's second name line
 	String	'of anaheim'
 

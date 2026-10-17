@@ -3,10 +3,10 @@
 ;	players' overall ratings. Each position gets a list of its players, best first; a line takes the player of
 ;	the asked rank from a list and marks him used, or the next free player from the fallback lists.
 
-NullSaveClear	;An rts. Called from ClearSRAM
+NullSaveClear						;An rts. Called from ClearSRAM
 	rts
 
-GetTeamLines	;a0 = the line sets of team d7
+GetTeamLines						;a0 = the line sets of team d7
 	movem.l	d0-d7/a1-a6,-(sp)
 	bsr.w	CheckDefaultRoster
 	bne.w	.0
@@ -76,7 +76,7 @@ GetTeamLines	;a0 = the line sets of team d7
 	movem.l	(sp)+,d0-d7/a1-a6
 	rts
 
-AddDefensePair	;Write the LD and RD of rank d1 to a0
+AddDefensePair						;Write the LD and RD of rank d1 to a0
 	movea.l	#$FFFFD177,a1
 	movea.l	#MergedFallbackLists,a2
 	bsr.w	AddLinePlayer
@@ -84,7 +84,7 @@ AddDefensePair	;Write the LD and RD of rank d1 to a0
 	movea.l	#MergedFallbackLists,a2
 	bra.w	AddLinePlayer
 
-AddFourForwards	;Write four forwards of rank d1 up from the forward list to a0, then 0
+AddFourForwards						;Write four forwards of rank d1 up from the forward list to a0, then 0
 	movea.l	#$FFFFD1B3,a1
 	movea.l	#MergedFallbackLists,a2
 	bsr.w	AddLinePlayer
@@ -103,7 +103,8 @@ AddFourForwards	;Write four forwards of rank d1 up from the forward list to a0, 
 	clr.b	(a0)+
 	rts
 
-AddLineSkaters	;Write the skaters of rank d1 to a0: LD, RD, LW, C, RW, then the rank 3 center, then 0
+AddLineSkaters						;Write the skaters of rank d1 to a0: LD, RD, LW, C, RW, then the rank 3
+									;center, then 0
 	movea.l	#$FFFFD177,a1
 	movea.l	#DefenseFallbackLists,a2
 	bsr.w	AddLinePlayer
@@ -126,7 +127,7 @@ AddLineSkaters	;Write the skaters of rank d1 to a0: LD, RD, LW, C, RW, then the 
 	clr.b	(a0)+
 	rts
 
-ClearUsedPlayers	;Clear the used marks of the five skater lists
+ClearUsedPlayers					;Clear the used marks of the five skater lists
 	movem.l	d0-d3/a0,-(sp)
 	movea.l	#$FFFFD1D1,a0
 	bsr.w	ClearPosListUsed
@@ -141,7 +142,7 @@ ClearUsedPlayers	;Clear the used marks of the five skater lists
 	movem.l	(sp)+,d0-d3/a0
 	rts
 
-ClearPosListUsed	;Clear bit 7 (used) of every player in the list at a0
+ClearPosListUsed					;Clear bit 7 (used) of every player in the list at a0
 	move.b	(a0),d1
 	ext.w	d1
 	addq.w	#2,a0
@@ -153,14 +154,16 @@ ClearPosListUsed	;Clear bit 7 (used) of every player in the list at a0
 .1
 	rts
 
-AddLinePlayer	;Write the player of rank d1 in list a1 to a0, or a free one from the fallback lists at a2
+AddLinePlayer						;Write the player of rank d1 in list a1 to a0, or a free one from the
+									;fallback lists at a2
 	bsr.w	TakePosListPlayer
 	bne.w	.0
 	bsr.w	TakeFallbackPlayer
 .0
 	rts
 
-TakePosListPlayer	;ne: the player of rank d1 in list a1 is free; write his number + 1 to a0 and mark him used
+TakePosListPlayer					;ne: the player of rank d1 in list a1 is free; write his number + 1 to a0
+									;and mark him used
 	movem.w	d1,-(sp)
 	subq.w	#1,d1
 	cmp.b	(a1),d1
@@ -176,7 +179,8 @@ TakePosListPlayer	;ne: the player of rank d1 in list a1 is free; write his numbe
 	move.w	#0,d0
 	rts
 
-TakeFallbackPlayer	;The first free player in the five lists at a2, trying the next rank in each, then the rank after
+TakeFallbackPlayer					;The first free player in the five lists at a2, trying the next rank in
+									;each, then the rank after
 	move.w	d1,-(sp)
 .0
 	clr.w	d4
@@ -193,23 +197,24 @@ TakeFallbackPlayer	;The first free player in the five lists at a2, trying the ne
 	move.w	(sp)+,d1
 	rts
 
-ForwardFallbackLists	;Lists AddLinePlayer tries for a forward
+ForwardFallbackLists				;Lists AddLinePlayer tries for a forward
 	dc.l	$FFFFD1D1,$FFFFD1EF,$FFFFD1B3,$FFFFD195,$FFFFD177
 
-DefenseFallbackLists	;Lists AddLinePlayer tries for a defenseman
+DefenseFallbackLists				;Lists AddLinePlayer tries for a defenseman
 	dc.l	$FFFFD177,$FFFFD195,$FFFFD1D1,$FFFFD1EF,$FFFFD1B3
 
-MergedFallbackLists	;Lists AddLinePlayer tries once the forward list holds all the forwards
+MergedFallbackLists					;Lists AddLinePlayer tries once the forward list holds all the forwards
 	dc.l	$FFFFD177,$FFFFD195,$FFFFD1B3,$FFFFD1B3,$FFFFD1B3
 
-AddBestGoalie	;Write the first goalie of the goalie list (player number + 1) to a0
+AddBestGoalie						;Write the first goalie of the goalie list (player number + 1) to a0
 	move.b	(LineSetsBuf+$43).w,d0
 	addq.b	#1,d0
 	move.b	d0,(a0)+
 	rts
 
-BuildPosList	;List at a3 (count, 0, player numbers) of the players of position slot d5 (-1: the forwards, any other
-	;negative: the defense), sorted by overall rating, best first
+BuildPosList						;List at a3 (count, 0, player numbers) of the players of position slot d5
+									;(-1: the forwards, any other negative: the defense), sorted by overall
+									;rating, best first
 	clr.b	(a3)
 	clr.b	1(a3)
 	movea.l	a3,a2
@@ -298,8 +303,8 @@ BuildPosList	;List at a3 (count, 0, player numbers) of the players of position s
 	dc.b	$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 	dc.b	$00,$00,$00,$00
 
-CheckDefaultRoster	;eq when the saved roster of team d7 is its default roster: the team data player count, and every slot
-	;holds the team's own player in order
+CheckDefaultRoster					;eq when the saved roster of team d7 is its default roster: the team data
+									;player count, and every slot holds the team's own player in order
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#TeamList,a0
 	move.w	d7,-(sp)

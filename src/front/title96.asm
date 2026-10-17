@@ -1,6 +1,7 @@
 ;	The opening screens. New in 96.
 
-TitleScreen	;Title screen: the picture TitleScreenImg and song 0, until start or the time runs out
+TitleScreen							;Title screen: the picture TitleScreenImg and song 0, until start or the
+									;time runs out
 	move	#$2700,sr
 	move.w	(HVcount).l,(seed).w
 	move.w	(HVcount).l,(seed+2).w
@@ -60,22 +61,24 @@ TitleScreen	;Title screen: the picture TitleScreenImg and song 0, until start or
 .1
 	rts
 
-VBlank_LineScroll	;A vblank handler nothing sets: the line scroll table (SortCords), Vscroll, cramfade, vcount, the music
-	;Code the listing does not decode: kept as bytes
+VBlank_LineScroll					;A vblank handler nothing sets: the line scroll table (SortCords),
+									;Vscroll, cramfade, vcount, the music
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$2C,$30,$7C
 	dc.b	$B0,$5E,$32,$38,$B0,$00,$30,$3C,$01,$C0,$4E,$B9,$00,$01,$B3,$EC
 	dc.b	$20,$7C,$00,$C0,$00,$00,$21,$7C,$40,$00,$00,$10,$00,$04,$30,$B8
 	dc.b	$BD,$36,$4E,$B9,$00,$01,$AF,$D6,$52,$78,$B0,$52,$4E,$B9,$00,$02
 	dc.b	$44,$86,$4C,$DF,$7F,$FF,$4E,$73
 
-TitleWaitFrame	;TitleScreen: wait for the next frame (vcount)
+TitleWaitFrame						;TitleScreen: wait for the next frame (vcount)
 	move.w	(vcount).w,d0
 .loop
 	cmp.w	(vcount).w,d0
 	beq.s	.loop
 	rts
 
-CreditsScreen	;The legal and credits pages (CreditsList) over three pictures; start skips after the first page
+CreditsScreen						;The legal and credits pages (CreditsList) over three pictures; start
+									;skips after the first page
 	move	#$2700,sr
 	move.w	(HVcount).l,(seed).w
 	move.w	(HVcount).l,(seed+2).w
@@ -184,7 +187,8 @@ CreditsScreen	;The legal and credits pages (CreditsList) over three pictures; st
 .5
 	rts
 
-PrintCreditsPage	;Print the CreditsList page at setupvalues, one String a row up to the empty String, then step setupvalues
+PrintCreditsPage					;Print the CreditsList page at setupvalues, one String a row up to the
+									;empty String, then step setupvalues
 	jsr	(printz).l
 	String	$AF,$10,$01
 	moveq	#$18,d0
@@ -206,27 +210,28 @@ PrintCreditsPage	;Print the CreditsList page at setupvalues, one String a row up
 	move.l	a1,(setupvalues).w
 	rts
 
-VBlank_LineScroll2	;A copy of VBlank_LineScroll; nothing sets it
-	;Code the listing does not decode: kept as bytes
+VBlank_LineScroll2					;A copy of VBlank_LineScroll; nothing sets it
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$2C,$30,$7C
 	dc.b	$B0,$5E,$32,$38,$B0,$00,$30,$3C,$01,$C0,$4E,$B9,$00,$01,$B3,$EC
 	dc.b	$20,$7C,$00,$C0,$00,$00,$21,$7C,$40,$00,$00,$10,$00,$04,$30,$B8
 	dc.b	$BD,$36,$4E,$B9,$00,$01,$AF,$D6,$52,$78,$B0,$52,$4E,$B9,$00,$02
 	dc.b	$44,$86,$4C,$DF,$7F,$FF,$4E,$73
 
-CreditsWaitFrame	;CreditsScreen: wait for the next frame (vcount)
+CreditsWaitFrame					;CreditsScreen: wait for the next frame (vcount)
 	move.w	(vcount).w,d0
 .loop
 	cmp.w	(vcount).w,d0
 	beq.s	.loop
 	rts
 
-CupCelebration	;The user's team won the Cup: the rink scene with the team's sprites and random crowd cheers until start
+CupCelebration						;The user's team won the Cup: the rink scene with the team's sprites and
+									;random crowd cheers until start
 	movem.l	d0-d7/a0-a6,-(sp)
-	jsr	(SoundOff).l	;stop the song
-	move.w	#9,d0	;restart the sound driver as Begin does
+	jsr	(SoundOff).l				;stop the song
+	move.w	#9,d0					;restart the sound driver as Begin does
 	jsr	(SoundCmd).l
-	move.w	#0,d0	;command 0: load the Z80 program
+	move.w	#0,d0					;command 0: load the Z80 program
 	move.w	#$1B24,d1
 	movea.l	#Z80Program,a0
 	jsr	(SoundCmd).l
@@ -275,29 +280,29 @@ CupCelebration	;The user's team won the Cup: the rink scene with the team's spri
 	movea.w	#(DMAList-M68K_RAM),a5
 	jsr	(updatescroll).l
 	jsr	(updatesound).l
-	movea.w	#(Satt-M68K_RAM),a6	;sprite attribute table area
-	moveq	#1,d6	;link counter
+	movea.w	#(Satt-M68K_RAM),a6		;sprite attribute table area
+	moveq	#1,d6					;link counter
 	jsr	(CupCelebrationSprites).l
-	cmpa.w	#$C066,a6	;no sprites: one blank sprite
+	cmpa.w	#$C066,a6				;no sprites: one blank sprite
 	bne.w	.n
 	clr.l	(a6)+
 	clr.l	(a6)+
 .n
-	clr.b	-5(a6)	;end sprite list
+	clr.b	-5(a6)					;end sprite list
 	move.l	a6,d0
 	subi.l	#$FFFFC066,d0
-	lsr.w	#1,d0	;words
+	lsr.w	#1,d0					;words
 	move.w	d0,(Sattsize).w
 	move.l	a5,(DMAlistend).w
-	bset	#dfok,(disflags).w	;dfok
+	bset	#dfok,(disflags).w		;dfok
 	bra.w	.loop2
 .3
 	jsr	(forceblack).l
 	jsr	(KillCrowd).l
-	jsr	(SoundOff).l	;stop the song
-	move.w	#9,d0	;restart the sound driver as Begin does
+	jsr	(SoundOff).l				;stop the song
+	move.w	#9,d0					;restart the sound driver as Begin does
 	jsr	(SoundCmd).l
-	move.w	#0,d0	;command 0: load the Z80 program
+	move.w	#0,d0					;command 0: load the Z80 program
 	move.w	#$1B24,d1
 	movea.l	#Z80Program,a0
 	jsr	(SoundCmd).l
@@ -311,10 +316,11 @@ CupCelebration	;The user's team won the Cup: the rink scene with the team's spri
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-CupCheerDelays	;CupCelebration: frames to the next crowd cheer, one picked at random
+CupCheerDelays						;CupCelebration: frames to the next crowd cheer, one picked at random
 	dc.w	$E6,$E1,$EB,$D7,$DC,$F0,$FA,$D2,$F0,$F0
 
-CupCelebrationSetup	;CupCelebration: vram, the team and rink palettes, the rink and sprite tiles, the picture
+CupCelebrationSetup					;CupCelebration: vram, the team and rink palettes, the rink and sprite
+									;tiles, the picture
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	#$FFFFFFFF,(padcont).w
 	move.l	#$FFFFFFFF,(padcont+4).w
@@ -344,7 +350,7 @@ CupCelebrationSetup	;CupCelebration: vram, the team and rink palettes, the rink 
 	movea.l	#$77E,a2
 	movea.l	(a2,d1.w),a2
 	clr.w	d1
-	adda.w	2(a2),a2	;Palettedata
+	adda.w	2(a2),a2				;Palettedata
 	adda.w	d1,a2
 	movea.w	#(palfadenew+$40-M68K_RAM),a1
 	adda.w	d1,a1
@@ -401,7 +407,7 @@ CupCelebrationSetup	;CupCelebration: vram, the team and rink palettes, the rink 
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-CupCelebrationSprites	;CupCelebration: the sprites of the current frame that are in view
+CupCelebrationSprites				;CupCelebration: the sprites of the current frame that are in view
 	movea.l	#unk_1CCEE8,a1
 	adda.l	4(a1),a1
 	move.w	(Hpos).w,d4

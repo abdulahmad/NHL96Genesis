@@ -1,8 +1,9 @@
 ;	Three pause-menu entries. PlayoffStatsMenu opens the playoff stats, TimeoutMenu calls a
 ;	timeout, and SelectGoalieMenu changes the goalie.
 
-PlayoffStatsMenu	;Pause menu Playoff Stats: with GameFlags bit 7 set jump to SeasonPlayoffStats, else PlayerStatsList for the team struct
-	;of team potree + potreeteam
+PlayoffStatsMenu					;Pause menu Playoff Stats: with GameFlags bit 7 set jump to
+									;SeasonPlayoffStats, else PlayerStatsList for the team struct of team
+									;potree + potreeteam
 	btst	#7,(GameFlags).w
 	beq.w	.0
 	jmp	SeasonPlayoffStats
@@ -22,8 +23,9 @@ PlayoffStatsMenu	;Pause menu Playoff Stats: with GameFlags bit 7 set jump to Sea
 	movem.l	(sp)+,a2
 	rts
 
-ExitStatsScreen	;Leave a stats screen: forceblack, then reload the rink graphics (the entry after the forceblack)
-	;Code the listing does not decode: kept as bytes
+ExitStatsScreen						;Leave a stats screen: forceblack, then reload the rink graphics (the
+									;entry after the forceblack)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$5A,$7C,$3F,$38,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$30,$38
 	dc.b	$B0,$00,$61,$00,$61,$90,$20,$BC,$00,$00,$00,$00,$30,$3C,$8D,$00
 	dc.b	$10,$38,$B0,$00,$E4,$08,$31,$40,$00,$04,$31,$7C,$8C,$00,$00,$04
@@ -35,8 +37,8 @@ ExitStatsScreen	;Leave a stats screen: forceblack, then reload the rink graphics
 	dc.b	$00,$02,$10,$C2,$4E,$B9,$00,$02,$10,$D0,$4E,$B9,$00,$02,$10,$9A
 	dc.b	$08,$F8,$00,$07,$C3,$54,$4E,$F9,$00,$02,$15,$B2
 
-TimeoutMenu	;Pause menu Timeout.
-	;Code the listing does not decode: kept as bytes
+TimeoutMenu							;Pause menu Timeout.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$1E,$2E,$AA,$53,$78,$CF,$FE,$53,$78,$D0,$00,$23,$FC
 	dc.b	$00,$02,$38,$90,$FF,$FF,$D0,$02,$08,$EA,$00,$02,$00,$30,$61,$00
 	dc.b	$65,$FE,$00,$06,$BF,$04,$0C,$00,$70,$16,$72,$06,$61,$00,$69,$26
@@ -48,8 +50,8 @@ TimeoutMenu	;Pause menu Timeout.
 	dc.b	$42,$78,$B0,$4C,$30,$3C,$00,$0A,$4E,$B9,$00,$01,$C1,$D2,$70,$78
 	dc.b	$60,$00,$5B,$50
 
-SelectGoalieMenu	;Pause menu Change Goalie.
-	;Code the listing does not decode: kept as bytes
+SelectGoalieMenu					;Pause menu Change Goalie.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$1E,$2E,$AA,$3F,$38,$CF,$FE,$3F,$38,$D0,$00,$61,$00
 	dc.b	$01,$8E,$31,$C0,$D0,$00,$61,$00,$65,$72,$00,$06,$BF,$04,$0C,$00
 	dc.b	$70,$18,$72,$03,$D2,$78,$D0,$00,$30,$2A,$00,$26,$6A,$00,$00,$04

@@ -1,6 +1,7 @@
 ;	Crowd frames. updatecrowdf walks one level of this table.
 
-CrowdFrameTbl	;updatecrowdf crowd frames: frame, frame count pairs, $20 bytes per crowd level
+CrowdFrameTbl						;updatecrowdf crowd frames: frame, frame count pairs, $20 bytes per crowd
+									;level
 	dc.b	$01,$0C,$02,$0C,$03,$0C,$04,$0C,$05,$0C,$0A,$0C,$09,$0C,$08,$0C
 	dc.b	$06,$0C,$07,$0C,$08,$0C,$09,$0C,$0A,$0C,$05,$0C,$04,$0C,$03,$0C
 	dc.b	$01,$07,$02,$07,$03,$07,$04,$07,$05,$07,$0B,$07,$0C,$07,$0D,$07

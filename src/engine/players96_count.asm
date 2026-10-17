@@ -2,7 +2,8 @@
 ;	or the roster when the teams are not from the save. WaitVSyncAndReadInput waits
 ;	for a new button on the menu pad.
 
-GetGoalieCountD7	;d0 = goalies on team d7: the low 2 bits of byte 3 of its save RAM SRTeamCounts entry, or 2 with sflags11 bit 4
+GetGoalieCountD7					;d0 = goalies on team d7: the low 2 bits of byte 3 of its save RAM
+									;SRTeamCounts entry, or 2 with sflags11 bit 4
 	movem.l	d1/d7-a0,-(sp)
 	btst	#4,(sflags11).w
 	bne.w	.1
@@ -18,15 +19,16 @@ GetGoalieCountD7	;d0 = goalies on team d7: the low 2 bits of byte 3 of its save 
 	move.w	#2,d0
 	bra.s	.0
 
-GetGoalieCount	;d0 = goalies on team a2 (GetGoalieCountD7 with d7 = the team number)
+GetGoalieCount						;d0 = goalies on team a2 (GetGoalieCountD7 with d7 = the team number)
 	movem.l	d1/d7-a0,-(sp)
 	move.w	$28(a2),d7
 	bsr.s	GetGoalieCountD7
 	movem.l	(sp)+,d1/d7-a0
 	rts
 
-GetPlayerCountD7	;d0 = players on team d7: byte 1 of its save RAM SRTeamCounts entry, or with sflags11 bit 4 from the
-	;roster in TeamList (records until a length word of 2)
+GetPlayerCountD7					;d0 = players on team d7: byte 1 of its save RAM SRTeamCounts entry, or
+									;with sflags11 bit 4 from the roster in TeamList (records until a length
+									;word of 2)
 	movem.l	d7-a0,-(sp)
 	btst	#4,(sflags11).w
 	bne.w	.2
@@ -51,15 +53,16 @@ GetPlayerCountD7	;d0 = players on team d7: byte 1 of its save RAM SRTeamCounts e
 	bne.s	.1
 	bra.s	.0
 
-GetPlayerCount	;d0 = players on team a2 (GetPlayerCountD7 with d7 = the team number)
+GetPlayerCount						;d0 = players on team a2 (GetPlayerCountD7 with d7 = the team number)
 	movem.l	d7-a0,-(sp)
 	move.w	$28(a2),d7
 	bsr.s	GetPlayerCountD7
 	movem.l	(sp)+,d7-a0
 	rts
 
-WaitVSyncAndReadInput	;Wait for the next vblank, read the menu pad (ReadMenuJoy) until a new button press.
-	;Code the listing does not decode: kept as bytes
+WaitVSyncAndReadInput				;Wait for the next vblank, read the menu pad (ReadMenuJoy) until a new
+									;button press.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$32,$38,$B0,$52,$B2,$78,$B0,$52,$67,$FA,$61,$00,$04,$C8,$61,$00
 	dc.b	$5A,$E4,$4A,$01,$67,$EA,$4E,$75
 

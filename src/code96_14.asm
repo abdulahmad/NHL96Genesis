@@ -1,18 +1,19 @@
 ;	The crowd meter, the hot and cold players, the team records and the
 ;	attribute weights.
 
-PuckOnAttackHalf	;d0 = 1 when the puck is on the half of the goal player a3 shoots at, else 0 (the code after the bra is never
-	;used). Called from doinput and asspassrec
+PuckOnAttackHalf					;d0 = 1 when the puck is on the half of the goal player a3 shoots at, else
+									;0 (the code after the bra is never
+									;used). Called from doinput and asspassrec
 	movem.w	d0-d1,-(sp)
 	btst	#3,(GameFlags).w
 	bne.w	.0
 	move.w	(pucky).w,d0
-	btst	#pfgoal,pflags(a3)	;pfgoal - check which goal shooting at
-	bne.w	.cont	;branch if top goal
+	btst	#pfgoal,pflags(a3)		;pfgoal - check which goal shooting at
+	bne.w	.cont					;branch if top goal
 	neg.w	d0
 .cont
-	tst.w	d0	;check if d0 is 0
-	bpl.w	.0	;branch if higher
+	tst.w	d0						;check if d0 is 0
+	bpl.w	.0						;branch if higher
 	bra.w	.playerabovetopgoalline
 	;In PuckOnAttackHalf after its bra: code nothing reaches.
 	;Code the listing does not decode: kept as bytes
@@ -30,8 +31,9 @@ PuckOnAttackHalf	;d0 = 1 when the puck is on the half of the goal player a3 shoo
 	movem.w	(sp)+,d0-d1
 	rts
 
-onetimershot	;Do the one-timer: a pass with GameFlags bit 3, else a shot; offsides, icing, assists and the crowd
-	;Code the listing does not decode: kept as bytes
+onetimershot						;Do the one-timer: a pass with GameFlags bit 3, else a shot; offsides,
+									;icing, assists and the crowd
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$03,$C3,$50,$67,$00,$00,$80,$48,$E7,$FF,$FE,$30,$38
 	dc.b	$BF,$A6,$B0,$78,$C3,$84,$67,$00,$00,$30,$B0,$78,$C3,$86,$67,$00
 	dc.b	$00,$3C,$B0,$78,$C3,$88,$67,$00,$00,$3C,$B0,$78,$C3,$8A,$67,$00
@@ -52,13 +54,14 @@ onetimershot	;Do the one-timer: a pass with GameFlags bit 3, else a shot; offsid
 	dc.b	$BF,$B0,$08,$38,$00,$03,$C3,$50,$66,$00,$00,$0E,$08,$EB,$00,$01
 	dc.b	$00,$63,$08,$F8,$00,$01,$C3,$46,$4E,$75
 
-CheckOneTimerFacing	;Findhittype on direction d0 (the angle to the goal), d0 kept. The Z flag picks the one-timer animation in
-	;setonetimeranim.
-	;Code the listing does not decode: kept as bytes
+CheckOneTimerFacing					;Findhittype on direction d0 (the angle to the goal), d0 kept. The Z flag
+									;picks the one-timer animation in
+									;setonetimeranim.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$A7,$80,$00,$4E,$B9,$00,$01,$6D,$36,$4C,$9F,$00,$01,$4E,$75
 	dc.b	$4E,$75
 
-InitCrowdMeter	;The crowd meter start threshold CrowdRecord = $50. Called from StartGame
+InitCrowdMeter						;The crowd meter start threshold CrowdRecord = $50. Called from StartGame
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(HomeTeam).w,d1
 	ext.l	d1
@@ -68,17 +71,18 @@ InitCrowdMeter	;The crowd meter start threshold CrowdRecord = $50. Called from S
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-UpdateCrowdMeter	;The crowd meter, every frame (setvideo): sflags5 bit 7 sets when CwdExciteLvl passes the threshold from
-	;CrowdRecord and clears when it drops; while set, every $14 frames CurCrowdMeter = sqrt(4 * CwdExciteLvl) + $41,
-	;the peak in CrowdPeak
-	btst	#sfhor,(sflags).w	;gmclock: clock stopped
+UpdateCrowdMeter					;The crowd meter, every frame (setvideo): sflags5 bit 7 sets when
+									;CwdExciteLvl passes the threshold from
+									;CrowdRecord and clears when it drops; while set, every $14 frames
+									;CurCrowdMeter = sqrt(4 * CwdExciteLvl) + $41, the peak in CrowdPeak
+	btst	#sfhor,(sflags).w		;gmclock: clock stopped
 	bne.w	.0
 	btst	#0,(gmode2).w
 	bne.w	.0
 	btst	#0,(sflags3).w
 	bne.w	.ex
-	btst	#7,(sflags5).w	;sf2faceoff- check for faceoff
-	bne.w	.2	;branch if faceoff
+	btst	#7,(sflags5).w			;sf2faceoff- check for faceoff
+	bne.w	.2						;branch if faceoff
 	tst.w	(crowdnoisedelay).w
 	beq.w	.1
 	subq.w	#1,(crowdnoisedelay).w
@@ -131,7 +135,8 @@ UpdateCrowdMeter	;The crowd meter, every frame (setvideo): sflags5 bit 7 sets wh
 .0
 	rts
 
-stopfast	;Stop, keeping the animation: Xvel / Yvel toward 0 by $7D0 a frame (stopna2 with a bigger step)
+stopfast							;Stop, keeping the animation: Xvel / Yvel toward 0 by $7D0 a frame
+									;(stopna2 with a bigger step)
 	tst.w	Xvel(a3)
 	bpl.w	.xp
 	addi.w	#$7D0,Xvel(a3)
@@ -154,7 +159,8 @@ stopfast	;Stop, keeping the animation: Xvel / Yvel toward 0 by $7D0 a frame (sto
 .end
 	rts
 
-checkcornercoll	;Corner circles and side walls for object a3 at d2 / d3 (wcradiusx / wcradiusy); a hit goes to end boards $128
+checkcornercoll						;Corner circles and side walls for object a3 at d2 / d3 (wcradiusx /
+									;wcradiusy); a hit goes to end boards $128
 	bclr	#pf3wall,pflags3(a3)	;wall collision bit
 	move.w	#$96,d4
 	sub.w	(wcradiusx).w,d4
@@ -163,7 +169,7 @@ checkcornercoll	;Corner circles and side walls for object a3 at d2 / d3 (wcradiu
 	movem.w	d2-d5,-(sp)
 	neg.w	d4
 	neg.w	d5
-	addi.w	#$40,d4	;radius
+	addi.w	#$40,d4					;radius
 	addi.w	#$40,d5
 	cmp.w	d5,d3
 	bgt.w	.ctc
@@ -186,12 +192,12 @@ checkcornercoll	;Corner circles and side walls for object a3 at d2 / d3 (wcradiu
 .circle
 	sub.w	d4,d2
 	sub.w	d5,d3
-	move.w	d3,d0	;cos0 = dy/r
-	move.w	d2,d1	;sin0 = -dx/r
+	move.w	d3,d0					;cos0 = dy/r
+	move.w	d2,d1					;sin0 = -dx/r
 	neg.w	d1
 	muls.w	d3,d3
 	muls.w	d2,d2
-	add.l	d2,d3	;dist from dot
+	add.l	d2,d3					;dist from dot
 	cmp.l	#$1000,d3
 	bls.w	.2
 	exg	d0,d3
@@ -209,7 +215,7 @@ checkcornercoll	;Corner circles and side walls for object a3 at d2 / d3 (wcradiu
 	move.w	$4E(a3),d0
 	or.w	$50(a3),d0
 	bne.w	.rtss3
-	move.w	#$100,d0	;now check side walls
+	move.w	#$100,d0				;now check side walls
 	clr.w	d1
 	cmp.w	d5,d3
 	bge.w	cornercollb
@@ -227,14 +233,14 @@ checkcornercoll	;Corner circles and side walls for object a3 at d2 / d3 (wcradiu
 .rtss3
 	rts
 
-cornercollb	;Straight to wallcollb
+cornercollb							;Straight to wallcollb
 	jmp	wallcollb
 
-Create_HotCold_Table	;Fill the hot / cold table at $1A4 of team struct a0 with random values
+Create_HotCold_Table				;Fill the hot / cold table at $1A4 of team struct a0 with random values
 	movem.l	d0-d7,-(sp)
-	move.w	#$1BF,d1	;$1C0 values
+	move.w	#$1BF,d1				;$1C0 values
 .0
-	move.w	#9,d0	;sets RNG limit (-9 - +8)
+	move.w	#9,d0					;sets RNG limit (-9 - +8)
 	jsr	(randomd0s).l
 	move.l	a0,-(sp)
 	adda.l	#$1BC,a0
@@ -246,52 +252,54 @@ Create_HotCold_Table	;Fill the hot / cold table at $1A4 of team struct a0 with r
 	dc.b	$4A,$43,$6A,$00,$00,$06,$42,$43,$4E,$75,$B6,$7C,$00,$64,$6F,$00
 	dc.b	$00,$06,$36,$3C,$00,$64,$4E,$75
 
-AttributeCalc	;Attribute d3 of player a3 * 5 plus his hot / cold value / 3 limited to 0 ... $1E
+AttributeCalc						;Attribute d3 of player a3 * 5 plus his hot / cold value / 3 limited to 0
+									;... $1E
 	movem.l	d0-d2/a1,-(sp)
 	move.w	(TempWord2).w,d1
-	movea.l	#tmstruct,a1	;Start of Home Team struct
+	movea.l	#tmstruct,a1			;Start of Home Team struct
 	btst	#pfteam,pflags(a3)
 	beq.w	.attribmath
 	adda.l	#$39E,a1
 .attribmath
 	clr.w	d1
 	move.b	$67(a3),d1
-	asl.w	#4,d1	;shifts d1 4 bits left, moving the values over 1 nibble
+	asl.w	#4,d1					;shifts d1 4 bits left, moving the values over 1 nibble
 	adda.l	#$1BC,a1
 	move.b	(a1,d1.w),d1
-	ext.w	d1	;sign-extend word. Ex: F5 (-5) -> FFF5
-	ext.l	d1	;sign-extend long word. Ex: FFF5 -> FFFFFFF5
-	divs.w	#3,d1	;Signed-Div D1 by 3 (FFFFFFF5 / 3, or -5 / 3 = -1r2, or FFFEFFFF
-	move.w	d3,-(sp)	;push d3 onto stack
-	asl.w	#2,d3	;shift left 2 bits (mult. by 4)
-	add.w	(sp)+,d3	;Pop off d3 value and add to d3 (attrib X 5)
-	add.w	d1,d3	;add d1 (H/C value) to d3
+	ext.w	d1						;sign-extend word. Ex: F5 (-5) -> FFF5
+	ext.l	d1						;sign-extend long word. Ex: FFF5 -> FFFFFFF5
+	divs.w	#3,d1					;Signed-Div D1 by 3 (FFFFFFF5 / 3, or -5 / 3 = -1r2, or FFFEFFFF
+	move.w	d3,-(sp)				;push d3 onto stack
+	asl.w	#2,d3					;shift left 2 bits (mult. by 4)
+	add.w	(sp)+,d3				;Pop off d3 value and add to d3 (attrib X 5)
+	add.w	d1,d3					;add d1 (H/C value) to d3
 	bmi.w	.LowerLimit
 	cmp.w	#$1E,d3
 	blt.w	.MaskAttribMathResult
 	move.w	#$1E,d3
 	bra.w	.MaskAttribMathResult
 .LowerLimit
-	clr.w	d3	;if below lower limit (0), set to 0
+	clr.w	d3						;if below lower limit (0), set to 0
 .MaskAttribMathResult
 	andi.w	#$FF,d3
 	movem.l	(sp)+,d0-d2/a1
 	rts
 
-NextHomeHotPlayer	;d1 = the next home hot player (homehotidx, homehotplayer).
-	;Code the listing does not decode: kept as bytes
+NextHomeHotPlayer					;d1 = the next home hot player (homehotidx, homehotplayer).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$80,$80,$20,$7C,$FF,$FF,$BF,$98,$30,$38,$BF,$90,$D0,$40
 	dc.b	$32,$30,$00,$00,$0C,$78,$00,$00,$BF,$90,$6C,$00,$00,$06,$52,$78
 	dc.b	$BF,$90,$4C,$DF,$01,$01,$22,$7C,$FF,$FF,$C7,$26,$4E,$75
 
-NextAwayHotPlayer	;The same for the away team (awayhotidx, awayhotplayer).
-	;Code the listing does not decode: kept as bytes
+NextAwayHotPlayer					;The same for the away team (awayhotidx, awayhotplayer).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$80,$80,$20,$7C,$FF,$FF,$BF,$96,$30,$38,$BF,$8E,$D0,$40
 	dc.b	$32,$30,$00,$00,$0C,$78,$00,$00,$BF,$8E,$6C,$00,$00,$06,$52,$78
 	dc.b	$BF,$8E,$4C,$DF,$01,$01,$22,$7C,$FF,$FF,$CA,$C4,$4E,$75,$4E,$75
 
-BuildHotColdLists	;The hot / cold player lists of both teams (SortHotColdStarters, CopyHottestPlayer, CopyColdestPlayer).
-	;Code the listing does not decode: kept as bytes
+BuildHotColdLists					;The hot / cold player lists of both teams (SortHotColdStarters,
+									;CopyHottestPlayer, CopyColdestPlayer).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$42,$78,$BF,$8E,$42,$78,$BF,$90,$48,$E7,$FF,$FE,$20,$7C,$FF,$FF
 	dc.b	$C7,$26,$61,$00,$00,$3A,$20,$7C,$FF,$FF,$BF,$98,$61,$00,$01,$20
 	dc.b	$20,$7C,$FF,$FF,$BF,$9C,$61,$00,$01,$36,$20,$7C,$FF,$FF,$CA,$C4
@@ -307,31 +315,32 @@ BuildHotColdLists	;The hot / cold player lists of both teams (SortHotColdStarter
 	dc.b	$6F,$00,$00,$0E,$50,$C1,$34,$29,$00,$02,$33,$51,$00,$02,$32,$82
 	dc.b	$4A,$59,$51,$C8,$FF,$E4,$4A,$41,$66,$D2,$4C,$DF,$7F,$FF,$4E,$75
 
-NextHomeColdPlayer	;d1 = the next home cold player (homecoldidx, homecoldplayer).
-	;Code the listing does not decode: kept as bytes
+NextHomeColdPlayer					;d1 = the next home cold player (homecoldidx, homecoldplayer).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$80,$80,$20,$7C,$FF,$FF,$BF,$9C,$30,$38,$BF,$94,$D0,$40
 	dc.b	$32,$30,$00,$00,$0C,$78,$00,$00,$BF,$94,$6C,$00,$00,$06,$52,$78
 	dc.b	$BF,$94,$4C,$DF,$01,$01,$22,$7C,$FF,$FF,$C7,$26,$4E,$75
 
-NextAwayColdPlayer	;The same for the away team (awaycoldidx, awaycoldplayer).
-	;Code the listing does not decode: kept as bytes
+NextAwayColdPlayer					;The same for the away team (awaycoldidx, awaycoldplayer).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$80,$80,$20,$7C,$FF,$FF,$BF,$9A,$30,$38,$BF,$92,$D0,$40
 	dc.b	$32,$30,$00,$00,$0C,$78,$00,$00,$BF,$92,$6C,$00,$00,$06,$52,$78
 	dc.b	$BF,$92,$4C,$DF,$01,$01,$22,$7C,$FF,$FF,$CA,$C4,$4E,$75,$4E,$75
 
-CopyHottestPlayer	;Copy the hottest player of TempBuffer to the list a0.
-	;Code the listing does not decode: kept as bytes
+CopyHottestPlayer					;Copy the hottest player of TempBuffer to the list a0.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$C0,$C0,$22,$7C,$FF,$FF,$BF,$54,$30,$3C,$00,$00,$42,$18
 	dc.b	$12,$11,$10,$C1,$4A,$59,$51,$C8,$FF,$F6,$4C,$DF,$03,$03,$4E,$75
 
-CopyColdestPlayer	;Copy the coldest player of TempBuffer to the list a0.
-	;Code the listing does not decode: kept as bytes
+CopyColdestPlayer					;Copy the coldest player of TempBuffer to the list a0.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$80,$C0,$22,$7C,$FF,$FF,$BF,$5E,$30,$3C,$00,$00,$42,$18
 	dc.b	$10,$D1,$4A,$61,$51,$C8,$FF,$F8,$4C,$DF,$03,$01,$4E,$75
 
-CompareHotColdTotals	;Compare the hot / cold totals of the teams (GetHotColdTotal): d0 = $22 / $23 (the better team, awayhotter)
-	;when they differ enough, else -1.
-	;Code the listing does not decode: kept as bytes
+CompareHotColdTotals				;Compare the hot / cold totals of the teams (GetHotColdTotal): d0 = $22 /
+									;$23 (the better team, awayhotter)
+									;when they differ enough, else -1.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$7F,$FE,$20,$7C,$FF,$FF,$C7,$26,$61,$00,$00,$5A,$31,$C1
 	dc.b	$BF,$46,$20,$7C,$FF,$FF,$CA,$C4,$61,$00,$00,$4C,$31,$C1,$BF,$48
 	dc.b	$32,$38,$BF,$46,$34,$38,$BF,$48,$94,$41,$31,$FC,$00,$00,$BF,$86
@@ -340,8 +349,9 @@ CompareHotColdTotals	;Compare the hot / cold totals of the teams (GetHotColdTota
 	dc.b	$30,$3C,$00,$22,$B4,$7C,$00,$BD,$6D,$00,$00,$06,$30,$3C,$00,$23
 	dc.b	$4C,$DF,$7F,$FE,$4E,$75
 
-GetHotColdTotal	;d1 = the hot / cold total of the starters of team a0 (SortHotColdStarters, TempBuffer).
-	;Code the listing does not decode: kept as bytes
+GetHotColdTotal						;d1 = the hot / cold total of the starters of team a0
+									;(SortHotColdStarters, TempBuffer).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$FE,$6A,$30,$3C,$00,$06,$20,$7C,$FF,$FF,$BF,$54,$42,$41
 	dc.b	$14,$28,$00,$01,$48,$82,$D2,$42,$4A,$58,$51,$C8,$FF,$F4,$4E,$75
 	dc.b	$4E,$75,$4E,$75,$48,$E7,$FF,$00,$08,$B8,$00,$00,$D3,$00,$67,$00
@@ -358,53 +368,54 @@ GetHotColdTotal	;d1 = the hot / cold total of the starters of team a0 (SortHotCo
 	dc.b	$B9,$76,$4C,$DF,$00,$FF,$4E,$75,$31,$FC,$00,$AA,$D3,$0E,$08,$38
 	dc.b	$00,$05,$D3,$00,$67,$00,$00,$08,$31,$FC,$00,$53,$D3,$0E,$4E,$75
 
-wallcollduringcheck	;During a check, a skater a2 (not a goalie) near the wall: test the wall at his position with his size + $17.
-	;Called from CCStart and FallDown
+wallcollduringcheck					;During a check, a skater a2 (not a goalie) near the wall: test the wall
+									;at his position with his size + $17.
+									;Called from CCStart and FallDown
 	tst.w	$34(a2)
 	beq.w	.end
 	movem.l	d0-d7,-(sp)
-	move.w	(a2),d2	;Xpos of checking player
+	move.w	(a2),d2					;Xpos of checking player
 	move.w	Ypos(a2),d3
 	move.w	$4A(a2),(wcradiusx).w
-	addi.w	#$17,(wcradiusx).l	;add $17 to wcradiusx
+	addi.w	#$17,(wcradiusx).l		;add $17 to wcradiusx
 	move.w	$4C(a2),(wcradiusy).w
-	addi.w	#$17,(wcradiusy).l	;add $17 to wcradiusy
+	addi.w	#$17,(wcradiusy).l		;add $17 to wcradiusy
 	movem.l	a0-a6,-(sp)
-	exg	a2,a3	;swap a2 and a3
+	exg	a2,a3						;swap a2 and a3
 	jsr	(checkcornercoll).l
-	exg	a2,a3	;swap a2 and a3
+	exg	a2,a3						;swap a2 and a3
 	movem.l	(sp)+,a0-a6
 	movem.l	(sp)+,d0-d7
 .end
 	rts
 
-setSlotBit	;sflags6 bit 5 (the slot) = the puck carrier is in the slot
-	bclr	#5,(sflags6).w	;clears Slot Bit
+setSlotBit							;sflags6 bit 5 (the slot) = the puck carrier is in the slot
+	bclr	#5,(sflags6).w			;clears Slot Bit
 	tst.w	(puckc).w
-	bmi.w	.x	;exit if no puckc
+	bmi.w	.x						;exit if no puckc
 	movem.l	d0/a0,-(sp)
-	movea.l	#SortCords,a0	;start of SCStructs
-	move.w	(puckc).w,d0	;move puckc SCnum into d0
-	asl.w	#7,d0	;mult by 128 decimal
-	adda.w	d0,a0	;move to start of puckc SCstruct
-	move.w	Ypos(a0),d0	;Ypos
-	btst	#pfgoal,pflags(a0)	;pfgoal - which goal shooting at
-	bne.w	.checkpos	;jump if top goal
-	neg.w	d0	;negative d0
+	movea.l	#SortCords,a0			;start of SCStructs
+	move.w	(puckc).w,d0			;move puckc SCnum into d0
+	asl.w	#7,d0					;mult by 128 decimal
+	adda.w	d0,a0					;move to start of puckc SCstruct
+	move.w	Ypos(a0),d0				;Ypos
+	btst	#pfgoal,pflags(a0)		;pfgoal - which goal shooting at
+	bne.w	.checkpos				;jump if top goal
+	neg.w	d0						;negative d0
 .checkpos
-	cmp.w	#$76,d0	;compare to blueline
-	blt.w	.restore	;branch if not in off zone
-	cmpi.w	#$51,(a0)	;compare X position to $47
-	bgt.w	.restore	;branch if greater than 47
-	cmpi.w	#$FFAF,(a0)	;compare X position to -$47
-	blt.w	.restore	;branch if less than -47
-	bset	#5,(sflags6).w	;set bit
+	cmp.w	#$76,d0					;compare to blueline
+	blt.w	.restore				;branch if not in off zone
+	cmpi.w	#$51,(a0)				;compare X position to $47
+	bgt.w	.restore				;branch if greater than 47
+	cmpi.w	#$FFAF,(a0)				;compare X position to -$47
+	blt.w	.restore				;branch if less than -47
+	bset	#5,(sflags6).w			;set bit
 .restore
 	movem.l	(sp)+,d0/a0
 .x
 	rts
 
-TeamLogoPalettes2	;Team logo palettes, a second set (nothing in the listing uses it)
+TeamLogoPalettes2					;Team logo palettes, a second set (nothing in the listing uses it)
 	dc.b	$0E,$EA,$00,$00,$00,$42,$0E,$EA,$0E,$EA,$0E,$EE,$00,$00,$08,$88
 	dc.b	$0A,$AA,$00,$68,$00,$8A,$00,$CE,$02,$60,$00,$40,$06,$64,$0E,$8E
 	dc.b	$0E,$EA,$0E,$EA,$0E,$EA,$00,$00,$00,$42,$0E,$EE,$00,$00,$08,$88
@@ -518,8 +529,8 @@ TeamLogoPalettes2	;Team logo palettes, a second set (nothing in the listing uses
 	dc.b	$0E,$E8,$0E,$E8,$0E,$E8,$00,$00,$00,$4A,$0E,$EE,$00,$00,$06,$88
 	dc.b	$04,$64,$02,$44,$02,$22,$00,$4E,$00,$0A,$00,$22,$0A,$AA,$00,$00
 
-CopyString	;Copy String a1 (length word first) to a3.
-	;Code the listing does not decode: kept as bytes
+CopyString							;Copy String a1 (length word first) to a3.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$80,$00,$30,$11,$53,$40,$16,$D9,$51,$C8,$FF,$FC,$4C,$DF
 	dc.b	$00,$01,$4E,$75,$48,$A7,$FE,$80,$2F,$09,$3C,$00,$54,$89,$42,$41
 	dc.b	$48,$C0,$80,$FC,$00,$64,$4A,$40,$67,$00,$00,$0A,$06,$40,$00,$30
@@ -529,10 +540,11 @@ CopyString	;Copy String a1 (length word first) to a3.
 	dc.b	$00,$00,$67,$00,$00,$08,$12,$FC,$00,$00,$52,$41,$20,$5F,$54,$41
 	dc.b	$30,$81,$4C,$9F,$01,$7F,$4E,$75
 
-ReadTeamRecord	;Read the 16 byte team record block d1 ($D22 + d1 * 16) to a0 (TeamRecordIO)
+ReadTeamRecord						;Read the 16 byte team record block d1 ($D22 + d1 * 16) to a0
+									;(TeamRecordIO)
 	bclr	#6,(sflags6).w
 
-TeamRecordIO	;The team record block: read or write (sflags6 bit 6)
+TeamRecordIO						;The team record block: read or write (sflags6 bit 6)
 	movem.l	d0-d1/a0-a1,-(sp)
 	move.l	d1,d0
 	asl.w	#4,d0
@@ -548,18 +560,18 @@ TeamRecordIO	;The team record block: read or write (sflags6 bit 6)
 	movem.l	(sp)+,d0-d1/a0-a1
 	rts
 
-WriteTeamRecord	;Write the team record block (TeamRecordIO)
+WriteTeamRecord						;Write the team record block (TeamRecordIO)
 	bset	#6,(sflags6).w
 	bra.s	TeamRecordIO
 
-WriteNameLog	;Write the user name log ($80 bytes at namelog) to save RAM SRNameLog
+WriteNameLog						;Write the user name log ($80 bytes at namelog) to save RAM SRNameLog
 	bset	#6,(sflags6).w
 	bra.w	NameLogIO
 
-ReadNameLog	;Read the user name log from save RAM SRNameLog to namelog
+ReadNameLog							;Read the user name log from save RAM SRNameLog to namelog
 	bclr	#6,(sflags6).w
 
-NameLogIO	;Read or write (sflags6 bit 6) the name log
+NameLogIO							;Read or write (sflags6 bit 6) the name log
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	#$80,d1
 	move.l	#$F4E,d0
@@ -578,9 +590,10 @@ NameLogIO	;Read or write (sflags6 bit 6) the name log
 	dc.b	$01,$C0,$01,$DC,$01,$F8,$02,$14,$02,$30,$02,$4C,$02,$68,$02,$84
 	dc.b	$02,$A0,$02,$BC,$02,$D8,$02,$F4,$03,$10
 
-UpdateRecords	;With save RAM (ValidSRAM) and user records on (OptUserRec 0), update the player records
-	;(UpdatePlayerRecords), with sflags11 bit 7 the crowd records of both teams (UpdateCrowdRecord), then the team
-	;record of each pad (UpdateUserRecord), then the save RAM checksum
+UpdateRecords						;With save RAM (ValidSRAM) and user records on (OptUserRec 0), update the
+									;player records (UpdatePlayerRecords), with sflags11 bit 7 the crowd
+									;records of both teams (UpdateCrowdRecord), then the team record of each
+									;pad (UpdateUserRecord), then the save RAM checksum
 	tst.w	(ValidSRAM).w
 	bmi.w	.x
 	tst.w	(OptUserRec).w
@@ -611,8 +624,10 @@ UpdateRecords	;With save RAM (ValidSRAM) and user records on (OptUserRec 0), upd
 .x
 	rts
 
-UpdateTeamRecord	;Add the game of team a1 (against a2) to team record block d1 (games, wins, ties) with sflags11 bit 7 keep the
-	;biggest win and loss margins with users d3 / d4 and team d2 (WriteTeamRecord)
+UpdateTeamRecord					;Add the game of team a1 (against a2) to team record block d1 (games,
+									;wins, ties) with sflags11 bit 7 keep the
+									;biggest win and loss margins with users d3 / d4 and team d2
+									;(WriteTeamRecord)
 	movem.l	d0-d7/a0-a6,-(sp)
 	bsr.w	ReadTeamRecord
 	st	d7
@@ -680,7 +695,8 @@ UpdateTeamRecord	;Add the game of team a1 (against a2) to team record block d1 (
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-CountGoalies	;homegoalies / awaygoalies = goalies of the home / away team (GetGoalieCount)
+CountGoalies						;homegoalies / awaygoalies = goalies of the home / away team
+									;(GetGoalieCount)
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#tmstruct,a2
 	jsr	(GetGoalieCount).l
@@ -691,7 +707,8 @@ CountGoalies	;homegoalies / awaygoalies = goalies of the home / away team (GetGo
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-CountPlayers	;homeplayers / awayplayers = players of the home / away team (GetPlayerCount)
+CountPlayers						;homeplayers / awayplayers = players of the home / away team
+									;(GetPlayerCount)
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#tmstruct,a2
 	jsr	(GetPlayerCount).l
@@ -702,9 +719,10 @@ CountPlayers	;homeplayers / awayplayers = players of the home / away team (GetPl
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-AppendUserName	;Append user name d2 (12 bytes of the name log at namelog, spaces for 0) to a1, or NoNameTxt when d2 is 0
-	;trailing spaces trimmed (TrimSpaces).
-	;Code the listing does not decode: kept as bytes
+AppendUserName						;Append user name d2 (12 bytes of the name log at namelog, spaces for 0)
+									;to a1, or NoNameTxt when d2 is 0
+									;trailing spaces trimmed (TrimSpaces).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$F0,$F0,$24,$49,$4A,$42,$67,$00,$00,$42,$30,$3C,$00,$09
 	dc.b	$42,$43,$20,$7C,$FF,$FF,$D3,$2C,$C4,$FC,$00,$0A,$D1,$C2,$12,$30
 	dc.b	$30,$00,$66,$00,$00,$06,$12,$3C,$00,$20,$13,$41,$00,$02,$4A,$19
@@ -713,15 +731,18 @@ AppendUserName	;Append user name d2 (12 bytes of the name log at namelog, spaces
 	dc.b	$22,$7C,$00,$1D,$7D,$CA,$4E,$B9,$00,$1D,$7A,$90,$24,$5F,$61,$00
 	dc.b	$01,$BE,$4C,$DF,$0F,$0F,$4E,$75,$00,$02
 
-AppendTeamName	;Append the city name of team d0 (TeamList block Strings) to a1 (appstring).
-	;Code the listing does not decode: kept as bytes
+AppendTeamName						;Append the city name of team d0 (TeamList block Strings) to a1
+									;(appstring).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$80,$F0,$48,$80,$E5,$40,$20,$7C,$00,$00,$07,$7E,$20,$70
 	dc.b	$00,$00,$30,$28,$00,$04,$48,$C0,$D1,$C0,$D0,$D0,$26,$49,$22,$48
 	dc.b	$4E,$B9,$00,$01,$BE,$80,$4C,$DF,$0F,$01,$4E,$75
 
-CalcAttrib	;The overall rating of player d0: his attributes weighted by OvrPlayerWgtList (skaters) or OvrGoalWgtList
-	;(goalies), and by AttribWgtList. Called from getNameandAttrib and PrintOverallRating
-	move.l	a6,-(sp)	;push a6 to stack
+CalcAttrib							;The overall rating of player d0: his attributes weighted by
+									;OvrPlayerWgtList (skaters) or OvrGoalWgtList
+									;(goalies), and by AttribWgtList. Called from getNameandAttrib and
+									;PrintOverallRating
+	move.l	a6,-(sp)				;push a6 to stack
 	clr.w	(attribsum).w
 	clr.w	(attribcount).w
 	movea.l	#AttribWgtList,a6
@@ -735,11 +756,11 @@ CalcAttrib	;The overall rating of player d0: his attributes weighted by OvrPlaye
 .2
 	movea.l	$1E(a2),a0
 	lea	$1BC(a2),a4
-	clr.l	d1	;clear d1
-	move.w	d0,d1	;move d0 into d1. d0 is the offset of the player
-	asl.w	#4,d1	;mult d1 by 16
-	adda.l	d1,a4	;add d1 to a4
-	adda.l	#$10,a4	;add 16 dec to a4. Move to start of Hot/Cold for player.
+	clr.l	d1						;clear d1
+	move.w	d0,d1					;move d0 into d1. d0 is the offset of the player
+	asl.w	#4,d1					;mult d1 by 16
+	adda.l	d1,a4					;add d1 to a4
+	adda.l	#$10,a4					;add 16 dec to a4. Move to start of Hot/Cold for player.
 	movem.l	d7/a1,-(sp)
 	move.w	$28(a2),d7
 	jsr	(GetRosterName).l
@@ -841,17 +862,17 @@ CalcAttrib	;The overall rating of player d0: his attributes weighted by OvrPlaye
 	movea.l	(sp)+,a6
 	rts
 
-OvrPlayerWgtList	;Skater attribute weights for the overall rating (CalcAttrib)
+OvrPlayerWgtList					;Skater attribute weights for the overall rating (CalcAttrib)
 	dc.b	$02,$02,$02,$02,$04,$06,$02,$04,$02,$04,$06,$06,$04,$02,$02,$02
 
-OvrGoalWgtList	;Goalie attribute weights
+OvrGoalWgtList						;Goalie attribute weights
 	dc.b	$02,$02,$02,$02,$02,$02,$02,$02,$09,$09,$02,$02,$09,$02,$02,$02
 
-AttribWgtList	;Single attribute weights
+AttribWgtList						;Single attribute weights
 	dc.b	$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02
 
-TrimSpaces	;Trim the trailing spaces of String a2 and pad it to an even length.
-	;Code the listing does not decode: kept as bytes
+TrimSpaces							;Trim the trailing spaces of String a2 and pad it to an even length.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$00,$10,$26,$4A,$D6,$D2,$10,$23,$B0,$3C,$00,$20,$66,$00
 	dc.b	$00,$0A,$16,$BC,$00,$00,$53,$52,$60,$EE,$52,$52,$02,$52,$00,$FE
 	dc.b	$4C,$DF,$08,$00,$4E,$75

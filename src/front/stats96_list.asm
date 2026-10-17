@@ -1,11 +1,12 @@
 ;	The player stats list for one team, this game or the playoffs.
 
-PlayerStatsScreen	;Pause menu Player Stats: PlayerStatsList with d7 = 0 (this game)
-	;Code the listing does not decode: kept as bytes
+PlayerStatsScreen					;Pause menu Player Stats: PlayerStatsList with d7 = 0 (this game) Code the
+									;listing does not decode: kept as bytes
 	dc.b	$42,$47
 
-PlayerStatsList	;Stats screen for team a2, d7 = 0 game / 1 playoff (plistplayoff): skaters or goalies sorted by
-	;category DispAttribCtr; up / down scroll, left / right category, A the other team (game stats), B skaters / goalies
+PlayerStatsList						;Stats screen for team a2, d7 = 0 game / 1 playoff (plistplayoff): skaters
+									;or goalies sorted by category DispAttribCtr; up / down scroll, left /
+									;right category, A the other team (game stats), B skaters / goalies
 	move.w	d7,(plistplayoff).w
 	movem.l	d0-d7/a0-a6,-(sp)
 	clr.w	(carddelay).w
@@ -110,7 +111,7 @@ PlayerStatsList	;Stats screen for team a2, d7 = 0 game / 1 playoff (plistplayoff
 	bra.w	.0
 .right
 	btst	#0,d1
-	beq.w	.13	;branch if not
+	beq.w	.13						;branch if not
 	tst.w	(VertLineScrolling).w
 	beq.w	.input
 	subq.w	#1,(VertLineScrolling).w
@@ -160,7 +161,7 @@ PlayerStatsList	;Stats screen for team a2, d7 = 0 game / 1 playoff (plistplayoff
 	move.w	#5,(DispAttribCtr).w
 	bra.w	.0
 .4
-	btst	#3,d1	;dbut
+	btst	#3,d1					;dbut
 	beq.w	.input
 	addq.w	#1,(DispAttribCtr).w	;next lower item
 	tst.w	(plistplayoff).w
@@ -193,7 +194,8 @@ PlayerStatsList	;Stats screen for team a2, d7 = 0 game / 1 playoff (plistplayoff
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-ReadAnyPad	;Wait for a press on pad 1 or 2 (3 and 4 with FourWayPlay); d1 = the buttons
+ReadAnyPad							;Wait for a press on pad 1 or 2 (3 and 4 with
+									;FourWayPlay); d1 = the buttons
 	move.l	#$5460,d6
 .wait
 	move.w	#$64,d6
@@ -232,7 +234,8 @@ ReadAnyPad	;Wait for a press on pad 1 or 2 (3 and 4 with FourWayPlay); d1 = the 
 .exit
 	rts
 
-PListArrows	;PlayerStatsList: the scroll marks { (VertLineScrolling above 0) and } (more rows below)
+PListArrows							;PlayerStatsList: the scroll marks { (VertLineScrolling above 0) and }
+									;(more rows below)
 	movem.l	d0-d7/a0-a6,-(sp)
 	tst.w	(VertLineScrolling).w
 	beq.w	.0
@@ -256,7 +259,7 @@ PListArrows	;PlayerStatsList: the scroll marks { (VertLineScrolling above 0) and
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-PListSetup	;PlayerStatsList: vram, fonts and the screen bitmaps
+PListSetup							;PlayerStatsList: vram, fonts and the screen bitmaps
 	move.l	a2,-(sp)
 	bset	#5,(sflags12).w
 	move.l	#VBlank_Menus,(vbint).w
@@ -350,7 +353,8 @@ PListSetup	;PlayerStatsList: vram, fonts and the screen bitmaps
 	movea.l	(sp)+,a2
 	rts
 
-PListTeamBlock	;PlayerStatsList: the team block of the shown team (DrawSetupTeamBlock), then PListHeading
+PListTeamBlock						;PlayerStatsList: the team block of the shown team (DrawSetupTeamBlock),
+									;then PListHeading
 	move.w	d7,-(sp)
 	jsr	(printz).l
 	String	$BF,$01,$05
@@ -359,7 +363,7 @@ PListTeamBlock	;PlayerStatsList: the team block of the shown team (DrawSetupTeam
 	jsr	(DrawSetupTeamBlock).l
 	move.w	(sp)+,d7
 
-PListHeading	;PlayerStatsList: the column heading, players or goalies
+PListHeading						;PlayerStatsList: the column heading, players or goalies
 	tst.w	(plistplayoff).w
 	bne.w	.1
 	cmpi.w	#5,(DispAttribCtr).w
@@ -382,7 +386,7 @@ PListHeading	;PlayerStatsList: the column heading, players or goalies
 .3
 	rts
 
-PListHelp	;PlayerStatsList: the button help lines
+PListHelp							;PlayerStatsList: the button help lines
 	tst.w	(plistplayoff).w
 	bne.w	.0
 	cmpi.w	#5,(DispAttribCtr).w
@@ -421,7 +425,8 @@ PListHelp	;PlayerStatsList: the button help lines
 .6
 	rts
 
-PListCategory	;PlayerStatsList: the name of category DispAttribCtr (PListPlayoffCats or PListGameCats)
+PListCategory						;PlayerStatsList: the name of category DispAttribCtr (PListPlayoffCats or
+									;PListGameCats)
 	jsr	(printz).l
 	String	$BF,$15,$05
 	movea.l	#PListPlayoffCats,a1
@@ -434,7 +439,7 @@ PListCategory	;PlayerStatsList: the name of category DispAttribCtr (PListPlayoff
 	jsr	(printbig).l
 	rts
 
-PListPlayoffCats	;PListCategory: the playoff categories
+PListPlayoffCats					;PListCategory: the playoff categories
 	String	'     goals     '
 	String	'    assists    '
 	String	'     points    '
@@ -443,7 +448,7 @@ PListPlayoffCats	;PListCategory: the playoff categories
 	String	'     shots     '
 	String	'save percentage'
 
-PListGameCats	;PListCategory: the game categories
+PListGameCats						;PListCategory: the game categories
 	String	'     goals     '
 	String	'    assists    '
 	String	'     points    '
@@ -453,7 +458,8 @@ PListGameCats	;PListCategory: the game categories
 	String	'     shots     '
 	String	'save percentage'
 
-PListBuild	;PlayerStatsList: the player or goalie list of the shown team with its stat columns (PListColumns)
+PListBuild							;PlayerStatsList: the player or goalie list of the shown team with its
+									;stat columns (PListColumns)
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(setupvalues+2).w,d7
 	tst.w	(plistplayoff).w
@@ -657,7 +663,7 @@ PListBuild	;PlayerStatsList: the player or goalie list of the shown team with it
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-PListBytes	;d3 stat bytes of team a2 from offset d2 as words at a0
+PListBytes							;d3 stat bytes of team a2 from offset d2 as words at a0
 	move.l	a2,-(sp)
 	subq.w	#1,d3
 	clr.w	d4
@@ -669,7 +675,7 @@ PListBytes	;d3 stat bytes of team a2 from offset d2 as words at a0
 	movea.l	(sp)+,a2
 	rts
 
-PListWords	;d3 stat words of a2 from offset d2 to a0
+PListWords							;d3 stat words of a2 from offset d2 to a0
 	move.l	a2,-(sp)
 	subq.w	#1,d3
 	clr.w	d4
@@ -681,10 +687,10 @@ PListWords	;d3 stat words of a2 from offset d2 to a0
 	movea.l	(sp)+,a2
 	rts
 
-PListColumns	;PlayerStatsList: the stat column buffers
+PListColumns						;PlayerStatsList: the stat column buffers
 	dc.l	$FFFFD078,$FFFFD0B0,$FFFFD0E8,$FFFFD120,$FFFFD158,$FFFFD190,$FFFFD1C8,$FFFFD200
 
-PListPrint	;PlayerStatsList: print the rows of the list
+PListPrint							;PlayerStatsList: print the rows of the list
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printz).l
 	String	$8F,$00,$00
@@ -840,7 +846,7 @@ PListPrint	;PlayerStatsList: print the rows of the list
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-PListValue	;PlayerStatsList: print stat column word_FFD238 of row d0
+PListValue							;PlayerStatsList: print stat column word_FFD238 of row d0
 	move.w	d0,-(sp)
 	move.w	(word_FFD238).w,d0
 	asl.w	#2,d0
@@ -881,7 +887,7 @@ PListValue	;PlayerStatsList: print stat column word_FFD238 of row d0
 .4
 	rts
 
-PListMark	;PlayerStatsList: print a value, highlighted in the column of the category
+PListMark							;PlayerStatsList: print a value, highlighted in the column of the category
 	move.w	(printa).w,-(sp)
 	move.w	(DispAttribCtr).w,d0
 	cmp.w	(word_FFD238).w,d0

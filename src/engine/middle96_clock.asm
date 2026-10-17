@@ -1,6 +1,6 @@
 ;	The game clock on the ice, and the big score.
 
-showclock	;Put the game clock on screen (m:ss), or else queue it (showclockdma)
+showclock							;Put the game clock on screen (m:ss), or else queue it (showclockdma)
 	btst	#sfhor,(sflags).w
 	beq.w	showclockdma
 	btst	#0,(gmode2).w
@@ -42,14 +42,14 @@ showclock	;Put the game clock on screen (m:ss), or else queue it (showclockdma)
 .2
 	rts
 
-PrintClockDigit	;Print digit d0 (ClockDigitText)
+PrintClockDigit						;Print digit d0 (ClockDigitText)
 	movea.l	#ClockDigitText,a1
 	asl.w	#2,d0
 	adda.w	d0,a1
 	jsr	(print).l
 	rts
 
-ClockDigitText	;The digits 0-9
+ClockDigitText						;The digits 0-9
 	String	$30
 	String	$31
 	String	$32
@@ -61,7 +61,7 @@ ClockDigitText	;The digits 0-9
 	String	$38
 	String	$39
 
-showclockdma	;When dfclock is set queue the clock chars in the dma list (a5)
+showclockdma						;When dfclock is set queue the clock chars in the dma list (a5)
 	bclr	#dfclock,(disflags).w
 	beq.w	rtsBigClock
 	btst	#sf2replay,(sflags2).w
@@ -174,7 +174,8 @@ showclockdma	;When dfclock is set queue the clock chars in the dma list (a5)
 	move.w	d0,(a5)+
 	rts
 
-BigClockDigitChar	;showclockdma helper: next digit of d0 as a big-font clock char word to -(a0)
+BigClockDigitChar					;showclockdma helper: next digit of d0 as a
+									;big-font clock char word to -(a0)
 	swap	d0
 	asl.w	#1,d0
 	move.w	$38(a1,d0.w),d0
@@ -184,10 +185,10 @@ BigClockDigitChar	;showclockdma helper: next digit of d0 as a big-font clock cha
 	swap	d0
 	ext.l	d0
 
-rtsBigClock	;BigClockDigitChar returns here. showclockdma exits here too
+rtsBigClock							;BigClockDigitChar returns here. showclockdma exits here too
 	rts
 
-ClockDigitChar2	;The same from the second char row of the font
+ClockDigitChar2						;The same from the second char row of the font
 	swap	d0
 	asl.w	#1,d0
 	addi.w	#$98,d0
@@ -199,7 +200,8 @@ ClockDigitChar2	;The same from the second char row of the font
 	ext.l	d0
 	rts
 
-ShowBigScore	;The big score of both teams with the EASN logo; in a shootout also the period (ScorePeriodText)
+ShowBigScore						;The big score of both teams with the EASN logo; in a shootout also the
+									;period (ScorePeriodText)
 	movem.l	d0-d7/a0-a6,-(sp)
 	bset	#2,(sflags12).w
 	bset	#0,(byte_FFC35A).w
@@ -264,14 +266,14 @@ ShowBigScore	;The big score of both teams with the EASN logo; in a shootout also
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-ScorePeriodText	;ShowBigScore: the period names
+ScorePeriodText						;ShowBigScore: the period names
 	String	'  1st period    '
 	String	'  2nd period    '
 	String	'  3rd period    '
 	String	'   overtime     '
 	String	'     final      '
 
-ClearBigScore	;Erase the big score
+ClearBigScore						;Erase the big score
 	movem.l	d0-d7/a0-a6,-(sp)
 	bclr	#0,(byte_FFC35A).w
 	jsr	(printz).l

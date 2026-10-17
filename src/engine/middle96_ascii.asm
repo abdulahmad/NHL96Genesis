@@ -1,6 +1,6 @@
 ;	Which big-font tile each ASCII character prints.
 
-bfasciicon	;Char definitions for the big font, indexed by ascii - $20 (PrintBigChar)
+bfasciicon							;Char definitions for the big font, indexed by ascii - $20 (PrintBigChar)
 	dc.b	$24,$25,$00,$26,$00,$27,$00,$47,$2D,$2E,$25,$27,$00,$28,$2A,$29
 	dc.b	$1A,$1B,$1C,$1D,$1E,$1F,$20,$21,$22,$23,$2F,$00,$2B,$00,$2C,$4A
 	dc.b	$4A,$00,$01,$02,$03,$04,$05,$06,$07,$08,$09,$0A,$0B,$0C,$0D,$0E

@@ -1,7 +1,8 @@
 ;	Who can fill a line slot, and which slots matter most.
 
-sublist	;Substitution lists by position (goalie, LD, RD, LW, C, RW, extra attacker), word offsets from sublist. Used
-	;by SetPlList
+sublist								;Substitution lists by position (goalie, LD, RD, LW, C, RW, extra
+									;attacker), word offsets from sublist. Used
+									;by SetPlList
 	dc.w	.defl-sublist
 	dc.w	.defl-sublist
 	dc.w	.defr-sublist
@@ -24,6 +25,6 @@ sublist	;Substitution lists by position (goalie, LD, RD, LW, C, RW, extra attack
 	dc.b	$05,$0D,$15,$1D,$25,$2D,$35
 	dc.b	-1
 
-priolist	;Positions in order of importance. Used by SetPlList
+priolist							;Positions in order of importance. Used by SetPlList
 	dc.b	$00,$01,$02,$04,$03,$05,$06
 	dc.b	$FF

@@ -2,7 +2,8 @@
 ;	the animation and the assignment for every player. chgplayer, setcplayer and
 ;	setpads choose which pad controls which skater.
 
-updateplayers	;This routine calls all collision/animation/assignment code for all players. d7 = elapsed frames
+updateplayers						;This routine calls all collision/animation/assignment code for all
+									;players. d7 = elapsed frames
 	btst	#sfhor,(sflags).w
 	bne.w	.16
 	ori.l	#$F,(PadControlBits).w
@@ -45,15 +46,15 @@ updateplayers	;This routine calls all collision/animation/assignment code for al
 .18
 	movea.w	#(SortCords-M68K_RAM),a3
 .19
-	move.l	(a3),OldXpos(a3)	;Xpos, oldXpos
+	move.l	(a3),OldXpos(a3)		;Xpos, oldXpos
 	move.l	Ypos(a3),OldYpos(a3)	;Ypos, oldYpos
 	move.l	Zpos(a3),OldZpos(a3)	;Zpos, oldZpos
 	btst	#pf3fall,pflags3(a3)	;falling down?
-	beq.w	.20	;branch if not
-	clr.w	Xvel(a3)	;clear Xvel
-	clr.w	Yvel(a3)	;clear Yvel
-	tst.w	SPAnum(a3)	;check animation index
-	bne.w	.0	;branch if index not 0
+	beq.w	.20						;branch if not
+	clr.w	Xvel(a3)				;clear Xvel
+	clr.w	Yvel(a3)				;clear Yvel
+	tst.w	SPAnum(a3)				;check animation index
+	bne.w	.0						;branch if index not 0
 	jsr	(PlaceBoardFall).l
 	bra.w	.20
 .0
@@ -117,23 +118,23 @@ updateplayers	;This routine calls all collision/animation/assignment code for al
 	bclr	#pf3break,pflags3(a3)
 .top2
 	bsr.w	updateanim
-	sub.b	d7,nopuck(a3)	;no puck control
+	sub.b	d7,nopuck(a3)			;no puck control
 	bpl.w	.np
-	clr.b	nopuck(a3)	;clear upper byte of nopuck
+	clr.b	nopuck(a3)				;clear upper byte of nopuck
 .np
-	sub.b	d7,$5F(a3)	;subtract # of frames from nopuck+1
+	sub.b	d7,$5F(a3)				;subtract # of frames from nopuck+1
 	bpl.w	.np2
-	clr.b	$5F(a3)	;clear lower byte of nopuck
+	clr.b	$5F(a3)					;clear lower byte of nopuck
 .np2
 	btst	#sf3icetime,(sflags3).w	;check if penalty timer is up
 	beq.w	.21
 	clr.w	d0
-	move.b	$67(a3),d0	;player offset on roster
+	move.b	$67(a3),d0				;player offset on roster
 	bmi.w	.21
 	add.w	d0,d0
 	addi.w	#$14C,d0
 	jsr	(loadTeamStruct).l
-	addq.w	#1,(a2,d0.w)	;add 1 to TOI for player
+	addq.w	#1,(a2,d0.w)			;add 1 to TOI for player
 .21
 	cmpi.w	#SPA17E4,SPA(a3)
 	blt.w	.22
@@ -217,18 +218,18 @@ updateplayers	;This routine calls all collision/animation/assignment code for al
 	move.w	d0,-(sp)
 	jsr	(sfx).l
 .done
-	move.w	SCnum(a3),d6	;SCnum
-	cmp.w	(puckc).w,d6	;check if puck carrier
+	move.w	SCnum(a3),d6			;SCnum
+	cmp.w	(puckc).w,d6			;check if puck carrier
 	bne.w	.tp
 	btst	#pf2fight,pflags2(a3)
 	bne.w	.tp
 	btst	#sfhor,(sflags).w
-	bne.w	.tp	;not puck carrier
+	bne.w	.tp						;not puck carrier
 	moveq	#-2,d4
 	bsr.w	setpads
 .tp
 	btst	#sf2faceoff,(sflags2).w	;sf2faceoff- check for faceoff
-	bne.w	.tp2	;branch if faceoff
+	bne.w	.tp2					;branch if faceoff
 	tst.w	(holdreset).w
 	beq.w	.tp2
 	subq.w	#1,(holdreset).w
@@ -241,20 +242,20 @@ updateplayers	;This routine calls all collision/animation/assignment code for al
 .tp2
 	jsr	(updatepadinput).l
 .32
-	adda.w	#$80,a3	;SCstruct size
+	adda.w	#$80,a3					;SCstruct size
 	cmpi.w	#$F,SCnum-SCstruct(a3)	;compare Sortobjs-1 to SCnum-SCstruct
-	blt.w	.19	;loop for all Sort objects
+	blt.w	.19						;loop for all Sort objects
 	rts
 
-updateanim	;Frame switch control on struct a3. Called from updateplayers
-	tst.w	SPA(a3)	;test SPA
-	bne.w	.ia	;branch if not 0
-	bclr	#pfalock,pflags(a3)	;clear anim lock
-	bclr	#pf2aip,pflags2(a3)	;clear anim in progress
+updateanim							;Frame switch control on struct a3. Called from updateplayers
+	tst.w	SPA(a3)					;test SPA
+	bne.w	.ia						;branch if not 0
+	bclr	#pfalock,pflags(a3)		;clear anim lock
+	bclr	#pf2aip,pflags2(a3)		;clear anim in progress
 	rts
 .ia
-	movea.l	#SPAlist,a0	;animation data tables
-	adda.w	SPA(a3),a0	;add SPA to a0 address
+	movea.l	#SPAlist,a0				;animation data tables
+	adda.w	SPA(a3),a0				;add SPA to a0 address
 	move.w	$10(a0),d1
 	move.w	facedir(a3),d0
 	btst	#sfhor,(sflags).w
@@ -264,20 +265,20 @@ updateanim	;Frame switch control on struct a3. Called from updateplayers
 	subq.w	#2,d0
 	andi.w	#7,d0
 .2
-	btst	#3,attribute(a3)	;x flip flag
-	beq.w	.nox	;branch if no flip
-	neg.w	d0	;negate d0
-	addq.w	#8,d0	;add 8 to d0 for flipping
-	andi.w	#7,d0	;pass first 3 bits
+	btst	#3,attribute(a3)		;x flip flag
+	beq.w	.nox					;branch if no flip
+	neg.w	d0						;negate d0
+	addq.w	#8,d0					;add 8 to d0 for flipping
+	andi.w	#7,d0					;pass first 3 bits
 .nox
-	asl.w	#1,d0	;mult by 2
-	adda.w	(a0,d0.w),a0	;add the direction offset: a0 = this direction's frame,time pairs
-	move.w	SPAnum(a3),d0	;SPANum into d0 (index into animation)
-	move.w	(a0,d0.w),d2	;the new SPF frame of this animation
-	tst.w	SPAcnt(a3)	;check if SPAcnt is 0 (time for a new frame)
-	bmi.w	.1	;branch if so (SPAcnt is negative)
-	sub.w	d7,SPAcnt(a3)	;sub frames elasped from SPAcnt
-	bpl.w	.cframe	;branch if SPAcnt is positive
+	asl.w	#1,d0					;mult by 2
+	adda.w	(a0,d0.w),a0			;add the direction offset: a0 = this direction's frame,time pairs
+	move.w	SPAnum(a3),d0			;SPANum into d0 (index into animation)
+	move.w	(a0,d0.w),d2			;the new SPF frame of this animation
+	tst.w	SPAcnt(a3)				;check if SPAcnt is 0 (time for a new frame)
+	bmi.w	.1						;branch if so (SPAcnt is negative)
+	sub.w	d7,SPAcnt(a3)			;sub frames elasped from SPAcnt
+	bpl.w	.cframe					;branch if SPAcnt is positive
 	btst	#gmclock,(gmode).w
 	beq.w	.3
 	cmpi.w	#SPA3300,SPA(a3)
@@ -296,46 +297,48 @@ updateanim	;Frame switch control on struct a3. Called from updateplayers
 	move.w	#$30,-(sp)
 	jsr	(sfx).l
 .4
-	addq.w	#4,SPAnum(a3)	;add 4 to SPAnum (set for next index)
-	addq.w	#4,d0	;add 4 to d0 (currently holds current index)
-	tst.w	-2(a0,d0.w)	;the frame time for the previous frame
-	bpl.w	.1	;branch if positive (not the end of the animation)
+	addq.w	#4,SPAnum(a3)			;add 4 to SPAnum (set for next index)
+	addq.w	#4,d0					;add 4 to d0 (currently holds current index)
+	tst.w	-2(a0,d0.w)				;the frame time for the previous frame
+	bpl.w	.1						;branch if positive (not the end of the animation)
 	cmpi.w	#SPA037A,SPA(a3)
 	bne.w	.5
 	bset	#1,(sflags12).w
 .5
-	clr.w	d0	;loop from the start
+	clr.w	d0						;loop from the start
 	clr.w	SPAnum(a3)
-	bclr	#pfalock,pflags(a3)	;clear animation lock
+	bclr	#pfalock,pflags(a3)		;clear animation lock
 	bclr	#pf2aip,pflags2(a3)
 	bclr	#pf3fall,pflags3(a3)
 	btst	#0,d1
 	bne.w	.1
-	clr.w	SPA(a3)	;clear SPA
+	clr.w	SPA(a3)					;clear SPA
 .1
-	move.w	2(a0,d0.w),d0	;move frame time for animation frame into d0
-	bpl.w	.0	;branch if positive
-	neg.w	d0	;make d0 positive (this is the case if final frame)
+	move.w	2(a0,d0.w),d0			;move frame time for animation frame into d0
+	bpl.w	.0						;branch if positive
+	neg.w	d0						;make d0 positive (this is the case if final frame)
 .0
-	move.w	d0,SPAcnt(a3)	;move d0 into SPAcnt
+	move.w	d0,SPAcnt(a3)			;move d0 into SPAcnt
 .cframe
-	sub.b	d7,$66(a3)	;sub frames elapsed from glitch - limit minimum time between frame switches
-	bpl.w	.rtss	;branch if glitch is positive still
-	clr.b	$66(a3)	;clear glitch
-	cmp.w	frame(a3),d2	;compare frame to d2
-	beq.w	.rtss	;branch if equal
-	move.w	d2,frame(a3)	;move d2 into frame
-	move.b	#4,$66(a3)	;move 4 into glitch - /60 sec min frame switch time
+	sub.b	d7,$66(a3)				;sub frames elapsed from glitch - limit minimum
+	;time between frame switches
+	bpl.w	.rtss					;branch if glitch is positive still
+	clr.b	$66(a3)					;clear glitch
+	cmp.w	frame(a3),d2			;compare frame to d2
+	beq.w	.rtss					;branch if equal
+	move.w	d2,frame(a3)			;move d2 into frame
+	move.b	#4,$66(a3)				;move 4 into glitch - /60 sec min frame switch time
 .rtss
 	rts
 
-LockScroll	;xc1 / yc1 = Hpos / Vpos, sflags bit 6
+LockScroll							;xc1 / yc1 = Hpos / Vpos, sflags bit 6
 	move.w	(Vpos).w,(yc1).w
 	move.w	(Hpos).w,(xc1).w
 	bset	#sfslock,(sflags).w
 	rts
 
-checkwindow	;Scroll the window one step toward xc1 / yc1 (sflags bit 6) or the puck carrier
+checkwindow							;Scroll the window one step toward xc1 / yc1 (sflags bit 6) or the puck
+									;carrier
 	move.w	(yc1).w,d2
 	move.w	(xc1).w,d3
 	btst	#sfslock,(sflags).w
@@ -425,8 +428,8 @@ checkwindow	;Scroll the window one step toward xc1 / yc1 (sflags bit 6) or the p
 .1
 	rts
 
-FindGoalie	;d0 = SCnum of the goalie of the team of player d0 (the first position 0 going down
-	;from player d0), -1 none
+FindGoalie							;d0 = SCnum of the goalie of the team of player d0 (the first position 0
+									;going down from player d0), -1 none
 	movem.l	d1/a0,-(sp)
 	movea.l	#SortCords,a0
 	asl.w	#7,d0
@@ -452,20 +455,21 @@ FindGoalie	;d0 = SCnum of the goalie of the team of player d0 (the first positio
 	dc.b	$20,$7C,$00,$01,$AE,$60,$C1,$F0,$20,$00,$C3,$F0,$20,$02,$D1,$6B
 	dc.b	$00,$28,$D3,$6B,$00,$2A,$4E,$75
 
-burst	;C button speed burst: take $BA energy unless OptLine is set, add a facedir push to Xvel / Yvel and set
-	;SPAburst. Jumped to from doinput
-	jsr	(getpde).l	;get players energy
+burst								;C button speed burst: take $BA energy unless OptLine is set, add a
+									;facedir push to Xvel / Yvel and set
+									;SPAburst. Jumped to from doinput
+	jsr	(getpde).l					;get players energy
 	tst.w	(OptLine).w
 	bne.w	.0
 	subi.w	#$BA,d0
-	jsr	(setpde).l	;decrease players energy
+	jsr	(setpde).l					;decrease players energy
 	btst	#4,(sflags7).w
 	beq.w	.0
 	move.w	#$1000,d0
 .0
-	lsr.w	#7,d0	;d0 will be $1000 with lines off
-	move.w	d0,d1	;energy = speed increase (check violence)
-	move.w	facedir(a3),d2	;facedir
+	lsr.w	#7,d0					;d0 will be $1000 with lines off
+	move.w	d0,d1					;energy = speed increase (check violence)
+	move.w	facedir(a3),d2			;facedir
 	asl.w	#2,d2
 	movea.l	#dirtab,a0
 	muls.w	(a0,d2.w),d0
@@ -476,20 +480,21 @@ burst	;C button speed burst: take $BA energy unless OptLine is set, add a facedi
 	move.w	#SPAburst,d1
 	bra.w	SetSPA
 
-holdplayer	;Hold check (SPAhook, SPAHold with the stick up); a puck carrier the checked player stops loses the puck.
-	;Jumped to from doinput
-	bset	#pfalock,pflags(a3)	;lock animation
-	move.w	#SPAhook,d1	;move anim into d1 - normal hold check
-	tst.w	impact(a3)	;check if impact = 0
+holdplayer							;Hold check (SPAhook, SPAHold with the stick up); a puck carrier the
+									;checked player stops loses the puck.
+									;Jumped to from doinput
+	bset	#pfalock,pflags(a3)		;lock animation
+	move.w	#SPAhook,d1				;move anim into d1 - normal hold check
+	tst.w	impact(a3)				;check if impact = 0
 	beq.w	SetSPA
 	movea.w	#(SortCords-M68K_RAM),a0	;move SortCord into a0
-	move.w	impactp(a3),d0	;move last impact player into d0
-	asl.w	#7,d0	;calc offset
-	adda.w	d0,a0	;add offset to a0
-	bset	#pfalock,pflags(a3)	;lock animation
-	move.w	#SPAhook,d1	;move anim into d1 - normal hold check
-	tst.w	impact(a3)	;check if impact = 0
-	beq.w	.2	;set anim if 0
+	move.w	impactp(a3),d0			;move last impact player into d0
+	asl.w	#7,d0					;calc offset
+	adda.w	d0,a0					;add offset to a0
+	bset	#pfalock,pflags(a3)		;lock animation
+	move.w	#SPAhook,d1				;move anim into d1 - normal hold check
+	tst.w	impact(a3)				;check if impact = 0
+	beq.w	.2						;set anim if 0
 	btst	#pf3wall,pflags3(a0)
 	bne.w	.0
 	cmpi.w	#$76,(a0)
@@ -505,14 +510,14 @@ holdplayer	;Hold check (SPAhook, SPAHold with the stick up); a puck carrier the 
 	move.w	#SPA16EE,d1
 	bra.w	.2
 .1
-	move.w	Ypos(a3),d0	;move Ypos checker into d0
-	sub.w	Ypos(a0),d0	;sub Ypos of player
-	btst	#pfgoal,pflags(a3)	;check goal checker is shooting at
-	beq.w	.air	;jump if bottom
-	neg.w	d0	;make d0 negative
+	move.w	Ypos(a3),d0				;move Ypos checker into d0
+	sub.w	Ypos(a0),d0				;sub Ypos of player
+	btst	#pfgoal,pflags(a3)		;check goal checker is shooting at
+	beq.w	.air					;jump if bottom
+	neg.w	d0						;make d0 negative
 .air
 	bmi.w	.2
-	move.w	#SPAHold,d1	;set anim - hold check stick in air
+	move.w	#SPAHold,d1				;set anim - hold check stick in air
 .2
 	btst	#pfjoycon,pflags(a0)
 	beq.w	SetSPA
@@ -528,13 +533,14 @@ holdplayer	;Hold check (SPAhook, SPAHold with the stick up); a puck carrier the 
 	move.b	#$1E,nopuck(a0)
 	bra.w	SetSPA
 
-chgplayer	;The pad d4 takes the nearest free skater to where the puck is going (not a goalie, not locked or
-	;unavailable; in a penalty shot / shootout only BA_Sktr_SCnum or BA_Goalie_SCnum), or sweep checks when it is the
-	;same one. Jumped to from doinput
-	btst	#6,(sflags5).w	;Check bit 6
+chgplayer							;The pad d4 takes the nearest free skater to where the puck is going (not
+									;a goalie, not locked or unavailable; in a penalty shot / shootout only
+									;BA_Sktr_SCnum or BA_Goalie_SCnum), or sweep checks when it is the same
+									;one. Jumped to from doinput
+	btst	#6,(sflags5).w			;Check bit 6
 	bne.w	.6
 	movem.l	d0-d6/a0-a1,-(sp)
-	move.w	(puckvx).w,d0	;lead puck slightly
+	move.w	(puckvx).w,d0			;lead puck slightly
 	asr.w	#8,d0
 	add.w	(puckx).w,d0
 	move.w	(puckvy).w,d1
@@ -550,32 +556,32 @@ chgplayer	;The pad d4 takes the nearest free skater to where the puck is going (
 	movea.w	#(cont1team-M68K_RAM),a1
 	cmpi.w	#1,(a1,d4.w)
 	beq.w	.t1
-	adda.w	#$300,a0	;controller is on other team
+	adda.w	#$300,a0				;controller is on other team
 .t1
 	movea.w	#(c1playernum-M68K_RAM),a1
 .top
-	tst.w	position(a0)	;position
+	tst.w	position(a0)			;position
 	bne.w	.3
 	tst.w	(puckc).w
 	bmi.w	.3
 	movem.w	d1,-(sp)
-	move.w	SCnum(a0),d1	;SCnum
+	move.w	SCnum(a0),d1			;SCnum
 	cmp.w	(a1,d4.w),d1
 	movem.w	(sp)+,d1
 	beq.w	.4
 .3
-	tst.w	position(a0)	;position
-	ble.w	.next	;cant switch to goalie
+	tst.w	position(a0)			;position
+	ble.w	.next					;cant switch to goalie
 .4
 	btst	#pf2unav,pflags2(a0)	;#pf2unav
-	bne.w	.next	;this player is unavailable for some reason
+	bne.w	.next					;this player is unavailable for some reason
 	movem.w	d1,-(sp)
-	move.w	SCnum(a0),d1	;SCnum
+	move.w	SCnum(a0),d1			;SCnum
 	cmp.w	(a1,d4.w),d1
 	movem.w	(sp)+,d1
 	beq.w	.0
 	btst	#pfjoycon,pflags(a0)	;is player controlled?
-	bne.w	.next	;yes branch
+	bne.w	.next					;yes branch
 .0
 	btst	#2,(BA_PS_flags).w
 	beq.w	.1
@@ -590,7 +596,7 @@ chgplayer	;The pad d4 takes the nearest free skater to where the puck is going (
 	movem.l	(sp)+,d0
 	bne.w	.next
 .1
-	movem.w	d1,-(sp)	;the pad's own player may be locked
+	movem.w	d1,-(sp)				;the pad's own player may be locked
 	move.w	SCnum(a0),d1
 	cmp.w	(a1,d4.w),d1
 	movem.w	(sp)+,d1
@@ -599,9 +605,9 @@ chgplayer	;The pad d4 takes the nearest free skater to where the puck is going (
 	bne.w	.next
 .2
 	movem.w	(sp),d0-d1
-	sub.w	(a0),d0	;Xpos
+	sub.w	(a0),d0					;Xpos
 	muls.w	d0,d0
-	sub.w	Ypos(a0),d1	;Ypos
+	sub.w	Ypos(a0),d1				;Ypos
 	muls.w	d1,d1
 	add.l	d1,d0
 	cmp.l	d5,d0
@@ -622,7 +628,7 @@ chgplayer	;The pad d4 takes the nearest free skater to where the puck is going (
 	move.l	d0,d5
 	move.w	d1,d6
 .next
-	adda.w	#$80,a0	;size of SCstruct
+	adda.w	#$80,a0					;size of SCstruct
 	dbf	d2,.top
 	tst.l	d5
 	bpl.w	.found
@@ -637,8 +643,8 @@ chgplayer	;The pad d4 takes the nearest free skater to where the puck is going (
 	addq.w	#4,sp
 	pea	(.ex).l
 	cmp.w	(a1,d4.w),d6
-	beq.w	.7	;player is same so sweep check
-	move.w	d6,d0	;d0 now is new player
+	beq.w	.7						;player is same so sweep check
+	move.w	d6,d0					;d0 now is new player
 	jmp	setcplayer
 .ex
 	movem.l	(sp)+,d0-d6/a0-a1
@@ -657,8 +663,9 @@ chgplayer	;The pad d4 takes the nearest free skater to where the puck is going (
 	move.w	#$52C,d1
 	jmp	SetSPA
 
-setcplayer	;Give pad d4 (0 / 2 / 4 / 6) player d0: restorepl the old one, then c1playernum + d4 = d0.
-	;Jumped to from chgplayer
+setcplayer							;Give pad d4 (0 / 2 / 4 / 6) player d0: restorepl the old one, then
+									;c1playernum + d4 = d0.
+									;Jumped to from chgplayer
 	movem.l	d0/a0-a1,-(sp)
 	movea.l	#c1playernum,a0
 	cmp.w	(a0,d4.w),d0
@@ -688,35 +695,35 @@ setcplayer	;Give pad d4 (0 / 2 / 4 / 6) player d0: restorepl the old one, then c
 .2
 	bra.s	.x
 
-setc1player	;Give pad 1 player d0 (setcplayer, d4 = 0)
+setc1player							;Give pad 1 player d0 (setcplayer, d4 = 0)
 	move.w	d4,-(sp)
 	clr.w	d4
 	bsr.s	setcplayer
 	move.w	(sp)+,d4
 	rts
 
-setc2player	;Give pad 2 player d0 (setcplayer, d4 = 2)
+setc2player							;Give pad 2 player d0 (setcplayer, d4 = 2)
 	move.w	d4,-(sp)
 	move.w	#2,d4
 	bsr.s	setcplayer
 	move.w	(sp)+,d4
 	rts
 
-setc3player	;Give pad 3 player d0 (setcplayer, d4 = 4)
+setc3player							;Give pad 3 player d0 (setcplayer, d4 = 4)
 	move.w	d4,-(sp)
 	move.w	#4,d4
 	bsr.s	setcplayer
 	move.w	(sp)+,d4
 	rts
 
-setc4player	;Give pad 4 player d0 (setcplayer, d4 = 6)
+setc4player							;Give pad 4 player d0 (setcplayer, d4 = 6)
 	move.w	d4,-(sp)
 	move.w	#6,d4
 	bsr.w	setcplayer
 	move.w	(sp)+,d4
 	rts
 
-Sweepcheck	;Sweep check animation for player a3 (SPA052C for a goalie, else SPA216A)
+Sweepcheck							;Sweep check animation for player a3 (SPA052C for a goalie, else SPA216A)
 	move.w	#SPA216A,d1
 	tst.w	position(a3)
 	bne.w	.0
@@ -725,17 +732,18 @@ Sweepcheck	;Sweep check animation for player a3 (SPA052C for a goalie, else SPA2
 	bset	#pfalock,pflags(a3)
 	bra.w	SetSPA
 
-restorepl	;d1 = old player (back to the computer), d0 = new player (joystick controlled)
+restorepl							;d1 = old player (back to the computer), d0 = new player (joystick
+									;controlled)
 	movem.l	a0,-(sp)
 	movea.l	#SortCords,a0
 	tst.w	d1
 	blt.w	.spd
 	cmp.w	#$B,d1
 	bgt.w	.spd
-	asl.w	#scsize,d1	;multiply d0 by 80 hex (SCsize)
+	asl.w	#scsize,d1				;multiply d0 by 80 hex (SCsize)
 	btst	#pf2lcm,pflags2(a0,d1.w)	;#pfnp - no joystick pad
 	beq.w	.cont
-	lsr.w	#7,d1	;divide by 80 hex
+	lsr.w	#7,d1					;divide by 80 hex
 	move.w	d1,d0
 	bra.w	.ex
 .cont
@@ -744,11 +752,11 @@ restorepl	;d1 = old player (back to the computer), d0 = new player (joystick con
 	bne.w	.spd
 	bset	#pfna,pflags(a0,d1.w)	;#pfna - new assignment
 .spd
-	tst.w	d0	;checks if d0 0 or higher
+	tst.w	d0						;checks if d0 0 or higher
 	blt.w	.ex
-	cmp.w	#$B,d0	;checks if d0 11 or less
+	cmp.w	#$B,d0					;checks if d0 11 or less
 	bgt.w	.ex
-	move.w	d0,d1	;copies d0 into d1
+	move.w	d0,d1					;copies d0 into d1
 	asl.w	#7,d1
 	btst	#2,(BA_PS_flags).w
 	bne.w	.chkgoalie
@@ -765,14 +773,15 @@ restorepl	;d1 = old player (back to the computer), d0 = new player (joystick con
 	tst.w	(goaliemode1).w
 .1
 	beq.w	.3
-	bra.w	.ex	;the goalie stays with the computer
+	bra.w	.ex						;the goalie stays with the computer
 .3
 	bset	#pfjoycon,pflags(a0,d1.w)	;set pfjoycon for SCNum
 .ex
 	movem.l	(sp)+,a0
 	rts
 
-Findhittype	;Z by direction d0 relative to facedir and the hand (attribute bit 3): forehand or backhand
+Findhittype							;Z by direction d0 relative to facedir and the hand (attribute bit 3):
+									;forehand or backhand
 	movem.l	d0-d1,-(sp)
 	move.w	#8,d1
 	sub.w	facedir(a3),d1
@@ -789,15 +798,17 @@ Findhittype	;Z by direction d0 relative to facedir and the hand (attribute bit 3
 	movem.l	(sp)+,d0-d1
 	rts
 
-setpads	;Put SCnum of a3 in the d4 nibble of PadControlBits; d4 = -2 puck carrier, 0 / 2 / 4 / 6 pads.
-	;In a shootout only for a pad controlled player (pflags bit 3) or the puck carrier
+setpads								;Put SCnum of a3 in the d4 nibble of PadControlBits; d4 = -2 puck carrier,
+									;0 / 2 / 4 / 6 pads.
+									;In a shootout only for a pad controlled player (pflags bit 3) or the puck
+									;carrier
 	movem.l	d0-d1,-(sp)
 	btst	#0,(gmode2).w
 	beq.w	.0
 	btst	#pfjoycon,pflags(a3)
 	bne.w	.0
-	move.w	(puckc).w,d0	;puck carrier SCnum into d0
-	cmp.w	SCnum(a3),d0	;is player puck carrier?
+	move.w	(puckc).w,d0			;puck carrier SCnum into d0
+	cmp.w	SCnum(a3),d0			;is player puck carrier?
 	bne.w	.1
 .0
 	moveq	#2,d0

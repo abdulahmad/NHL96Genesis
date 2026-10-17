@@ -2,8 +2,9 @@
 ;	ReadSRAMBits reads one back. Bytes the listing does not decode, and that nothing
 ;	references, stay where they are.
 
-WriteSRAMBits	;Write the d2-bit value d0 to the save RAM at bit d1 (bit 0 is the top bit of the
-	;first odd byte at SaveRAM), then MakeSRAMChecksum unless GameFlags bit 6 is set
+WriteSRAMBits						;Write the d2-bit value d0 to the save RAM at bit d1 (bit 0 is the top bit
+									;of the first odd byte at SaveRAM), then MakeSRAMChecksum unless GameFlags
+									;bit 6 is set
 	movem.l	d0-d6/a0,-(sp)
 	movea.l	#SaveRAM,a0
 	move.w	d1,d3
@@ -43,7 +44,7 @@ WriteSRAMBits	;Write the d2-bit value d0 to the save RAM at bit d1 (bit 0 is the
 	movem.l	(sp)+,d0-d6/a0
 	rts
 
-ReadSRAMBits	;d0 = the d2-bit value at bit d1 of the save RAM (see WriteSRAMBits)
+ReadSRAMBits						;d0 = the d2-bit value at bit d1 of the save RAM (see WriteSRAMBits)
 	movem.l	d1-d6/a0,-(sp)
 	movea.l	#SaveRAM,a0
 	move.w	d1,d3

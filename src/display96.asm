@@ -1,8 +1,9 @@
 ;	The picture. VBlank runs the frame, setvideo builds the dma list, and the
 ;	crowd, the referee and the sprites are drawn here.
 
-VBlank	;The game vertical blank handler (vbint): the dma list, sprites, scroll, palette fade, pads.
-	;Code the listing does not decode: kept as bytes
+VBlank								;The game vertical blank handler (vbint): the dma list, sprites, scroll,
+									;palette fade, pads.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$14,$08,$B8
 	dc.b	$00,$00,$BF,$B2,$67,$00,$00,$06,$61,$00,$00,$F0,$61,$00,$AD,$DC
 	dc.b	$08,$38,$00,$00,$C3,$3A,$66,$00,$00,$8E,$08,$38,$00,$02,$C3,$48
@@ -19,23 +20,24 @@ VBlank	;The game vertical blank handler (vbint): the dma list, sprites, scroll, 
 	dc.b	$D3,$28,$64,$E2,$08,$F8,$00,$03,$BF,$B2,$08,$38,$00,$07,$C3,$48
 	dc.b	$66,$D4,$53,$78,$D3,$26,$60,$CE
 
-vb2	;The vertical blank handler for fades only (forcefade, EASportsScreen).
-	;Code the listing does not decode: kept as bytes
+vb2									;The vertical blank handler for fades only (forcefade, EASportsScreen).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$06,$61,$00
 	dc.b	$AD,$02,$52,$78,$B0,$52,$4E,$B9,$00,$02,$44,$86,$4C,$DF,$7F,$FF
 
-IRQ7	;Unused interrupts: return
+IRQ7								;Unused interrupts: return
 	rte
 
-DumpSprites	;Dma the sprite attribute table (Satt) to vram. Scroll first, then the dma list
+DumpSprites							;Dma the sprite attribute table (Satt) to vram.
+									;Scroll first, then the dma list
 	bsr.w	SetScroll2
-DumpSprites2	;Transfer the sprite table, then the dma list
+DumpSprites2						;Transfer the sprite table, then the dma list
 	movea.w	#(Satt-M68K_RAM),a0
 	move.w	(Sattsize).w,d0
 	move.w	(VSPRITES).w,d1
 	bsr.w	DoDMA
 
-DoDMAList	;Transfer data from the dma list
+DoDMAList							;Transfer data from the dma list
 	movea.l	(DMAlistend).w,a6
 	cmpa.l	#DMAList,a6
 	beq.w	rtss2
@@ -48,14 +50,14 @@ DoDMAList	;Transfer data from the dma list
 	bne.s	.0
 	rts
 
-DumpSpriteTable	;Dma the sprite attribute table and return
+DumpSpriteTable						;Dma the sprite attribute table and return
 	movea.w	#(Satt-M68K_RAM),a0
 	move.w	(Sattsize).w,d0
 	move.w	(VSPRITES).w,d1
 	bsr.w	DoDMA
 	rts
 
-SetScroll2	;Write Hscroll / Vscroll to the vdp
+SetScroll2							;Write Hscroll / Vscroll to the vdp
 	move.w	(VSCRLPM).w,d0
 	addq.w	#2,d0
 	bsr.w	Vmaddr
@@ -64,11 +66,12 @@ SetScroll2	;Write Hscroll / Vscroll to the vdp
 	move.w	(Vscroll).w,(a0)
 	rts
 
-setvideo	;This is not vblank code but sets up ram for vblank transfers. Called once per game frame (DoGameFrame,
-	;Pausemode, ...).
+setvideo							;This is not vblank code but sets up ram for vblank transfers. Called once
+									;per game frame (DoGameFrame,
+									;Pausemode, ...).
 	movem.l	d0-d7/a0-a6,-(sp)
 .p
-	btst	#dfok,(disflags).w	;dfok: wait for vblank to take the last frame
+	btst	#dfok,(disflags).w		;dfok: wait for vblank to take the last frame
 	bne.s	.p
 	movea.w	#(DMAList-M68K_RAM),a5	;dma transfer list
 	bsr.w	updatescroll
@@ -83,22 +86,22 @@ setvideo	;This is not vblank code but sets up ram for vblank transfers. Called o
 	bsr.w	showcrowd
 	jsr	(showref).l
 	jsr	(UpdateCrowdMeter).l
-	cmpa.w	#$C066,a6	;no sprites: one blank sprite
+	cmpa.w	#$C066,a6				;no sprites: one blank sprite
 	bne.w	.n
 	clr.l	(a6)+
 	clr.l	(a6)+
 .n
-	clr.b	-5(a6)	;end sprite list
+	clr.b	-5(a6)					;end sprite list
 	move.l	a6,d0
 	subi.l	#$FFFFC066,d0
-	lsr.w	#1,d0	;words
+	lsr.w	#1,d0					;words
 	move.w	d0,(Sattsize).w
 	move.l	a5,(DMAlistend).w
-	bset	#dfok,(disflags).w	;dfok
+	bset	#dfok,(disflags).w		;dfok
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-updatescroll	;Scroll the rink window: Hscroll / Vscroll from Hpos / Vpos
+updatescroll						;Scroll the rink window: Hscroll / Vscroll from Hpos / Vpos
 	btst	#sfhor,(sflags).w
 	bne.w	rtss2
 	moveq	#-64,d0
@@ -110,7 +113,7 @@ updatescroll	;Scroll the rink window: Hscroll / Vscroll from Hpos / Vpos
 	move.w	(Oldrow).w,d4
 	asr.w	#3,d1
 	move.w	d1,(Oldrow).w
-	moveq	#$1F,d3	;max lines to update
+	moveq	#$1F,d3					;max lines to update
 	cmp.w	d4,d1
 	beq.w	rtss2
 	movea.l	#Rinktilelist,a0
@@ -163,13 +166,14 @@ updatescroll	;Scroll the rink window: Hscroll / Vscroll from Hpos / Vpos
 	dbeq	d3,.2
 	rts
 
-showref	;Ref window: when sflags2 bit 1 is set add the 8 RefRamMap rows to the dma list at a5 (VmMap1)
+showref								;Ref window: when sflags2 bit 1 is set add the 8 RefRamMap rows to the dma
+									;list at a5 (VmMap1)
 	bclr	#sf2refref,(sflags2).w
 	beq.w	rtss2
 	movea.w	#(RefRamMap-M68K_RAM),a0
 	movea.w	#(VmMap1-M68K_RAM),a1
 	move.w	2(a1),d2
-	moveq	#2,d0	;refy: Xpos on ice screen
+	moveq	#2,d0					;refy: Xpos on ice screen
 	asl.w	d2,d0
 	moveq	#2,d1
 	asl.w	d2,d1
@@ -190,7 +194,7 @@ showref	;Ref window: when sflags2 bit 1 is set add the 8 RefRamMap rows to the d
 	dbf	d2,.2
 	rts
 
-checkfo	;Check for faceoff sprites: the fofdata2 entries (frame, flags) as sprites
+checkfo								;Check for faceoff sprites: the fofdata2 entries (frame, flags) as sprites
 	btst	#sfpz,(sflags).w
 	bne.w	rtss2
 	btst	#dffaceoff,(disflags).w	;face off flag
@@ -273,8 +277,9 @@ checkfo	;Check for faceoff sprites: the fofdata2 entries (frame, flags) as sprit
 	dc.b	$D1,$5E,$52,$46,$BC,$7C,$00,$40,$67,$00,$00,$08,$50,$48,$51,$CC
 	dc.b	$FF,$D2,$4C,$DF,$01,$3F,$4E,$75
 
-showcrowd	;Crowd sprites: the penalty box frames per PBnum nibble (ShowCrowdPb), then the crowdframe frame
-	btst	#4,(sflags4).w	;check if reverse angle replay
+showcrowd							;Crowd sprites: the penalty box frames per PBnum nibble (ShowCrowdPb),
+									;then the crowdframe frame
+	btst	#4,(sflags4).w			;check if reverse angle replay
 	bne.w	rtsShowCrowd
 	movea.l	#CrowdFrameList,a1
 	adda.l	4(a1),a1
@@ -291,7 +296,8 @@ showcrowd	;Crowd sprites: the penalty box frames per PBnum nibble (ShowCrowdPb),
 	move.b	(padiconchars1+1).w,d0
 	bra.w	ShowCrowdFrame
 
-ShowCrowdPb	;Crowd frames for the penalty box: d2 = the count (PBnum nibble, at most 3), d3 = the first frame
+ShowCrowdPb							;Crowd frames for the penalty box: d2 = the count (PBnum nibble, at most
+									;3), d3 = the first frame
 	andi.w	#$F,d2
 	cmp.w	#3,d2
 	bls.w	.0
@@ -306,7 +312,8 @@ ShowCrowdPb	;Crowd frames for the penalty box: d2 = the count (PBnum nibble, at 
 	dbf	d2,.1
 	rts
 
-ShowCrowdFrame	;Crowd frame d0 (0 = none): its sprites in view as sprite table entries at a6 (at most $40)
+ShowCrowdFrame						;Crowd frame d0 (0 = none): its sprites in view as sprite table entries at
+									;a6 (at most $40)
 	ext.w	d0
 	beq.w	rtss2
 	cmp.w	#$40,d6
@@ -369,10 +376,10 @@ ShowCrowdFrame	;Crowd frame d0 (0 = none): its sprites in view as sprite table e
 .x
 	movem.l	(sp)+,d0-d5
 
-rtsShowCrowd	;Shared rts of showcrowd and ShowCrowdFrame
+rtsShowCrowd						;Shared rts of showcrowd and ShowCrowdFrame
 	rts
 
-JumpToShowClock	;setvideo enters showclock here
+JumpToShowClock						;setvideo enters showclock here
 	jmp	showclock
 	;After JumpToShowClock: code that only its own branches reach.
 	;Code the listing does not decode: kept as bytes
@@ -386,12 +393,12 @@ JumpToShowClock	;setvideo enters showclock here
 	dc.b	$4E,$B9,$00,$02,$07,$AE,$22,$5F,$4E,$B9,$00,$01,$BB,$8E,$00,$06
 	dc.b	$BD,$0D,$05,$00,$4E,$75
 
-.digit	;A clock digit for the dead clock code above (.digits)
-	;Code the listing does not decode: kept as bytes
+.digit								;A clock digit for the dead clock code above (.digits) Code the listing
+									;does not decode: kept as bytes
 	dc.b	$22,$7C,$00,$02,$07,$C0,$E5,$40,$D2,$C0,$4E,$B9,$00,$01,$BB,$A0
 	dc.b	$4E,$75
 
-.digits	;.digit: the digit chars
+.digits								;.digit: the digit chars
 	dc.b	$00,$04,$30,$00,$00,$04,$31,$00,$00,$04,$32,$00,$00,$04,$33,$00
 	dc.b	$00,$04,$34,$00,$00,$04,$35,$00,$00,$04,$36,$00,$00,$04,$37,$00
 	dc.b	$00,$04,$38,$00,$00,$04,$39,$00,$08,$B8,$00,$03,$BF,$B2,$67,$00
@@ -407,7 +414,8 @@ JumpToShowClock	;setvideo enters showclock here
 	dc.b	$74,$0D,$32,$29,$00,$02,$E3,$60,$D0,$42,$E3,$40,$D0,$51,$3A,$C0
 	dc.b	$4E,$75
 
-ClockDigitChar	;Next digit of d0 (divu remainder) as a small-font clock char word to -(a0)
+ClockDigitChar						;Next digit of d0 (divu remainder) as a
+									;small-font clock char word to -(a0)
 	swap	d0
 	asl.w	#1,d0
 	move.w	$64(a1,d0.w),d0
@@ -418,17 +426,19 @@ ClockDigitChar	;Next digit of d0 (divu remainder) as a small-font clock char wor
 	ext.l	d0
 	rts
 
-checksso	;Do graphics for sso structure: arrows for the players when they are off screen. Called from setvideo. a5 =
-	;dma list, a6 = sprite table, d6 = link counter. Returns on the horizontal rink. Pads 3 and 4 when cont3team /
-	;cont4team. Falls into .ca for the last one
+checksso							;Do graphics for sso structure: arrows for the players when they are off
+									;screen. Called from setvideo. a5 =
+									;dma list, a6 = sprite table, d6 = link counter. Returns on the horizontal
+									;rink. Pads 3 and 4 when cont3team / cont4team. Falls into .ca for the
+									;last one
 	btst	#4,(sflags9).w
 	bne.w	rtss2
 	movea.w	#(Joy1Struct-M68K_RAM),a0
 	movea.w	#(sso-M68K_RAM),a3
-	move.w	#$72E,d3	;SPFarrow, the first arrow frame
+	move.w	#$72E,d3				;SPFarrow, the first arrow frame
 	bsr.w	.ca
-	adda.w	#$1C,a0	;ffosize
-	adda.w	#$14,a3	;ssosize
+	adda.w	#$1C,a0					;ffosize
+	adda.w	#$14,a3					;ssosize
 	move.w	#$731,d3
 	bsr.w	.ca
 	tst.w	(cont3team).w
@@ -478,19 +488,19 @@ checksso	;Do graphics for sso structure: arrows for the players when they are of
 	sub.w	(Vpos).w,d1
 .11
 	clr.w	d2
-	cmp.w	#$74,d0	;xoff = 116
+	cmp.w	#$74,d0					;xoff = 116
 	blt.w	.8
 	bset	#3,d2
 .8
-	cmp.w	#$FF8C,d0	;-.xoff
+	cmp.w	#$FF8C,d0				;-.xoff
 	bgt.w	.1
 	bset	#2,d2
 .1
-	cmp.w	#$64,d1	;yoff = 100
+	cmp.w	#$64,d1					;yoff = 100
 	blt.w	.9
 	bset	#0,d2
 .9
-	cmp.w	#$FF9C,d1	;-.yoff
+	cmp.w	#$FF9C,d1				;-.yoff
 	bgt.w	.3
 	bset	#1,d2
 .3
@@ -504,36 +514,37 @@ checksso	;Do graphics for sso structure: arrows for the players when they are of
 	beq.w	.4
 	move.w	d4,d0
 .4
-	addi.w	#$100,d0	;128+128
+	addi.w	#$100,d0				;128+128
 	move.w	d0,(a3)
 	move.w	2(a1,d2.w),d4
 	beq.w	.5
 	move.w	d4,d1
 .5
 	neg.w	d1
-	addi.w	#$F0,d1	;112+128
+	addi.w	#$F0,d1					;112+128
 	move.w	d1,2(a3)
 	add.w	attribute(a1,d2.w),d3
 	move.w	d3,frame(a3)
 	move.w	frame(a1,d2.w),attribute(a3)
 	bra.w	addframe2
 
-.tab	;x spot, y spot, frame add, attribute per direction
+.tab								;x spot, y spot, frame add, attribute per direction
 	dc.b	$00,$00,$00,$64,$00,$00,$00,$00,$00,$74,$00,$64,$00,$01,$00,$00
 	dc.b	$00,$74,$00,$00,$00,$02,$00,$00,$00,$74,$FF,$9C,$00,$01,$10,$00
 	dc.b	$00,$00,$FF,$9C,$00,$00,$10,$00,$FF,$8C,$FF,$9C,$00,$01,$18,$00
 	dc.b	$FF,$8C,$00,$00,$00,$02,$08,$00,$FF,$8C,$00,$64,$00,$01,$08,$00
 
-setsortcords	;Setup sort cord graphics: addframe for the 16 objects in OOlist order. a5 = dmalist, a6 = sprite attribute
-	;table, d6 = link counter
+setsortcords						;Setup sort cord graphics: addframe for the 16 objects in OOlist order. a5
+									;= dmalist, a6 = sprite attribute
+									;table, d6 = link counter
 	movea.w	#(OOlist-M68K_RAM),a4	;move OOlist into a4
-	move.w	#$F,d0	;sortobj-1 (15 dec)
+	move.w	#$F,d0					;sortobj-1 (15 dec)
 .top
 	clr.w	d1
-	move.b	(a4)+,d1	;move next sortcord into d1
-	asl.w	#6,d1	;mult by 64
+	move.b	(a4)+,d1				;move next sortcord into d1
+	asl.w	#6,d1					;mult by 64
 	movea.w	#(SortCords-M68K_RAM),a3	;Sort Cord struct start into a3
-	adda.w	d1,a3	;add offset to next struct
+	adda.w	d1,a3					;add offset to next struct
 	move.b	4(a3),-(sp)
 	cmpi.w	#$AF4,$58(a3)
 	beq.w	.0
@@ -547,10 +558,10 @@ setsortcords	;Setup sort cord graphics: addframe for the 16 objects in OOlist or
 	dbf	d0,.top
 	rts
 
-setffo	;Called from setvideo
+setffo								;Called from setvideo
 	bsr.w	SetGloveAndSetupPad
-	move.w	#7,d0	;ffo obj -1
-	movea.w	#(pads-M68K_RAM),a3	;move start of struct into a3
+	move.w	#7,d0					;ffo obj -1
+	movea.w	#(pads-M68K_RAM),a3		;move start of struct into a3
 .top
 	movea.w	a6,a0
 	bsr.w	addframe
@@ -560,11 +571,12 @@ setffo	;Called from setvideo
 	add.w	d1,6(a0)
 	add.w	d1,$E(a0)
 .next
-	adda.w	#$1C,a3	;move to next struct
+	adda.w	#$1C,a3					;move to next struct
 	dbf	d0,.top
 	rts
 
-SetGloveAndSetupPad	;The setup pad (glovecords+2 at $3E8: none) and the glove (glovecords), then uppads
+SetGloveAndSetupPad					;The setup pad (glovecords+2 at $3E8: none) and the glove (glovecords),
+									;then uppads
 	movea.w	#(unk_FFBE72-M68K_RAM),a0
 	st	$18(a0)
 	cmpi.w	#$3E8,(glovecords+2).w
@@ -593,8 +605,9 @@ SetGloveAndSetupPad	;The setup pad (glovecords+2 at $3E8: none) and the glove (g
 	move.w	d1,$14(a0)
 	clr.w	$18(a0)
 
-uppads	;Update the 6 pad objects and queue new pad labels (QueuePadLabel). The pad players come from the
-	;PadControlBits nibbles ($E = no change, $F = none).
+uppads								;Update the 6 pad objects and queue new pad labels (QueuePadLabel). The
+									;pad players come from the
+									;PadControlBits nibbles ($E = no change, $F = none).
 	move.w	#5,d4
 	movea.w	#(pads-M68K_RAM),a0
 	movea.w	#(padcont-M68K_RAM),a1
@@ -613,9 +626,9 @@ uppads	;Update the 6 pad objects and queue new pad labels (QueuePadLabel). The p
 	move.w	(a2,d0.w),(a0)
 	move.w	$14(a2,d0.w),$14(a0)
 	clr.w	$18(a0)
-	move.b	$35(a2,d0.w),d1	;position+1
+	move.b	$35(a2,d0.w),d1			;position+1
 	asl.w	#8,d1
-	move.b	$70(a2,d0.w),d1	;rostnum
+	move.b	$70(a2,d0.w),d1			;rostnum
 .chg
 	cmp.w	(a1),d1
 	beq.w	.next
@@ -628,16 +641,18 @@ uppads	;Update the 6 pad objects and queue new pad labels (QueuePadLabel). The p
 	dbf	d4,.nibble
 	rts
 
-QueuePadLabel	;Queue the 3 character label of a pad object. d1 = label code: bits 7-4 and 3-0 are digits ($F = blank), bits
-	;10-8 index ButtonLabelCharTable (none while sflags7 bit 7 is set). a0 = pad object, a5 = dma list. Falls into
-	;RenderSmallFontChar for the last char
+QueuePadLabel						;Queue the 3 character label of a pad object. d1 = label code: bits 7-4
+									;and 3-0 are digits ($F = blank), bits
+									;10-8 index ButtonLabelCharTable (none while sflags7 bit 7 is set). a0 =
+									;pad object, a5 = dma list. Falls into RenderSmallFontChar for the last
+									;char
 	lea	ButtonLabelCharTable(pc),a4
-	clr.w	2(a0)	;x offset (setffo adds it to the sprites)
+	clr.w	2(a0)					;x offset (setffo adds it to the sprites)
 	move.w	d1,d2
 	lsr.w	#4,d2
 	andi.w	#$F,d2
 	bne.w	.hi
-	move.w	#$FFF0,d2	;' '-'0': blank leading zero
+	move.w	#$FFF0,d2				;' '-'0': blank leading zero
 	subq.w	#4,2(a0)
 .hi
 	addi.w	#$30,d2
@@ -647,7 +662,7 @@ QueuePadLabel	;Queue the 3 character label of a pad object. d1 = label code: bit
 	andi.w	#$F,d2
 	cmp.w	#$F,d2
 	bne.w	.lo
-	move.w	#$FFF0,d2	;$F: blank
+	move.w	#$FFF0,d2				;$F: blank
 .lo
 	addi.w	#$30,d2
 	moveq	#1,d0
@@ -665,42 +680,45 @@ QueuePadLabel	;Queue the 3 character label of a pad object. d1 = label code: bit
 	move.b	(a4,d2.w),d2
 	moveq	#2,d0
 
-RenderSmallFontChar	;Dma one small font tile to the object's chars. d2 = ascii char, d0 = char slot, a0 = object
+RenderSmallFontChar					;Dma one small font tile to the object's chars. d2 = ascii char, d0 = char
+									;slot, a0 = object
 	movea.l	#SmallFontMap,a3
 	adda.l	4(a3),a3
 	add.w	d2,d2
 	move.w	4(a3,d2.w),d2
 	andi.w	#$7FF,d2
-	asl.w	#5,d2	;32 bytes per tile
+	asl.w	#5,d2					;32 bytes per tile
 	movea.l	#SmallFontMap,a3
 	lea	$A(a3,d2.w),a3
 	move.l	a3,(a5)+
-	move.w	#$10,(a5)+	;words to transfer
+	move.w	#$10,(a5)+				;words to transfer
 	add.w	$12(a0),d0
 	asl.w	#5,d0
 	move.w	d0,(a5)+
 	rts
 
-ButtonLabelCharTable	;Third label character by bits 10-8 of the label code
+ButtonLabelCharTable				;Third label character by bits 10-8 of the label code
 	dc.b	' DDLCRX',$FF
 
-addframe	;a3 = sort cord object. Project it with find3d, then addframe2. a5 = dma trans, a6 = sprite attribute table.
-	;Called from setsortcords
+addframe							;a3 = sort cord object. Project it with find3d, then addframe2. a5 = dma
+									;trans, a6 = sprite attribute table.
+									;Called from setsortcords
 	movem.l	d0-d2,-(sp)
-	move.w	(a3),d0	;Xpos into d0
-	move.w	Ypos(a3),d1	;Ypos into d1
-	move.w	Zpos(a3),d2	;Zpos into d2
-	bmi.w	.0	;exit if Zpos minus
-	bsr.w	find3d	;get position on screen
-	cmp.w	#osflag,d1	;#osflag into d1
-	beq.w	.0	;exit if Sort Cord is off screen
+	move.w	(a3),d0					;Xpos into d0
+	move.w	Ypos(a3),d1				;Ypos into d1
+	move.w	Zpos(a3),d2				;Zpos into d2
+	bmi.w	.0						;exit if Zpos minus
+	bsr.w	find3d					;get position on screen
+	cmp.w	#osflag,d1				;#osflag into d1
+	beq.w	.0						;exit if Sort Cord is off screen
 	bsr.w	addframe2
 .0
 	movem.l	(sp)+,d0-d2
 	rts
 
-addframe2	;d0/d1 = x/y coord on screen, a3 = object, a5 = dma trans, a6 = sprite attribute table, d6 = link counter.
-	;Queue the sprite tiles of the frame and write its sprites
+addframe2							;d0/d1 = x/y coord on screen, a3 = object, a5 = dma trans, a6 = sprite
+									;attribute table, d6 = link counter.
+									;Queue the sprite tiles of the frame and write its sprites
 	move.w	attribute(a3),-(sp)
 	movem.l	d0-d5/a0-a2,-(sp)
 	move.w	frame(a3),d4
@@ -841,8 +859,9 @@ addframe2	;d0/d1 = x/y coord on screen, a3 = object, a5 = dma trans, a6 = sprite
 	move.w	(sp)+,attribute(a3)
 	rts
 
-find3d	;Input: d0 = xfield, d1 = yfield, d2 = height off field. Output: d0 = xscreen, d1 = yscreen (the horizontal
-	;rink with sflags bit 7)
+find3d								;Input: d0 = xfield, d1 = yfield, d2 = height off field. Output: d0 =
+									;xscreen, d1 = yscreen (the horizontal
+									;rink with sflags bit 7)
 	btst	#sfhor,(sflags).w
 	beq.w	.0
 	exg	d0,d1
@@ -872,7 +891,7 @@ find3d	;Input: d0 = xfield, d1 = yfield, d2 = height off field. Output: d0 = xsc
 	move.w	#$4E20,d1
 	rts
 
-KillCrowd	;Silence the crowd noise (psg)
+KillCrowd							;Silence the crowd noise (psg)
 	move.b	#$E7,(Asound).l
 	move.b	#$DF,(Asound).l
 	move.b	#$C8,(Asound).l
@@ -880,7 +899,8 @@ KillCrowd	;Silence the crowd noise (psg)
 	move.b	#$FF,(Asound).l
 	rts
 
-setupice	;Set all variables, send non purgeable graphics, build sprite frame lists for ice rink
+setupice							;Set all variables, send non purgeable graphics, build sprite frame lists
+									;for ice rink
 	movem.l	d0-d7/a0-a6,-(sp)
 	bset	#df32c,(disflags).w
 	move.w	#$C000,(VmMap2).w
@@ -966,7 +986,7 @@ setupice	;Set all variables, send non purgeable graphics, build sprite frame lis
 	dc.b	$00,$02,$01,$DC,$D2,$44,$08,$B8,$00,$00,$BF,$B2,$08,$B8,$00,$02
 	dc.b	$BF,$B2,$46,$FC,$23,$00,$4C,$DF,$7F,$FF,$4E,$75
 
-DumpPadSprites	;The six pad sprites (addframe2), then the dma list
+DumpPadSprites						;The six pad sprites (addframe2), then the dma list
 	movea.w	#(DMAList-M68K_RAM),a5
 	movea.w	#(Satt-M68K_RAM),a6
 	moveq	#1,d6
@@ -990,7 +1010,7 @@ DumpPadSprites	;The six pad sprites (addframe2), then the dma list
 	bsr.w	DoDMAList
 	rts
 
-setupIceRinkPal	;Copy the rink palettes (at the Rinktilelist header) to palfadenew
+setupIceRinkPal						;Copy the rink palettes (at the Rinktilelist header) to palfadenew
 	movea.l	#Rinktilelist,a0
 	adda.l	(a0),a0
 	moveq	#$F,d0
@@ -1000,61 +1020,61 @@ setupIceRinkPal	;Copy the rink palettes (at the Rinktilelist header) to palfaden
 	dbf	d0,.0
 	rts
 
-setupEASNmap	;Load the EASN logo tiles (EASNmap+8) at EASNcset
+setupEASNmap						;Load the EASN logo tiles (EASNmap+8) at EASNcset
 	move.w	(EASNcset).w,d4
 	movea.l	#EASNmap+8,a2
 	jmp	DecompressGraphicsPlain
 	dc.b	$4E,$75
 
-LoadEnergyBarTiles	;Decompress EnergyBarMap at energybarchars
+LoadEnergyBarTiles					;Decompress EnergyBarMap at energybarchars
 	move.w	(energybarchars).w,d4
 	movea.l	#EnergyBarMap+8,a2
 	bra.w	DecompressGraphicsPlain
 
-LoadCrowdFrames	;Decompress CrowdFrameList at animchars
+LoadCrowdFrames						;Decompress CrowdFrameList at animchars
 	move.w	(animchars).w,d4
 	movea.l	#CrowdFrameList+8,a2
 	bra.w	DecompressGraphicsPlain
 
-LoadRefTilesHor	;Decompress RefTilesHor at ExtraChars
+LoadRefTilesHor						;Decompress RefTilesHor at ExtraChars
 	move.w	(ExtraChars).w,d4
 	movea.l	#RefTilesHor+8,a2
 	bra.w	DecompressGraphicsPlain
 
-LoadRefTiles	;Decompress RefTiles at ExtraChars
+LoadRefTiles						;Decompress RefTiles at ExtraChars
 	move.w	(ExtraChars).w,d4
 	movea.l	#RefTiles+8,a2
 	bra.w	DecompressGraphicsPlain
 
-LoadFaceOffSprites	;Decompress FaceOffSprites at faceoffvrcset
+LoadFaceOffSprites					;Decompress FaceOffSprites at faceoffvrcset
 	move.w	(faceoffvrcset).w,d4
 	movea.l	#FaceOffSprites+8,a2
 	bra.w	DecompressGraphicsPlain
 
-LoadFaceOffMap	;Decompress FaceOffMap at ExtraChars
+LoadFaceOffMap						;Decompress FaceOffMap at ExtraChars
 	move.w	(ExtraChars).w,d4
 	movea.l	#FaceOffMap+8,a2
 	bra.w	DecompressGraphicsPlain
 
-defaultsprites	;The screen objects (sso) from .listsso, then the pads from .listffo
+defaultsprites						;The screen objects (sso) from .listsso, then the pads from .listffo
 	movea.l	#.listsso,a2
 	movea.w	#(sso-M68K_RAM),a3
-	moveq	#3,d0	;#ssonum-1 into d0
+	moveq	#3,d0					;#ssonum-1 into d0
 .ssotop
-	move.w	#$FFFF,8(a3)	;screen objects not locked to scroll of screen
+	move.w	#$FFFF,8(a3)			;screen objects not locked to scroll of screen
 	move.w	(a2)+,(a3)
 	move.w	(a2)+,2(a3)
 	move.w	(a2)+,6(a3)
 	move.w	(a2)+,4(a3)
 	move.w	d4,$12(a3)
 	add.w	(a2)+,d4
-	adda.w	#$14,a3	;#ssosize
+	adda.w	#$14,a3					;#ssosize
 	dbf	d0,.ssotop
 	movea.l	#.listffo,a2
-	movea.l	#$FFFFBDCA,a3	;ffo
-	moveq	#7,d0	;#ffonum-1
+	movea.l	#$FFFFBDCA,a3			;ffo
+	moveq	#7,d0					;#ffonum-1
 .ffotop
-	st	8(a3)	;objects tied to screen scrolling (not players/net/puck)
+	st	8(a3)						;objects tied to screen scrolling (not players/net/puck)
 	move.w	(a2)+,(a3)
 	move.w	(a2)+,$14(a3)
 	move.w	(a2)+,$18(a3)
@@ -1062,16 +1082,16 @@ defaultsprites	;The screen objects (sso) from .listsso, then the pads from .list
 	move.w	(a2)+,4(a3)
 	move.w	d4,$12(a3)
 	add.w	(a2)+,d4
-	adda.w	#$1C,a3	;#ffosize
+	adda.w	#$1C,a3					;#ffosize
 	dbf	d0,.ffotop
 	bra.w	defaultsprites2
 
-.listsso	;Xcord, ycord, frame, attribute, vram char size
+.listsso							;Xcord, ycord, frame, attribute, vram char size
 	dc.b	$00,$00,$00,$00,$00,$00,$00,$00,$00,$09,$00,$00,$00,$00,$00,$00
 	dc.b	$00,$00,$00,$09,$00,$00,$00,$00,$00,$00,$00,$00,$00,$09,$00,$00
 	dc.b	$00,$00,$00,$00,$00,$00,$00,$09
 
-.listffo	;Xcord, ycord, zpos, frame, attribute, vram char size
+.listffo							;Xcord, ycord, zpos, frame, attribute, vram char size
 	dc.b	$00,$00,$00,$00,$FF,$FF,$07,$28,$00,$00,$00,$07,$00,$00,$00,$00
 	dc.b	$FF,$FF,$07,$2A,$00,$00,$00,$07,$00,$00,$00,$00,$FF,$FF,$07,$2B
 	dc.b	$00,$00,$00,$07,$00,$00,$00,$00,$FF,$FF,$07,$2C,$00,$00,$00,$07
@@ -1079,15 +1099,17 @@ defaultsprites	;The screen objects (sso) from .listsso, then the pads from .list
 	dc.b	$FF,$FF,$07,$29,$80,$00,$00,$07,$00,$00,$00,$00,$FF,$FF,$06,$7B
 	dc.b	$08,$00,$00,$05,$00,$00,$00,$00,$FF,$FF,$06,$7B,$00,$00,$00,$05
 
-defaultsprites2	;Objects which are tied to screen scrolling and have velocity: the 16 SortCords objects from .list (players,
-	;puck, puck shadow, goal nets ...), the OOlist and OOlistpos; then SprSort.
+defaultsprites2						;Objects which are tied to screen scrolling and have velocity: the 16
+									;SortCords objects from .list (players,
+									;puck, puck shadow, goal nets ...), the OOlist and OOlistpos; then
+									;SprSort.
 	clr.w	d6
 	movea.w	#(OOlist-M68K_RAM),a1
 	lea	.list(pc),a2
 	movea.w	#(SortCords-M68K_RAM),a3
 	movea.w	#(OOlistpos-M68K_RAM),a4
 .0
-	moveq	#$1F,d0	;$1F
+	moveq	#$1F,d0					;$1F
 	movea.w	a3,a0
 .1
 	clr.l	(a0)+
@@ -1118,7 +1140,7 @@ defaultsprites2	;Objects which are tied to screen scrolling and have velocity: t
 	bne.s	.0
 	bra.w	SprSort
 
-.list	;Xcord, ycord, zcord, frame, attribute, char size, radii, asslist, pflags
+.list								;Xcord, ycord, zcord, frame, attribute, char size, radii, asslist, pflags
 	dc.b	$01,$80,$00,$C0,$00,$00,$00,$01,$00,$00,$00,$14,$00,$08,$00,$04
 	dc.b	$00,$00,$00,$80,$FF,$38,$FF,$9C,$00,$00,$00,$01,$00,$00,$00,$14
 	dc.b	$00,$08,$00,$04,$00,$00,$00,$80,$FF,$38,$FF,$B0,$00,$00,$00,$01
@@ -1140,13 +1162,14 @@ defaultsprites2	;Objects which are tied to screen scrolling and have velocity: t
 	dc.b	$00,$00,$00,$01,$00,$05,$00,$05,$00,$18,$00,$01,$00,$00,$00,$00
 	dc.b	$00,$00,$02,$99,$00,$00,$00,$11,$00,$03,$00,$03,$00,$19,$00,$04
 
-SprSort	;Sort objects in struct SortObj and set corresponding tables for keeping them sorted later (Ylist, OOlist,
-	;OOlistpos).
+SprSort								;Sort objects in struct SortObj and set corresponding tables for keeping
+									;them sorted later (Ylist, OOlist,
+									;OOlistpos).
 	movem.l	d0-d4/a0-a2,-(sp)
 	movea.l	#$FFFFB87E,a2
 	movea.l	#$FFFFB85E,a1
 	movea.l	#SortCords,a0
-	move.w	#$F,d3	;Sortobjs -1
+	move.w	#$F,d3					;Sortobjs -1
 .loop0
 	move.w	$14(a0),d4
 	btst	#sfhor,(sflags).w
@@ -1184,8 +1207,8 @@ SprSort	;Sort objects in struct SortObj and set corresponding tables for keeping
 	movem.l	(sp)+,d0-d4/a0-a2
 	rts
 
-resetplstuff	;Reset the player variables of the sort objects.
-	;Code the listing does not decode: kept as bytes
+resetplstuff						;Reset the player variables of the sort objects.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$E0,$F0,$34,$7C,$C7,$26,$61,$00,$00,$10,$34,$7C,$CA,$C4
 	dc.b	$61,$00,$00,$08,$4C,$DF,$0F,$07,$4E,$75,$08,$AA,$00,$04,$00,$30
 	dc.b	$74,$05,$36,$6A,$00,$22,$42,$2B,$00,$63,$4A,$6B,$00,$34,$6B,$00

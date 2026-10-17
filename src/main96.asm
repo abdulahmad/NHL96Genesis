@@ -1,9 +1,10 @@
 ;	Startup. This file holds the vector table and the cartridge header, runs Sega's startup code,
 ;	checks the region and the checksum, and then starts the game.
-;	The region lock reads the country code as one hex digit of region bits (1 Japan, 2 Asia PAL, 4 USA, 8 Europe).
-;	If the console's region is not in it, it draws "DEVELOPED FOR USE ONLY WITH ... SYSTEMS." and hangs.
+;	The region lock reads the country code as one hex digit of region bits (1 Japan, 2 Asia PAL, 4 USA, 8
+;	Europe). If the console's region is not in it, it draws "DEVELOPED FOR USE ONLY WITH ... SYSTEMS." and
+;	hangs.
 
-InitialSP = $FFFFF6	;reset vector 0. 24-bit form of $FFFFFFF6. Begin moves the stack to Stack
+InitialSP = $FFFFF6					;reset vector 0. 24-bit form of $FFFFFFF6. Begin moves the stack to Stack
 
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;
@@ -11,25 +12,25 @@ InitialSP = $FFFFF6	;reset vector 0. 24-bit form of $FFFFFFF6. Begin moves the s
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-	dc.l	InitialSP	; 0 initial stack pointer
-	dc.l	Start		; 1 initial program counter
-	dc.l	AdrErr		; 2 bus error. Bus and address error share one handler
-	dc.l	AdrErr		; 3 address error
-	dc.l	InvOpCode	; 4 illegal instruction
-	dc.l	DivBy0		; 5 zero divide
-	dcb.b	72,$FF		; 6-23: CHK ... reserved, not used
+	dc.l	InitialSP				; 0 initial stack pointer
+	dc.l	Start					; 1 initial program counter
+	dc.l	AdrErr					; 2 bus error. Bus and address error share one handler
+	dc.l	AdrErr					; 3 address error
+	dc.l	InvOpCode				; 4 illegal instruction
+	dc.l	DivBy0					; 5 zero divide
+	dcb.b	72,$FF					; 6-23: CHK ... reserved, not used
 
-	dc.l	IRQ7		; 24 spurious interrupt. IRQ7 is an rte
-	dc.l	IRQ7		; 25 level 1, not used
-	dc.l	IRQ7		; 26 level 2 (external), not used
-	dc.l	IRQ7		; 27 level 3, not used
-	dc.l	IRQ7		; 28 level 4: horizontal retrace (not used)
-	dc.l	0		; 29 level 5: not used
-	dc.l	VBjsr		; 30 level 6: vertical retrace, jumps through vbint
-	dc.l	IRQ7		; 31 level 7
+	dc.l	IRQ7					; 24 spurious interrupt. IRQ7 is an rte
+	dc.l	IRQ7					; 25 level 1, not used
+	dc.l	IRQ7					; 26 level 2 (external), not used
+	dc.l	IRQ7					; 27 level 3, not used
+	dc.l	IRQ7					; 28 level 4: horizontal retrace (not used)
+	dc.l	0						; 29 level 5: not used
+	dc.l	VBjsr					; 30 level 6: vertical retrace, jumps through vbint
+	dc.l	IRQ7					; 31 level 7
 
-	dc.l	0,0,0,0		; 32-35: trap #0-#3, not used
-	dcb.b	112,$FF		; 36-63: trap #4-#15 and reserved, not used
+	dc.l	0,0,0,0					; 32-35: trap #0-#3, not used
+	dcb.b	112,$FF					; 36-63: trap #4-#15 and reserved, not used
 
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;
@@ -43,8 +44,9 @@ InitialSP = $FFFFF6	;reset vector 0. 24-bit form of $FFFFFFF6. Begin moves the s
 ;	Start
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-Start	;Power on: the Sega hardware init, then the region lock, the checksum and Begin
-	include	sega\SegaInit.asm	;SegaInit, falls into CHECK_VDP
+Start								;Power on: the Sega hardware init, then the region lock, the checksum and
+									;Begin
+	include	sega\SegaInit.asm		;SegaInit, falls into CHECK_VDP
 
 ;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;
@@ -52,13 +54,14 @@ Start	;Power on: the Sega hardware init, then the region lock, the checksum and 
 ;
 ;<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-CHECK_VDP	;Hot start lands here. Look the country code digit up in the table for the console's region;
-	;0 there means the cartridge is sold in this region, so start the game
+CHECK_VDP							;Hot start lands here. Look the country code digit up in the table for the
+									;console's region; 0 there means the cartridge is sold in this region, so
+									;start the game
 	tst.w	(Vctrl).l
 	clr.l	d0
-	move.b	(IO_PCBVER+1).l,d0	;version register: bit 7 = overseas, bit 6 = PAL
+	move.b	(IO_PCBVER+1).l,d0		;version register: bit 7 = overseas, bit 6 = PAL
 	lsr.b	#6,d0
-	andi.b	#3,d0			;0 Japan NTSC, 1 Japan PAL, 2 overseas NTSC, 3 overseas PAL
+	andi.b	#3,d0					;0 Japan NTSC, 1 Japan PAL, 2 overseas NTSC, 3 overseas PAL
 	cmpi.b	#0,d0
 	bne.s	.1
 	lea	RegionJapanNtsc(pc),a6
@@ -74,7 +77,7 @@ CHECK_VDP	;Hot start lands here. Look the country code digit up in the table for
 .3	cmpi.b	#3,d0
 	bne.w	.regionHang
 	lea	RegionOverseasPal(pc),a6
-.digit	;country code letter to its hex value: '0'-'9' or 'A'-'F'
+.digit								;country code letter to its hex value: '0'-'9' or 'A'-'F'
 	clr.l	d6
 	lea	(CountryCode).l,a0
 	move.b	(a0),d6
@@ -85,38 +88,38 @@ CHECK_VDP	;Hot start lands here. Look the country code digit up in the table for
 	bra.s	.look
 .num	lsl.b	#4,d6
 	lsr.b	#4,d6
-.look	move.b	d6,d7			;keep the region bits for the message
+.look	move.b	d6,d7				;keep the region bits for the message
 	move.b	(a6,d6.w),d6
 	tst.b	d6
-	beq.w	RegionOK		;the cartridge lists this region: start the game
-	;wrong region: set the VDP up and load RegionFont as tiles 0-$3A
+	beq.w	RegionOK				;the cartridge lists this region: start the game wrong region: set the VDP
+									;up and load RegionFont as tiles 0-$3A
 	lea	(Vdata).l,a4
 	lea	(Vctrl).l,a5
-	move.w	#VDPR_MODE2+$64,(a5)		;reg 1: display on, vblank int, DMA off
-	move.w	#VDPR_PLANEA+$30,(a5)		;reg 2: plane A at $C000
-	move.w	#VDPR_MODE4+$81,(a5)		;reg 12: 40 cell mode
-	move.w	#VDPR_AUTOINC+$02,(a5)		;reg 15: auto increment 2
-	move.w	#VDPR_PLANESIZE+$01,(a5)		;reg 16: 64 x 32 cell planes
-	move.l	#CRAM_W+(2<<16),(a5)		;cram write, address 2 (colour 1)
-	move.w	#$EEE,(a4)		;colour 1 = white
-	move.l	#VRAM_W,(a5)		;vram write, address 0
+	move.w	#VDPR_MODE2+$64,(a5)	;reg 1: display on, vblank int, DMA off
+	move.w	#VDPR_PLANEA+$30,(a5)	;reg 2: plane A at $C000
+	move.w	#VDPR_MODE4+$81,(a5)	;reg 12: 40 cell mode
+	move.w	#VDPR_AUTOINC+$02,(a5)	;reg 15: auto increment 2
+	move.w	#VDPR_PLANESIZE+$01,(a5)	;reg 16: 64 x 32 cell planes
+	move.l	#CRAM_W+(2<<16),(a5)	;cram write, address 2 (colour 1)
+	move.w	#$EEE,(a4)				;colour 1 = white
+	move.l	#VRAM_W,(a5)			;vram write, address 0
 	lea	RegionFont(pc),a0
-	move.w	#$3A,d0			;characters space to Z
-	move.l	#$10000000,d2		;pixel mask: colour 1 in the nibble rol.l moves into place
+	move.w	#$3A,d0					;characters space to Z
+	move.l	#$10000000,d2			;pixel mask: colour 1 in the nibble rol.l moves into place
 .char
-	move.w	#7,d6			;8 rows
+	move.w	#7,d6					;8 rows
 .row
-	move.b	(a0)+,d1		;1 bit per pixel, left pixel in bit 7
+	move.b	(a0)+,d1				;1 bit per pixel, left pixel in bit 7
 	move.l	#0,d4
-	move.w	#7,d5			;8 pixels
+	move.w	#7,d5					;8 pixels
 .pixel
 	rol.l	#4,d2
 	ror.b	#1,d1
 	bcc.s	.clear
-	or.l	d2,d4			;set the pixel to colour 1
+	or.l	d2,d4					;set the pixel to colour 1
 .clear
 	dbf	d5,.pixel
-	move.l	d4,(a4)			;one 4 bpp tile row
+	move.l	d4,(a4)					;one 4 bpp tile row
 	dbf	d6,.row
 	dbf	d0,.char
 	;one line for each system the cartridge is sold for, by the country code digit
@@ -165,55 +168,56 @@ CHECK_VDP	;Hot start lands here. Look the country code digit up in the table for
 	move.b	(a0)+,d0
 	addq.w	#1,d1
 	bsr.w	RegionPrint
-.regionHang	;Wrong region: hang
+.regionHang							;Wrong region: hang
 	bra.s	.regionHang
 
-PrintDeveloped	;"DEVELOPED FOR USE ONLY WITH" on row 8
+PrintDeveloped						;"DEVELOPED FOR USE ONLY WITH" on row 8
 	move.b	#8,d1
 	lea	DevelopedTxt(pc),a0
 	move.b	(a0)+,d0
 	bsr.w	RegionPrint
 	rts
 
-PrintNtscMegaDrive	;"NTSC MEGA DRIVE" on the next row
+PrintNtscMegaDrive					;"NTSC MEGA DRIVE" on the next row
 	lea	NtscMegaDriveTxt(pc),a0
 	move.b	(a0)+,d0
 	addq.w	#1,d1
 	bsr.w	RegionPrint
 	rts
 
-PrintNtscGenesis	;"NTSC GENESIS" on the next row
+PrintNtscGenesis					;"NTSC GENESIS" on the next row
 	lea	NtscGenesisTxt(pc),a0
 	move.b	(a0)+,d0
 	addq.w	#1,d1
 	bsr.w	RegionPrint
 	rts
 
-PrintPalMegaDrive	;"PAL AND FRENCH SECAM MEGA DRIVE" on the next row
+PrintPalMegaDrive					;"PAL AND FRENCH SECAM MEGA DRIVE" on the next row
 	lea	PalMegaDriveTxt(pc),a0
 	move.b	(a0)+,d0
 	addq.w	#1,d1
 	bsr.w	RegionPrint
 	rts
 
-PrintAnd	;"&" on the next row
+PrintAnd							;"&" on the next row
 	lea	AndTxt(pc),a0
 	move.b	(a0)+,d0
 	addq.w	#1,d1
 	bsr.w	RegionPrint
 	rts
 
-RegionPrint	;Print the 0 terminated text at a0 on plane A ($C000), row d1, column d0. Tile = character - $20
+RegionPrint							;Print the 0 terminated text at a0 on plane A ($C000), row d1, column d0.
+									;Tile = character - $20
 	move.b	d1,d2
 	andi.l	#$FF,d2
 	swap	d2
-	lsl.l	#7,d2			;row * $80, in the address half of the vram command
+	lsl.l	#7,d2					;row * $80, in the address half of the vram command
 	move.b	d0,d3
 	andi.l	#$FF,d3
 	swap	d3
-	asl.l	#1,d3			;column * 2
+	asl.l	#1,d3					;column * 2
 	add.l	d3,d2
-	addi.l	#VRAM_W+(($C000&$3FFF)<<16)+($C000>>14),d2		;vram write at $C000 + row * $80 + column * 2
+	addi.l	#VRAM_W+(($C000&$3FFF)<<16)+($C000>>14),d2	;vram write at $C000 + row * $80 + column * 2
 	move.l	d2,(a5)
 .0
 	tst.b	(a0)
@@ -248,7 +252,7 @@ NtscGenesisTxt
 	dc.b	$D,'NTSC GENESIS',0
 PalMegaDriveTxt
 	dc.b	4,'PAL AND FRENCH SECAM MEGA DRIVE',0
-RegionFont	;8 x 8, 1 bit per pixel, characters $20-$5A
+RegionFont							;8 x 8, 1 bit per pixel, characters $20-$5A
 	dc.b	$00,$00,$00,$00,$00,$00,$00,$00	;' '
 	dc.b	$18,$18,$18,$18,$00,$18,$18,$00	;'!'
 	dc.b	$36,$36,$48,$00,$00,$00,$00,$00	;'"'
@@ -309,7 +313,7 @@ RegionFont	;8 x 8, 1 bit per pixel, characters $20-$5A
 	dc.b	$66,$66,$66,$3C,$18,$18,$18,$00	;'Y'
 	dc.b	$7F,$07,$0E,$1C,$38,$70,$7F,$00	;'Z'
 
-RegionOK	;The region is listed: checksum, then the game
+RegionOK							;The region is listed: checksum, then the game
 	IF CHECKSUM=1
 		jsr	(ValidationRoutine).l	;Red screen and hang if the ROM sum is wrong
 	ELSE
@@ -319,5 +323,5 @@ RegionOK	;The region is listed: checksum, then the game
 	ENDIF
 	jmp	(Begin).l
 
-ZeroLong	;A zero long
+ZeroLong							;A zero long
 	dc.l	0

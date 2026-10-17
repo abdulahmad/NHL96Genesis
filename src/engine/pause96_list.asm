@@ -1,7 +1,7 @@
 ;	Menu lists. PrintMenuList and PrintMenuList2 draw the shown rows of a menu, with the scroll marks.
 
-PrintMenuList	;Print the shown rows of the menu list (menulist) with the scroll marks.
-	;Code the listing does not decode: kept as bytes
+PrintMenuList						;Print the shown rows of the menu list (menulist) with the scroll marks.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$26,$78,$D0,$02,$28,$4B,$D8,$D4,$42,$47,$20,$78
 	dc.b	$D0,$02,$D0,$D0,$D0,$D0,$4A,$68,$00,$02,$6B,$00,$00,$0A,$52,$47
 	dc.b	$D0,$D0,$58,$48,$60,$F0,$30,$38,$CF,$FE,$6A,$00,$00,$08,$42,$78
@@ -24,15 +24,15 @@ PrintMenuList	;Print the shown rows of the menu list (menulist) with the scroll 
 	dc.b	$D0,$0A,$B0,$47,$6C,$00,$00,$08,$22,$7C,$00,$01,$45,$54,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$4C,$DF,$7F,$FF,$4E,$75
 
-ScrollClearTxt	;Scroll marks for PrintMenuList
+ScrollClearTxt						;Scroll marks for PrintMenuList
 	String	$F9,$00,$20
 ScrollUpTxt
 	String	$F9,$00,$7B
 ScrollDownTxt
 	String	$F9,$00,$7D
 
-PrintMenuList2	;Print the shown rows of the menu list (menulist): each item through its routine, the selected item
-	;with the highlight
+PrintMenuList2						;Print the shown rows of the menu list (menulist): each item through its
+									;routine, the selected item with the highlight
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	(menulist).w,a3
 	movea.l	a3,a4
