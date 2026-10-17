@@ -649,152 +649,152 @@ asswingo	;Winger on offense (tmap 5 / 4: asswingo5 / asswingo4): a random spot i
 
 Penaltylist	;Penalty number = word offset into this table
 	dc.w	$0000
-	dc.w	.eop-Penaltylist	;$02
-	dc.w	.eog-Penaltylist	;$04
-	dc.w	.ghold-Penaltylist	;$06
-	dc.w	.ghold-Penaltylist	;$08
-	dc.w	.whistle-Penaltylist	;$0A
-	dc.w	.ice-Penaltylist	;$0C
-	dc.w	.goal-Penaltylist	;$0E
-	dc.w	.offsides-Penaltylist	;$10
-	dc.w	.rough2-Penaltylist	;$12
-	dc.w	.p14-Penaltylist	;$14
-	dc.w	.charge-Penaltylist	;$16
-	dc.w	.slash-Penaltylist	;$18
-	dc.w	.rough-Penaltylist	;$1A
-	dc.w	.cross-Penaltylist	;$1C
-	dc.w	.hook-Penaltylist	;$1E
-	dc.w	.trip-Penaltylist	;$20
-	dc.w	.int-Penaltylist	;$22
-	dc.w	.hold-Penaltylist	;$24
-	dc.w	.fight-Penaltylist	;$26
-	dc.w	.fight2-Penaltylist	;$28
-	dc.w	.inst-Penaltylist	;$2A
-	dc.w	.delay-Penaltylist	;$2C
-	dc.w	.p2E-Penaltylist	;$2E
-	dc.w	.p30-Penaltylist	;$30
-	dc.w	.p32-Penaltylist	;$32
-	dc.w	.p34-Penaltylist	;$34
-	dc.w	.p36-Penaltylist	;$36
-	dc.w	.p38-Penaltylist	;$38
-	dc.w	.p3A-Penaltylist	;$3A
-	dc.w	.p3C-Penaltylist	;$3C
-	dc.w	.p3E-Penaltylist	;$3E
-	dc.w	.p40-Penaltylist	;$40
-	dc.w	.p42-Penaltylist	;$42
-	dc.w	.p44-Penaltylist	;$44
-	dc.w	.p46-Penaltylist	;$46
-	dc.w	.p48-Penaltylist	;$48
-	dc.w	.p4A-Penaltylist	;$4A
-.eop	dc.w	$0100
+	dc.w	PenDataEOP-Penaltylist	;$02
+	dc.w	PenDataEOG-Penaltylist	;$04
+	dc.w	PenDataGhold-Penaltylist	;$06
+	dc.w	PenDataGhold-Penaltylist	;$08
+	dc.w	PenDatawhistle-Penaltylist	;$0A
+	dc.w	PenDataice-Penaltylist	;$0C
+	dc.w	PenDataGoal-Penaltylist	;$0E
+	dc.w	PenDataoffsides-Penaltylist	;$10
+	dc.w	PenDatarough2-Penaltylist	;$12
+	dc.w	PenDataNoText-Penaltylist	;$14
+	dc.w	PenDatacharge-Penaltylist	;$16
+	dc.w	PenDataslash-Penaltylist	;$18
+	dc.w	PenDatarough-Penaltylist	;$1A
+	dc.w	PenDatacross-Penaltylist	;$1C
+	dc.w	PenDatahook-Penaltylist	;$1E
+	dc.w	PenDatatrip-Penaltylist	;$20
+	dc.w	PenDataint-Penaltylist	;$22
+	dc.w	PenDataHold-Penaltylist	;$24
+	dc.w	PenDatafight-Penaltylist	;$26
+	dc.w	PenDatafight2-Penaltylist	;$28
+	dc.w	PenDataInst-Penaltylist	;$2A
+	dc.w	PenDatadelay-Penaltylist	;$2C
+	dc.w	PenDatap2E-Penaltylist	;$2E
+	dc.w	PenDatap30-Penaltylist	;$30
+	dc.w	PenDatap32-Penaltylist	;$32
+	dc.w	PenDatap34-Penaltylist	;$34
+	dc.w	PenDatap36-Penaltylist	;$36
+	dc.w	PenDatap38-Penaltylist	;$38
+	dc.w	PenDatap3A-Penaltylist	;$3A
+	dc.w	PenDatap3C-Penaltylist	;$3C
+	dc.w	PenDatap3E-Penaltylist	;$3E
+	dc.w	PenDatap40-Penaltylist	;$40
+	dc.w	PenDatap42-Penaltylist	;$42
+	dc.w	PenDatap44-Penaltylist	;$44
+	dc.w	PenDatap46-Penaltylist	;$46
+	dc.w	PenDatap48-Penaltylist	;$48
+	dc.w	PenDatap4A-Penaltylist	;$4A
+PenDataEOP	dc.w	$0100
 	String	'Period Over'
 	dc.w	-$0510
-.eog	dc.w	$0100
+PenDataEOG	dc.w	$0100
 	String	'Game Over'
 	dc.w	$0510,-$4060
-.goal	dc.w	$0100
+PenDataGoal	dc.w	$0100
 	dc.w	2	;String with no text
 	dc.w	$050A,-$4018
-.p14	dc.w	$0100
+PenDataNoText	dc.w	$0100
 	dc.w	2	;String with no text
 	dc.w	$0510,-$4018
-.ice	dc.w	$0100
+PenDataice	dc.w	$0100
 	String	'Icing'
 	dc.w	$0002,$0101,-$0206
-.offsides	dc.w	$0100
+PenDataoffsides	dc.w	$0100
 	String	'Off-side'
 	dc.w	$0002,$0301,-$040F
-.ghold	dc.w	$0100
+PenDataGhold	dc.w	$0100
 	String	'Face-off '
 	dc.w	-$050A
-.p3C	dc.w	$0000
+PenDatap3C	dc.w	$0000
 	String	'Face-off '
 	dc.w	-$050A
-.delay	dc.w	$0000
+PenDatadelay	dc.w	$0000
 	String	'Penalty'
 	dc.w	$0003,$0301,-$040F
-.whistle	dc.w	$0000
+PenDatawhistle	dc.w	$0000
 	dc.w	2	;String with no text
 	dc.w	-$050A
-.charge	dc.w	$0402
+PenDatacharge	dc.w	$0402
 	String	'Charging'
 	dc.w	$0504,$0A01,$0B01,$0C01,$0A01,$0B01,$0C01,$0A01,$0B01,$0C01,$0A01,$0B01,-$0C01
-.p42	dc.w	$04FF
+PenDatap42	dc.w	$04FF
 	String	'Charging'
 	dc.w	$0504,$0A01,$0B01,$0C01,$0A01,$0B01,$0C01,$0A01,$0B01,$0C01,$0A01,$0B01,-$0C01
-.slash	dc.w	$0402
+PenDataslash	dc.w	$0402
 	String	'Slashing'
 	dc.w	$0504,$0101,$0001,$0101,$0001,$0101,$0001,$0101,$0001,$0101,$0001,-$0101
-.p46	dc.w	$04FF
+PenDatap46	dc.w	$04FF
 	String	'Slashing'
 	dc.w	$0504,$0101,$0001,$0101,$0001,$0101,$0001,$0101,$0001,$0101,$0001,-$0101
-.trip	dc.w	$0402
+PenDatatrip	dc.w	$0402
 	String	'Tripping'
 	dc.w	$0504,$0708,-$0701
-.p3A	dc.w	$04FF
+PenDatap3A	dc.w	$04FF
 	String	'Tripping'
 	dc.w	$0504,$0708,-$0701
-.rough2	dc.w	$0A02
+PenDatarough2	dc.w	$0A02
 	String	'Roughing'
 	dc.w	$0504,$0808,-$0801
-.rough	dc.w	$0402
+PenDatarough	dc.w	$0402
 	String	'Roughing'
 	dc.w	$0504,$0808,-$0801
-.p34	dc.w	$0404
+PenDatap34	dc.w	$0404
 	String	'Roughing'
 	dc.w	$0504,$0808,-$0801
-.p2E	dc.w	$0A02
+PenDatap2E	dc.w	$0A02
 	String	'Roughing'
 	dc.w	$0504,$0808,-$0801
-.p40	dc.w	$04FF
+PenDatap40	dc.w	$04FF
 	String	'Roughing'
 	dc.w	$0504,$0808,-$0801
-.hook	dc.w	$0402
+PenDatahook	dc.w	$0402
 	String	'Hooking'
 	dc.w	$0504,$0201,$0301,$0201,$0301,$0201,$0301,$0201,$0301,$0201,-$0301
-.p38	dc.w	$04FF
+PenDatap38	dc.w	$04FF
 	String	'Hooking'
 	dc.w	$0504,$0201,$0301,$0201,$0301,$0201,$0301,$0201,$0301,$0201,-$0301
-.cross	dc.w	$0402
+PenDatacross	dc.w	$0402
 	String	'Cross Check'
 	dc.w	$0504,$0501,$0601,$0501,$0601,$0501,$0601,$0501,$0601,-$0501
-.p44	dc.w	$04FF
+PenDatap44	dc.w	$04FF
 	String	'Cross Check'
 	dc.w	$0504,$0501,$0601,$0501,$0601,$0501,$0601,$0501,$0601,-$0501
-.p36	dc.w	$0404
+PenDatap36	dc.w	$0404
 	String	'Cross Check'
 	dc.w	$0504,$0501,$0601,$0501,$0601,$0501,$0601,$0501,$0601,-$0501
-.int	dc.w	$0402
+PenDataint	dc.w	$0402
 	String	'Interference'
 	dc.w	$0504,$0907,-$0501
-.p3E	dc.w	$04FF
+PenDatap3E	dc.w	$04FF
 	String	'Interference'
 	dc.w	$0504,$0907,-$0501
-.hold	dc.w	$0402
+PenDataHold	dc.w	$0402
 	String	'Holding'
 	dc.w	$0504,$0407,-$0501
-.fight	dc.w	$0105
+PenDatafight	dc.w	$0105
 	String	'Fighting'
 	dc.w	$0504,$0D01,$0E01,$0D01,$0E01,$0D01,$0E01,$0D01,$0E01,-$0501
-.fight2	dc.w	$2805
+PenDatafight2	dc.w	$2805
 	String	'Fighting *'
 	dc.w	$0504,$0D01,$0E01,$0D01,$0E01,$0D01,$0E01,$0D01,$0E01,-$0501
-.inst	dc.w	$2802
+PenDataInst	dc.w	$2802
 	String	'Fight Instigator'
 	dc.w	$0004,$1008,-$0101
 	dc.w	$0402	;not in the table
 	String	'Boarding'
 	dc.w	$0504,$0D01,$0E01,$0D01,$0E01,$0D01,$0E01,$0D01,$0E01,-$0501
-.p30	dc.w	$0402
+PenDatap30	dc.w	$0402
 	String	'Elbowing'
 	dc.w	$0504,$0F08,-$0501
-.p48	dc.w	$04FF
+PenDatap48	dc.w	$04FF
 	String	'Elbowing'
 	dc.w	$0504,$0F08,-$0501
-.p32	dc.w	$0402
+PenDatap32	dc.w	$0402
 	String	'High Sticking'
 	dc.w	$0504,$1108,-$0501
-.p4A	dc.w	$04FF
+PenDatap4A	dc.w	$04FF
 	String	'High Sticking'
 	dc.w	$0504,$1108,-$0501
 
