@@ -499,13 +499,13 @@ PeriodStatsTitleMap	;The Period Stats title banner (PeriodStatsScreen)
 PeriodStatsMap	;The period stats screen background (PeriodStatsScreen)
 	incbin	..\Extracted\NHL96\Graphics\PeriodStatsMap.map.jim
 
-GameStatsTitleMap	;The Game Stats title banner (GameStatisticsScreen)
+GameStatsTitleMap	;The Game Stats title banner (StatsReport)
 	incbin	..\Extracted\NHL96\Graphics\GameStatsTitleMap.map.jim
 
-GameStatsBgMap	;The game stats screen background (GameStatisticsScreen)
+GameStatsBgMap	;The game stats screen background (StatsReport)
 	incbin	..\Extracted\NHL96\Graphics\GameStatsBgMap.map.jim
 
-GameStatsSprites	;The game stats screen sprites (GameStatisticsScreen); +8 the tiles
+GameStatsSprites	;The game stats screen sprites (StatsReport); +8 the tiles
 	incbin	..\Extracted\NHL96\Graphics\GameStatsSprites.map.jim
 
 ShootoutSetupTitleMap	;The Shootout Setup title banner (ShootoutShooters)

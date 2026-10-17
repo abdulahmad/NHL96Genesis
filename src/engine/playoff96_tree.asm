@@ -157,7 +157,7 @@ PlayoffScreen	;Bring up the playoff screen if in playoff mode (OptPlayMode nonze
 	clr.w	(PlayerScrollCtr).w
 	bsr.w	UpdatePlayoffScroll
 .9
-	bsr.w	PlayoffScreen_waitvsync
+	bsr.w	waitxc1
 	movea.l	#rtss2,a0
 	bsr.w	HandlePlayoffInput
 	bra.s	.9
@@ -228,7 +228,7 @@ PlayoffScreenExit	;Drop HandlePlayoffInput's return address and return from Play
 rtsPlayoffScreen	;Shared rts of PlayoffScreen and UpdatePlayoffScroll
 	rts
 
-PlayoffScreen_waitvsync	;Wait for the next frame; flash a colour each time palcount runs out
+waitxc1	;(was PlayoffScreen_waitvsync) Wait for the next frame; flash a colour each time palcount runs out
 	tst.w	(palcount).w
 	bpl.w	.wait
 	movem.l	d0-d1/a0-a1,-(sp)
