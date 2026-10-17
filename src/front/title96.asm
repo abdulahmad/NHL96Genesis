@@ -2,8 +2,8 @@
 
 TitleScreen	;Title screen: the picture TitleScreenImg and song 0, until start or the time runs out
 	move	#$2700,sr
-	move.w	(VDP_CNTR).l,(seed).w
-	move.w	(VDP_CNTR).l,(seed+2).w
+	move.w	(HVcount).l,(seed).w
+	move.w	(HVcount).l,(seed+2).w
 	bset	#5,(sflags12).w
 	move.l	#VBlank_Menus,(vbint).w
 	bclr	#dfok,(disflags).w
@@ -77,8 +77,8 @@ TitleWaitFrame	;TitleScreen: wait for the next frame (vcount)
 
 CreditsScreen	;The legal and credits pages (CreditsList) over three pictures; start skips after the first page
 	move	#$2700,sr
-	move.w	(VDP_CNTR).l,(seed).w
-	move.w	(VDP_CNTR).l,(seed+2).w
+	move.w	(HVcount).l,(seed).w
+	move.w	(HVcount).l,(seed+2).w
 	bset	#5,(sflags12).w
 	move.l	#VBlank_Menus,(vbint).w
 	bclr	#dfok,(disflags).w

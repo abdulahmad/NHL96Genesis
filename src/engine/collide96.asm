@@ -479,7 +479,7 @@ CCStart	;Player a3 is checking player a2
 	bhi.w	rtss2
 	btst	#gmhl,(gmode).w
 	bne.w	rtss2
-	move.b	(VDP_CNTR).l,d0
+	move.b	(HVcount).l,d0
 	andi.w	#2,d0
 	addi.w	#$16,d0
 	jsr	(PenShotChk).l
@@ -733,7 +733,7 @@ FallDown	;Player a2 falls down (hit by a3, or the puck): the fall animation, the
 	blt.w	.cont2
 	tst.b	$5F(a2)	;check if puck collision possible
 	bne.w	.cont2
-	move.w	(VDP_CNTR).l,d0	;frame counter
+	move.w	(HVcount).l,d0	;frame counter
 	andi.w	#$F,d0	;pass 1st byte of d0
 	addi.w	#$10,d0
 	cmp.w	impact(a2),d0	;compare impact value to d0.
@@ -1601,7 +1601,7 @@ CheckBump	;Supply minimum separation velocity for coll with walls/goal/net. a2 =
 	;a player near the puck in y moving faster than $24CC knocks the net (a2 gets a quarter of a3's velocity, a3
 	;stops, scroll lock at Vpos) and, while the clock runs, calls penalty 8. Called from checkgoalp
 	movem.l	d0-d1,-(sp)
-	move.w	(VDP_CNTR).l,d0
+	move.w	(HVcount).l,d0
 	andi.w	#$1F,d0
 	bne.w	.ex
 	move.w	(pucky).w,d0

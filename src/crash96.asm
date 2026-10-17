@@ -44,7 +44,7 @@ crash	;Print d1 then d0 as hex, set the vdp up, copy 8 longs from the Rinktileli
 	movea.w	#(mesarea-M68K_RAM),a1
 .3
 	jsr	(printcur).l
-	movea.l	#VDP_DATA,a0
+	movea.l	#Vdata,a0
 .4
 	move.w	#$9100,4(a0)
 	move.w	#$9206,4(a0)

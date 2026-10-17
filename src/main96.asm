@@ -54,7 +54,7 @@ Start	;Power on: the Sega hardware init, then the region lock, the checksum and 
 
 CHECK_VDP	;Hot start lands here. Look the country code digit up in the table for the console's region;
 	;0 there means the cartridge is sold in this region, so start the game
-	tst.w	(VDP_CTRL).l
+	tst.w	(Vctrl).l
 	clr.l	d0
 	move.b	(IO_PCBVER+1).l,d0	;version register: bit 7 = overseas, bit 6 = PAL
 	lsr.b	#6,d0
@@ -90,8 +90,8 @@ CHECK_VDP	;Hot start lands here. Look the country code digit up in the table for
 	tst.b	d6
 	beq.w	RegionOK		;the cartridge lists this region: start the game
 	;wrong region: set the VDP up and load RegionFont as tiles 0-$3A
-	lea	(VDP_DATA).l,a4
-	lea	(VDP_CTRL).l,a5
+	lea	(Vdata).l,a4
+	lea	(Vctrl).l,a5
 	move.w	#VDPR_MODE2+$64,(a5)		;reg 1: display on, vblank int, DMA off
 	move.w	#VDPR_PLANEA+$30,(a5)		;reg 2: plane A at $C000
 	move.w	#VDPR_MODE4+$81,(a5)		;reg 12: 40 cell mode

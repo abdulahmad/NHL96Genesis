@@ -92,7 +92,7 @@ PlayoffScreen	;Bring up the playoff screen if in playoff mode (OptPlayMode nonze
 	move.w	2(a1),d3
 	moveq	#1,d5
 	jsr	(dobitmap).l
-	movea.l	#VDP_CTRL,a0
+	movea.l	#Vctrl,a0
 	move.w	#$9200,(a0)
 	movea.l	#potree,a1
 	movea.l	#PlayoffTreeSetup,a0

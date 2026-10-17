@@ -6,8 +6,8 @@ OptionsScreen	;The game options screen: play mode, rosters, period length, goali
 	;(carddelay) it puts the options back to the defaults
 	move.w	#$15,(skillspeed).w
 	move.w	#$1D,(skillspeedpal).w
-	move.w	(VDP_CNTR).l,(seed).w
-	move.w	(VDP_CNTR).l,(seed+2).w
+	move.w	(HVcount).l,(seed).w
+	move.w	(HVcount).l,(seed+2).w
 	clr.w	(optanimframe).w
 	clr.w	(optanimdelay).w
 	st	(demoflag).w
