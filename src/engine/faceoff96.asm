@@ -13,17 +13,17 @@ faceoffinput	;The faceoff player (assignment $17): store the dpad pull (fodir1 /
 	cmpi.b	#$17,asslist(a3,d4.w)
 	bne.w	rtss7
 	movea.w	#(fodir1-M68K_RAM),a0	;faceoff direction of puck control variable
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	beq.w	.2	;branch if bottom goal
 	movea.w	#(fodir2-M68K_RAM),a0
 .2
 	move.w	d0,(a0)
-	btst	#1,pflags2(a3)
+	btst	#pf2aip,pflags2(a3)
 	bne.w	rtss7
 	btst	#4,d1	;test for b button press
 	beq.w	.3
 	move.w	#SPA2126,d1
-	bset	#1,pflags2(a3)	;set anim in progress
+	bset	#pf2aip,pflags2(a3)	;set anim in progress
 	jmp	SetSPA
 .3
 	move.w	#SPA2150,d1
@@ -232,7 +232,7 @@ DrawFaceoffWindow	;Draw the faceoff window (FaceOffMap) at x $36 or $BE
 	jsr	(Framer).l
 	move.w	(tmstruct+tmline).w,d0
 	move.w	(AwShots+tmline).w,d1
-	btst	#1,(gmode).w
+	btst	#gmdir,(gmode).w
 	bne.w	.0
 	exg	d0,d1
 .0
@@ -265,7 +265,7 @@ limitfo	;Limit the faceoff spot to the walls of the rink, for every player in Pe
 	asl.w	#scsize,d0	;scsize
 	movea.w	#(SortCords-M68K_RAM),a1
 	move.w	#$76,d1
-	btst	#7,pflags(a1,d0.w)
+	btst	#pfgoal,pflags(a1,d0.w)
 	bne.w	.2
 	neg.w	d1
 	cmp.w	(foy).w,d1

@@ -164,7 +164,7 @@ chkFgtBit1	;Z set when $77(a2) is 2 or less (d0 kept)
 
 HiScoreScreen	;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up to $50 * 4 frames or a button (waitx)
 	move.l	#vb2,(vbint).w
-	bclr	#1,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#5,(Map3col1).w
 	move.w	#$A000,(VmMap2).w
 	move.w	#7,(Map2col1).w
@@ -226,7 +226,7 @@ HiScoreScreen	;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up to $50
 
 sub_1D920A	;Called before setpassmode / SetShotMode (input96)
 	movem.l	d1-d7/a0,-(sp)
-	btst	#0,(gmode).w
+	btst	#gmclock,(gmode).w
 	bne.w	.0
 	move.w	(TempWord1).w,d1
 .0
@@ -262,7 +262,7 @@ ReadGoaliePulled	;Z clear when the team of a3 pulled its goalie ($26 of the team
 	;and assnearest
 	movem.l	a1,-(sp)
 	movea.l	#tmstruct,a1
-	btst	#6,pflags(a3)
+	btst	#pfteam,pflags(a3)
 	beq.w	.0
 	movea.l	#AwShots,a1
 .0
@@ -272,9 +272,9 @@ ReadGoaliePulled	;Z clear when the team of a3 pulled its goalie ($26 of the team
 
 EndOneTimer	;End a one-timer for a3: the one-timer bits cleared, onetimerplayer = -1, SetSPA $856
 	movem.l	d0/a0,-(sp)
-	bclr	#3,pflags3(a3)
-	bclr	#5,pflags(a3)
-	bclr	#1,pflags2(a3)
+	bclr	#pf3onetimer,pflags3(a3)
+	bclr	#pfalock,pflags(a3)
+	bclr	#pf2aip,pflags2(a3)
 	clr.w	(onetimerflags).w
 	st	(onetimerplayer).w
 	move.w	d1,-(sp)

@@ -264,7 +264,7 @@ setplayer	;Bring player onto the ice and set his attributes. d3 = offset of play
 	clr.l	(PPBonus).w	;Clears all bonuses
 	tst.w	$34(a3)	;check if goalie
 	beq.w	.2
-	btst	#5,(sflags2).w	;might be checking for a PP
+	btst	#sf2pwrplay,(sflags2).w	;might be checking for a PP
 	beq.w	.habonus
 	bsr.w	chkpk2
 	beq.w	.pk

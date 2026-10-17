@@ -1,7 +1,7 @@
 ;	The game clock on the ice, and the big score.
 
 showclock	;Put the game clock on screen (m:ss), or else queue it (showclockdma)
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	beq.w	showclockdma
 	btst	#0,(gmode2).w
 	bne.w	.2
@@ -62,9 +62,9 @@ ClockDigitText	;The digits 0-9
 	String	$39
 
 showclockdma	;When dfclock is set queue the clock chars in the dma list (a5)
-	bclr	#3,(disflags).w
+	bclr	#dfclock,(disflags).w
 	beq.w	rtsBigClock
-	btst	#3,(sflags2).w
+	btst	#sf2replay,(sflags2).w
 	bne.w	rtsBigClock
 	cmpi.w	#4,(gsp).w
 	beq.w	rtsBigClock
@@ -108,7 +108,7 @@ showclockdma	;When dfclock is set queue the clock chars in the dma list (a5)
 	movea.w	#(VmMap1-M68K_RAM),a1
 	moveq	#$19,d0
 	moveq	#1,d2
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	beq.w	.0
 	movea.w	#(VmMap2-M68K_RAM),a1
 	moveq	#5,d0
@@ -160,7 +160,7 @@ showclockdma	;When dfclock is set queue the clock chars in the dma list (a5)
 	movea.w	#(VmMap1-M68K_RAM),a1
 	moveq	#$1A,d0
 	moveq	#1,d2
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	beq.w	.4
 	movea.w	#(VmMap2-M68K_RAM),a1
 	moveq	#5,d0

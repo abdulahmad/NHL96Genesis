@@ -46,7 +46,7 @@ rtsdemo
 	rts
 
 startpause	;Pause on (sfpz)
-	bset	#0,(sflags).w
+	bset	#sfpz,(sflags).w
 	rts
 
 startpause1	;Pause initiated by cont 1
@@ -182,7 +182,7 @@ DrawMenuScreen	;Call the draw routine, print the items (UpdateMenuSelection), pa
 
 SetMenuPrintX	;printx = 5, 9 with disflags bit 1 clear
 	move.w	#5,(printx).w
-	btst	#1,(disflags).w
+	btst	#df32c,(disflags).w
 	bne.w	rtss8
 	addq.w	#4,(printx).w
 	rts

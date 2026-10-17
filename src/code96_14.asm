@@ -7,7 +7,7 @@ PuckOnAttackHalf	;d0 = 1 when the puck is on the half of the goal player a3 shoo
 	btst	#3,(GameFlags).w
 	bne.w	.0
 	move.w	(pucky).w,d0
-	btst	#7,pflags(a3)	;pfgoal - check which goal shooting at
+	btst	#pfgoal,pflags(a3)	;pfgoal - check which goal shooting at
 	bne.w	.cont	;branch if top goal
 	neg.w	d0
 .cont
@@ -71,7 +71,7 @@ InitCrowdMeter	;The crowd meter start threshold CrowdRecord = $50. Called from S
 UpdateCrowdMeter	;The crowd meter, every frame (setvideo): sflags5 bit 7 sets when CwdExciteLvl passes the threshold from
 	;CrowdRecord and clears when it drops; while set, every $14 frames CurCrowdMeter = sqrt(4 * CwdExciteLvl) + $41,
 	;the peak in CrowdPeak
-	btst	#7,(sflags).w	;gmclock: clock stopped
+	btst	#sfhor,(sflags).w	;gmclock: clock stopped
 	bne.w	.0
 	btst	#0,(gmode2).w
 	bne.w	.0
@@ -155,7 +155,7 @@ stopfast	;Stop, keeping the animation: Xvel / Yvel toward 0 by $7D0 a frame (sto
 	rts
 
 checkcornercoll	;Corner circles and side walls for object a3 at d2 / d3 (wcradiusx / wcradiusy); a hit goes to end boards $128
-	bclr	#4,pflags3(a3)	;wall collision bit
+	bclr	#pf3wall,pflags3(a3)	;wall collision bit
 	move.w	#$96,d4
 	sub.w	(wcradiusx).w,d4
 	move.w	#$148,d5
@@ -250,7 +250,7 @@ AttributeCalc	;Attribute d3 of player a3 * 5 plus his hot / cold value / 3 limit
 	movem.l	d0-d2/a1,-(sp)
 	move.w	(TempWord2).w,d1
 	movea.l	#tmstruct,a1	;Start of Home Team struct
-	btst	#6,pflags(a3)
+	btst	#pfteam,pflags(a3)
 	beq.w	.attribmath
 	adda.l	#$39E,a1
 .attribmath
@@ -388,7 +388,7 @@ setSlotBit	;sflags6 bit 5 (the slot) = the puck carrier is in the slot
 	asl.w	#7,d0	;mult by 128 decimal
 	adda.w	d0,a0	;move to start of puckc SCstruct
 	move.w	Ypos(a0),d0	;Ypos
-	btst	#7,pflags(a0)	;pfgoal - which goal shooting at
+	btst	#pfgoal,pflags(a0)	;pfgoal - which goal shooting at
 	bne.w	.checkpos	;jump if top goal
 	neg.w	d0	;negative d0
 .checkpos

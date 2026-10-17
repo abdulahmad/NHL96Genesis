@@ -101,13 +101,13 @@ assexit	;Exit the current assignment of player a3
 	rts
 
 assinsert	;Insert assignment d0 on player a3
-	subq.w	#1,$36(a3)	;$36 = assnum
+	subq.w	#1,assnum(a3)	;$36 = assnum
 	andi.w	#7,$36(a3)
 
 assreplace	;Replace the current assignment of player a3 with d0
 	move.l	d1,-(sp)	;push on stack
-	move.w	$36(a3),d1	;$36 = assnum
-	move.b	d0,$38(a3,d1.w)	;replace current assignment with d0 on asslist
+	move.w	assnum(a3),d1	;$36 = assnum
+	move.b	d0,asslist(a3,d1.w)	;replace current assignment with d0 on asslist
 	bset	#1,$62(a3)	;set flag to start new assignment
 	move.l	(sp)+,d1	;pop on stack
 	rts
@@ -174,7 +174,7 @@ GetHot	;Push long address of structure to get hot spot from; hot spot x/y return
 	bne.w	.1
 	neg.w	d1	;ngate d1 (x now)
 .1
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	beq.w	.ex
 	exg	d0,d1
 	neg.w	d1	;ngate d1 (x now)

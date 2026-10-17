@@ -56,7 +56,7 @@ StartGame	;Reset game state for a new game, then start the first period
 	clr.b	(gmode).w
 	cmpi.w	#1,(OptPen).w
 	bne.w	.1
-	bset	#5,(gmode).w
+	bset	#gmoffs,(gmode).w
 .1
 	cmpi.w	#1,(OptPlayMode).w
 	ble.w	.2
@@ -145,7 +145,7 @@ ResetClock	;gameclock = PerTimeTotal = the period length (GetPeriodTime; overtim
 	asr.w	#1,d0
 	jsr	(randomd0).l
 	sub.w	d0,(periodendtime).w
-	bset	#0,(gmode).w
+	bset	#gmclock,(gmode).w
 	rts
 
 GetPeriodTime	;Return d0 = period length in seconds for the period length option
@@ -200,8 +200,8 @@ StartPer	;Start a period: reset stack, rink and clock, face off, run the game lo
 	moveq	#$1B,d0
 .ass
 	jsr	(assreplace).l
-	bset	#2,(sflags2).w
-	bclr	#4,(sflags).w
+	bset	#sf2drec,(sflags2).w
+	bclr	#sfwrap,(sflags).w
 	move.w	#$FFFF,(lastsfx).w
 	move.l	#M68K_RAM,(recbpr).w
 	move.w	(vcount).w,(oldvcount).w
@@ -224,7 +224,7 @@ StartPer	;Start a period: reset stack, rink and clock, face off, run the game lo
 Gameloop	;Main loop for game
 	bsr.w	DoGameFrame
 	bsr.w	demoread
-	btst	#0,(sflags).w
+	btst	#sfpz,(sflags).w
 	beq.s	Gameloop
 	bsr.w	Pausemode
 	bra.s	Gameloop
@@ -273,7 +273,7 @@ DoFrameUpdates	;The frame updates of DoGameFrame: the new puck carrier check, th
 	jsr	(RunArenaAnim).l
 	jsr	(updatesound).l
 	bsr.w	clockcont
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	bne.w	rtss8
 	sub.w	d7,(lldisp).w
 	bpl.w	rtss8
@@ -355,11 +355,11 @@ updatecrowdf	;Every game loop, d7 = elapsed frames: the crowd level falls (faste
 	rts
 
 clockcont	;At the end of the period clock (gameclock 0): the horn, then the end of period or game assignments
-	btst	#0,(gmode).w
+	btst	#gmclock,(gmode).w
 	bne.w	rtss8
 	tst.w	(gameclock).w
 	bne.w	rtss8
-	bset	#3,(disflags).w
+	bset	#dfclock,(disflags).w
 	jsr	(stop_current_song).l
 	move.w	#4,-(sp)
 	jsr	(sfx).l
@@ -417,7 +417,7 @@ clockcont	;At the end of the period clock (gameclock 0): the horn, then the end 
 .eog
 	jsr	(ClearPenaltyBuffer).l
 	addi.w	#$3E8,(crowdlevel).w
-	bset	#0,(gmode).w
+	bset	#gmclock,(gmode).w
 	bset	#6,(gmode).w
 	jsr	(ClearPenalties).l
 	move.w	#4,d0

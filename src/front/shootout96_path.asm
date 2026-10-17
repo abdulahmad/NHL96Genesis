@@ -204,7 +204,7 @@ GetTeamArena	;a1 = the arena String of team a2.
 EndShootout	;Shootout over: LockScroll, then the 5 skaters of player slots 1-5 (homeshootgoals > awayshootgoals) or 7-$B
 	;are set up (setplayer) above or below the view and get assscore (assinsert 7)
 	movem.l	d0-d7/a0-a6,-(sp)
-	bset	#2,(sflags2).w
+	bset	#sf2drec,(sflags2).w
 	jsr	(LockScroll).l
 	move.w	#$60,(shootoutdelay).w
 	movea.l	#SortCords,a3
@@ -280,10 +280,10 @@ AddArenaAnimSprite	;Add the arena animation sprites; disabled in 96: the rts com
 	dc.b	$0D,$FF,$4E,$75,$00,$06,$20,$2E,$20,$00,$4E,$75
 
 updatePPTeamTime	;Power play time of the teams, once a second. Called from updatepentime
-	btst	#5,(sflags2).w
+	btst	#sf2pwrplay,(sflags2).w
 	beq.w	.x
 	movea.l	#tmstruct,a2
-	btst	#6,(sflags2).w
+	btst	#sf2pwrtm,(sflags2).w
 	beq.w	.0
 	movea.l	#AwShots,a2
 .0

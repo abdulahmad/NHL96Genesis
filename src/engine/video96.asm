@@ -3,7 +3,7 @@
 
 remap	;Write d0 chars at a0 to vram d1, each pixel through the colour map at a1. Reached from DecompressGraphics
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	movem.l	d0-d4/a0-a2,-(sp)
 	exg	d1,d0
 	movea.l	a0,a2
@@ -60,7 +60,7 @@ forcefade	;Run the palette fade to the end: vbint = vb2 (fades only), interrupts
 	move	sr,-(sp)
 	move.l	(vbint).w,-(sp)
 	move.w	(disflags).w,-(sp)
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	move.l	#vb2,(vbint).l
 	move	#$2500,sr
 .1
@@ -86,7 +86,7 @@ cramfade	;Step the palette fade (palcount) and copy the palette to cram. Called 
 CopyPaletteToCRAM	;Copy all 64 palfadenew colours to colour ram (dfng set), then palcount = -1
 	movem.l	d0/a0-a1,-(sp)
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	movea.w	#(palfadenew-M68K_RAM),a1
 	movea.l	#VDP_DATA,a0
 	move.l	#$C0000000,4(a0)	;cram write, address 0
@@ -362,7 +362,7 @@ jdtab	;ReadJoy: pad directions to the directions 0-7, 8 for none
 
 DoDMApro	;DoDMA protected from vblank (dfng set)
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	bsr.w	DoDMA
 	move.w	(sp)+,(disflags).w
 	rts
@@ -485,7 +485,7 @@ setVram	;Fade every colour to d0, then fall into setVram_0
 
 setVram_0	;Second half of setVram without the fade: clear vram and set the VDP registers from disflags
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	move.w	#$8F02,(VDP_CTRL).l
 	clr.w	d0
 	bsr.w	Vmaddr
@@ -499,7 +499,7 @@ setVram_0	;Second half of setVram without the fade: clear vram and set the VDP r
 	beq.w	.0
 	move.w	#$8C08,d0	;8 for shadow mode
 .0
-	btst	#1,(disflags).w
+	btst	#df32c,(disflags).w
 	bne.w	.i32
 	ori.w	#$81,d0
 .i32
@@ -556,7 +556,7 @@ Vmaddr
 dobitmap	;Copy the palettes flagged in d5 to palfadenew, then write the map at a1 to the screen at printx / printy
 	move.w	(printy).w,-(sp)
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	movem.l	d0-d3/d5-d6/a0-a3,-(sp)
 	move.w	d1,d6
 	movea.w	#(palfadenew-M68K_RAM),a3
@@ -760,7 +760,7 @@ xyVmMap	;Set the vdp write address to printx, printy in the map at VmMap1 + prin
 eraser	;Fill a d0 x d1 rectangle with char d2 at printx / printy / printm
 	movem.l	d0-d2/a0,-(sp)
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	movem.w	d0-d1,-(sp)
 .0
 	bsr.s	xyVmMap
@@ -781,7 +781,7 @@ eraser	;Fill a d0 x d1 rectangle with char d2 at printx / printy / printm
 Framer	;Draw a d0 x d1 frame at printx / printy from the framer map
 	movem.l	d0-d4/a0-a1,-(sp)
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	movem.w	d0-d1,-(sp)
 	move.w	(printa).w,d2
 	add.w	(framercset).w,d2
@@ -833,7 +833,7 @@ printsmallz	;printsmall with the String after the call
 printsmall	;print String a1 at printx / printy with the small font chars (smallfontchars, or word_FFBF88 with
 	;sflags6 bit 3): a negative byte is a control code (ControlCodeJumpTable)
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	movem.l	d0-d3/a0/a2-a3,-(sp)
 	movea.w	#(smallfontchars-M68K_RAM),a3
 	btst	#3,(sflags6).w
@@ -944,7 +944,7 @@ printz	;print with the String after the call
 print	;print String a1 at printx / printy with the font map SmallFontMap: a negative byte sets printa / printm /
 	;printx / printy from the next bytes, $40 a blank, $5E a new line, lower case printed as upper case
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	movem.l	d0-d3/a0/a2,-(sp)
 	bsr.w	xyVmMap
 	move.w	(printa).w,d2
@@ -1023,7 +1023,7 @@ printcurz	;printcur with the String after the call
 
 printcur	;print with the font map at smallfontptr
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	movem.l	d0-d3/a0/a2,-(sp)
 	bsr.w	xyVmMap
 	move.w	(printa).w,d2
@@ -1251,7 +1251,7 @@ printbig	;print String a1 with the big font at printx / printy: BigFontMap2, Big
 
 printbigtext	;Print with the font map at bigfontptr. Lower case is printed as upper case
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	movem.l	d0-d7/a0/a2,-(sp)
 	move.w	(printx).w,d4
 	move.w	(printy).w,d5

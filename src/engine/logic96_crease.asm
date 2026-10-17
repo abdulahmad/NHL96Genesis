@@ -6,7 +6,7 @@ GoalieInCrease	;Z set when player a3 is in its crease: x within $17 of the middl
 	bgt.w	.1
 	cmpi.w	#$FFE9,(a3)
 	blt.w	.1
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.checkbottom
 	cmpi.w	#$126,Ypos(a3)
 	bgt.w	.1

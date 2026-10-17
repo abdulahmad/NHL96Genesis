@@ -19,7 +19,7 @@ NameEntryScreen	;Name entry screen for pad slot a5: the name log, then edit or p
 	bsr.w	GetLogName
 	bsr.w	PrintNameLog
 	move.w	#$18,(palcount).w
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	clr.w	d4
 	bsr.w	SyncLetterCursor
 	bsr.w	PrintNameCursor
@@ -632,9 +632,9 @@ NameEntryGfx	;Name entry: vram, fonts, the screen bitmaps, the pad icon (NameEnt
 	;heading
 	bset	#5,(sflags12).w
 	move.l	#VBlank_Menus,(vbint).w
-	bclr	#0,(disflags).w
-	bset	#2,(disflags).w
-	bclr	#1,(disflags).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
 	move.w	#$B800,(VmMap3).w

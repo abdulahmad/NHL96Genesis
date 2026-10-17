@@ -16,19 +16,19 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 	blt.w	rtsfight
 	cmpi.w	#$A,impact(a2)
 	blt.w	rtsfight
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	rtsfight
-	btst	#5,pflags(a2)
+	btst	#pfalock,pflags(a2)
 	bne.w	rtsfight
-	btst	#4,pflags2(a3)
+	btst	#pf2pen,pflags2(a3)
 	bne.w	rtsfight
-	btst	#4,pflags2(a2)
+	btst	#pf2pen,pflags2(a2)
 	bne.w	rtsfight
 	tst.w	position(a3)
 	beq.w	rtsfight
 	tst.w	position(a2)
 	beq.w	rtsfight
-	btst	#0,(gmode).w
+	btst	#gmclock,(gmode).w
 	bne.w	rtsfight
 	btst	#0,(puck_pflags2).w
 	bne.w	rtsfight
@@ -48,7 +48,7 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 	exg	a2,a3
 	bsr.w	SetInst
 	exg	a2,a3
-	btst	#0,pflags2(a3)
+	btst	#pf2fight,pflags2(a3)
 	beq.w	.4
 	clr.w	(ChkCnt).w
 	moveq	#$1B,d0
@@ -64,15 +64,15 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 	clr.l	(dword_FFDCE4).w
 	bclr	#1,(sflags10).w
 	bclr	#2,(sflags10).w
-	bclr	#2,(sflags).w
-	bclr	#3,(sflags).w
+	bclr	#sfspdir,(sflags).w
+	bclr	#sfssdir,(sflags).w
 	move.w	SCnum(a3),(puckc).w
 	move.w	Ypos(a3),d1
 	add.w	Ypos(a2),d1
 	asr.w	#1,d1
 	move.w	d1,(yc1).w
-	bset	#2,(sflags2).w
-	bset	#6,(sflags).w
+	bset	#sf2drec,(sflags2).w
+	bset	#sfslock,(sflags).w
 	moveq	#2,d1
 	move.w	(a3),d0
 	cmp.w	(a2),d0
@@ -90,11 +90,11 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 	move.l	#$15,d0
 	moveq	#$B,d1
 .2
-	btst	#0,pflags2(a3)
+	btst	#pf2fight,pflags2(a3)
 	bne.w	.3
 	tst.w	position(a3)	;check if goalie
 	beq.w	.3
-	btst	#2,pflags2(a3)
+	btst	#pf2unav,pflags2(a3)
 	bne.w	.3
 	movem.w	d0,-(sp)
 	move.w	assnum(a3),d0
@@ -106,7 +106,7 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 	adda.w	#$80,a3
 	dbf	d1,.2
 	movea.w	#(puckx-M68K_RAM),a3
-	bset	#0,pflags2(a3)
+	bset	#pf2fight,pflags2(a3)
 	move.l	#$1A,d0
 	jsr	(assinsert).l
 	st	(collflag).w
@@ -136,9 +136,9 @@ startfight	;Start the fight for player a3 against a2: AddPenalty2 $2E, setd0play
 .0
 	move.w	d1,Xvel(a3)
 	bset	#2,pflags2(a3)
-	bclr	#1,pflags2(a3)
+	bclr	#pf2aip,pflags2(a3)
 	bset	#5,pflags2(a3)
-	bclr	#5,pflags(a3)
+	bclr	#pfalock,pflags(a3)
 	move.w	#SPAfight,d1
 	jmp	SetSPA
 
@@ -151,7 +151,7 @@ SetInst	;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 bit 0 (f
 	clr.w	d1
 	move.b	$67(a2),d1
 	movea.w	#(tmstruct-M68K_RAM),a0
-	btst	#6,pflags(a2)
+	btst	#pfteam,pflags(a2)
 	beq.w	.tm
 	adda.w	#$39E,a0
 .tm
@@ -161,8 +161,8 @@ SetInst	;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 bit 0 (f
 	neg.b	d1
 	addi.b	#$10,d1
 	cmp.b	$75(a2),d1
-	bset	#0,pflags2(a2)
-	bset	#0,pflags2(a3)
+	bset	#pf2fight,pflags2(a2)
+	bset	#pf2fight,pflags2(a3)
 	bne.w	rtsfight
 	rts
 	;Not decoded in the listing and not referenced from it: kept as bytes
@@ -426,7 +426,7 @@ fightinput	;Controller processing for fighting
 .14
 	move.w	#5,d0
 .15
-	btst	#0,pflags2(a0)
+	btst	#pf2fight,pflags2(a0)
 	bne.w	.16
 	adda.w	#$80,a0
 	dbf	d0,.15
@@ -467,7 +467,7 @@ fightinput	;Controller processing for fighting
 	sub.w	d0,Xvel(a3)
 .22
 	move.w	(sp)+,d1
-	bset	#1,pflags2(a3)
+	bset	#pf2aip,pflags2(a3)
 	bne.w	rtsfight
 	move.w	d1,d2
 	cmpi.w	#SPAfight,SPA(a3)
@@ -493,7 +493,7 @@ fightinput	;Controller processing for fighting
 	btst	#5,d2
 	bne.w	.34
 .25
-	bclr	#1,pflags2(a3)
+	bclr	#pf2aip,pflags2(a3)
 	rts
 .26
 	btst	#2,(sflags10).w
@@ -534,7 +534,7 @@ fightinput	;Controller processing for fighting
 	movea.l	#SortCords,a0
 	move.w	#$B,d0
 .31
-	btst	#0,pflags2(a0)
+	btst	#pf2fight,pflags2(a0)
 	beq.w	.32
 	cmpa.l	a0,a3
 	bne.w	.33
@@ -544,7 +544,7 @@ fightinput	;Controller processing for fighting
 .33
 	movea.l	a0,a3
 	move.w	#SPA34D0,d1
-	bset	#1,pflags2(a3)
+	bset	#pf2aip,pflags2(a3)
 	jsr	(SetSPA).l
 	movem.l	(sp)+,d1/a0/a3
 .34
