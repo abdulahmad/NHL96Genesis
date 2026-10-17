@@ -627,15 +627,18 @@ stopna2	;Stop, keeping the animation (goalies)
 	clr.w	Yvel(a3)
 	rts
 
-dirtab	;X / Y acc speed for each direction 0-7
-	dc.w	$0,$C8,$8D,$8D,$C8,$0,$8D,$FF73
-	dc.w	$0,$FF38,$FF73,$FF73,$FF38,$0,$FF73,$8D
-	dc.w	$0,$0
+runspeed	equ	200	;acc speed equate for dirtab
+runspeed2	equ	450	;acc speed equate for dirtab2
 
-dirtab2	;The same with the lower speeds
-	dc.w	$0,$1C2,$13E,$13E,$1C2,$0,$13E,$FEC2
-	dc.w	$0,$FE3E,$FEC2,$FEC2,$FE3E,$0,$FEC2,$13E
-	dc.w	$0,$0
+dirtab	;X / Y acc speed for each direction 0-7 (runspeed / sqrt(2) = runspeed*1000/1414)
+	dc.w	0,runspeed,runspeed*1000/1414,runspeed*1000/1414,runspeed,0,runspeed*1000/1414,-runspeed*1000/1414
+	dc.w	0,-runspeed,-runspeed*1000/1414,-runspeed*1000/1414,-runspeed,0,-runspeed*1000/1414,runspeed*1000/1414
+	dc.w	0,0
+
+dirtab2	;The same with runspeed2 (playeracc uses it while SPA is $2052 or $2020)
+	dc.w	0,runspeed2,runspeed2*1000/1414,runspeed2*1000/1414,runspeed2,0,runspeed2*1000/1414,-runspeed2*1000/1414
+	dc.w	0,-runspeed2,-runspeed2*1000/1414,-runspeed2*1000/1414,-runspeed2,0,-runspeed2*1000/1414,runspeed2*1000/1414
+	dc.w	0,0
 	;After dirtab2: code that nothing in the listing reaches.
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$E0,$C0,$32,$7C,$D2,$30,$42,$42,$60,$00,$00,$16,$12,$18
