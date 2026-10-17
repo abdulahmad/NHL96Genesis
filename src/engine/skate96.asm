@@ -531,7 +531,7 @@ playeracc	;Player acceleration with facing d2 (doplayeracc entry used by the goa
 .7
 	tst.w	(OptLine).w
 	bne.w	rtss2
-	move.w	(VDP_CNTR).l,d0
+	move.w	(HVcount).l,d0
 	andi.w	#$7F,d0
 	bne.w	rtss2
 	bsr.w	getpde

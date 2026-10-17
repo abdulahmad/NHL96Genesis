@@ -873,11 +873,11 @@ find3d	;Input: d0 = xfield, d1 = yfield, d2 = height off field. Output: d0 = xsc
 	rts
 
 KillCrowd	;Silence the crowd noise (psg)
-	move.b	#$E7,(VDP_PSG).l
-	move.b	#$DF,(VDP_PSG).l
-	move.b	#$C8,(VDP_PSG).l
-	move.b	#1,(VDP_PSG).l
-	move.b	#$FF,(VDP_PSG).l
+	move.b	#$E7,(Asound).l
+	move.b	#$DF,(Asound).l
+	move.b	#$C8,(Asound).l
+	move.b	#1,(Asound).l
+	move.b	#$FF,(Asound).l
 	rts
 
 setupice	;Set all variables, send non purgeable graphics, build sprite frame lists for ice rink

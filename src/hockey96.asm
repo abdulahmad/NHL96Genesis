@@ -11,7 +11,7 @@ Begin	;Cold start, entered from Start. Clear RAM, init sound and menus, go to th
 	cmpa.w	#$DDC6,a0
 	blt.s	.0
 	clr.w	(PALflag).w
-	move.w	(VDP_CTRL).l,d0
+	move.w	(Vctrl).l,d0
 	andi.w	#1,d0
 	move.w	d0,(PalMode).w
 	beq.w	.1
@@ -91,9 +91,9 @@ StartGame	;Reset game state for a new game, then start the first period
 	move.w	#7,d0
 	move.w	#1,d1
 	jsr	(SoundCmd).l
-	move.b	#$E7,(VDP_PSG).l
-	move.b	#$C8,(VDP_PSG).l
-	move.b	#1,(VDP_PSG).l
+	move.b	#$E7,(Asound).l
+	move.b	#$C8,(Asound).l
+	move.b	#1,(Asound).l
 	jsr	(InitScores).l
 	jsr	(setupice).l
 	jsr	(InitCrowdMeter).l
@@ -337,7 +337,7 @@ updatecrowdf	;Every game loop, d7 = elapsed frames: the crowd level falls (faste
 	move.b	(a0,d0.w),(crowdframe+1).w
 	clr.w	d1
 	move.b	1(a0,d0.w),d1
-	move.w	(VDP_CNTR).l,d2
+	move.w	(HVcount).l,d2
 	and.w	d1,d2
 	add.w	d2,d1
 	move.w	d1,(crowdcnt).w
@@ -345,7 +345,7 @@ updatecrowdf	;Every game loop, d7 = elapsed frames: the crowd level falls (faste
 	clr.b	(crowdframe).w
 	cmpi.w	#$118,(crowdlevel).w
 	bls.w	rtss8
-	move.w	(VDP_CNTR).l,d0
+	move.w	(HVcount).l,d0
 	andi.w	#$7F,d0
 	cmp.w	#$13,d0
 	blt.w	rtss8

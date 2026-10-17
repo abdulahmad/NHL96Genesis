@@ -19,7 +19,7 @@ ReturnToGame	;Back to the game after a menu: restart the sound driver, RestoreGa
 	jsr	(SoundCmd).l
 	move	#$2700,sr
 	jsr	(RestoreGameScreen).l
-	movea.l	#VDP_DATA,a0
+	movea.l	#Vdata,a0
 	move.w	#$9100,4(a0)
 	move.w	#$9200,4(a0)
 	bclr	#sfpz,(sflags).w

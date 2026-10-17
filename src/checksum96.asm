@@ -59,7 +59,7 @@ ValidationRoutine	;The ROM checksum: sum the ROM longs, less the header long at 
 	bne.s	.4
 	rts
 .4
-	movea.l	#VDP_CTRL,a4
+	movea.l	#Vctrl,a4
 	move.w	#$8F02,(a4)
 	move.w	#$8004,(a4)
 	move.w	#$8700,(a4)

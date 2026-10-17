@@ -164,8 +164,8 @@ OpeningClear	;Reset the stack and clear the game variables (keeping the season d
 	beq.w	.7
 .6
 	jsr	(TeamSelectScreen).l
-	move.w	(VDP_CNTR).l,(seed).w
-	move.w	(VDP_CNTR).l,(seed+2).w
+	move.w	(HVcount).l,(seed).w
+	move.w	(HVcount).l,(seed+2).w
 	jsr	(StartNewSeason).l
 .7
 	btst	#7,(GameFlags).w
