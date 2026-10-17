@@ -5,12 +5,12 @@ ShowThreeStars	;End of game Stars of the Game box. Waits for RefCnt <= $40 and r
 	;bit 3 and a vblank. Frames the box, then the three best star scores (TakeTopStarScore)
 	cmpi.w	#$40,(RefCnt).w
 	bgt.w	rtss2
-	bset	#7,(gmode).w
+	bset	#gmstars,(gmode).w
 	bne.w	rtss2
 	jsr	(ClearBigScore).l
 	jsr	(ErasePowerPlayBox).l
 	movem.l	d0/a1,-(sp)
-	bset	#3,(disflags).w
+	bset	#dfclock,(disflags).w
 	move.w	(vcount).w,d0
 .loop2
 	cmp.w	(vcount).w,d0
@@ -216,7 +216,7 @@ ShowGoalBox	;Goal box: close both line change boxes (lcfound2), then the scorer 
 	movem.l	d0-d2/a0-a4,-(sp)
 	btst	#2,(BA_PS_flags).w
 	beq.w	.0
-	bset	#2,(sflags2).w
+	bset	#sf2drec,(sflags2).w
 .0
 	movea.w	#(tmstruct-M68K_RAM),a2
 	jsr	(lcfound2).l

@@ -531,10 +531,10 @@ EncodePW	;After a playoff game compute winners and save the bits if needed
 	movea.l	#pwddatabuffer,a3
 	bsr.w	WritePassBits
 	jsr	(WritePassData).l
-	bclr	#4,(sflags).w
+	bclr	#sfwrap,(sflags).w
 	move.w	#$FFFF,(lastsfx).w
 	move.l	#$FFFF0000,(recbpr).w
-	btst	#2,(sflags3).w
+	btst	#sf3alttree,(sflags3).w
 	beq.w	.1
 	movea.w	#(tpassbits-M68K_RAM),a3
 	bsr.w	ReadPassBits
@@ -549,7 +549,7 @@ EncodePW	;After a playoff game compute winners and save the bits if needed
 	jsr	(WritePassData).l
 	bclr	#6,(GameFlags).w
 	jsr	(MakeSRAMChecksum).l
-	bclr	#4,(sflags).w
+	bclr	#sfwrap,(sflags).w
 	move.w	#$FFFF,(lastsfx).w
 	move.l	#$FFFF0000,(recbpr).w
 	move.w	#2,(OptPlayMode).w	;new playoffs
@@ -890,7 +890,7 @@ ResolveGames	;Compute winners and losers for playoff matchups
 	dbf	d1,.cr0
 	movea.w	#(tpassbits-M68K_RAM),a3
 	bsr.w	WritePassBits
-	bset	#2,(sflags3).w
+	bset	#sf3alttree,(sflags3).w
 .nextround
 	clr.w	(bosgames).w	;advance to next round
 	bsr.w	GetShifter

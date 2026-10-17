@@ -27,7 +27,7 @@ PlayoffScreen	;Bring up the playoff screen if in playoff mode (OptPlayMode nonze
 	move.w	d0,(a0)
 	move.w	d0,2(a0)
 	move.l	#VBlank_Playoff,(vbint).l
-	bclr	#1,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$BC00,(VSPRITES).w
 	move.w	#$B000,(VmMap3).w

@@ -2,7 +2,7 @@
 ;	pulls him late in a game the computer is losing. The puck checks follow.
 
 ChkGoalies	;A computer team down with its goalie in: pull him on a delayed penalty, else CPgoalie
-	btst	#0,(gmode).w	;check if clock running
+	btst	#gmclock,(gmode).w	;check if clock running
 	bne.w	rtss2
 	movea.w	#(tmstruct-M68K_RAM),a2
 	lea	$39E(a2),a1
@@ -22,7 +22,7 @@ ChkGoalies	;A computer team down with its goalie in: pull him on a delayed penal
 .chkpen
 	tst.w	d1
 	bpl.w	rtss2
-	btst	#3,(gmode).w	;#gmpendel - delayed penalty called
+	btst	#gmpendel,(gmode).w	;#gmpendel - delayed penalty called
 	beq.w	.nopen
 	st	$26(a2)	;sets to FFFF (no goalie)
 	bra.w	setpersonel
@@ -45,7 +45,7 @@ CPgoalie	;See if the computer should pull its goalie: third period, behind by 1,
 	;other end
 	cmpi.w	#2,(gsp).w	;check if 3rd period
 	bne.w	rtss2
-	move.w	$C(a1),d0	;tmscore
+	move.w	tmscore(a1),d0	;tmscore
 	sub.w	$C(a2),d0
 	bmi.w	rtss2
 	cmp.w	#1,d0
@@ -54,7 +54,7 @@ CPgoalie	;See if the computer should pull its goalie: third period, behind by 1,
 	bgt.w	rtss2
 	move.l	a0,-(sp)
 	movea.w	$22(a2),a0	;moves a player struct address into a0
-	btst	#7,$62(a0)	;#pfgoal
+	btst	#pfgoal,$62(a0)	;#pfgoal
 	movea.l	(sp)+,a0
 	bne.w	.0
 	neg.w	d1	;if shooting on bottom goal, make d1 negative

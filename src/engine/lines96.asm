@@ -8,16 +8,16 @@ SetLCmode	;Open the line change box for the team of player a3 (loadTeamStruct): 
 	btst	#4,(sflags7).w
 	bne.w	rtss7
 	jsr	(loadTeamStruct).l
-	bset	#1,tmflags(a2)
+	bset	#tmflcm,tmflags(a2)
 	bne.w	rtss7
 	btst	#3,(sflags5).w
 	bne.w	.0
-	bclr	#2,(sflags).w
+	bclr	#sfspdir,(sflags).w
 .0
-	bclr	#3,(sflags).w
-	bset	#3,pflags2(a3)
+	bclr	#sfssdir,(sflags).w
+	bset	#pf2lcm,pflags2(a3)
 SetLCmode2	;Open the line change box: wait for the box, then draw the line choices (setlccords, getlchoice)
-	btst	#0,(gmode).w
+	btst	#gmclock,(gmode).w
 	beq.w	.0
 	bsr.w	setlccords
 	cmpi.w	#$F,(printy).w
@@ -32,7 +32,7 @@ SetLCmode2	;Open the line change box: wait for the box, then draw the line choic
 	bsr.w	setlccords
 	cmpi.w	#$F,(printy).w
 	blt.w	.box
-	bset	#0,(sflags3).w
+	bset	#sf3llcs,(sflags3).w
 	bra.w	.1
 .box
 	jsr	(box).l
@@ -80,7 +80,7 @@ setlccords	;printx / printy of the line change box for team a2
 	bne.w	.0
 	eori.w	#$16,d0
 .0
-	btst	#1,(gmode).w
+	btst	#gmdir,(gmode).w
 	beq.w	.1
 	eori.w	#$16,d0
 .1
@@ -132,7 +132,7 @@ getlchoice2
 lineinput	;Pad input while the line change box is open (pflags2 bit 3)
 	movem.w	d1/d4,-(sp)
 	movea.w	#(tmstruct-M68K_RAM),a2
-	btst	#6,pflags(a3)
+	btst	#pfteam,pflags(a3)
 	beq.w	.1
 	adda.w	#$39E,a2
 .1
@@ -151,11 +151,11 @@ lineinput	;Pad input while the line change box is open (pflags2 bit 3)
 	addq.w	#1,d2
 	btst	#5,d1
 	bne.w	lcfound
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	beq.w	.x
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	.x
-	btst	#0,pflags2(a3)
+	btst	#pf2fight,pflags2(a3)
 	beq.w	.5
 .x
 	rts
@@ -173,8 +173,8 @@ lcfound	;Line choice d2 made: set the line, close the box
 	bsr.w	getlchoice	;translate choice 0-2 into line number 0-6
 	tst.w	d0
 	bmi.w	rtss
-	bclr	#3,pflags2(a3)
-	bset	#3,pflags(a3)
+	bclr	#pf2lcm,pflags2(a3)
+	bset	#pfjoycon,pflags(a3)
 	jsr	(loadTeamStruct).l
 	bclr	#1,limpact(a2)
 	move.w	d0,$16(a2)
@@ -186,7 +186,7 @@ lcfound2
 	bsr.w	setlccords
 	cmpi.w	#$F,(printy).w
 	blt.w	.nollcm
-	bclr	#0,(sflags3).w
+	bclr	#sf3llcs,(sflags3).w
 .nollcm
 	addq.w	#1,d1
 	move.w	#$7FF,d2

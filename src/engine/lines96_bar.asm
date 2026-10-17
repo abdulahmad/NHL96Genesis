@@ -60,11 +60,11 @@ AvgCline	;Average energy of the current line.
 	dc.b	$00,$04,$80,$C1,$4C,$DF,$01,$0E,$4E,$75
 
 ChkShotStat	;Determine if a shot was taken and add it to the stats (crowd, team, shooter and goalie)
-	btst	#0,(gmode).w
+	btst	#gmclock,(gmode).w
 	bne.w	rtss2
-	btst	#4,(gmode).w
+	btst	#gmhl,(gmode).w
 	bne.w	rtss2
-	bclr	#4,(sflags2).w
+	bclr	#sf2shot,(sflags2).w
 	bne.w	.Cwdupdate
 	btst	#0,(sflags4).w
 	beq.w	rtss2
@@ -107,9 +107,9 @@ ChkShotStat	;Determine if a shot was taken and add it to the stats (crowd, team,
 	adda.w	d0,a3
 	bsr.w	loadTeamStruct
 	addq.w	#1,(a2)
-	btst	#5,(sflags2).w
+	btst	#sf2pwrplay,(sflags2).w
 	beq.w	.8
-	btst	#6,(sflags2).w
+	btst	#sf2pwrtm,(sflags2).w
 	bne.w	.7
 	btst	#6,$62(a3)
 	bne.w	.8

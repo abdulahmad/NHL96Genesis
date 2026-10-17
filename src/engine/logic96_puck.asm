@@ -10,12 +10,12 @@ AdjustFacingDirection	;Turn facedir one step toward direction d0 (not past the d
 	andi.w	#4,d0
 	lsr.w	#1,d0
 	subq.w	#1,d0	;d0 = +1/-1
-	btst	#3,pflags(a3)	;pfjoycon
+	btst	#pfjoycon,pflags(a3)	;pfjoycon
 	bne.w	.add
 	btst	d1,#$42
 	beq.w	.add
 	add.w	d0,d1
-	btst	#7,pflags(a3)	;pfgoal
+	btst	#pfgoal,pflags(a3)	;pfgoal
 	bne.w	.dn
 	btst	d1,#$83
 	bra.w	.0
@@ -83,7 +83,7 @@ goaliesave	;The goalie a3 makes a save of the puck crossing at a0: the save SPA 
 	move.w	#$1000,d1
 	move.w	d1,Xvel(a3)
 	ori.w	#1,d0
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.10
 	eori.w	#1,d0
 .10
@@ -172,7 +172,7 @@ goaliesave	;The goalie a3 makes a save of the puck crossing at a0: the save SPA 
 	asr	Xvel(a3)
 	asr	Yvel(a3)
 	asr	Yvel(a3)
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	beq.w	.19
 	cmpi.w	#3,facedir(a3)
 	beq.w	.9
@@ -303,16 +303,16 @@ asspuckc	;asstab entry: the puck carrier.
 	dc.b	$61,$00,$77,$5E,$61,$00,$4C,$6A,$4E,$F9,$00,$00,$F4,$66
 
 chkpk	;With a power play (sflags2 bit 5) chkpk2, else Z set
-	btst	#5,(sflags2).w
+	btst	#sf2pwrplay,(sflags2).w
 	bne.w	chkpk2
 	eori	#4,ccr	;Z flag
 	rts
 
 chkpk2	;Z set when a3's team is on the power play (sflags2 bit 6 against pfteam)
 	movem.l	d0-d1,-(sp)
-	btst	#6,(sflags2).w	;#sf2pwrtm - 0 for team 1, 1 for team 2
+	btst	#sf2pwrtm,(sflags2).w	;#sf2pwrtm - 0 for team 1, 1 for team 2
 	move	sr,d0
-	btst	#6,pflags(a3)
+	btst	#pfteam,pflags(a3)
 	move	sr,d1
 	eor.w	d1,d0
 	move	d0,ccr
@@ -385,7 +385,7 @@ EvadePC	;skateto extra routine: steer around the puck carrier (its address is pa
 
 checkob	;Offside watch (gmode bit 5): with a player of the attacking side past the blue line ahead of the puck
 	;set sflags2 bit 7 (and the referee, PushRef), clear it when they are all back
-	btst	#5,(gmode).w
+	btst	#gmoffs,(gmode).w
 	beq.w	rtss2
 	btst	#2,(BA_PS_flags).w
 	bne.w	rtss2
@@ -397,7 +397,7 @@ checkob	;Offside watch (gmode bit 5): with a player of the attacking side past t
 	adda.w	#$300,a0
 .0
 	moveq	#$7A,d1
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.top
 	neg.w	d1
 	cmp.w	(pucky).w,d1
@@ -412,14 +412,14 @@ checkob	;Offside watch (gmode bit 5): with a player of the attacking side past t
 	dbf	d0,.1
 .3
 	moveq	#$40,d0
-	bclr	#7,(sflags2).w
+	bclr	#sf2offsig,(sflags2).w
 	bne.w	.dref
 .ex
 	movem.l	(sp)+,d0-d1/a0
 	rts
 .5
 	moveq	#6,d0
-	bset	#7,(sflags2).w
+	bset	#sf2offsig,(sflags2).w
 	bne.s	.ex
 .dref
 	tst.w	(RefCnt).w

@@ -115,7 +115,7 @@ ResolveDayGames	;Compute winners and losers for the playoff matchups of the day:
 	movea.w	#(pwddatabuffer-M68K_RAM),a3
 	jsr	(WritePassBits).l
 	jsr	(WritePassData).l
-	bclr	#4,(sflags).w
+	bclr	#sfwrap,(sflags).w
 	move.w	#$FFFF,(lastsfx).w
 	move.l	#M68K_RAM,(recbpr).w
 	jsr	(WriteDayGames).l

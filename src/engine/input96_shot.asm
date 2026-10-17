@@ -2,15 +2,15 @@
 ;	doshot releases it. setpassmode, dopass and passtoa0 send the puck to a teammate.
 
 shotdiradj	;Adjust the shot direction by the pad and the shooter
-	btst	#3,pflags3(a3)	;check if shooting one timer
+	btst	#pf3onetimer,pflags3(a3)	;check if shooting one timer
 	bne.w	.0	;jump if shooting one timer
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	bne.w	.2
 .0
 	moveq	#8,d0
 	moveq	#5,d1
 	movea.w	#(SortCords-SCstruct-M68K_RAM),a0	;SC Struct start - 80
-	btst	#6,pflags(a3)
+	btst	#pfteam,pflags(a3)
 	bne.w	.g
 	adda.w	#$300,a0
 .g
@@ -38,7 +38,7 @@ shotdiradj	;Adjust the shot direction by the pad and the shooter
 	movem.w	(sp)+,d0-d1	;pop from stack (distance x and y from G to puck)
 	moveq	#$12,d3	;post?
 	move.w	#$11E,d4
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.chkposts
 	neg.w	d4	;negate if bottom goal
 .chkposts
@@ -54,7 +54,7 @@ shotdiradj	;Adjust the shot direction by the pad and the shooter
 	bgt.w	.setpassdir
 	cmp.w	#$FFD4,d4	;-$2C, the left X edge of the crease
 	blt.w	.setpassdir
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	beq.w	.passdir
 	neg.w	d4	;negate d4
 .passdir
@@ -98,10 +98,10 @@ SetShotMode	;Start the shot mode (C button)
 	move.w	#$64,(passmodetimer).w
 .0
 	move.w	#8,(passdir).w	;default shot direction
-	bset	#3,(sflags).w
+	bset	#sfssdir,(sflags).w
 	clr.w	d0	;find dx/dy for shot
 	move.w	#$13A,d1	;#296 = top Y boards
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.ck0
 	neg.w	d1	;flip if bottom goal
 .ck0
@@ -140,7 +140,7 @@ ShotMode	;Shot mode: wind up, then doshot
 	bne.w	.checkcbut
 	addq.w	#1,(passspeed).w
 .checkcbut
-	btst	#5,d2	;5 = #cbut
+	btst	#cbut,d2	;5 = #cbut
 	beq.w	.end
 	neg.w	SPAnum(a3)	;end windup and swing through
 	addi.w	#$1C,SPAnum(a3)
@@ -150,7 +150,7 @@ ShotMode	;Shot mode: wind up, then doshot
 prepshot
 	bclr	#4,(sflags5).w
 	move.w	#$B,d0
-	btst	#6,pflags(a3)
+	btst	#pfteam,pflags(a3)
 	beq.w	.33
 	move.w	#5,d0	;opponent is home
 .33
@@ -173,7 +173,7 @@ prepshot
 	bne.w	.3
 .dir017
 	move.w	(pucky).w,d0
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.cmppuck
 	neg.w	d0	;flips d0 for compare calc
 .cmppuck
@@ -187,36 +187,36 @@ doshot	;Shoot the puck
 	movem.l	d0-d7/a0-a3,-(sp)
 	bclr	#0,(GameFlags).w
 	beq.w	.0
-	bclr	#3,(sflags).w
+	bclr	#sfssdir,(sflags).w
 	bra.w	.4
 .0
 	move.b	pflags(a3),(shotpflags).w
 	bclr	#4,(gmode2).w
-	btst	#1,pflags3(a3)	;check if player on breakaway
+	btst	#pf3break,pflags3(a3)	;check if player on breakaway
 	beq.w	.cont
 	bset	#4,(gmode2).w	;set if breakaway
 .cont
 	bsr.w	shotdiradj
-	move.w	#5,-(sp)	;#SFXshotwiff - sound effect
+	move.w	#SFXshotwiff,-(sp)	;#SFXshotwiff - sound effect
 	move.w	SCnum(a3),(shotplayer).w
-	bclr	#3,(sflags).w
-	bset	#5,pflags(a3)
-	btst	#3,pflags3(a3)	;check if shooting one timer
+	bclr	#sfssdir,(sflags).w
+	bset	#pfalock,pflags(a3)
+	btst	#pf3onetimer,pflags3(a3)	;check if shooting one timer
 	bne.w	.2
 	move.w	(puckc).w,d0	;puck carrier SCnum into d0
 	cmp.w	SCnum(a3),d0	;is player puck carrier?
 	bne.w	.3
 .2
-	move.w	#$18,(sp)	;#SFXshotfh
-	bset	#4,(sflags2).w
+	move.w	#SFXshotfh,(sp)	;#SFXshotfh
+	bset	#sf2shot,(sflags2).w
 	cmpi.w	#$FB6,SPA(a3)
 	bne.w	.nbh
-	move.w	#$14,(sp)	;#SFXshotbh
+	move.w	#SFXshotbh,(sp)	;#SFXshotbh
 	move.w	(passspeed).w,d0
 	lsr.w	#2,d0	;sub 25% for backhand shots
 	sub.w	d0,(passspeed).w
 .nbh
-	btst	#3,pflags3(a3)	;check if shooting one timer
+	btst	#pf3onetimer,pflags3(a3)	;check if shooting one timer
 	beq.w	.cont2
 	movem.l	d0-d1,-(sp)	;push d0-d1 on stack
 	move.w	#$1F,d0	;1F into d0 - one timer min speed
@@ -249,7 +249,7 @@ doshot	;Shoot the puck
 	move.b	#$10,nopuck(a3)	;5E = nopuck - no puck collision till 0
 	move.w	SCnum(a3),(lastplayer).w
 	move.w	#$11E,d1
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.7
 	neg.w	d1	;flip d1 if shooting down
 .7
@@ -270,7 +270,7 @@ doshot	;Shoot the puck
 	addq.w	#1,d0
 .8
 	move.w	d0,d3	;straight line distance from puck to spot aiming for with passdir
-	btst	#4,(gmode).w
+	btst	#gmhl,(gmode).w
 	bne.w	.perf
 	cmp.w	#$C8,d3	;C8 = 200 decimal
 	bhi.w	.notperf
@@ -336,14 +336,14 @@ doshot	;Shoot the puck
 	divs.w	d3,d2	;divide d2 by straight line distance
 	move.w	d2,(puckvy).w	;move into puckvy
 	move.w	#$8000,d1	;this is the highest negative puckvy possible
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	beq.w	.15
 	clr.w	d1
 .15
 	eor.w	d2,d1	;EOR - checking to see if exceeding maximum puckvy
 	bpl.w	.16
 	move.w	#$3810,(puckvy).w	;move into puckvy
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.16
 	move.w	#$C7F0,(puckvy).w	;move into puckvy (shooting on bottom net)
 .16
@@ -362,7 +362,7 @@ doshot	;Shoot the puck
 	move.w	d3,(puckvz).w
 	bclr	#4,(sflags5).w
 	beq.w	.3
-	btst	#3,pflags3(a3)
+	btst	#pf3onetimer,pflags3(a3)
 	bne.w	.3
 	jsr	(puckvzadj).l
 .3
@@ -387,7 +387,7 @@ setpassmode	;Start the pass mode (B button)
 	bclr	#5,(gmode2).w
 	move.w	#$64,(passmodetimer).w
 .0
-	bset	#2,(sflags).w	;#sfspdir - set pass dir mode
+	bset	#sfspdir,(sflags).w	;#sfspdir - set pass dir mode
 
 rtss	;The shared rts of setpassmode and passmode
 	rts
@@ -405,7 +405,7 @@ passmode
 
 dopass	;Pass the puck
 	movem.l	d0-d5/a0-a1,-(sp)
-	bclr	#2,(sflags).w
+	bclr	#sfspdir,(sflags).w
 	st	(puckc).w	;player is not puck handler anymore
 	move.b	#$10,nopuck(a3)	;$5E = nopuck
 	move.w	SCnum(a3),(lastplayer).w
@@ -451,7 +451,7 @@ dopass	;Pass the puck
 	beq.w	.next
 	tst.w	position(a1)	;position(a1)
 	ble.w	.next
-	btst	#2,pflags2(a1)	;check if player is unavailable
+	btst	#pf2unav,pflags2(a1)	;check if player is unavailable
 	bne.w	.next
 	move.w	(a1),d0	;X Position of receiving player
 	sub.w	(puckx).w,d0	;sub puckx from d0
@@ -528,7 +528,7 @@ dopass	;Pass the puck
 	tst.w	position(a3)	;$34 = position
 	bne.w	.notgoalie
 	tst.w	(puckvy).w
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	beq.w	.g0
 	bmi.w	.nvy
 	bra.w	.notgoalie
@@ -556,7 +556,7 @@ dopass	;Pass the puck
 	move.w	#$A70,d1
 .9
 	jsr	(SetSPA).l
-	bset	#5,pflags(a3)
+	bset	#pfalock,pflags(a3)
 	moveq	#$C,d0
 	sub.b	(puckvz).w,d0
 	lsr.w	#2,d0
@@ -887,7 +887,7 @@ sub_FFD0
 	bmi.w	.exit
 	movem.l	d0-d4/a0-a3,-(sp)
 	move.w	(puckc).w,d0
-	asl.w	#7,d0	;#scsize
+	asl.w	#scsize,d0	;#scsize
 	movea.w	#(SortCords-M68K_RAM),a3
 	adda.w	d0,a3
 	movea.l	#SortCords,a0

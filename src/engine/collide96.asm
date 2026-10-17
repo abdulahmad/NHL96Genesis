@@ -5,11 +5,11 @@ checkcoll	;d2 = new x coord, d3 = new y coord, a3 = struct of object. Check wall
 	;end of the stick) and player collisions, then move a3 in the OOlist sort order by its y. If a player
 	;collision set collflag, restore the old x/y instead. Called from updateplayers.
 	clr.w	(collflag).w
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	beq.w	.0
 	exg	d2,d3
 .0
-	btst	#2,pflags(a3)
+	btst	#pfnc,pflags(a3)
 	bne.w	.ex
 	movem.l	d0-d7,-(sp)
 	move.w	(a3),d2
@@ -81,7 +81,7 @@ checkcoll	;d2 = new x coord, d3 = new y coord, a3 = struct of object. Check wall
 
 checkplcoll	;Check collision with other players. d2/d3 = x/y cords, a3 = struct. Walk up and down the OOlist from a3 and
 	;call checkcx for each object within $10 in y. Called from checkcoll
-	btst	#5,pflags2(a3)
+	btst	#pf2npc,pflags2(a3)
 	bne.w	.ex
 	cmpi.w	#$B,SCnum(a3)
 	bgt.w	.ex
@@ -125,14 +125,14 @@ checkcx	;d4 = obj. # * 2 for possible collision so check x range and distance fo
 	asl.w	#6,d4
 	movea.l	#SortCords,a2
 	adda.w	d4,a2
-	btst	#2,pflags(a2)
+	btst	#pfnc,pflags(a2)
 	bne.w	.exit
-	btst	#5,pflags2(a2)
+	btst	#pf2npc,pflags2(a2)
 	bne.w	.exit
 	cmpi.w	#$B,SCnum(a2)
 	bgt.w	.exit
 	move.w	(a2),d0
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	beq.w	.0
 	move.w	Ypos(a2),d0
 .0
@@ -176,11 +176,11 @@ checkcx	;d4 = obj. # * 2 for possible collision so check x range and distance fo
 .g40
 	add.w	d4,impact(a3)
 	add.w	d4,impact(a2)
-	btst	#0,pflags2(a2)
+	btst	#pf2fight,pflags2(a2)
 	bne.w	.2
 	move.w	SCnum(a3),impactp(a2)
 .2
-	btst	#0,pflags2(a3)
+	btst	#pf2fight,pflags2(a3)
 	bne.w	.3
 	move.w	SCnum(a2),impactp(a3)
 .3
@@ -290,7 +290,7 @@ checkcx	;d4 = obj. # * 2 for possible collision so check x range and distance fo
 .droppuck	;A pad controlled puck carrier a0 at speed 2 or less loses the puck (puckc -1, nopuck $1E)
 	tst.w	position(a0)
 	beq.w	.done
-	btst	#3,pflags(a0)
+	btst	#pfjoycon,pflags(a0)
 	beq.w	.done
 	move.w	(puckc).w,d0
 	cmp.w	SCnum(a0),d0
@@ -330,7 +330,7 @@ checkint	;Check for interference penalty. player a2 interferes with a3 or vice-v
 .1
 	tst.w	position(a2)
 	bne.w	rtss2
-	btst	#0,(gmode).w
+	btst	#gmclock,(gmode).w
 	bne.w	rtss2
 	move.w	(puckc).w,d0
 	cmp.w	SCnum(a3),d0
@@ -345,14 +345,14 @@ checkint	;Check for interference penalty. player a2 interferes with a3 or vice-v
 	exg	a2,a3
 	cmpi.w	#$14,impact(a2)
 	ble.w	rtss2
-	btst	#4,pflags2(a3)
+	btst	#pf2pen,pflags2(a3)
 	bne.w	rtss2
 	cmpi.w	#3,(gsp).w
 	beq.w	rtss2
 	tst.w	position(a2)
 	bne.w	rtss2
 	move.w	#1,d0
-	btst	#6,pflags(a3)
+	btst	#pfteam,pflags(a3)
 	beq.w	.control
 	move.w	#2,d0
 .control
@@ -365,11 +365,11 @@ checkint	;Check for interference penalty. player a2 interferes with a3 or vice-v
 	cmp.w	(cont4team).w,d0
 	bne.w	.5
 .4
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	beq.w	rtss2
 .5
 	move.w	Ypos(a2),d0
-	btst	#7,pflags(a2)
+	btst	#pfgoal,pflags(a2)
 	beq.w	.6
 	neg.w	d0
 .6
@@ -387,14 +387,14 @@ checkint	;Check for interference penalty. player a2 interferes with a3 or vice-v
 	bsr.w	randomd0
 	cmp.w	#4,d0
 	bhi.w	rtss2
-	btst	#4,(gmode).w
+	btst	#gmhl,(gmode).w
 	bne.w	rtss2
 	moveq	#$22,d0
 	jmp	AddPenalty
 
 checkcheck	;Contact: a stopped pad controlled puck carrier a2 loses the puck, then CCStart for a3 on a2 and for a2 on a3
 	movem.l	d0-d4/a0-a3,-(sp)
-	btst	#3,pflags(a2)
+	btst	#pfjoycon,pflags(a2)
 	beq.w	.0
 	tst.w	position(a2)
 	beq.w	.0
@@ -426,7 +426,7 @@ CCStart	;Player a3 is checking player a2
 	beq.w	Bcheck
 	cmpi.w	#$2C5C,SPA(a3)
 	bne.w	rtss2
-	btst	#0,(gmode).w
+	btst	#gmclock,(gmode).w
 	beq.w	.nofight
 	move.w	#$100,impact(a3)
 	move.w	#$100,impact(a2)
@@ -447,14 +447,14 @@ CCStart	;Player a3 is checking player a2
 	asl.w	#1,d0
 	lea	checkinglist(pc),a0
 	move.w	(a0,d0.w),d1
-	bset	#5,pflags(a3)
+	bset	#pfalock,pflags(a3)
 	bsr.w	SetSPA
 	tst.w	position(a2)
 	beq.w	rtss2
 	cmp.w	#$14,d4
 	blt.w	rtss2
 	moveq	#$78,d0
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	beq.w	*+4
 .0
 	sub.b	$68(a3),d0
@@ -466,7 +466,7 @@ CCStart	;Player a3 is checking player a2
 	sub.w	impact(a2),d0
 	beq.w	.2
 	bmi.w	.2
-	btst	#4,pflags3(a3)
+	btst	#pf3wall,pflags3(a3)
 	bne.w	.2
 	bsr.w	randomd0
 	clr.w	(TempWord1).w
@@ -477,7 +477,7 @@ CCStart	;Player a3 is checking player a2
 	bsr.w	checkagr
 	cmp.w	#4,d0
 	bhi.w	rtss2
-	btst	#4,(gmode).w
+	btst	#gmhl,(gmode).w
 	bne.w	rtss2
 	move.b	(VDP_CNTR).l,d0
 	andi.w	#2,d0
@@ -488,7 +488,7 @@ CCStart	;Player a3 is checking player a2
 	bsr.w	checkagr
 	cmp.w	#3,d0
 	bhi.w	.4
-	btst	#4,(gmode).w
+	btst	#gmhl,(gmode).w
 	bne.w	.4
 	move.b	(seed+1).w,d0
 	andi.w	#3,d0
@@ -516,7 +516,7 @@ checkagr	;Aggression check
 	sub.b	$74(a3),d0
 	lsr.b	#1,d0
 	mulu.w	#$D,d0
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	beq.w	.checkpos
 	asl.w	#1,d0
 .checkpos
@@ -535,7 +535,7 @@ checkagr	;Aggression check
 	asr.w	#1,d0
 .0
 	bsr.w	randomd0
-	btst	#1,pflags3(a2)
+	btst	#pf3break,pflags3(a2)
 	beq.w	.teamchk
 	move.w	Ypos(a2),d1
 	bpl.w	.2
@@ -556,7 +556,7 @@ checkagr	;Aggression check
 .1
 	bsr.w	randomd0
 .teamchk
-	btst	#6,pflags(a3)
+	btst	#pfteam,pflags(a3)
 	bne.w	.5
 	btst	#2,(sflags9).w
 	bne.w	.nopen
@@ -575,11 +575,11 @@ checkagr	;Aggression check
 
 holdcheck	;Player a2 in a hold or hook animation holds a3 (within 1 direction of where a2 faces): both get the average
 	;velocity, the hold animations, and checkagr rolls penalty $24 or $1E
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	rtss2
 	tst.w	position(a3)
 	beq.w	rtss2
-	btst	#0,pflags2(a3)
+	btst	#pf2fight,pflags2(a3)
 	bne.w	rtss2
 	move.w	(a3),d0
 	sub.w	(a2),d0
@@ -594,7 +594,7 @@ holdcheck	;Player a2 in a hold or hook animation holds a3 (within 1 direction of
 	move.w	(puckc).w,d0
 	cmp.w	SCnum(a3),d0
 	bne.w	.holdcheck
-	bclr	#3,(sflags).w
+	bclr	#sfssdir,(sflags).w
 .holdcheck
 	move.w	Xvel(a3),d0
 	add.w	Xvel(a2),d0
@@ -606,7 +606,7 @@ holdcheck	;Player a2 in a hold or hook animation holds a3 (within 1 direction of
 	asr.w	#1,d0
 	move.w	d0,Yvel(a3)
 	move.w	d0,Yvel(a2)
-	bset	#5,pflags(a3)
+	bset	#pfalock,pflags(a3)
 	move.w	#$139E,d1
 	cmpi.w	#$16EE,SPA(a2)
 	bne.w	.0
@@ -619,7 +619,7 @@ holdcheck	;Player a2 in a hold or hook animation holds a3 (within 1 direction of
 .0
 	bsr.w	SetSPA
 	exg	a2,a3
-	bset	#5,pflags(a3)
+	bset	#pfalock,pflags(a3)
 	move.w	#$16EE,d1
 	cmpi.w	#$16EE,SPA(a3)
 	beq.w	.1
@@ -632,7 +632,7 @@ holdcheck	;Player a2 in a hold or hook animation holds a3 (within 1 direction of
 	bsr.w	checkagr
 	cmp.w	#3,d0
 	bhi.w	.exit
-	btst	#4,(gmode).w
+	btst	#gmhl,(gmode).w
 	bne.w	.exit
 	move.w	#$24,d0
 	cmpi.w	#$164A,SPA(a3)
@@ -649,15 +649,15 @@ holdcheck	;Player a2 in a hold or hook animation holds a3 (within 1 direction of
 Bcheck	;a2 B-checks a3 (CCStart, SPA216A / SPA052C). With OptPen off and a pad controlled a2 it needs randomd0($20 +
 	;a2 checking - a3 legstr) >= $18; a3 within 1 direction of where a2 faces falls (FallDown) and checkagr may
 	;call tripping ($20). Sets collflag
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	rtss2
 	tst.w	position(a3)
 	beq.w	rtss2
-	btst	#0,pflags2(a3)
+	btst	#pf2fight,pflags2(a3)
 	bne.w	rtss2
 	tst.w	(OptPen).w
 	bne.w	.checkdir
-	btst	#3,pflags(a2)
+	btst	#pfjoycon,pflags(a2)
 	beq.w	.checkdir
 	move.w	#$20,d0
 	add.b	$76(a2),d0
@@ -722,12 +722,12 @@ FallDown	;Player a2 falls down (hit by a3, or the puck): the fall animation, the
 .1
 	move.l	a2,(PlayerChked).w	;player checked
 	move.l	a3,(PlayerChking).w	;player checking
-	btst	#3,pflags3(a2)	;is player a2 doing a one-timer
+	btst	#pf3onetimer,pflags3(a2)	;is player a2 doing a one-timer
 	bne.w	rtss2
-	btst	#3,pflags3(a3)	;Is player a3 doing a one-timer
+	btst	#pf3onetimer,pflags3(a3)	;Is player a3 doing a one-timer
 	bne.w	rtss2
 	move.w	#SPA12EC,d1
-	btst	#4,pflags3(a3)	;wall collision bit
+	btst	#pf3wall,pflags3(a3)	;wall collision bit
 	bne.w	.cont2
 	cmpi.b	#$18,$72(a2)
 	blt.w	.cont2
@@ -744,7 +744,7 @@ FallDown	;Player a2 falls down (hit by a3, or the puck): the fall animation, the
 	tst.w	position(a3)	;check for goalie
 	beq.w	.chkpos
 	movea.w	#(tmstruct-M68K_RAM),a0	;Start of Home Team Stats Struct
-	btst	#6,pflags(a3)
+	btst	#pfteam,pflags(a3)
 	beq.w	.AddChktoPlayerStats
 	adda.w	#$39E,a0	;Change to Away Team Stats
 .AddChktoPlayerStats
@@ -767,7 +767,7 @@ FallDown	;Player a2 falls down (hit by a3, or the puck): the fall animation, the
 	tst.w	position(a2)
 	beq.w	.24
 	jsr	(wallcollduringcheck).l	;check for wall collision
-	btst	#4,pflags3(a2)	;check wall collision bit
+	btst	#pf3wall,pflags3(a2)	;check wall collision bit
 	beq.w	.24
 	movem.l	d1-d4,-(sp)
 	move.w	Xvel(a2),d1
@@ -890,17 +890,17 @@ FallDown	;Player a2 falls down (hit by a3, or the puck): the fall animation, the
 .20
 	clr.w	Xvel(a2)
 	clr.w	Yvel(a2)
-	btst	#5,pflags3(a2)
+	btst	#pf3fall,pflags3(a2)
 	bne.w	.22
 	move.w	#$C,-(sp)
-	btst	#6,pflags(a2)
+	btst	#pfteam,pflags(a2)
 	beq.w	.21
 	move.w	#$B,(sp)
 .21
 	jsr	(sfx).l
 .22
-	bset	#5,pflags3(a2)	;set falldown bit
-	bset	#0,pflags(a2)
+	bset	#pf3fall,pflags3(a2)	;set falldown bit
+	bset	#pfdoff,pflags(a2)
 	movem.l	(sp)+,d0/a0	;pop from stack
 	bra.w	.25
 
@@ -922,7 +922,7 @@ FallDown	;Player a2 falls down (hit by a3, or the puck): the fall animation, the
 	bne.w	.hitter
 	cmpi.b	#$14,$76(a3)
 	blt.w	.hitter
-	cmpi.w	#$B,$52(a3)	;check if SCNum of checker is a player
+	cmpi.w	#$B,SCnum(a3)	;check if SCNum of checker is a player
 	bgt.w	.hitter
 	btst	#5,$64(a2)	;check if falldown bit is set for player
 	bne.w	.hitter
@@ -945,20 +945,20 @@ FallDown	;Player a2 falls down (hit by a3, or the puck): the fall animation, the
 	cmp.w	$52(a2),d0	;check if puck carrier is a2
 	bne.w	.h6
 	st	(puckc).w	;clear out puck carrier
-	btst	#4,(gmode).w	;check if highlight
+	btst	#gmhl,(gmode).w	;check if highlight
 	bne.w	.h4
 	cmpi.w	#$26C8,$58(a2)
 	bne.w	.h4
-	move.w	$54(a2),d0	;facedir into d0
+	move.w	facedir(a2),d0	;facedir into d0
 	andi.w	#3,d0	;pass first 2 bits of d0
 	bne.w	.h4
 	btst	#4,$63(a2)	;check if player is unavailable
 	bne.w	.h4
 	move.w	#$DC,d0
 	bsr.w	randomd0
-	cmp.w	$32(a2),d0	;compare impact to d0
+	cmp.w	impact(a2),d0	;compare impact to d0
 	bgt.w	.h4
-	btst	#0,(gmode).w	;check if clock running
+	btst	#gmclock,(gmode).w	;check if clock running
 	bne.w	.h4
 	exg	a2,a3
 	move.w	#$17E4,d1
@@ -1007,17 +1007,17 @@ setInjuryType	;a2 injured: out for the period ($FFFD) or the game ($FFFC); in a 
 	bclr	#2,(sflags13).w
 	addq.w	#5,(ChkCnt).w
 	move.w	d0,-(sp)
-	bset	#2,pflags2(a2)
+	bset	#pf2unav,pflags2(a2)
 	addi.w	#$12C,(crowdlevel).w
 	addi.w	#$1E,(CwdExciteLvl).w
 	move.w	#$D,-(sp)	;sound effect
 	jsr	(sfx).l
 	move.w	(a2),(xc1).w	;move Xpos to scroll center
 	move.w	Ypos(a2),(yc1).w
-	bset	#6,(sflags).w
+	bset	#sfslock,(sflags).w
 	clr.w	d1	;clear d1
 	movea.w	#(tmstruct-M68K_RAM),a0	;move Home team Struct to a0
-	btst	#6,pflags(a2)
+	btst	#pfteam,pflags(a2)
 	beq.w	.0	;branch if home
 	move.w	#$8000,d1
 	adda.w	#$39E,a0	;add $364 to a0 (Away Team Struct start)
@@ -1054,7 +1054,7 @@ setInjuryType	;a2 injured: out for the period ($FFFD) or the game ($FFFC); in a 
 checkwallcoll	;d2/d3 = x/y to test, a3 = object, wcradiusx/wcradiusy = radius. Check the corner circles, the goals
 	;(checkgoal with a2 = SortCords+(13*SCstruct) top, SortCords+(12*SCstruct) bottom) and then the side and end
 	;boards. Calls wallcollb on a hit, with d0/d1 = cos/sin of the wall.
-	bclr	#4,pflags3(a3)	;wall collision bit
+	bclr	#pf3wall,pflags3(a3)	;wall collision bit
 	move.w	#$96,d4
 	sub.w	(wcradiusx).w,d4
 	move.w	#$148,d5
@@ -1170,7 +1170,7 @@ checkgoal	;Check object a3 against the goal / net a2: the puck scores (Goal), a 
 	move.w	OldZpos(a3),Zpos(a3)
 	bra.w	.7
 .nod
-	bclr	#7,pflags(a3)
+	bclr	#pfgoal,pflags(a3)
 	move.w	(puckc).w,d0
 	bmi.w	.nocon
 	st	(puckc).w
@@ -1178,13 +1178,13 @@ checkgoal	;Check object a3 against the goal / net a2: the puck scores (Goal), a 
 	movea.w	#(SortCords-M68K_RAM),a0
 	move.b	#8,nopuck(a0,d0.w)
 	move.w	(pucky).w,d1
-	btst	#7,pflags(a0,d0.w)
+	btst	#pfgoal,pflags(a0,d0.w)
 	bne.w	.an
 	neg.w	d1
 .an
 	tst.w	d1
 	bpl.w	.nocon
-	bset	#7,pflags(a3)
+	bset	#pfgoal,pflags(a3)
 .nocon
 	move.w	#$FF00,d0
 	move.l	Ypos(a3),d1
@@ -1213,7 +1213,7 @@ checkgoal	;Check object a3 against the goal / net a2: the puck scores (Goal), a 
 	eor.w	d0,d3
 	bmi.w	wallcoll
 	neg.w	d0
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	wallcoll
 	cmpi.w	#$D,Zpos(a3)
 	beq.w	.10
@@ -1226,7 +1226,7 @@ checkgoal	;Check object a3 against the goal / net a2: the puck scores (Goal), a 
 .10
 	bsr.w	ChkShotStat
 	move.w	#$25,-(sp)	;sfx $25 when the clock is stopped
-	btst	#0,(gmode).w	;gmclock: no goal after the whistle
+	btst	#gmclock,(gmode).w	;gmclock: no goal after the whistle
 	bne.w	.5
 	move.w	#8,(sp)	;sfx 8 and crowd
 	addi.w	#$12C,(crowdlevel).w
@@ -1273,7 +1273,7 @@ Goal	;A goal: the shootout count, EndPenaltyShotPlay, the score and both teams
 	asl.w	#7,d0
 	movea.l	#SortCords,a0
 	adda.w	d0,a0
-	btst	#7,pflags(a0)
+	btst	#pfgoal,pflags(a0)
 	movem.l	(sp)+,d0/a0
 	bne.w	.1
 	bra.w	.2
@@ -1300,7 +1300,7 @@ Goal	;A goal: the shootout count, EndPenaltyShotPlay, the score and both teams
 	jsr	(EndPenaltyShotPlay).l
 	bra.w	.20
 .6
-	btst	#0,(gmode).w
+	btst	#gmclock,(gmode).w
 	bne.w	rtss2
 .20
 	bset	#0,(sflags4).w
@@ -1324,7 +1324,7 @@ Goal	;A goal: the shootout count, EndPenaltyShotPlay, the score and both teams
 	bpl.w	.9
 	exg	a2,a1
 .9
-	btst	#1,(gmode).w
+	btst	#gmdir,(gmode).w
 	beq.w	.23
 	exg	a2,a1
 .23
@@ -1342,9 +1342,9 @@ Goal	;A goal: the shootout count, EndPenaltyShotPlay, the score and both teams
 	beq.w	.12
 	addq.w	#1,$394(a2)
 .12
-	btst	#5,(sflags2).w
+	btst	#sf2pwrplay,(sflags2).w
 	beq.w	.14
-	btst	#6,(sflags2).w
+	btst	#sf2pwrtm,(sflags2).w
 	bne.w	.13
 	cmpa.l	#AwShots,a2
 	bne.w	.14
@@ -1449,7 +1449,7 @@ Goal	;A goal: the shootout count, EndPenaltyShotPlay, the score and both teams
 	clr.w	Zpos(a3)
 	st	(puckcross2).w
 	st	(puckcross6).w
-	bset	#2,pflags(a3)
+	bset	#pfnc,pflags(a3)
 	move.w	#$1A,d0
 	bsr.w	assreplace
 	move.l	a3,-(sp)
@@ -1473,10 +1473,10 @@ AssignTeam	;Give assignment d0 to every player of team a2 on the ice (assinsert)
 .loop
 	tst.w	position(a3)
 	ble.w	.next
-	btst	#0,pflags2(a3)
+	btst	#pf2fight,pflags2(a3)
 	bne.w	.next
-	bclr	#2,pflags(a3)
-	bclr	#3,pflags3(a3)
+	bclr	#pfnc,pflags(a3)
+	bclr	#pf3onetimer,pflags3(a3)
 	beq.w	.0
 	jsr	(EndOneTimer).l
 .0
@@ -1497,7 +1497,7 @@ GetPeriodTimeRemaining	;Return d0 = (gsp << 14 | PerTimeTotal) - gameclock
 	rts
 
 checkgoalp	;Check for player a3 collision with goal/net a2. Entered from checkgoal
-	btst	#5,pflags2(a3)	;pflags2 bit 5: no player coll
+	btst	#pf2npc,pflags2(a3)	;pflags2 bit 5: no player coll
 	bne.w	rtss2
 	cmpi.w	#$A,Zpos(a3)
 	bgt.w	rtss2
@@ -1545,11 +1545,11 @@ checkgoalp	;Check for player a3 collision with goal/net a2. Entered from checkgo
 	rts
 .0
 	movem.w	d2-d3,-(sp)
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	bne.w	.1
 	movem.w	d0,-(sp)
 	move.w	Ypos(a3),d0
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	beq.w	.6
 	neg.w	d0
 .6
@@ -1633,8 +1633,8 @@ CheckBump	;Supply minimum separation velocity for coll with walls/goal/net. a2 =
 	move.w	d1,Yvel(a2)
 	clr.w	Xvel(a3)
 	clr.w	Yvel(a3)
-	bset	#6,(sflags).w
-	btst	#0,(gmode).w
+	bset	#sfslock,(sflags).w
+	btst	#gmclock,(gmode).w
 	bne.w	rtss2
 	moveq	#8,d0
 	jmp	AddPenalty2
@@ -1671,18 +1671,18 @@ wallcollb	;Bounce off the boards
 	addi.w	#$258,(crowdlevel).w
 	addi.w	#$F,(CwdExciteLvl).w
 .1
-	bset	#6,(sflags).w
-	bset	#2,pflags(a3)
+	bset	#sfslock,(sflags).w
+	bset	#pfnc,pflags(a3)
 	tst.w	Ypos(a3)
 	bpl.w	.2
 	ori.w	#$8000,attribute(a3)
 .2
 	clr.w	$86(a3)	;frame+SCstruct(a3)
-	btst	#0,(gmode).w
+	btst	#gmclock,(gmode).w
 	bne.w	rtss2
 	move.l	a3,-(sp)
 	move.w	(ltplayer).w,d0
-	asl.w	#7,d0	;#scsize
+	asl.w	#scsize,d0	;#scsize
 	movea.w	#(SortCords-M68K_RAM),a3
 	adda.w	d0,a3
 	moveq	#6,d0
@@ -1709,9 +1709,9 @@ wallcoll	;d0 = cosine, d1 = sine of angle of incidence with wall, a3 = object. B
 	asr.l	#8,d0
 	move.w	d0,d3	;v1t
 	neg.w	d2
-	cmpi.w	#$E,SCnum(a3)	;#puckSCnum, SCnum
+	cmpi.w	#puckscnum,SCnum(a3)	;#puckSCnum, SCnum
 	bne.w	.player
-	bclr	#4,(sflags2).w
+	bclr	#sf2shot,(sflags2).w
 	tst.w	d2
 	bpl.w	.nocoll
 	asr.w	#2,d2	;reduce normal speed on puck
@@ -1745,13 +1745,13 @@ wallcoll	;d0 = cosine, d1 = sine of angle of incidence with wall, a3 = object. B
 	bgt.w	.nocoll
 	bclr	#4,(sflags6).w
 	bne.w	.3
-	bset	#4,pflags3(a3)	;set wall collision bit
+	bset	#pf3wall,pflags3(a3)	;set wall collision bit
 .3
 	cmp.w	#$F000,d2	;$-1000
 	bgt.w	.nosfx
 	cmpi.w	#$A,impact(a3)	;impact(a3)
 	blt.w	.nosfx
-	move.w	#$20,-(sp)	;#SFXplayerwall
+	move.w	#SFXplayerwall,-(sp)	;#SFXplayerwall
 	jsr	(sfx).l
 .nosfx
 	asr.w	#2,d2

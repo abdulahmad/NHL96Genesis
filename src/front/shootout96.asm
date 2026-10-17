@@ -134,9 +134,9 @@ EndPenaltyShotPlay	;LockScroll, end the penalty shot play (the BA flags), the sh
 	btst	#0,(gmode2).w
 	bne.w	.stopplay
 	move.w	#$A,(replaydelay).w
-	bset	#2,(sflags2).w
+	bset	#sf2drec,(sflags2).w
 .stopplay
-	bset	#0,(gmode).w
+	bset	#gmclock,(gmode).w
 	bclr	#2,(gmode2).w
 	bclr	#2,(BA_PS_flags).w
 	bclr	#3,(BA_PS_flags).w

@@ -20,7 +20,7 @@ doplayeracc	;Player acceleration toward direction d0 by his speed rating (dirtab
 	bra.w	.d0
 .1
 	move.w	#$856,d1
-	btst	#4,pflags(a3)
+	btst	#pfrev,pflags(a3)
 	beq.w	.d0
 	move.w	#$856,d1
 .d0
@@ -33,7 +33,7 @@ doplayeracc	;Player acceleration toward direction d0 by his speed rating (dirtab
 	or.w	Yvel(a3),d0	;OR Yvel with Xvel
 	bne.w	dostop
 .4
-	btst	#1,pflags2(a3)
+	btst	#pf2aip,pflags2(a3)
 	beq.s	SetSPA
 	rts
 .0
@@ -49,14 +49,14 @@ doplayeracc	;Player acceleration toward direction d0 by his speed rating (dirtab
 	ext.w	d1
 	add.w	(pucky).w,d1	;add pucky to d1
 	sub.w	d3,d1	;sub Ypos from d1
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.8
 	neg.w	d0
 	neg.w	d1
 	neg.w	d3
 	eori.w	#4,d2
 .8
-	btst	#4,pflags(a3)
+	btst	#pfrev,pflags(a3)
 	bne.w	.2
 	tst.w	d3
 	bpl.w	.7
@@ -79,7 +79,7 @@ doplayeracc	;Player acceleration toward direction d0 by his speed rating (dirtab
 	cmp.w	#4,d0
 	bhi.w	.5
 .3
-	btst	#4,pflags(a3)
+	btst	#pfrev,pflags(a3)
 	bne.w	.done
 	move.w	Xvel(a3),d0	;move Xvel into d0
 	or.w	Yvel(a3),d0	;or with Yvel
@@ -93,7 +93,7 @@ doplayeracc	;Player acceleration toward direction d0 by his speed rating (dirtab
 	cmp.w	#2,d0
 	bhi.w	.done
 .10
-	bset	#4,pflags(a3)
+	bset	#pfrev,pflags(a3)
 	bra.w	.done
 .5
 	movem.w	d0-d1,-(sp)
@@ -114,7 +114,7 @@ doplayeracc	;Player acceleration toward direction d0 by his speed rating (dirtab
 .6
 	movem.w	(sp)+,d0-d1
 .7
-	bclr	#4,pflags(a3)
+	bclr	#pfrev,pflags(a3)
 .done
 	movem.w	(sp)+,d0-d1
 	move.w	facedir(a3),d2	;facedir into d2
@@ -137,7 +137,7 @@ doplayeracc	;Player acceleration toward direction d0 by his speed rating (dirtab
 	move.w	#$180,d4
 .9
 	muls.w	(a0,d0.w),d4
-	btst	#4,pflags(a3)
+	btst	#pfrev,pflags(a3)
 	beq.w	.i0
 	neg.l	d4
 .i0
@@ -156,7 +156,7 @@ doplayeracc	;Player acceleration toward direction d0 by his speed rating (dirtab
 	eori.w	#$FFCE,d1
 .20
 	addi.w	#$2052,d1
-	bset	#1,pflags2(a3)
+	bset	#pf2aip,pflags2(a3)
 .11
 	bsr.w	SetSPA
 	cmp.w	#2,d3
@@ -167,7 +167,7 @@ doplayeracc	;Player acceleration toward direction d0 by his speed rating (dirtab
 	dc.w	$0,$10,$10,$10,$0,$FFF0,$FFF0,$FFF0
 
 goalieacc	;Goalie movement
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	beq.w	.28
 	movem.w	d0,-(sp)
 	move.w	(puckc).w,d0
@@ -222,18 +222,18 @@ goalieacc	;Goalie movement
 	movem.w	(sp)+,d0-d1
 .8
 	move.w	#$712,d1
-	btst	#1,pflags2(a3)
+	btst	#pf2aip,pflags2(a3)
 	bne.w	.15
 	bsr.w	SetSPA
 	cmp.w	#8,d0
 	bne.w	.3
 	tst.w	position(a3)
 	bne.w	.3
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	beq.w	.3
 	move.w	d0,-(sp)
 	move.w	Ypos(a3),d0
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	beq.w	.6
 	neg.w	d0
 .6
@@ -254,7 +254,7 @@ goalieacc	;Goalie movement
 	move.w	d0,d2
 	jsr	(GoalieInCrease).l
 	bne.w	.27
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.4
 	cmpi.w	#$11E,Ypos(a3)
 	blt.w	playeracc
@@ -280,9 +280,9 @@ goalieacc	;Goalie movement
 	bra.w	playeracc
 .28
 	move.w	#$712,d1
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	beq.w	.goalieacc2
-	btst	#2,pflags3(a3)
+	btst	#pf3gctrl,pflags3(a3)
 	bne.w	.14
 	cmp.w	#8,d0
 	bne.w	.turnskater
@@ -290,7 +290,7 @@ goalieacc	;Goalie movement
 	bne.w	.14
 	move.w	d0,-(sp)
 	move.w	Ypos(a3),d0
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	beq.w	.10
 	neg.w	d0
 .10
@@ -320,7 +320,7 @@ goalieacc	;Goalie movement
 	beq.w	.14
 	jmp	stopfast
 .14
-	btst	#1,pflags2(a3)
+	btst	#pf2aip,pflags2(a3)
 	beq.w	SetSPA
 .15
 	rts
@@ -453,7 +453,7 @@ playeracc	;Player acceleration with facing d2 (doplayeracc entry used by the goa
 	muls.w	d7,d1	;mult d1 by frames elapsed (d7)
 	tst.w	position(a3)
 	bne.w	.noy3
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	beq.w	.noy3
 	move.w	(puckc).w,d2
 	cmp.w	SCnum(a3),d2
@@ -512,7 +512,7 @@ playeracc	;Player acceleration with facing d2 (doplayeracc entry used by the goa
 	asr.l	#1,d2	;divide by 2
 	add.l	(TempMaxSpd).w,d2	;add TempMaxSpd to d2 (so halves the difference between the 2 Speed steps)
 .fgtinj
-	btst	#6,pflags2(a3)	;check if injured during fight
+	btst	#pf2inj,pflags2(a3)	;check if injured during fight
 	beq.w	.5
 	lsr.l	#3,d2	;divide d2 by 8
 .5
