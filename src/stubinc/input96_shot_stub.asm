@@ -20,6 +20,7 @@ vtoa = $01A3EE		;logic96_vec
 GetHot = $01A458		;logic96_vec
 SetSPA = $01A614		;skate96
 dirtab = $01AE60		;skate96
+runspeed = 200
 randomd0s = $01B09A		;video96
 randomd0 = $01B0A6		;video96
 sroot = $01B0DE		;video96
