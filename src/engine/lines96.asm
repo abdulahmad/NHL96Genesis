@@ -8,7 +8,7 @@ SetLCmode	;Open the line change box for the team of player a3 (loadTeamStruct): 
 	btst	#4,(sflags7).w
 	bne.w	rtss7
 	jsr	(loadTeamStruct).l
-	bset	#tmflc,tmflags(a2)
+	bset	#tmflcm,tmflags(a2)
 	bne.w	rtss7
 	btst	#3,(sflags5).w
 	bne.w	.0

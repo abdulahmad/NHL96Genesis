@@ -219,7 +219,7 @@ StartPer	;Start a period: reset stack, rink and clock, face off, run the game lo
 	jsr	(song).l
 	cmpi.w	#2,(gsp).w
 	bge.w	Gameloop
-	bset	#7,(sflags3).w
+	bset	#sf3fosong,(sflags3).w
 
 Gameloop	;Main loop for game
 	bsr.w	DoGameFrame

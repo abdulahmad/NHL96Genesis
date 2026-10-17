@@ -5,7 +5,7 @@ ShowThreeStars	;End of game Stars of the Game box. Waits for RefCnt <= $40 and r
 	;bit 3 and a vblank. Frames the box, then the three best star scores (TakeTopStarScore)
 	cmpi.w	#$40,(RefCnt).w
 	bgt.w	rtss2
-	bset	#7,(gmode).w
+	bset	#gmstars,(gmode).w
 	bne.w	rtss2
 	jsr	(ClearBigScore).l
 	jsr	(ErasePowerPlayBox).l
