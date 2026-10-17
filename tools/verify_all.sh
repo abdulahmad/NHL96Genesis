@@ -1,13 +1,16 @@
 #!/bin/bash
 # verify_all.sh: clean check under wine: fresh extract, the full ROM, then every seg:* segment.
-# Usage: tools/verify_all.sh            (from anywhere; works in the repo root)
+# Usage: tools/verify_all.sh [-q|--quiet]   (from anywhere; works in the repo root)
+# -q: print only failures and the final ALL MATCH line (the full per-segment summary still goes to output/verify_all.log).
 # Writes every log to output/: verify_all.log (this summary), prebuild.log, top.log, seg_<name>.log,
 # and the assembler logs Build96.log / Build_<name>.log. Exit status 1 if anything is not MATCH.
 cd "$(cd "$(dirname "$0")/.." && pwd)" || exit 1
 export WINEDEBUG=-all
 mkdir -p output
+quiet=0; case "$1" in -q|--quiet) quiet=1;; esac
 sum=output/verify_all.log; : > $sum; fail=0
-say() { echo "$*" | tee -a $sum; }
+# say logs everything; in quiet mode it echoes only lines that are not "<name>: MATCH..." (ALL MATCH is printed by the last line).
+say() { echo "$*" >>$sum; [ $quiet = 1 ] && [[ "$*" == *": MATCH"* ]] || echo "$*"; }
 # tools/prebuild.js runs here with Linux node (fresh extract, ROM check); the .bat files skip it (no node under wine).
 export NHL_PREBUILD_DONE=1
 rm -rf Extracted; node tools/prebuild.js retail >output/prebuild.log 2>&1 || { say "PREBUILD FAIL (output/prebuild.log)"; cat output/prebuild.log; exit 1; }
