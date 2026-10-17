@@ -25,8 +25,8 @@ DecompressGraphicsPlain = $01B730		;video96
 AssignBySavedPos = $01FE78		;players96
 vb2 = $0202C4		;display96
 ReplayIconMap = $140AFE		;graphics96
-unk_1468D6 = $1468D6		;graphics96
-unk_147896 = $147896		;graphics96
+HiScoreBgMap = $1468D6		;graphics96
+HiScoreImg = $147896		;graphics96
 
 
 ; Main segment code

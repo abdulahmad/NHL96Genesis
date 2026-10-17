@@ -32,7 +32,7 @@ findpc	;Where and when the puck crosses each goal line (puckcross).
 	dc.b	$44,$41,$32,$80,$60,$00,$00,$08,$33,$7C,$FF,$FF,$00,$02,$58,$49
 	dc.b	$4E,$75
 
-sub_1A050	;Called from the assignment code.
+skateto	;Skate a3 to d0 / d1, a0 = an extra collision routine (EvadePC); every 12 frames, then doplayeracc
 	;Code the listing does not decode: kept as bytes
 	dc.b	$9F,$2B,$00,$42,$6A,$00,$00,$B0,$06,$2B,$00,$0C,$00,$42,$61,$00
 	dc.b	$00,$B0,$48,$A7,$C0,$00,$30,$2B,$00,$28,$E0,$40,$44,$40,$D0,$5F
@@ -87,7 +87,7 @@ sub_1A050	;Called from the assignment code.
 	dc.b	$67,$00,$00,$0E,$4A,$6B,$00,$34,$67,$00,$00,$06,$61,$00,$00,$06
 	dc.b	$60,$00,$02,$A8
 
-sub_1A384	;Called from the assignment code.
+FacePuck	;Turn a3's facedir one step toward the puck (vtoa); d0 / d1 kept
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$A7,$C0,$00,$30,$38,$B7,$5E,$32,$38,$B7,$72,$90,$53,$92,$6B
 	dc.b	$00,$14,$61,$00,$00,$56,$90,$6B,$00,$54,$67,$00,$00,$18,$44,$40
@@ -183,7 +183,7 @@ GetHot	;Push long address of structure to get hot spot from; hot spot x/y return
 	move.l	(sp)+,(sp)
 	rts
 
-sub_1A4B2	;A GetHot variant (hot spot x/y of the structure pushed before the call).
+GetHot2a	;Push a struct: d0 / d1 = rink x / y of its first HotList2 hot spot for its frame (0 / 0 with no frame)
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$00,$C0,$20,$6F,$00,$0C,$42,$40,$42,$41,$4A,$68,$00,$06
 	dc.b	$6F,$00,$00,$58,$22,$7C,$00,$13,$A2,$12,$30,$28,$00,$06,$32,$19
@@ -194,7 +194,7 @@ sub_1A4B2	;A GetHot variant (hot spot x/y of the structure pushed before the cal
 	dc.b	$C1,$41,$44,$41,$D2,$68,$00,$14,$D0,$50,$4C,$DF,$03,$00,$2E,$9F
 	dc.b	$4E,$75,$4E,$71,$60,$FC
 
-sub_1A528	;A GetHot variant (hot spot x/y of the structure pushed before the call).
+GetHot2b	;Push a struct: d0 / d1 = rink x / y of its second HotList2 hot spot for its frame
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$00,$C0,$20,$6F,$00,$0C,$42,$40,$42,$41,$4A,$68,$00,$06
 	dc.b	$6F,$00,$00,$58,$22,$7C,$00,$13,$A2,$12,$30,$28,$00,$06,$32,$19
@@ -205,7 +205,7 @@ sub_1A528	;A GetHot variant (hot spot x/y of the structure pushed before the cal
 	dc.b	$C1,$41,$44,$41,$D2,$68,$00,$14,$D0,$50,$4C,$DF,$03,$00,$2E,$9F
 	dc.b	$4E,$75,$4E,$71,$60,$FC
 
-sub_1A59E	;A GetHot variant (hot spot x/y of the structure pushed before the call).
+GetHot2c	;Push a struct: d0 / d1 = rink x / y of its third HotList2 hot spot for its frame
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$00,$C0,$20,$6F,$00,$0C,$42,$40,$42,$41,$4A,$68,$00,$06
 	dc.b	$6F,$00,$00,$58,$22,$7C,$00,$13,$A2,$12,$30,$28,$00,$06,$32,$19

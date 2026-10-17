@@ -65,7 +65,7 @@ ShootoutModeBox	;Shootout round box: "SHOOTOUT MODE" (ShootoutModeBigTxt), the s
 	jsr	(printbig2).l
 	jsr	(printz).l
 	String	$BF,$04,$0C,'       Round '
-	move.w	(word_FFD438).w,d0
+	move.w	(shootoutround).w,d0
 	move.w	#2,d1
 	jsr	(PushNumberWidth).l
 	jsr	(print).l
@@ -82,12 +82,12 @@ ShootoutInit	;Clear the player structs (SortCords) and the shootout state, then 
 .loop
 	clr.w	(a0)+
 	dbf	d0,.loop
-	clr.w	(word_FFDCC4).w
-	move.w	#1,(word_FFD438).w
+	clr.w	(shootoutdelay).w
+	move.w	#1,(shootoutround).w
 	bclr	#3,(gmode2).w
 	clr.w	(homeshootgoals).w
 	clr.w	(awayshootgoals).w
-	clr.w	(word_FFD446).w
+	clr.w	(homeshootnum).w
 	clr.w	(shootoutteam).w
 	rts
 
@@ -104,7 +104,7 @@ CountShootoutGoals	;Shootout: count the goals and end it when one team cannot ca
 	movem.l	d0-d7/a0-a6,-(sp)
 	btst	#0,(shootoutteam+1).w
 	beq.w	.switch
-	cmpi.w	#5,(word_FFD438).w
+	cmpi.w	#5,(shootoutround).w
 	blt.w	.switch
 	move.w	(homeshootgoals).w,d0
 	cmp.w	(awayshootgoals).w,d0
@@ -115,12 +115,12 @@ CountShootoutGoals	;Shootout: count the goals and end it when one team cannot ca
 .switch
 	eori.w	#1,(shootoutteam).w
 	bne.w	.x
-	addq.w	#1,(word_FFD446).w
-	cmpi.w	#5,(word_FFD446).w
+	addq.w	#1,(homeshootnum).w
+	cmpi.w	#5,(homeshootnum).w
 	blt.w	.1
-	clr.w	(word_FFD446).w
+	clr.w	(homeshootnum).w
 .1
-	addq.w	#1,(word_FFD438).w
+	addq.w	#1,(shootoutround).w
 .x
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
@@ -136,7 +136,7 @@ InitShooters	;The 6 starters of the home (shootoutteam 0) or away team (save RAM
 .0
 	movem.l	d7-a0,-(sp)
 	move.w	d0,d7
-	jsr	(sub_EF02).l
+	jsr	(GetTeamLines).l
 	movea.l	a0,a1
 	movem.l	(sp)+,d7-a0
 	move.w	#5,d0
@@ -206,7 +206,7 @@ EndShootout	;Shootout over: LockScroll, then the 5 skaters of player slots 1-5 (
 	movem.l	d0-d7/a0-a6,-(sp)
 	bset	#2,(sflags2).w
 	jsr	(LockScroll).l
-	move.w	#$60,(word_FFDCC4).w
+	move.w	#$60,(shootoutdelay).w
 	movea.l	#SortCords,a3
 	move.w	#0,d0
 	move.w	(homeshootgoals).w,d2
@@ -252,7 +252,7 @@ EndShootout	;Shootout over: LockScroll, then the 5 skaters of player slots 1-5 (
 	dc.b	$00,$00,$00,$4B,$00,$00,$01,$1E,$FF,$B5,$00,$00,$FE,$E2,$00,$00
 	dc.b	$00,$00,$00,$4B,$FE,$E2,$00,$00
 
-nullsub_5
+AddArenaAnimSprite	;Add the arena animation sprites; disabled in 96: the rts comes first and the body after it is dead
 	rts
 	dc.b	$4A,$78,$D4,$74,$6B,$00,$01,$18,$4A,$B8,$D4,$7A,$67,$00,$01,$10
 	dc.b	$08,$38,$00,$04,$C3,$42,$66,$00,$01,$06,$08,$38,$00,$03,$C3,$3C
@@ -262,7 +262,7 @@ nullsub_5
 	dc.b	$00,$04,$74,$03,$60,$00,$00,$0A,$30,$03,$D0,$42,$61,$00,$00,$08
 	dc.b	$51,$CA,$FF,$F6,$4E,$75
 
-ShowCrowdFrame2	;A copy of ShowCrowdFrame. Nothing in the listing reaches it.
+.spr	;Add the arena animation sprites in view (the ShowCrowdFrame loop); reached only from the dead body above
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$80,$67,$00,$00,$B4,$BC,$7C,$00,$40,$6C,$00,$00,$AC,$48,$E7
 	dc.b	$FC,$00,$D0,$40,$20,$49,$32,$30,$00,$02,$92,$70,$00,$00,$E6,$49
@@ -327,7 +327,7 @@ ManualGoalieMenu	;The "x Manual Goalie" pause menu item.
 	dc.b	$00,$18,$30,$3C,$00,$06,$4A,$78,$D2,$6E,$66,$00,$00,$06,$30,$3C
 	dc.b	$00,$0B,$4E,$B9,$00,$01,$6C,$5C,$4C,$DF,$7F,$FF,$4E,$75
 
-nullsub_6
+RunArenaAnim	;Run the arena animation (load its frames and tiles, step the frames); disabled in 96 by the leading rts
 	rts
 	dc.b	$4A,$78,$D4,$74,$6B,$00,$00,$56,$48,$E7,$FF,$FE,$4A,$B8,$D4,$7A
 	dc.b	$66,$00,$00,$36,$30,$38,$D4,$74,$E7,$40,$20,$7C,$00,$1D,$88,$20
@@ -379,17 +379,17 @@ nullsub_6
 	dc.b	$00,$06,$C3,$3A,$31,$FC,$00,$00,$BF,$DC,$31,$FC,$01,$60,$BF,$DE
 	dc.b	$4E,$75
 
-nullsub_7
+StartArenaAnim	;Start arena animation d0; disabled in 96 by the leading rts
 	rts
 	dc.b	$48,$E7,$FF,$FE,$31,$C0,$D4,$74,$21,$FC,$00,$00,$00,$00,$D4,$76
 	dc.b	$21,$FC,$00,$00,$00,$00,$D4,$7A,$31,$FC,$00,$01,$D4,$6E,$42,$78
 	dc.b	$D4,$70,$50,$F8,$D4,$7E,$4C,$DF,$7F,$FF,$4E,$75
 
-sub_1D8AB4	;Called from the faceoff bytes.
+SetFaceoffAnim	;Set the faceoff animation d0 (sflags7 bit 0)
 	;Code the listing does not decode: kept as bytes
 	dc.b	$08,$F8,$00,$00,$C3,$4A,$31,$C0,$D4,$7E,$4E,$75
 
-sub_1D8AC0	;Called from the faceoff bytes.
+EndArenaAnim	;End the arena animation (none running, sflags7 bit 0 cleared)
 	;Code the listing does not decode: kept as bytes
 	dc.b	$31,$FC,$FF,$FF,$D4,$74,$08,$B8,$00,$00,$C3,$4A,$4E,$75
 
@@ -406,7 +406,7 @@ ClearWinRecords	;Clear bytes 8-$B (wins, games) of the 8 ThreeStars records and 
 PSandSOpassdir	;Penalty shot / shootout: passdir = sopathdir (the end of the skate path NextPathPoint), turned by passdirlist
 	;for the bottom net
 	movem.l	d0-d7/a0-a6,-(sp)
-	move.w	(word_FFD81C).w,d0
+	move.w	(sopathdir).w,d0
 	btst	#7,$62(a3)
 	bne.w	.0
 	movea.l	#passdirlist,a0

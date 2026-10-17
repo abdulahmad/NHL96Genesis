@@ -13,7 +13,7 @@
 
 ; External addresses outside, read from lst/nhl96.bin.
 TeamList = $00077E		;teamdata96
-sub_EF02 = $00EF02		;lines96_set
+GetTeamLines = $00EF02		;lines96_set
 
 
 ; Main segment code

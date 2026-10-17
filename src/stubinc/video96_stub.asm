@@ -13,7 +13,7 @@
 
 ; External addresses outside, read from lst/nhl96.bin.
 PrintBigChar = $01BF94		;penalty96
-unk_1C01C = $01C01C		;penalty96
+BigControlCodeJumpTable = $01C01C		;penalty96
 rtss2 = $01F84A		;collide96
 vb2 = $0202C4		;display96
 SoundCmd = $08839E		;sound96

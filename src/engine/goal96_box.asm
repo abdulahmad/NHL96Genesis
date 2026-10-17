@@ -8,7 +8,7 @@ ShowThreeStars	;End of game Stars of the Game box. Waits for RefCnt <= $40 and r
 	bset	#7,(gmode).w
 	bne.w	rtss2
 	jsr	(ClearBigScore).l
-	jsr	(sub_1CFE4).l
+	jsr	(ErasePowerPlayBox).l
 	movem.l	d0/a1,-(sp)
 	bset	#3,(disflags).w
 	move.w	(vcount).w,d0
@@ -267,7 +267,7 @@ ShowGoalBox	;Goal box: close both line change boxes (lcfound2), then the scorer 
 	cmp.w	(HomeTeam).w,d0
 	bne.w	.3
 	move.w	#0,d0
-	jsr	(nullsub_7).l
+	jsr	(StartArenaAnim).l
 .3
 	move.w	(sp)+,d0
 .print

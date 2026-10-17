@@ -4,12 +4,12 @@ OptionsScreen	;The game options screen: play mode, rosters, period length, goali
 	;changes, fighting and skill level (OptionsMenuList; left / right change OptionVars). Start saves them
 	;(WriteOptions) and sets the play mode (SetPlayMode); transactions go to PlayoffMenuScreen. Left alone
 	;(carddelay) it puts the options back to the defaults
-	move.w	#$15,(word_FFD284).w
-	move.w	#$1D,(word_FFD286).w
+	move.w	#$15,(skillspeed).w
+	move.w	#$1D,(skillspeedpal).w
 	move.w	(VDP_CNTR).l,(seed).w
 	move.w	(VDP_CNTR).l,(seed+2).w
-	clr.w	(word_FFB8C6).w
-	clr.w	(word_FFB8C8).w
+	clr.w	(optanimframe).w
+	clr.w	(optanimdelay).w
 	st	(demoflag).w
 	jsr	(ReadPassData).l
 	movea.l	#pwddatabuffer,a3
@@ -19,11 +19,11 @@ OptionsScreen	;The game options screen: play mode, rosters, period length, goali
 	beq.w	.0
 	jsr	(maketree).l
 .0
-	jsr	(sub_1149E).l
+	jsr	(ReadSeasonHeader).l
 	bclr	#1,(sflags13).w
-	btst	#1,(dword_FFDD7E+2).w
+	btst	#1,(SeasonFlags).w
 	beq.w	.1
-	btst	#3,(dword_FFDD7E+2).w
+	btst	#3,(SeasonFlags).w
 	bne.w	.1
 	bset	#1,(sflags13).w
 .1
@@ -48,8 +48,8 @@ OptionsScreen	;The game options screen: play mode, rosters, period length, goali
 	clr.w	(carddelay).w
 	bsr.w	OptionsMenuInit
 	bsr.w	OptionsScreenSetup
-	movea.l	#unk_19C232,a0
-	jsr	(sub_1218A).l
+	movea.l	#MainMenuSprites,a0
+	jsr	(DrawScreenSprite).l
 	jsr	(PStatsPalette).l
 	move.w	#$18,(palcount).w
 	bclr	#2,(disflags).w
@@ -61,20 +61,20 @@ OptionsScreen	;The game options screen: play mode, rosters, period length, goali
 .loop2
 	cmp.w	(vcount).w,d0
 	beq.s	.loop2
-	jsr	(sub_12640).l
+	jsr	(SetMenuScroll).l
 	addq.w	#1,(carddelay).w
 	cmpi.w	#$2A30,(carddelay).w
 	bge.w	.16
-	move.w	(word_FFB8C8).w,d0
+	move.w	(optanimdelay).w,d0
 	addq.w	#1,d0
 	cmp.w	#8,d0
 	blt.w	.5
 	bsr.w	OptionsAnimFrame
-	addq.w	#1,(word_FFB8C6).w
-	andi.w	#7,(word_FFB8C6).w
+	addq.w	#1,(optanimframe).w
+	andi.w	#7,(optanimframe).w
 	clr.w	d0
 .5
-	move.w	d0,(word_FFB8C8).w
+	move.w	d0,(optanimdelay).w
 	jsr	(FindHeldMenuPad).l
 	jsr	(ProcessInputWithRepeat).l
 	tst.w	d1
@@ -196,8 +196,8 @@ OptionsScreen	;The game options screen: play mode, rosters, period length, goali
 	bsr.w	SetPlayMode
 	btst	#7,(GameFlags).w
 	beq.w	.19
-	jsr	(sub_1149E).l
-	btst	#2,(dword_FFDD7E+2).w
+	jsr	(ReadSeasonHeader).l
+	btst	#2,(SeasonFlags).w
 	beq.w	.19
 	jsr	(ReadPassData).l
 	jsr	(ReadPassBits).l
@@ -222,7 +222,7 @@ OptionsMenuDraw	;OptionsScreen: draw the menu (PrintMenuList2)
 
 OptionsScreenSetup	;OptionsScreen: vram, fonts, the screen bitmaps and the row labels
 	bset	#5,(sflags12).w
-	move.l	#unk_12D46,(vbint).w
+	move.l	#VBlank_Menus,(vbint).w
 	bclr	#0,(disflags).w
 	bset	#2,(disflags).w
 	bclr	#1,(disflags).w
@@ -240,17 +240,17 @@ OptionsScreenSetup	;OptionsScreen: vram, fonts, the screen bitmaps and the row l
 	bclr	#5,(disflags).w
 	jsr	(orjoy).l
 	move.w	#1,d4
-	movea.l	#unk_19C232,a1
-	jsr	(sub_1217A).l
+	movea.l	#MainMenuSprites,a1
+	jsr	(LoadScreenSprite).l
 	move.w	d4,(smallfontchars).w
 	movea.l	#RosterFont+8,a2
 	jsr	(DecompressGraphicsPlain).l
-	move.w	d4,(word_FFB01E).w
+	move.w	d4,(smallfont2chars).w
 	movea.l	#SmallFontMap2+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.l	#RosterFont,(smallfontptr).w
 	move.w	d4,(word_FFB8C4).w
-	movea.l	#unk_1C4C4E+8,a2
+	movea.l	#PuckAnimMap+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	jsr	(printsmallz).l
 	String	$FF,$01,$FD,$00,$FC
@@ -260,7 +260,7 @@ OptionsScreenSetup	;OptionsScreen: vram, fonts, the screen bitmaps and the row l
 	jsr	(eraser).l
 	jsr	(printz).l
 	String	$BF,$00,$00
-	movea.l	#unk_19A3E4,a0
+	movea.l	#MainMenuBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -273,7 +273,7 @@ OptionsScreenSetup	;OptionsScreen: vram, fonts, the screen bitmaps and the row l
 	jsr	(dobitmap).l
 	jsr	(printz).l
 	String	$BF,$0B,$01
-	movea.l	#unk_199BE4,a0
+	movea.l	#MainMenuTitleMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -331,10 +331,10 @@ ClearGameRAM	;Clear the shootout words, both team structs, PenBuf and the game f
 OptionsMenuInit	;OptionsScreen: menulist = OptionsMenuList, item 0
 	move.l	#OptionsMenuList,(menulist).l
 	clr.w	(menuitem).w
-	clr.w	(word_FFD000).w
-	move.w	#9,(word_FFD00A).w
-	move.w	#$13,(word_FFB03C).w
-	move.w	#9,(word_FFB03E).w
+	clr.w	(menuitem+2).w
+	move.w	#9,(menurows).w
+	move.w	#$13,(menux).w
+	move.w	#9,(menuy).w
 	rts
 
 OptionsMenuList	;The options menu: each item routine keeps its option in range and returns its text in a1
@@ -587,33 +587,33 @@ LineOptionTbl	;SetLineOption: the game value of each line changes row
 PenOptionTbl	;SetPenOption: the game value of each penalties row
 	dc.b	0,2,1
 
-SetSkillLevel	;word_FFD284 / word_FFD286 (PAL) by skill level OptSkill
+SetSkillLevel	;skillspeed / skillspeedpal (PAL) by skill level OptSkill
 	movea.l	#SkillLevelTbl,a0
 	movea.l	#SkillLevelPalTbl,a1
 	move.w	(OptSkill).w,d0
 	add.w	d0,d0
-	move.w	(a0,d0.w),(word_FFD284).w
-	move.w	(a1,d0.w),(word_FFD286).w
+	move.w	(a0,d0.w),(skillspeed).w
+	move.w	(a1,d0.w),(skillspeedpal).w
 	rts
 
-SkillLevelTbl	;SetSkillLevel: word_FFD284 of each skill level
+SkillLevelTbl	;SetSkillLevel: skillspeed of each skill level
 	dc.w	$15,$15,$14
 
-SkillLevelPalTbl	;SetSkillLevel: word_FFD286 of each skill level
+SkillLevelPalTbl	;SetSkillLevel: skillspeedpal of each skill level
 	dc.w	$1D,$1D,$1C
 
-OptionsAnimFrame	;OptionsScreen: draw frame word_FFB8C6 of the animation (unk_1C4C4E, 7 x 7 tiles)
+OptionsAnimFrame	;OptionsScreen: draw frame optanimframe of the animation (PuckAnimMap, 7 x 7 tiles)
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printz).l
 	String	$BF,$1F,$01
 	move.w	(word_FFB8C4).w,d4
-	movea.l	#unk_1C4C4E,a0
+	movea.l	#PuckAnimMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
 	adda.l	(a2)+,a1
 	clr.w	d0
-	move.w	(word_FFB8C6).w,d1
+	move.w	(optanimframe).w,d1
 	mulu.w	#7,d1
 	moveq	#7,d2
 	moveq	#7,d3

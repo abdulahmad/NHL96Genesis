@@ -210,7 +210,7 @@ SaveTeamLine	;Line editor menu item Save Team Line
 	dc.b	$22,$7C,$FF,$FF,$BD,$7E,$30,$3C,$00,$07,$22,$D8,$51,$C8,$FF,$FC
 	dc.b	$4C,$DF,$03,$00,$4E,$75
 
-sub_1E2644	;Called from the line editor
+FormatLineName	;a1 = mesarea " Last" for player d0 of team a2, space padded, for the line editor slots
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$F0,$A0,$4E,$B9,$00,$01,$01,$C6,$32,$7C,$BF,$F4,$12,$FC
 	dc.b	$00,$20,$30,$18,$45,$F0,$00,$FE,$0C,$18,$00,$20,$66,$FA,$12,$D8

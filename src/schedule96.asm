@@ -1,7 +1,7 @@
 ;	The season schedule. A day count, then one Day record per day: the number of games and the
 ;	two teams in each game.
 
-SeasonSchedule	;The season schedule (sub_1116A, sub_11226): a day count, then a Day record per day,
+SeasonSchedule	;The season schedule (BuildSeasonTeamList, WriteDayGames): a day count, then a Day record per day,
 	;the number of games and two team numbers per game
 	dc.b	191	;days
 	Day	CHI,PIT,  WPG,OTW,  BOS,MTL,  BUF,QUE,  TB,NYI,  NYR,NJ,  HFD,PHI,  WSH,TOR,  STL,DET,  ANH,DAL,  VAN,CGY,  LA,SJ

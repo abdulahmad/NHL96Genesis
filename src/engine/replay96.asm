@@ -14,7 +14,7 @@ ReplayMode	;Instant replay play-back control and display code. Pause menu INSTAN
 	dc.b	$05,$44,$4A,$47,$66,$F8,$4E,$B9,$00,$02,$13,$AE,$4E,$B9,$00,$02
 	dc.b	$03,$4A,$08,$B8,$00,$01,$C3,$3E,$42,$B8,$BE,$AE,$42,$B8,$BE,$B2
 	dc.b	$42,$B8,$BE,$B6,$31,$FC,$00,$18,$BD,$3C,$7E,$01
-loc_158C8	;Jumped to from later in ReplayMode
+.top
 	dc.b	$30,$38,$B0,$52,$90,$78,$B0,$54,$BE,$40,$62,$F4,$31,$F8,$B0,$52
 	dc.b	$B0,$54,$4A,$78,$DC,$A8,$6B,$00,$00,$14,$9F,$78,$DC,$A8,$6A,$00
 	dc.b	$00,$0C,$42,$78,$DC,$A8,$4E,$B9,$00,$01,$5D,$2A,$48,$E7,$80,$10
@@ -262,8 +262,8 @@ updatereplay	;Called every frame to save replay events, d7 = elapsed frames
 	or.b	d0,(a0)+
 	adda.w	#$80,a3
 	dbf	d2,.loop
-	move.b	(byte_FFB777).w,(a0)+
-	move.b	(byte_FFB7F7).w,(a0)+
+	move.b	(puckz+1).w,(a0)+
+	move.b	(SortCords+$F*SCstruct+Zpos+1).w,(a0)+
 	move.b	(lastsfx+1).w,(a0)+
 	bset	#7,(lastsfx+1).w
 	move.b	d7,(a0)+

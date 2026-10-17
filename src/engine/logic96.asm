@@ -4,12 +4,12 @@
 
 asstab	;Assignment routines: assignment number = index (asslist entries; doassignment)
 	dc.l	rtss2	;$0
-	dc.l	loc_E1F8	;$1
-	dc.l	loc_D956	;$2
-	dc.l	loc_DCDE	;$3
-	dc.l	loc_E63E	;$4
-	dc.l	loc_DFEC	;$5
-	dc.l	loc_E4C4	;$6
+	dc.l	assdefo	;$1
+	dc.l	assdefd	;$2
+	dc.l	asswingd	;$3
+	dc.l	asswingo	;$4
+	dc.l	asscenterd	;$5
+	dc.l	asscentero	;$6
 	dc.l	assscore	;$7
 	dc.l	assstanley	;$8
 	dc.l	asseben	;$9
@@ -39,23 +39,24 @@ asstab	;Assignment routines: assignment number = index (asslist entries; doassig
 	dc.l	chkpuckc	;$21
 	dc.l	assbreakaway	;$22
 	dc.l	assonetimer	;$23
-	dc.l	loc_D32A	;$24
-	dc.l	loc_D7A4	;$25
-	dc.l	loc_D06A	;$26
-	dc.l	loc_D5EA	;$27
-	dc.l	loc_CE72	;$28
-	dc.l	loc_CE70	;$29
-	dc.l	loc_CCE2	;$2A
-	dc.l	loc_CCE0	;$2B
-	dc.l	loc_CAEA	;$2C
-	dc.l	loc_C97A	;$2D
-	dc.l	loc_C7EC	;$2E
-	dc.l	loc_C60E	;$2F
+	dc.l	assdefo5	;$24
+	dc.l	assdefd5	;$25
+	dc.l	assdefo4	;$26
+	dc.l	assdefd4	;$27
+	dc.l	asswingd5	;$28
+	dc.l	asswingd4	;$29
+	dc.l	asswingo5	;$2A
+	dc.l	asswingo4	;$2B
+	dc.l	asscenterd5	;$2C
+	dc.l	asscenterd4	;$2D
+	dc.l	asscentero5	;$2E
+	dc.l	asscentero4	;$2F
 	;The assignment routines below are not decoded in the listing: kept as bytes, with a label at
 	;each asstab entry
 	dc.b	$4E,$F9,$00,$01,$A3,$DA
 
-loc_C60E	;Assignment $2F
+asscentero4	;Center on offense, two men short (tmap 4); back to asscentero / asscentero5 when tmap changes, asscenterd4
+	;when the other team has the puck
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$01,$D4,$0C,$6A,$00,$04,$00,$24
 	dc.b	$67,$00,$00,$22,$30,$3C,$00,$06,$0C,$6A,$00,$06,$00,$24,$66,$00
 	dc.b	$00,$04,$60,$D6,$30,$3C,$00,$2E,$0C,$6A,$00,$05,$00,$24,$66,$00
@@ -87,7 +88,7 @@ loc_C60E	;Assignment $2F
 	dc.b	$00,$04,$32,$00,$D0,$FC,$00,$80,$51,$CA,$FF,$CE,$30,$2B,$00,$44
 	dc.b	$20,$7C,$00,$01,$87,$3A,$4E,$F9,$00,$01,$A0,$50,$4E,$75
 
-loc_C7EC	;Assignment $2E
+asscentero5	;Center on offense, one man short (tmap 5); asscenterd5 when the other team has the puck
 	dc.b	$0C,$6A,$00,$05,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$06,$0C,$6A
 	dc.b	$00,$06,$00,$24,$66,$00,$00,$06,$60,$00,$FE,$02,$30,$3C,$00,$2F
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$FD,$F0,$08,$2B
@@ -114,7 +115,7 @@ loc_C7EC	;Assignment $2E
 	dc.b	$32,$2B,$00,$46,$08,$2B,$00,$07,$00,$62,$66,$00,$00,$04,$44,$41
 	dc.b	$20,$7C,$00,$01,$87,$3A,$4E,$F9,$00,$01,$A0,$50,$4E,$75
 
-loc_C97A	;Assignment $2D
+asscenterd4	;Center on defense, two men short (tmap 4); asscentero4 when his team gets the puck
 	dc.b	$0C,$6A,$00,$04,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$05,$0C,$6A
 	dc.b	$00,$06,$00,$24,$66,$00,$00,$06,$60,$00,$FC,$74,$30,$3C,$00,$2C
 	dc.b	$0C,$6A,$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$FC,$62,$08,$2B
@@ -139,7 +140,7 @@ loc_C97A	;Assignment $2D
 	dc.b	$44,$40,$37,$40,$00,$46,$30,$2B,$00,$44,$32,$2B,$00,$46,$41,$FA
 	dc.b	$00,$08,$4E,$F9,$00,$01,$A0,$50,$4E,$75,$4E,$F9,$00,$01,$73,$1E
 
-loc_CAEA	;Assignment $2C
+asscenterd5	;Center on defense, one man short (tmap 5); asscentero5 when his team gets the puck
 	dc.b	$0C,$6A,$00,$05,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$05,$0C,$6A
 	dc.b	$00,$06,$00,$24,$66,$00,$00,$06,$60,$00,$FB,$04,$30,$3C,$00,$2D
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$FA,$F2,$08,$2B
@@ -173,10 +174,10 @@ loc_CAEA	;Assignment $2C
 	dc.b	$60,$E0,$30,$2B,$00,$44,$32,$2B,$00,$46,$41,$FA,$00,$08,$4E,$F9
 	dc.b	$00,$01,$A0,$50,$4E,$75
 
-loc_CCE0	;Assignment $2B
+asswingo4	;Winger on offense, two men short (tmap 4): does nothing
 	dc.b	$4E,$75
 
-loc_CCE2	;Assignment $2A
+asswingo5	;Winger on offense, one man short (tmap 5); asswingd5 when the other team has the puck
 	dc.b	$0C,$6A,$00,$05,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$04,$0C,$6A
 	dc.b	$00,$06,$00,$24,$66,$00,$00,$06,$60,$00,$F9,$0C,$30,$3C,$00,$2B
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$F8,$FA,$08,$2B
@@ -203,10 +204,10 @@ loc_CCE2	;Assignment $2A
 	dc.b	$00,$46,$08,$2B,$00,$07,$00,$62,$66,$00,$00,$06,$44,$40,$44,$41
 	dc.b	$20,$7C,$00,$01,$87,$3A,$4E,$F9,$00,$01,$A0,$50,$4E,$75
 
-loc_CE70	;Assignment $29
+asswingd4	;Winger on defense, two men short (tmap 4): does nothing
 	dc.b	$4E,$75
 
-loc_CE72	;Assignment $28
+asswingd5	;Winger on defense, one man short (tmap 5); asswingo5 when his team gets the puck
 	dc.b	$0C,$6A,$00,$05,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$03,$0C,$6A
 	dc.b	$00,$06,$00,$24,$66,$00,$00,$06,$60,$00,$F7,$7C,$30,$3C,$00,$29
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$F7,$6A,$08,$2B
@@ -240,7 +241,7 @@ loc_CE72	;Assignment $28
 	dc.b	$00,$44,$60,$E0,$30,$2B,$00,$44,$32,$2B,$00,$46,$41,$FA,$00,$08
 	dc.b	$4E,$F9,$00,$01,$A0,$50,$4E,$75
 
-loc_D06A	;Assignment $26
+assdefo4	;Defenseman on offense, two men short (tmap 4); assdefd4 when his team loses the puck
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$02,$B6,$0C,$6A,$00,$04,$00,$24
 	dc.b	$67,$00,$00,$26,$30,$3C,$00,$01,$0C,$6A,$00,$06,$00,$24,$66,$00
 	dc.b	$00,$06,$60,$00,$F5,$7A,$30,$3C,$00,$24,$0C,$6A,$00,$05,$00,$24
@@ -286,7 +287,7 @@ loc_D06A	;Assignment $26
 	dc.b	$6D,$00,$00,$04,$32,$00,$D0,$FC,$00,$80,$51,$CA,$FF,$CE,$30,$2B
 	dc.b	$00,$44,$20,$7C,$00,$01,$87,$3A,$4E,$F9,$00,$01,$A0,$50,$4E,$75
 
-loc_D32A	;Assignment $24
+assdefo5	;Defenseman on offense, one man short (tmap 5); assdefd5 when his team loses the puck
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$02,$B6,$0C,$6A,$00,$05,$00,$24
 	dc.b	$67,$00,$00,$26,$30,$3C,$00,$01,$0C,$6A,$00,$06,$00,$24,$66,$00
 	dc.b	$00,$06,$60,$00,$F2,$BA,$30,$3C,$00,$26,$0C,$6A,$00,$04,$00,$24
@@ -332,7 +333,7 @@ loc_D32A	;Assignment $24
 	dc.b	$6D,$00,$00,$04,$32,$00,$D0,$FC,$00,$80,$51,$CA,$FF,$CE,$30,$2B
 	dc.b	$00,$44,$20,$7C,$00,$01,$87,$3A,$4E,$F9,$00,$01,$A0,$50,$4E,$75
 
-loc_D5EA	;Assignment $27
+assdefd4	;Defenseman on defense, two men short (tmap 4); assdefo4 when his team gets the puck
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$01,$B0,$0C,$6A,$00,$04,$00,$24
 	dc.b	$67,$00,$00,$26,$30,$3C,$00,$02,$0C,$6A,$00,$06,$00,$24,$66,$00
 	dc.b	$00,$06,$60,$00,$EF,$FA,$30,$3C,$00,$25,$0C,$6A,$00,$05,$00,$24
@@ -362,7 +363,7 @@ loc_D5EA	;Assignment $27
 	dc.b	$00,$07,$00,$62,$67,$00,$00,$04,$44,$40,$B0,$7C,$00,$76,$6E,$00
 	dc.b	$00,$08,$4E,$F9,$00,$01,$8D,$32,$4E,$75
 
-loc_D7A4	;Assignment $25
+assdefd5	;Defenseman on defense, one man short (tmap 5); assdefo5 when his team gets the puck
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$01,$A8,$0C,$6A,$00,$05,$00,$24
 	dc.b	$67,$00,$00,$26,$30,$3C,$00,$02,$0C,$6A,$00,$06,$00,$24,$66,$00
 	dc.b	$00,$06,$60,$00,$EE,$40,$30,$3C,$00,$27,$0C,$6A,$00,$04,$00,$24
@@ -392,7 +393,8 @@ loc_D7A4	;Assignment $25
 	dc.b	$44,$40,$B0,$7C,$00,$76,$6D,$00,$00,$08,$4E,$F9,$00,$01,$8D,$32
 	dc.b	$4E,$75
 
-loc_D956	;Assignment $2
+assdefd	;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo when his team carries the puck up; ends in
+	;check4check
 	dc.b	$0C,$6A,$00,$06,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$25,$0C,$6A
 	dc.b	$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$EC,$98,$30,$3C,$00,$27
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$EC,$86,$08,$2B
@@ -451,7 +453,7 @@ loc_D956	;Assignment $2
 	dc.b	$17,$7C,$00,$1E,$00,$6A,$4E,$B9,$00,$01,$A0,$50,$17,$5F,$00,$6A
 	dc.b	$4E,$F9,$00,$01,$8D,$32,$4E,$75
 
-loc_DCDE	;Assignment $3
+asswingd	;Winger on defense (tmap 5 / 4: asswingd5 / asswingd4); asswingo when his team gets the puck
 	dc.b	$0C,$6A,$00,$06,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$28,$0C,$6A
 	dc.b	$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$E9,$10,$30,$3C,$00,$29
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$E8,$FE,$08,$2B
@@ -502,7 +504,7 @@ loc_DCDE	;Assignment $3
 	dc.b	$B7,$72,$37,$40,$00,$44,$37,$41,$00,$46,$30,$2B,$00,$44,$32,$2B
 	dc.b	$00,$46,$41,$FA,$00,$08,$4E,$F9,$00,$01,$A0,$50,$4E,$75
 
-loc_DFEC	;Assignment $5
+asscenterd	;Center on defense (tmap 5 / 4: asscenterd5 / asscenterd4); asscentero when his team gets the puck
 	dc.b	$0C,$6A,$00,$06,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$2C,$0C,$6A
 	dc.b	$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$E6,$02,$30,$3C,$00,$2D
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$E5,$F0,$08,$2B
@@ -537,7 +539,8 @@ loc_DFEC	;Assignment $5
 	dc.b	$00,$00,$15,$F9,$00,$2A,$6D,$00,$00,$08,$17,$7C,$00,$1E,$00,$6A
 	dc.b	$4E,$B9,$00,$01,$A0,$50,$17,$5F,$00,$6A,$4E,$75
 
-loc_E1F8	;Assignment $1
+assdefo	;Defenseman on offense (tmap 5 / 4: assdefo5 / assdefo4); assdefd when his team loses the puck or it leaves the
+	;zone
 	dc.b	$0C,$6A,$00,$06,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$24,$0C,$6A
 	dc.b	$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$E3,$F6,$30,$3C,$00,$26
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$E3,$E4,$08,$2B
@@ -584,7 +587,8 @@ loc_E1F8	;Assignment $1
 	dc.b	$00,$44,$37,$41,$00,$46,$30,$2B,$00,$44,$32,$2B,$00,$46,$20,$7C
 	dc.b	$00,$01,$87,$3A,$4E,$F9,$00,$01,$A0,$50,$4E,$75
 
-loc_E4C4	;Assignment $6
+asscentero	;Center on offense (tmap 5 / 4: asscentero5 / asscentero4): a random spot ahead of the puck; asscenterd when it
+	;is lost
 	dc.b	$0C,$6A,$00,$06,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$2E,$0C,$6A
 	dc.b	$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$E1,$2A,$30,$3C,$00,$2F
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$E1,$18,$08,$2B
@@ -610,7 +614,8 @@ loc_E4C4	;Assignment $6
 	dc.b	$08,$2B,$00,$07,$00,$62,$66,$00,$00,$04,$44,$41,$20,$7C,$00,$01
 	dc.b	$87,$3A,$4E,$F9,$00,$01,$A0,$50,$4E,$75
 
-loc_E63E	;Assignment $4
+asswingo	;Winger on offense (tmap 5 / 4: asswingo5 / asswingo4): a random spot in the puck zone; asswingd when the puck
+	;is lost
 	dc.b	$0C,$6A,$00,$06,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$2A,$0C,$6A
 	dc.b	$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$DF,$B0,$30,$3C,$00,$2B
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$DF,$9E,$08,$2B
@@ -798,7 +803,7 @@ PenShotPenalties	;The penalty shot penalty number for penalty number d0 (word of
 	dc.w	$40,$44,$38,$3A,$3E,-1,-1,-1,-1,-1,-1,$48
 	dc.w	$4A,-1,-1
 
-unk_EBF8	;A second table by penalty number
+DoubleMinorPenalties	;The double minor version of each penalty (word offset), -1 none
 	dc.w	-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
 	dc.w	-1,$34,$36,-1,-1,-1,-1,-1,-1,-1,-1,-1
 	dc.w	-1,-1,-1,-1

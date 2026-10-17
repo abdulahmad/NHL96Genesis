@@ -6,17 +6,17 @@ ChecksumLongs	;ValidationRoutine: the number of ROM longs before this table
 ChecksumValue	;ValidationRoutine: the expected sum
 	dc.l	$5F4547E9
 
-dword_1E9030
+ChecksumSkipStart	;Checksum gap start: ValidationRoutine sums the ROM below this address (0 = no gap)
 	dc.l	0
 
-dword_1E9034
+ChecksumSkipEnd	;Checksum gap end: the sum restarts after this byte (0 = no gap)
 	dc.l	0
 
 ValidationRoutine	;The ROM checksum: sum the ROM longs, less the header long at ProductCode+$C; a red screen and a
 	;hang when it is not ChecksumValue
 	moveq	#0,d0
 	suba.l	a0,a0
-	move.l	dword_1E9030(pc),d1
+	move.l	ChecksumSkipStart(pc),d1
 	lsr.l	#2,d1
 	move.l	d1,d2
 	beq.w	.1
@@ -34,13 +34,13 @@ ValidationRoutine	;The ROM checksum: sum the ROM longs, less the header long at 
 .1
 	cmp.l	ChecksumLongs(pc),d2
 	bgt.s	.3
-	move.l	dword_1E9034(pc),d2
+	move.l	ChecksumSkipEnd(pc),d2
 	lsr.l	#2,d2
 	cmp.l	ChecksumLongs(pc),d2
 	bgt.s	.3
 	move.l	ChecksumLongs(pc),d1
 	subq.l	#1,d1
-	movea.l	dword_1E9034(pc),a0
+	movea.l	ChecksumSkipEnd(pc),a0
 	cmp.l	#0,d2
 	beq.w	.2
 	addq.l	#1,a0

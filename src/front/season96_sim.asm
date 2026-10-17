@@ -32,40 +32,41 @@ SimGameStats
 	move.w	d0,(rosterscroll).w
 	move.w	(HomeTeam).w,d1
 	move.w	(VisTeam).w,d2
-	bsr.w	sub_10C6A
+	bsr.w	SimShots
 	move.w	d0,(a1)
 	movea.l	#$FFFF5208,a5
 	movea.l	#$FFFF5244,a4
-	bsr.w	sub_10BAC
-	bsr.w	sub_10C00
+	bsr.w	SimScorers
+	bsr.w	SimTeamAssists
 	movea.l	#$FFFF5668,a6
-	bsr.w	sub_10A08
+	bsr.w	SimPenalties
 	clr.w	d0
 	move.b	3(a0),d0
 	move.w	d0,$C(a2)
 	move.w	d0,(rosterscroll).w
 	move.w	(VisTeam).w,d1
 	move.w	(HomeTeam).w,d2
-	bsr.w	sub_10C6A
+	bsr.w	SimShots
 	move.w	d0,(a2)
 	movea.l	a2,a1
 	movea.l	#$FFFF55F0,a5
 	movea.l	#$FFFF562C,a4
-	bsr.w	sub_10BAC
-	bsr.w	sub_10C00
+	bsr.w	SimScorers
+	bsr.w	SimTeamAssists
 	movea.l	#$FFFF56A4,a6
-	bsr.w	sub_10A08
+	bsr.w	SimPenalties
 	bsr.w	SimGoalieStats
-	jsr	(sub_10CF2).l
+	jsr	(SaveGameStats).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_10A08
+SimPenalties	;Sim penalties of team d1: the count (SimPenaltyBase), 2 PIM each to skaters by aggression rank (SimRankOdds),
+	;the first a major
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	#$C0,d0
 	jsr	(randomd0).l
 	asr.w	#5,d0
-	movea.l	#unk_10AFA,a3
+	movea.l	#SimPenaltyBase,a3
 	add.b	(a3,d1.w),d0
 	cmp.b	#1,d0
 	ble.w	.0
@@ -107,7 +108,7 @@ sub_10A08
 	move.w	6(a1),d6
 	move.w	d6,d7
 	subq.w	#1,d7
-	movea.l	#unk_10CA3,a3
+	movea.l	#SimRankOdds,a3
 	bra.w	.7
 .3
 	move.w	#$64,d0
@@ -140,7 +141,7 @@ sub_10A08
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-unk_10AFA
+SimPenaltyBase	;Per team: the base sim penalty count (SimPenalties)
 	dc.b	$04,$04,$06,$09,$07,$07,$06,$08,$04,$05,$06,$05,$04,$05,$04,$04
 	dc.b	$04,$06,$04,$05,$06,$07,$04,$07,$08,$08
 
@@ -192,10 +193,11 @@ PickSimGoalie
 	movem.l	(sp)+,d1-d7
 	rts
 
-sub_10BAC
+SimScorers	;Give each of the rosterscroll goals to a skater picked by rank (SimRankOdds) from the sorted list a4; injured
+	;picks re-roll
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(rosterscroll).w,d6
-	movea.l	#unk_10CA3,a3
+	movea.l	#SimRankOdds,a3
 	bra.w	.3
 .0
 	move.w	#$64,d0
@@ -223,7 +225,7 @@ sub_10BAC
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_10C00
+SimTeamAssists	;Sim assists: goals x 1.0-2.0, each to a skater picked by rank (SimAssistOdds); injured picks are dropped
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(rosterscroll).w,d6
 	move.w	#$64,d0
@@ -231,7 +233,7 @@ sub_10C00
 	addi.w	#$64,d0
 	muls.w	d0,d6
 	divs.w	#$64,d6
-	movea.l	#unk_10C94,a3
+	movea.l	#SimAssistOdds,a3
 	bra.w	.3
 .0
 	move.w	#$64,d0
@@ -259,9 +261,9 @@ sub_10C00
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_10C6A
+SimShots	;d0 = shots: d0 (goals) - SimTeamDefense of team d2 + 30 + a random 0-20
 	movem.l	d1-d7/a0-a6,-(sp)
-	movea.l	#unk_107F9,a1
+	movea.l	#SimTeamDefense,a1
 	clr.w	d3
 	move.b	(a1,d2.w),d3
 	sub.w	d3,d0
@@ -273,8 +275,8 @@ sub_10C6A
 	movem.l	(sp)+,d1-d7/a0-a6
 	rts
 
-unk_10C94
+SimAssistOdds	;SimTeamAssists: cumulative % of picking each rank of the sorted skater list
 	dc.b	$0C,$18,$24,$2E,$36,$3E,$46,$4C,$52,$56,$5A,$5E,$60,$62,$64
 
-unk_10CA3
+SimRankOdds	;SimScorers / SimPenalties: cumulative % of picking each rank of the sorted skater list
 	dc.b	$0D,$19,$22,$2B,$34,$3B,$42,$48,$4E,$54,$58,$5C,$60,$62,$64

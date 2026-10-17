@@ -12,7 +12,7 @@
 	include	macros\genesis.mac	;String
 
 ; External addresses outside, read from lst/nhl96.bin.
-sub_EF02 = $00EF02		;lines96_set
+GetTeamLines = $00EF02		;lines96_set
 LockScroll = $016786		;control96
 assinsert = $01A3D0		;logic96_vec
 Framer = $01B9B0		;video96

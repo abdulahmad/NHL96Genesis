@@ -27,7 +27,7 @@ SetLCmode2	;Open the line change box: wait for the box, then draw the line choic
 .0
 	bset	#2,(sflags12).w
 	bne.w	.2
-	jsr	(sub_1CFE4).l
+	jsr	(ErasePowerPlayBox).l
 .2
 	bsr.w	setlccords
 	cmpi.w	#$F,(printy).w
@@ -117,13 +117,13 @@ getlchoice2
 	add.w	d1,d0
 	add.w	d1,d0
 	add.w	d1,d0
-	lea	unk_EDCE(pc),a0
+	lea	.tab(pc),a0
 	move.b	(a0,d0.w),d0
 	ext.w	d0
 	movem.l	(sp)+,d1-d2
 	rts
 
-unk_EDCE
+.tab
 	dc.b	$00,$01,$02,$01,$02,$00,$02,$00,$01,$00,$01,$02,$00,$01,$02,$00
 	dc.b	$01,$02,$00,$01,$02,$03,$04,$FF,$03,$04,$FF,$03,$04,$FF,$03,$04
 	dc.b	$FF,$04,$03,$FF,$03,$04,$FF,$03,$04,$FF,$05,$06,$FF,$05,$06,$FF
@@ -193,5 +193,5 @@ lcfound2
 	jsr	(eraser).l
 	bclr	#2,(sflags12).w
 	bset	#3,(sflags12).w
-	jmp	nullsub_4
+	jmp	printscores1
 

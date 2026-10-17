@@ -20,7 +20,7 @@ CalcAttribRating = $1DF8AC		;create96
 OvrPlayerWgtList2 = $1DF9EC		;create96
 OvrGoalWgtList2 = $1DF9FC		;create96
 GetRosterName = $0101E6		;trade96
-sub_103AA = $0103AA		;trade96
+GetPositionSlot = $0103AA		;trade96
 
 
 ; Main segment code

@@ -13,9 +13,9 @@
 
 ; External addresses outside, read from lst/nhl96.bin.
 TeamList = $00077E		;teamdata96
-sub_10CF2 = $010CF2		;season96
-sub_112DA = $0112DA		;season96
-sub_11510 = $011510		;season96
+SaveGameStats = $010CF2		;season96
+SaveUserGame = $0112DA		;season96
+FindUserGame = $011510		;season96
 SetupPauseScreen = $014F14		;pause96
 InitMenuState = $014F70		;pause96
 HandleMenuInput = $014FA8		;pause96

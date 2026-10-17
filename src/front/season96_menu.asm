@@ -86,16 +86,16 @@ LeadersScrollArrows	;League Leaders: draw up/down scroll arrows depending on lis
 	dc.b	$05,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
 	dc.b	$20,$20,$20,$20,$20,$20,$20,$00,$4C,$DF,$7F,$FF,$4E,$75
 
-sub_1DA9EA	;Jump through unk_1DAA06 by word_FFBF56
+BuildPlayerLeaders	;League leaders: build and sort the list of category pstatscat through PlayerLeaderJumps
 	movem.l	d0-d7/a0-a6,-(sp)
-	move.w	(word_FFBF56).w,d0
+	move.w	(pstatscat).w,d0
 	asl.w	#2,d0
-	movea.l	#unk_1DAA06,a0
+	movea.l	#PlayerLeaderJumps,a0
 	movea.l	(a0,d0.w),a0
 	jmp	(a0)
 	dc.b	$4C,$DF,$7F,$FF,$4E,$75
 
-unk_1DAA06	;sub_1DA9EA jump table
+PlayerLeaderJumps	;BuildPlayerLeaders handler per category: goals, assists, points, goals against average
 	dc.b	$00,$1D,$AA,$56,$00,$1D,$AA,$88,$00,$1D,$AA,$BA,$00,$1D,$AA,$16
 	dc.b	$22,$3C,$00,$00,$59,$8C,$74,$0E,$76,$03,$28,$3C,$00,$00,$5D,$D0
 	dc.b	$7C,$0D,$08,$38,$00,$02,$DD,$80,$67,$00,$00,$14,$22,$3C,$00,$00
@@ -168,7 +168,7 @@ SortValuesUp	;Bubble sort the values at LeaderValues / players at LeaderPlayers 
 	dc.b	$00,$01,$BC,$84,$52,$78,$B0,$42,$52,$46,$BC,$78,$BF,$5C,$6D,$00
 	dc.b	$FE,$9C,$60,$00,$00,$02,$4E,$75
 
-unk_1DAE32	;A String of blanks (used from code96_14, code96_16 and data96_12)
+BlankStatsRow	;A String of blanks that clears a stats list row
 	dc.b	$00,$24,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
 	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
 	dc.b	$20,$20,$20,$20,$08,$F8,$00,$05,$C3,$56,$21,$FC,$00,$01,$2D,$46
@@ -202,32 +202,32 @@ unk_1DAE32	;A String of blanks (used from code96_14, code96_16 and data96_12)
 	dc.b	$04,$01,$18,$08,$54,$45,$41,$4D,$46,$FC,$25,$00,$4E,$75
 
 SeasonPlayoffStats	;The playoff stats screen in a season (PlayoffStatsMenu with GameFlags bit 7): the players or goalies of a
-	;team by category (word_FFBF56), the PStats helpers of code96_16
+	;team by category (pstatscat), the PStats helpers of code96_16
 	movem.l	d0-d7/a0-a6,-(sp)
 	clr.w	(carddelay).w
-	clr.w	(word_FFBF56).w
+	clr.w	(pstatscat).w
 	clr.w	(word_FF2720).l
 	bset	#5,(sflags12).w
 	bsr.w	PStatsSetup
-	movea.l	#unk_18B4F8,a0
-	jsr	(sub_1218A).l
+	movea.l	#PlayerStatsSprites,a0
+	jsr	(DrawScreenSprite).l
 	move.w	#$18,(palcount).w
 	bclr	#2,(disflags).w
-	clr.w	(word_FFBF58).w
-	move.w	#$D,(word_FFBF5C).w
-	move.w	#$C,(word_FFBF5A).w
-	clr.w	(word_FFBF56).w
+	clr.w	(pstatstop).w
+	move.w	#$D,(pstatsrows).w
+	move.w	#$C,(pstatsrow).w
+	clr.w	(pstatscat).w
 .1
 	move.w	(word_FF2720).l,d7
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.2
 	jsr	(GetPOSlotTeam).l
 .2
-	cmpi.w	#4,(word_FFBF56).w
+	cmpi.w	#4,(pstatscat).w
 	blt.w	.3
 	jsr	(GetGoalieCountD7).l
 	subq.w	#1,d0
-	move.w	d0,(word_FFBF5E).w
+	move.w	d0,(pstatslast).w
 	bra.w	.draw
 .3
 	jsr	(GetGoalieCountD7).l
@@ -235,7 +235,7 @@ SeasonPlayoffStats	;The playoff stats screen in a season (PlayoffStatsMenu with 
 	jsr	(GetPlayerCountD7).l
 	sub.w	(sp)+,d0
 	subq.w	#1,d0
-	move.w	d0,(word_FFBF5E).w
+	move.w	d0,(pstatslast).w
 .draw
 	bsr.w	PStatsBuildList
 	move.w	(vcount).w,d0
@@ -257,12 +257,12 @@ SeasonPlayoffStats	;The playoff stats screen in a season (PlayoffStatsMenu with 
 	cmp.w	(vcount).w,d0
 	beq.s	.loop3
 	bset	#2,(disflags).w
-	jsr	(sub_12640).l
+	jsr	(SetMenuScroll).l
 	bsr.w	PStatsPrintList
-	jsr	(sub_12640).l
+	jsr	(SetMenuScroll).l
 	move	#$2500,sr
 	bsr.w	PStatsArrows
-	jsr	(sub_12640).l
+	jsr	(SetMenuScroll).l
 	bclr	#2,(disflags).w
 .input
 	bsr.w	WaitAnyPad
@@ -272,44 +272,44 @@ SeasonPlayoffStats	;The playoff stats screen in a season (PlayoffStatsMenu with 
 	bne.w	.18
 	btst	#2,d1
 	beq.w	.right
-	cmpi.w	#4,(word_FFBF56).w
+	cmpi.w	#4,(pstatscat).w
 	blt.w	.8
-	subq.w	#1,(word_FFBF56).w
-	cmpi.w	#4,(word_FFBF56).w
+	subq.w	#1,(pstatscat).w
+	cmpi.w	#4,(pstatscat).w
 	bge.w	.9
-	move.w	#6,(word_FFBF56).w
+	move.w	#6,(pstatscat).w
 	bra.w	.9
 .8
-	subq.w	#1,(word_FFBF56).w
+	subq.w	#1,(pstatscat).w
 	bpl.w	.9
-	move.w	#3,(word_FFBF56).w
+	move.w	#3,(pstatscat).w
 .9
-	clr.w	(word_FFBF58).w
-	move.w	#$C,(word_FFBF5A).w
+	clr.w	(pstatstop).w
+	move.w	#$C,(pstatsrow).w
 	bra.w	.1
 .right
 	btst	#0,d1
 	beq.w	.13
-	tst.w	(word_FFBF58).w
+	tst.w	(pstatstop).w
 	beq.s	.input
-	subq.w	#1,(word_FFBF58).w
-	subq.w	#1,(word_FFBF5A).w
+	subq.w	#1,(pstatstop).w
+	subq.w	#1,(pstatsrow).w
 	bra.w	.4
 .13
 	btst	#1,d1
 	beq.w	.6
-	move.w	(word_FFBF5A).w,d0
-	cmp.w	(word_FFBF5E).w,d0
+	move.w	(pstatsrow).w,d0
+	cmp.w	(pstatslast).w,d0
 	bge.w	.input
-	addq.w	#1,(word_FFBF58).w
-	addq.w	#1,(word_FFBF5A).w	;next lower item
+	addq.w	#1,(pstatstop).w
+	addq.w	#1,(pstatsrow).w	;next lower item
 	bra.w	.4
 .6
 	btst	#6,d1
 	beq.w	.5
 	subq.w	#1,(word_FF2720).l
 	bpl.w	.1
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.10
 	move.w	#$F,(word_FF2720).l
 	bra.w	.1
@@ -320,7 +320,7 @@ SeasonPlayoffStats	;The playoff stats screen in a season (PlayoffStatsMenu with 
 	btst	#5,d1
 	beq.w	.14
 	addq.w	#1,(word_FF2720).l
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.11
 	cmpi.w	#$10,(word_FF2720).l
 	bra.w	.12
@@ -333,33 +333,33 @@ SeasonPlayoffStats	;The playoff stats screen in a season (PlayoffStatsMenu with 
 .14
 	btst	#4,d1
 	beq.w	.0
-	cmpi.w	#4,(word_FFBF56).w
+	cmpi.w	#4,(pstatscat).w
 	blt.w	.15
-	clr.w	(word_FFBF56).w
+	clr.w	(pstatscat).w
 	bra.w	.1
 .15
-	move.w	#4,(word_FFBF56).w
+	move.w	#4,(pstatscat).w
 	bra.w	.1
 .0
 	btst	#3,d1
 	beq.w	.input
-	addq.w	#1,(word_FFBF56).w
-	cmpi.w	#4,(word_FFBF56).w
+	addq.w	#1,(pstatscat).w
+	cmpi.w	#4,(pstatscat).w
 	blt.w	.9
 	bgt.w	.16
-	clr.w	(word_FFBF56).w
+	clr.w	(pstatscat).w
 	bra.w	.9
 .16
-	cmpi.w	#6,(word_FFBF56).w
+	cmpi.w	#6,(pstatscat).w
 	ble.w	.9
-	move.w	#4,(word_FFBF56).w
+	move.w	#4,(pstatscat).w
 	bra.w	.9
 .17
 	bclr	#5,(sflags12).w
 	jmp	Opening2
 .18
 	bclr	#5,(sflags12).w
-	move.l	#unk_122A4,(dword_FFDDAC).w
+	move.l	#SeasonMenuScreen,(NextScreenPtr).w
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
@@ -370,7 +370,7 @@ WaitAnyPad	;Wait for a press on pad 1 or 2 (3 and 4 with FourWayPlay); d1 = the 
 	move.w	(vcount).w,d1
 	sub.w	(oldvcount).w,d1
 	beq.s	.wait
-	jsr	(sub_12640).l
+	jsr	(SetMenuScroll).l
 	move.w	(vcount).w,(oldvcount).w
 	jsr	(ReadJoy1).l
 	jsr	(ProcessInputWithRepeat).l
@@ -402,9 +402,9 @@ WaitAnyPad	;Wait for a press on pad 1 or 2 (3 and 4 with FourWayPlay); d1 = the 
 .exit
 	rts
 
-PStatsArrows	;SeasonPlayoffStats: the scroll marks { (word_FFBF58 above 0) and } (more rows below)
+PStatsArrows	;SeasonPlayoffStats: the scroll marks { (pstatstop above 0) and } (more rows below)
 	movem.l	d0-d7/a0-a6,-(sp)
-	tst.w	(word_FFBF58).w
+	tst.w	(pstatstop).w
 	beq.w	.0
 	jsr	(printcurz).l
 	String	$8F,$02,$0B,$7B
@@ -413,8 +413,8 @@ PStatsArrows	;SeasonPlayoffStats: the scroll marks { (word_FFBF58 above 0) and }
 	jsr	(printcurz).l
 	String	$8F,$02,$0B,$20
 .1
-	move.w	(word_FFBF5A).w,d1
-	cmp.w	(word_FFBF5E).w,d1
+	move.w	(pstatsrow).w,d1
+	cmp.w	(pstatslast).w,d1
 	bge.w	.2
 	jsr	(printcurz).l
 	String	$8F,$02,$17,$7D
@@ -440,7 +440,7 @@ PStatsClearList	;SeasonPlayoffStats: erase the list area
 
 PStatsSetup	;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the heading, the team block and the help
 	bset	#5,(sflags12).w
-	move.l	#unk_12D46,(vbint).w
+	move.l	#VBlank_Menus,(vbint).w
 	bclr	#0,(disflags).w
 	bset	#2,(disflags).w
 	bclr	#1,(disflags).w
@@ -458,12 +458,12 @@ PStatsSetup	;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the heading
 	bclr	#5,(disflags).w
 	jsr	(orjoy).l
 	move.w	#1,d4
-	movea.l	#unk_18B4F8,a1
-	jsr	(sub_1217A).l
+	movea.l	#PlayerStatsSprites,a1
+	jsr	(LoadScreenSprite).l
 	move.w	d4,(smallfontchars).w
 	movea.l	#RosterFont+8,a2
 	jsr	(DecompressGraphicsPlain).l
-	move.w	d4,(word_FFB01E).w
+	move.w	d4,(smallfont2chars).w
 	movea.l	#SmallFontMap2+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.l	#RosterFont,(smallfontptr).w
@@ -471,7 +471,7 @@ PStatsSetup	;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the heading
 	movea.l	#BigFontMap4+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	bset	#2,(sflags11).w
-	move.w	d4,(word_FF2712).l
+	move.w	d4,(pstatsblockchars).l
 	addi.w	#$20,d4
 	jsr	(printsmallz).l
 	String	$FF,$01,$FD,$00,$FC
@@ -481,7 +481,7 @@ PStatsSetup	;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the heading
 	jsr	(eraser).l
 	jsr	(printz).l
 	String	$BF,$00,$00
-	movea.l	#unk_18948A,a0
+	movea.l	#PlayerStatsBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -494,12 +494,12 @@ PStatsSetup	;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the heading
 	jsr	(dobitmap).l
 	jsr	(printz).l
 	String	$BF,$0B,$01
-	movea.l	#unk_18ACD8,a0
-	btst	#2,(dword_FFDD7E+2).w
+	movea.l	#SeasonStatsTitleMap,a0
+	btst	#2,(SeasonFlags).w
 	beq.w	.0
 	jsr	(printz).l
 	String	$BF,$0B,$01
-	movea.l	#unk_18B916,a0
+	movea.l	#PlayoffStatsTitleMap,a0
 .0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -514,7 +514,7 @@ PStatsSetup	;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the heading
 	bsr.w	PStatsHelp
 	jsr	(printz).l
 	String	$FE,$00,$00
-	movea.l	#unk_170B0C,a0
+	movea.l	#IceBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -536,17 +536,17 @@ PStatsTeamBlock	;SeasonPlayoffStats: the team block of the shown team (DrawSetup
 	move.w	d7,-(sp)
 	jsr	(printz).l
 	String	$BF,$01,$05
-	move.w	(word_FF2712).l,d4
+	move.w	(pstatsblockchars).l,d4
 	move.w	(word_FF2720).l,d7
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.0
 	jsr	(GetPOSlotTeam).l
 .0
 	jsr	(DrawSetupTeamBlock).l
 	move.w	(sp)+,d7
 
-PStatsHeading	;SeasonPlayoffStats: the column heading, players or goalies (word_FFBF56 4 and up)
-	cmpi.w	#4,(word_FFBF56).w
+PStatsHeading	;SeasonPlayoffStats: the column heading, players or goalies (pstatscat 4 and up)
+	cmpi.w	#4,(pstatscat).w
 	bge.w	.0
 	jsr	(printbigz).l
 	String	$F8,$04,$01,$04,$08,'#  PLAYER         g   a   p   pim'
@@ -558,28 +558,28 @@ PStatsHeading	;SeasonPlayoffStats: the column heading, players or goalies (word_
 	rts
 
 PStatsHelp	;SeasonPlayoffStats: the button help lines
-	cmpi.w	#4,(word_FFBF56).w
+	cmpi.w	#4,(pstatscat).w
 	bge.w	.1
 	move.w	(smallfontchars).w,-(sp)
-	move.w	(word_FFB01E).w,(smallfontchars).w
+	move.w	(smallfont2chars).w,(smallfontchars).w
 	jsr	(printcurz).l
 	String	$8F,$04,$19,'{}-SCROLL LIST   A/C-TEAMS',$8F,$04,$1A,'[]-CATEGORY      B-GOALIES'
 	move.w	(sp)+,(smallfontchars).w
 	bra.w	.0
 .1
 	move.w	(smallfontchars).w,-(sp)
-	move.w	(word_FFB01E).w,(smallfontchars).w
+	move.w	(smallfont2chars).w,(smallfontchars).w
 	jsr	(printcurz).l
 	String	$8F,$04,$19,'{}-SCROLL LIST   A/C-TEAMS',$8F,$04,$1A,'[]-CATEGORY      B-PLAYERS'
 	move.w	(sp)+,(smallfontchars).w
 .0
 	rts
 
-PStatsCategory	;SeasonPlayoffStats: the name of category word_FFBF56 (PStatsCategoryTxt)
+PStatsCategory	;SeasonPlayoffStats: the name of category pstatscat (PStatsCategoryTxt)
 	jsr	(printz).l
 	String	$BF,$15,$05
 	movea.l	#PStatsCategoryTxt,a1
-	move.w	(word_FFBF56).w,d0
+	move.w	(pstatscat).w,d0
 	jsr	(SkipStrings).l
 	jsr	(printbig).l
 	rts
@@ -597,11 +597,11 @@ PStatsCategoryTxt	;PStatsCategory: the category names
 PStatsBuildList	;SeasonPlayoffStats: the player or goalie list of the shown team, sorted by category
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(word_FF2720).l,d7
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.0
 	jsr	(GetPOSlotTeam).l
 .0
-	cmpi.w	#4,(word_FFBF56).w
+	cmpi.w	#4,(pstatscat).w
 	bge.w	.9
 	jsr	(GetPlayerCountD7).l
 	move.w	d0,-(sp)
@@ -609,7 +609,7 @@ PStatsBuildList	;SeasonPlayoffStats: the player or goalie list of the shown team
 	move.w	d0,d1
 	sub.w	(sp)+,d0
 	neg.w	d0
-	move.w	d0,(word_FF2714).l
+	move.w	d0,(pstatscount).l
 	movea.l	#$FFFF1388,a0
 	bra.w	.2
 .1
@@ -617,38 +617,38 @@ PStatsBuildList	;SeasonPlayoffStats: the player or goalie list of the shown team
 	addq.w	#1,d1
 .2
 	dbf	d0,.1
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.3
 	jsr	(GetTeamPOSlot).l
 .3
-	move.w	(word_FF2714).l,d3
+	move.w	(pstatscount).l,d3
 	movea.l	#$FFFF193A,a0
 	move.l	#$268,d1
 	moveq	#$C,d2
 	move.l	#$120,d4
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.4
 	move.l	#$448,d1
 	moveq	#$A,d2
 	move.l	#$F0,d4
 .4
-	jsr	(sub_10F02).l
+	jsr	(ReadSRAMBitWords).l
 	movea.l	#$FFFF1A02,a0
 	move.l	#$1FA8,d1
 	moveq	#$C,d2
-	move.w	(word_FF2714).l,d3
+	move.w	(pstatscount).l,d3
 	move.l	#$120,d4
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.5
 	move.l	#$1348,d1
 	moveq	#$A,d2
 	move.l	#$F0,d4
 .5
-	jsr	(sub_10F02).l
+	jsr	(ReadSRAMBitWords).l
 	movea.l	#$FFFF193A,a1
 	movea.l	#$FFFF1A02,a2
 	movea.l	#$FFFF1ACA,a0
-	move.w	(word_FF2714).l,d3
+	move.w	(pstatscount).l,d3
 	bra.w	.7
 .6
 	move.w	(a1)+,d0
@@ -659,19 +659,19 @@ PStatsBuildList	;SeasonPlayoffStats: the player or goalie list of the shown team
 	movea.l	#$FFFF1B92,a0
 	move.l	#$3CE8,d1
 	moveq	#$A,d2
-	move.w	(word_FF2714).l,d3
+	move.w	(pstatscount).l,d3
 	move.l	#$F0,d4
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.8
 	move.l	#$2248,d1
 	moveq	#9,d2
 	move.l	#$D8,d4
 .8
-	jsr	(sub_10F02).l
+	jsr	(ReadSRAMBitWords).l
 	bra.w	.18
 .9
 	jsr	(GetGoalieCountD7).l
-	move.w	d0,(word_FF2714).l
+	move.w	d0,(pstatscount).l
 	movea.l	#$FFFF1388,a0
 	clr.w	d1
 	bra.w	.11
@@ -680,38 +680,38 @@ PStatsBuildList	;SeasonPlayoffStats: the player or goalie list of the shown team
 	addq.w	#1,d1
 .11
 	dbf	d0,.10
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.12
 	jsr	(GetTeamPOSlot).l
 .12
 	movea.l	#$FFFF1C5A,a0
-	move.w	(word_FF2714).l,d3
+	move.w	(pstatscount).l,d3
 	move.l	#$598C,d1
 	moveq	#$E,d2
 	moveq	#$2A,d4
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.13
 	move.l	#$3268,d1
 	moveq	#$E,d2
 	moveq	#$2A,d4
 .13
-	jsr	(sub_10F02).l
+	jsr	(ReadSRAMBitWords).l
 	movea.l	#$FFFF1D22,a0
 	move.l	#$5548,d1
 	moveq	#$E,d2
-	move.w	(word_FF2714).l,d3
+	move.w	(pstatscount).l,d3
 	moveq	#$2A,d4
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.14
 	move.l	#$2FC8,d1
 	moveq	#$E,d2
 	moveq	#$2A,d4
 .14
-	jsr	(sub_10F02).l
+	jsr	(ReadSRAMBitWords).l
 	movea.l	#$FFFF1C5A,a0
 	movea.l	#$FFFF1D22,a1
 	movea.l	#$FFFF1DEA,a2
-	move.w	(word_FF2714).l,d3
+	move.w	(pstatscount).l,d3
 	bra.w	.17
 .15
 	move.w	(a1)+,d0
@@ -727,7 +727,7 @@ PStatsBuildList	;SeasonPlayoffStats: the player or goalie list of the shown team
 	dbf	d3,.15
 .18
 	movea.l	#PStatsColumns,a0
-	move.w	(word_FFBF56).w,d0
+	move.w	(pstatscat).w,d0
 	asl.w	#2,d0
 	movea.l	(a0,d0.w),a0
 	movea.l	#$FFFF1388,a1
@@ -737,7 +737,7 @@ PStatsBuildList	;SeasonPlayoffStats: the player or goalie list of the shown team
 .19
 	clr.w	(TempWord1).w
 	clr.w	d0
-	move.w	(word_FF2714).l,d5
+	move.w	(pstatscount).l,d5
 	subq.w	#2,d5
 .20
 	move.w	d0,d1
@@ -773,48 +773,48 @@ PStatsPrintList	;SeasonPlayoffStats: print the rows of the list
 	clr.w	d6
 	move.w	#$B,(printy).w
 .0
-	clr.w	(word_FF1EB2).l
-	cmpi.w	#4,(word_FFBF56).w
+	clr.w	(pstatscol).l
+	cmpi.w	#4,(pstatscat).w
 	blt.w	.1
-	move.w	#4,(word_FF1EB2).l
+	move.w	#4,(pstatscol).l
 .1
 	movea.l	#PStatsColumns,a5
-	move.w	(word_FF1EB2).l,d0
+	move.w	(pstatscol).l,d0
 	asl.w	#2,d0
 	movea.l	(a5,d0.w),a5
 	move.w	#4,(printx).w
-	movea.l	#unk_1DAE32,a1
+	movea.l	#BlankStatsRow,a1
 	jsr	(printcur).l
 	move.w	d6,d0
-	add.w	(word_FFBF58).w,d0
-	cmp.w	(word_FF2714).l,d0
+	add.w	(pstatstop).w,d0
+	cmp.w	(pstatscount).l,d0
 	blt.w	.2
 	move.w	d6,d0
-	add.w	(word_FFBF58).w,d0
-	cmp.w	(word_FFBF5E).w,d0
+	add.w	(pstatstop).w,d0
+	cmp.w	(pstatslast).w,d0
 	bge.w	.11
-	move.w	d0,(word_FFBF5E).w
+	move.w	d0,(pstatslast).w
 	bra.w	.11
 .2
 	move.w	#4,(printx).w
 	movea.l	#$FFFF1388,a0
 	move.w	d6,d0
-	add.w	(word_FFBF58).w,d0
+	add.w	(pstatstop).w,d0
 	add.w	d0,d0
 	move.w	(a0,d0.w),d0
 	ext.l	d0
 	move.w	d0,-(sp)
 	move.w	(word_FF2720).l,d7
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.3
 	jsr	(GetPOSlotTeam).l
 .3
 	jsr	(FormatPlayerNameD7).l
 	jsr	(printcur).l
-	cmpi.w	#4,(word_FFBF56).w
+	cmpi.w	#4,(pstatscat).w
 	bge.w	.5
 	move.w	(word_FF2720).l,d7
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.4
 	jsr	(GetPOSlotTeam).l
 .4
@@ -822,7 +822,7 @@ PStatsPrintList	;SeasonPlayoffStats: print the rows of the list
 	sub.w	d0,(sp)
 .5
 	move.w	#$15,(printx).w
-	cmpi.w	#4,(word_FFBF56).w
+	cmpi.w	#4,(pstatscat).w
 	blt.w	.6
 	move.w	#$14,(printx).w
 .6
@@ -830,7 +830,7 @@ PStatsPrintList	;SeasonPlayoffStats: print the rows of the list
 	bsr.w	PStatsPrintValue
 	beq.w	.10
 	move.w	#$19,(printx).w
-	cmpi.w	#4,(word_FFBF56).w
+	cmpi.w	#4,(pstatscat).w
 	blt.w	.7
 	move.w	#$1A,(printx).w
 .7
@@ -838,7 +838,7 @@ PStatsPrintList	;SeasonPlayoffStats: print the rows of the list
 	bsr.w	PStatsPrintValue
 	beq.w	.10
 	move.w	#$1D,(printx).w
-	cmpi.w	#4,(word_FFBF56).w
+	cmpi.w	#4,(pstatscat).w
 	blt.w	.8
 	move.w	#$20,(printx).w
 .8
@@ -846,7 +846,7 @@ PStatsPrintList	;SeasonPlayoffStats: print the rows of the list
 	bsr.w	PStatsPrintValue
 	beq.w	.10
 	move.w	#$21,(printx).w
-	cmpi.w	#4,(word_FFBF56).w
+	cmpi.w	#4,(pstatscat).w
 	blt.w	.9
 	move.w	#0,(printx).w
 .9
@@ -857,14 +857,14 @@ PStatsPrintList	;SeasonPlayoffStats: print the rows of the list
 .11
 	addq.w	#1,(printy).w
 	addq.w	#1,d6
-	cmp.w	(word_FFBF5C).w,d6
+	cmp.w	(pstatsrows).w,d6
 	blt.w	.0
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-PStatsPrintValue	;SeasonPlayoffStats: print stat column word_FF1EB2 of player d0
+PStatsPrintValue	;SeasonPlayoffStats: print stat column pstatscol of player d0
 	move.w	d0,-(sp)
-	move.w	(word_FF1EB2).l,d0
+	move.w	(pstatscol).l,d0
 	asl.w	#2,d0
 	movea.l	#PStatsColumns,a0
 	movea.l	(a0,d0.w),a0
@@ -872,25 +872,25 @@ PStatsPrintValue	;SeasonPlayoffStats: print stat column word_FF1EB2 of player d0
 	add.w	d0,d0
 	move.w	(a0,d0.w),d0
 	move.w	#3,d1
-	cmpi.w	#4,(word_FF1EB2).l
+	cmpi.w	#4,(pstatscol).l
 	blt.w	.0
-	cmpi.w	#6,(word_FF1EB2).l
+	cmpi.w	#6,(pstatscol).l
 	beq.w	.0
 	move.w	#4,d1
 .0
 	jsr	(PushNumberWidth).l
 	bsr.w	PStatsMark
-	addq.w	#1,(word_FF1EB2).l
-	cmpi.w	#4,(word_FF1EB2).l
+	addq.w	#1,(pstatscol).l
+	cmpi.w	#4,(pstatscol).l
 	beq.w	.1
-	cmpi.w	#7,(word_FF1EB2).l
+	cmpi.w	#7,(pstatscol).l
 .1
 	rts
 
 PStatsMark	;SeasonPlayoffStats: print a value, highlighted in the column of the category
 	move.w	(printa).w,-(sp)
-	move.w	(word_FFBF56).w,d0
-	cmp.w	(word_FF1EB2).l,d0
+	move.w	(pstatscat).w,d0
+	cmp.w	(pstatscol).l,d0
 	bne.w	.0
 	jsr	(printsmallz).l
 	String	$FE,$05
@@ -936,8 +936,8 @@ PlayoffMenuScreen	;The playoff menu screen: the playoff tree from save RAM (Read
 	clr.w	(carddelay).w
 	bsr.w	PlayoffMenuInit
 	bsr.w	PlayoffMenuSetup
-	movea.l	#unk_190380,a0
-	jsr	(sub_1218A).l
+	movea.l	#TransactionsSprites,a0
+	jsr	(DrawScreenSprite).l
 	jsr	(PStatsPalette).l
 	move.w	#$18,(palcount).w
 	bclr	#2,(disflags).w
@@ -948,7 +948,7 @@ PlayoffMenuScreen	;The playoff menu screen: the playoff tree from save RAM (Read
 .loop2
 	cmp.w	(vcount).w,d0
 	beq.s	.loop2
-	jsr	(sub_12640).l
+	jsr	(SetMenuScroll).l
 	cmpi.w	#$5460,(carddelay).w
 	jsr	(FindHeldMenuPad).l
 	jsr	(ProcessInputWithRepeat).l
@@ -982,13 +982,13 @@ PlayoffMenuScreen	;The playoff menu screen: the playoff tree from save RAM (Read
 	bne.w	.4
 	bsr.w	ClearPlayoffSave
 .4
-	move.l	#$772,(dword_FFDDAC).w
+	move.l	#$772,(NextScreenPtr).w
 	move.l	#RosterMenuList,(menulist).l
 	clr.w	(menuitem).w
-	clr.w	(word_FFD000).w
-	move.w	#6,(word_FFD00A).w
-	move.w	#$D,(word_FFB03C).w
-	move.w	#6,(word_FFB03E).w
+	clr.w	(menuitem+2).w
+	move.w	#6,(menurows).w
+	move.w	#$D,(menux).w
+	move.w	#6,(menuy).w
 	jsr	(printsmallz).l
 	String	$FF,$01,$FD,$0C,$FC,$0B
 	move.w	#$11,d0
@@ -1001,17 +1001,17 @@ PlayoffMenuScreen	;The playoff menu screen: the playoff tree from save RAM (Read
 	movea.l	#PlayoffMenuRoutines,a0
 	move.w	(menuitem).w,d0
 	asl.w	#2,d0
-	move.l	(a0,d0.w),(dword_FFDDAC).w
-	cmpi.l	#unk_122A4,(dword_FFDDAC).w
+	move.l	(a0,d0.w),(NextScreenPtr).w
+	cmpi.l	#SeasonMenuScreen,(NextScreenPtr).w
 	beq.w	.7
-	cmpi.l	#ClearPlayoffSave,(dword_FFDDAC).l
+	cmpi.l	#ClearPlayoffSave,(NextScreenPtr).l
 	bne.w	.6
 	move.l	#YesNoMenuList,(menulist).l
 	clr.w	(menuitem).w
-	clr.w	(word_FFD000).w
-	move.w	#2,(word_FFD00A).w
-	move.w	#$12,(word_FFB03C).w
-	move.w	#$F,(word_FFB03E).w
+	clr.w	(menuitem+2).w
+	move.w	#2,(menurows).w
+	move.w	#$12,(menux).w
+	move.w	#$F,(menuy).w
 	jsr	(printsmallz).l
 	String	$FF,$01,$FD,$0C,$FC,$0B
 	move.w	#$11,d0
@@ -1022,9 +1022,9 @@ PlayoffMenuScreen	;The playoff menu screen: the playoff tree from save RAM (Read
 	String	$FE,$07,$F9,$00,$FD,$0E,$FC,$0B,'Reset Rosters'
 	bra.w	.draw
 .6
-	cmpi.l	#$772,(dword_FFDDAC).w
+	cmpi.l	#$772,(NextScreenPtr).w
 	beq.w	.draw
-	movea.l	(dword_FFDDAC).w,a0
+	movea.l	(NextScreenPtr).w,a0
 	bset	#6,(sflags11).w
 	jsr	(a0)
 	bclr	#6,(sflags11).w
@@ -1035,7 +1035,7 @@ PlayoffMenuScreen	;The playoff menu screen: the playoff tree from save RAM (Read
 
 PlayoffMenuRoutines	;PlayoffMenuScreen: the routine of each menu item
 	dc.l	TradePlayers,MenuCreatePlayers,MenuSignFreeAgents,MenuReleasePlayer,ClearPlayoffSave,TeamRosterScreen
-	dc.l	unk_122A4
+	dc.l	SeasonMenuScreen
 
 PlayoffMenuDraw	;PlayoffMenuScreen: draw the menu (PrintMenuList2)
 	movem.l	d0-d7/a0-a6,-(sp)
@@ -1049,15 +1049,15 @@ PlayoffMenuInit	;PlayoffMenuScreen: menulist = RosterMenuList, item 0
 	move.l	#RosterMenuList,(menulist).l
 .0
 	clr.w	(menuitem).w
-	clr.w	(word_FFD000).w
-	move.w	#7,(word_FFD00A).w
-	move.w	#$D,(word_FFB03C).w
-	move.w	#$B,(word_FFB03E).w
+	clr.w	(menuitem+2).w
+	move.w	#7,(menurows).w
+	move.w	#$D,(menux).w
+	move.w	#$B,(menuy).w
 	rts
 
 PlayoffMenuSetup	;PlayoffMenuScreen: vram and the screen bitmaps
 	bset	#5,(sflags12).w
-	move.l	#unk_12D46,(vbint).w
+	move.l	#VBlank_Menus,(vbint).w
 	bclr	#0,(disflags).w
 	bset	#2,(disflags).w
 	bclr	#1,(disflags).w
@@ -1075,16 +1075,16 @@ PlayoffMenuSetup	;PlayoffMenuScreen: vram and the screen bitmaps
 	bclr	#5,(disflags).w
 	jsr	(orjoy).l
 	move.w	#1,d4
-	movea.l	#unk_190380,a1
-	jsr	(sub_1217A).l
+	movea.l	#TransactionsSprites,a1
+	jsr	(LoadScreenSprite).l
 	move.w	d4,(smallfontchars).w
 	movea.l	#RosterFont+8,a2
 	jsr	(DecompressGraphicsPlain).l
-	move.w	d4,(word_FFB01E).w
+	move.w	d4,(smallfont2chars).w
 	movea.l	#SmallFontMap2+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.l	#RosterFont,(smallfontptr).w
-	move.w	d4,(word_FFB014).w
+	move.w	d4,(printbigchars).w
 	movea.l	#BigFontMap2+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	bclr	#2,(sflags11).w
@@ -1096,7 +1096,7 @@ PlayoffMenuSetup	;PlayoffMenuScreen: vram and the screen bitmaps
 	jsr	(eraser).l
 	jsr	(printz).l
 	String	$BF,$00,$00
-	movea.l	#unk_18E932,a0
+	movea.l	#TransactionsBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -1109,7 +1109,7 @@ PlayoffMenuSetup	;PlayoffMenuScreen: vram and the screen bitmaps
 	jsr	(dobitmap).l
 	jsr	(printz).l
 	String	$BF,$0B,$01
-	movea.l	#unk_18E152,a0
+	movea.l	#TransactionsTitleMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0

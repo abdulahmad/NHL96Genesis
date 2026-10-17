@@ -22,7 +22,7 @@ PlayoffStatsMenu	;Pause menu Playoff Stats: with GameFlags bit 7 set jump to Sea
 	movem.l	(sp)+,a2
 	rts
 
-loc_154D4	;Jumped to from outside the segment.
+ExitStatsScreen	;Leave a stats screen: forceblack, then reload the rink graphics (the entry after the forceblack)
 	;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$5A,$7C,$3F,$38,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$30,$38
 	dc.b	$B0,$00,$61,$00,$61,$90,$20,$BC,$00,$00,$00,$00,$30,$3C,$8D,$00

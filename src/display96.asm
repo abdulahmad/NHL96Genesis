@@ -79,7 +79,7 @@ setvideo	;This is not vblank code but sets up ram for vblank transfers. Called o
 	bsr.w	setsortcords
 	bsr.w	setffo
 	bsr.w	JumpToShowClock
-	jsr	(nullsub_5).l
+	jsr	(AddArenaAnimSprite).l
 	bsr.w	showcrowd
 	jsr	(showref).l
 	jsr	(UpdateCrowdMeter).l
@@ -166,7 +166,7 @@ updatescroll	;Scroll the rink window: Hscroll / Vscroll from Hpos / Vpos
 showref	;Ref window: when sflags2 bit 1 is set add the 8 RefRamMap rows to the dma list at a5 (VmMap1)
 	bclr	#1,(sflags2).w
 	beq.w	rtss2
-	movea.w	#(unk_FFC44C-M68K_RAM),a0
+	movea.w	#(RefRamMap-M68K_RAM),a0
 	movea.w	#(VmMap1-M68K_RAM),a1
 	move.w	2(a1),d2
 	moveq	#2,d0	;refy: Xpos on ice screen
@@ -386,12 +386,12 @@ JumpToShowClock	;setvideo enters showclock here
 	dc.b	$4E,$B9,$00,$02,$07,$AE,$22,$5F,$4E,$B9,$00,$01,$BB,$8E,$00,$06
 	dc.b	$BD,$0D,$05,$00,$4E,$75
 
-sub_207AE	;Called from the code above.
+.digit	;A clock digit for the dead clock code above (.digits)
 	;Code the listing does not decode: kept as bytes
 	dc.b	$22,$7C,$00,$02,$07,$C0,$E5,$40,$D2,$C0,$4E,$B9,$00,$01,$BB,$A0
 	dc.b	$4E,$75
 
-unk_207C0	;sub_207AE table
+.digits	;.digit: the digit chars
 	dc.b	$00,$04,$30,$00,$00,$04,$31,$00,$00,$04,$32,$00,$00,$04,$33,$00
 	dc.b	$00,$04,$34,$00,$00,$04,$35,$00,$00,$04,$36,$00,$00,$04,$37,$00
 	dc.b	$00,$04,$38,$00,$00,$04,$39,$00,$08,$B8,$00,$03,$BF,$B2,$67,$00
@@ -564,13 +564,13 @@ setffo	;Called from setvideo
 	dbf	d0,.top
 	rts
 
-SetGloveAndSetupPad	;The setup pad (word_FFBF16 at $3E8: none) and the glove (glovecords), then uppads
+SetGloveAndSetupPad	;The setup pad (glovecords+2 at $3E8: none) and the glove (glovecords), then uppads
 	movea.w	#(unk_FFBE72-M68K_RAM),a0
 	st	$18(a0)
-	cmpi.w	#$3E8,(word_FFBF16).w
+	cmpi.w	#$3E8,(glovecords+2).w
 	beq.w	.0
-	move.b	(word_FFBF16).w,d0
-	move.b	(word_FFBF16+1).w,d1
+	move.b	(glovecords+2).w,d0
+	move.b	(glovecords+2+1).w,d1
 	ext.w	d0
 	asl.w	#2,d0
 	move.w	d0,(a0)
@@ -905,7 +905,7 @@ setupice	;Set all variables, send non purgeable graphics, build sprite frame lis
 	move.w	#$7FF,d2
 	bsr.w	DoFill
 	clr.w	d4
-	move.w	d4,(word_FFB022).w
+	move.w	d4,(rinkvrcset).w
 	movea.l	#Rinktilelist+8,a2
 	btst	#4,(sflags4).w
 	beq.w	*+4
@@ -920,11 +920,11 @@ setupice	;Set all variables, send non purgeable graphics, build sprite frame lis
 	bsr.w	DecompressGraphicsPlain
 	move.w	d4,(animchars).w
 	jsr	(LoadCrowdFrames).l
-	move.w	d4,(word_FFB02E).w
+	move.w	d4,(spritechars).w
 	bsr.w	defaultsprites
 	bsr.w	setupIceRinkPal
-	bsr.w	sub_1C184
-	move.w	d4,(word_FFB038).w
+	bsr.w	AddFramer
+	move.w	d4,(gamefontchars).w
 	jsr	(LoadSmallFont).l
 	jsr	(LoadBigFonts).l
 	move.w	d4,(ExtraChars).w

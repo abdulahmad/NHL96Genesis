@@ -573,7 +573,7 @@ doinput_chkanim	;Animation in progress (pflags2 bit 1): rts. Then the goalie che
 	rts
 .0
 	tst.w	position(a3)
-	bne.w	loc_AFD4
+	bne.w	JumpToDoplayeracc
 	bclr	#1,(BA_PS_flags).w
 	cmpi.w	#$24,(a3)
 	ble.w	.1
@@ -617,7 +617,7 @@ doinput_skater	;Skater input (doinput, position not 0)
 	btst	#3,pflags3(a3)
 	bne.w	rtss7
 	btst	#5,d1
-	beq.w	loc_AFD4
+	beq.w	JumpToDoplayeracc
 	movem.l	d7-a0,-(sp)
 	move.w	(lastplayer).w,d7
 	asl.w	#7,d7
@@ -753,7 +753,7 @@ doinput_ispc	;The puck carrier: checkob, then pass mode, shot mode, or the butto
 	jmp	doplayeracc
 .7
 	btst	#5,d1
-	beq.w	loc_AFD4
+	beq.w	JumpToDoplayeracc
 	jsr	(sub_1D920A).l
 	bra.w	SetShotMode
 
@@ -796,7 +796,7 @@ doinput_islocked	;B with the player not the carrier: change player (chgplayer)
 	movem.l	(sp)+,d0/a0
 	rts
 
-loc_AFD4	;jmp doplayeracc, shared by doinput_chkanim, doinput_skater and doinput_islocked
+JumpToDoplayeracc	;jmp doplayeracc, shared by doinput_chkanim, doinput_skater and doinput_islocked
 	jmp	doplayeracc
 
 sub_AFDA	;Start with a dpad direction: SPA288C with pflags2 bit 1 set and Xvel + $64,

@@ -38,7 +38,7 @@ PadIconMap3 = $1B5EC0		;graphics96
 PadIconMap4 = $1B643E		;graphics96
 PadCursorMap = $1B69BC		;graphics96
 ControllerTitleMap = $1B6F3A		;graphics96
-unk_1B773A = $1B773A		;graphics96
+ControllerFrameMap = $1B773A		;graphics96
 
 ; Main segment code
 	include	engine\goal96.asm

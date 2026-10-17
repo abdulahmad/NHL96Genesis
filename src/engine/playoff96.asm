@@ -102,8 +102,8 @@ maketree	;Make the playoff tree (potree) from the playoff seeds and WinBits, the
 	movem.l	d0-d4/a0-a3,-(sp)
 	btst	#7,(GameFlags).w
 	beq.w	.0
-	btst	#2,(dword_FFDD7E+2).w
-	beq.w	loc_21F94
+	btst	#2,(SeasonFlags).w
+	beq.w	.nogames
 	movea.l	#$FFFFD130,a0
 	moveq	#$57,d0
 	moveq	#$10,d1
@@ -120,7 +120,7 @@ maketree	;Make the playoff tree (potree) from the playoff seeds and WinBits, the
 .1
 	movem.l	d5-d6/a4-a5,-(sp)
 	movea.l	#$FFFFD108,a5
-	movea.l	#unk_21F9A,a4
+	movea.l	#FirstRoundSeeds,a4
 	move.l	(a4),(a5)
 	move.l	4(a4),4(a5)
 	move.l	8(a4),8(a5)
@@ -134,7 +134,7 @@ maketree	;Make the playoff tree (potree) from the playoff seeds and WinBits, the
 	moveq	#$E,d2
 	move.w	(WinBits).w,d0
 
-loc_21D84
+.loop
 	move.w	d0,d1
 	andi.w	#1,d1
 	move.b	(a0,d1.w),(a1)+
@@ -142,23 +142,23 @@ loc_21D84
 	addq.w	#2,a0
 	addq.l	#2,a5
 	cmp.w	#$B,d2
-	beq.w	loc_21E8E
+	beq.w	.reseed4
 	cmp.w	#7,d2
-	beq.w	loc_21E8E
+	beq.w	.reseed4
 	cmp.w	#5,d2
-	beq.w	loc_21E62
+	beq.w	.reseed2
 	cmp.w	#3,d2
-	beq.w	loc_21E62
+	beq.w	.reseed2
 	cmp.w	#1,d2
-	beq.w	.0
-	bra.w	loc_21F3E
-.0
+	beq.w	.final
+	bra.w	.next
+.final
 	btst	#7,(GameFlags).w
-	beq.w	loc_21F3E
-	bsr.w	sub_21DD4
-	bra.w	loc_21F3E
+	beq.w	.next
+	bsr.w	.bypoints
+	bra.w	.next
 
-sub_21DD4
+.bypoints
 	movem.l	d0-d3,-(sp)
 	clr.l	d1
 	move.b	-2(a4),d1
@@ -193,18 +193,18 @@ sub_21DD4
 	add.l	(sp)+,d0
 	move.l	d0,d6
 	cmp.w	d5,d6
-	bge.w	.0
+	bge.w	.keep
 	move.b	-1(a4),d5
 	move.b	-2(a4),-1(a4)
 	move.b	d5,-2(a4)
-.0
+.keep
 	movem.l	(sp)+,d0-d3
 	rts
 
-loc_21E62
+.reseed2
 	move.b	-2(a4),d5
 	cmp.b	-1(a4),d5
-	bge.w	loc_21F3E
+	bge.w	.next
 	move.b	-1(a4),d6
 	move.b	d5,-1(a4)
 	move.b	d6,-2(a4)
@@ -212,42 +212,42 @@ loc_21E62
 	move.b	-1(a1),d6
 	move.b	d5,-1(a1)
 	move.b	d6,-2(a1)
-	bra.w	loc_21F3E
+	bra.w	.next
 
-loc_21E8E
+.reseed4
 	clr.w	d6
 	move.b	-4(a4),d5
 	cmp.b	-3(a4),d5
-	ble.w	.0
+	ble.w	.p1
 	move.b	-3(a4),d6
 	move.b	d5,-3(a4)
 	move.b	d6,-4(a4)
 	move.b	-3(a1),-(sp)
 	move.b	-4(a1),-3(a1)
 	move.b	(sp)+,-4(a1)
-.0
+.p1
 	move.b	-3(a4),d5
 	cmp.b	-2(a4),d5
-	ble.w	.1
+	ble.w	.p2
 	move.b	-2(a4),d6
 	move.b	d5,-2(a4)
 	move.b	d6,-3(a4)
 	move.b	-3(a1),-(sp)
 	move.b	-2(a1),-3(a1)
 	move.b	(sp)+,-2(a1)
-.1
+.p2
 	move.b	-2(a4),d5
 	cmp.b	-1(a4),d5
-	ble.w	.2
+	ble.w	.p3
 	move.b	-1(a4),d6
 	move.b	d5,-1(a4)
 	move.b	d6,-2(a4)
 	move.b	-2(a1),-(sp)
 	move.b	-1(a1),-2(a1)
 	move.b	(sp)+,-1(a1)
-.2
+.p3
 	tst.w	d6
-	bne.s	loc_21E8E
+	bne.s	.reseed4
 	move.b	-4(a4),d5
 	move.b	-4(a1),d6
 	move.b	-3(a4),-4(a4)
@@ -261,37 +261,37 @@ loc_21E8E
 	move.b	d5,-1(a4)
 	move.b	d6,-1(a1)
 
-loc_21F3E
+.next
 	lsr.w	#1,d0
-	dbf	d2,loc_21D84
+	dbf	d2,.loop
 	btst	#7,(GameFlags).w
-	beq.w	.0
+	beq.w	.nofinal
 	movea.l	#$FFFFCFF0,a4
-	bsr.w	sub_21DD4
-.0
+	bsr.w	.bypoints
+.nofinal
 	movem.l	(sp)+,d5-d6/a4-a5
 	bsr.w	GetShifter
 	tst.w	d1
-	bmi.w	loc_21F94
+	bmi.w	.nogames
 	movea.w	#(potree-M68K_RAM),a0
 	adda.w	d2,a0
 	adda.w	d2,a0
 	movea.w	#(gsstruct-M68K_RAM),a1
-.1
+.games
 	clr.w	$A(a1)
 	clr.w	$C(a1)
 	clr.w	8(a1)
 	bclr	#1,$E(a1)
 	bsr.w	SetTreeGameTeams
 	adda.w	#$10,a1
-	dbf	d1,.1
+	dbf	d1,.games
 	bsr.w	FigureJoy
 
-loc_21F94
+.nogames
 	movem.l	(sp)+,d0-d4/a0-a3
 	rts
 
-unk_21F9A	;SetTreeGameTeams table
+FirstRoundSeeds	;The seed of each first round team in tree order (1-8, 4-5, 3-6, 2-7), both conferences; maketree copies it
 	dc.b	$08,$01,$05,$04,$06,$03,$07,$02,$08,$01,$05,$04,$06,$03,$07,$02
 
 SetTreeGameTeams	;Put the two teams at a0 in game a1: flipped (gsstruct flags bit 0) except for bosgames 2, 3 and 5
@@ -318,11 +318,11 @@ FigureJoy	;Set cont1team ... cont4team
 	clr.w	(cont3team).w
 	clr.w	(cont4team).w
 	tst.w	(demoflag).w
-	beq.w	loc_2216C
+	beq.w	.ex
 	tst.w	(OptPlayMode).w
-	beq.w	loc_22156
+	beq.w	.fjnpo
 	btst	#0,(gmode2).w
-	bne.w	loc_22156
+	bne.w	.fjnpo
 	bsr.w	GetShifter
 	movea.w	#(potree-M68K_RAM),a0
 	move.w	(potreeteam).w,d2
@@ -345,7 +345,7 @@ FigureJoy	;Set cont1team ... cont4team
 	beq.w	.it2
 	suba.w	#$10,a1
 	dbf	d1,.f0
-	bra.w	loc_2216C
+	bra.w	.ex
 .it2
 	moveq	#4,d0
 	tst.w	(FourWayPlay).w
@@ -366,15 +366,15 @@ FigureJoy	;Set cont1team ... cont4team
 	move.w	2(a1),(VisTeam).w
 	btst	#0,$E(a1)
 	asl.w	#2,d0
-	lea	unk_2210E(pc),a0
+	lea	.9(pc),a0
 	tst.w	(FourWayPlay).w
 	beq.w	.5
-	lea	unk_2212E(pc),a0
+	lea	.10(pc),a0
 .5
 	move.w	(a0,d0.w),(cont1team).w
 	move.w	2(a0,d0.w),(cont2team).w
 	tst.w	(FourWayPlay).w
-	beq.w	loc_2216C
+	beq.w	.ex
 	cmp.w	#4,d0
 	beq.w	.6
 	cmp.w	#$18,d0
@@ -383,39 +383,39 @@ FigureJoy	;Set cont1team ... cont4team
 .6
 	move.w	(cont1team).w,(cont3team).w
 	move.w	(cont2team).w,(cont4team).w
-	bra.w	loc_2216C
+	bra.w	.ex
 .7
 	cmp.w	#8,d0
 	beq.w	.8
 	cmp.w	#$1C,d0
 	beq.w	.8
-	bra.w	loc_2216C
+	bra.w	.ex
 .8
 	move.w	(cont1team).w,(cont3team).w
 	move.w	#0,(cont4team).w
-	bra.w	loc_2216C
+	bra.w	.ex
 
-unk_2210E	;FigureJoy table
+.9	;FigureJoy table
 	dc.b	$00,$01,$00,$00,$00,$01,$00,$01,$00,$01,$00,$02,$00,$02,$00,$01
 	dc.b	$00,$02,$00,$00,$00,$02,$00,$02,$00,$02,$00,$01,$00,$01,$00,$02
 
-unk_2212E	;FigureJoy table
+.10	;FigureJoy table
 	dc.b	$00,$01,$00,$00,$00,$01,$00,$02,$00,$01,$00,$02,$00,$01,$00,$01
 	dc.b	$00,$01,$00,$02,$00,$02,$00,$00,$00,$02,$00,$01,$00,$02,$00,$01
 	dc.b	$00,$02,$00,$02,$00,$02,$00,$01
 
-loc_22156
+.fjnpo
 	move.w	(OptNOP).w,d0
 	asl.w	#2,d0
-	lea	unk_22172(pc),a0
+	lea	NOPJoyTbl(pc),a0
 	move.w	(a0,d0.w),(cont1team).w
 	move.w	2(a0,d0.w),(cont2team).w
 
-loc_2216C
+.ex
 	movem.l	(sp)+,d0-d3/a0-a1
 	rts
 
-unk_22172
+NOPJoyTbl	;FigureJoy: cont1team, cont2team by OptNOP when it is not a playoff game
 	dc.b	$00,$00,$00,$00,$00,$01,$00,$00,$00,$02,$00,$00,$00,$01,$00,$01
 	dc.b	$00,$01,$00,$02,$00,$01,$00,$02,$00,$01,$00,$02
 	btst	#7,(GameFlags).w
@@ -574,12 +574,12 @@ ReadPassData	;Read pwddatabuffer from save RAM (GameFlags bit 7: the season copy
 	rts
 
 WritePassData	;Write pwddatabuffer to save RAM and its checksum (GameFlags bit 7: the season copy, only with
-	;dword_FFDD7E bit 2)
+	;SeasonDay bit 2)
 	movem.l	d0-d1/a0,-(sp)
 	move.l	#$E5E,d0
 	btst	#7,(GameFlags).w
 	beq.w	.0
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.1
 	moveq	#$4D,d0
 .0
@@ -745,27 +745,27 @@ AddPlayoffTeamStats	;Add the po team's game stats to its playoff totals in stats
 	move.l	#$7340,d1
 	movea.l	#statsbuffer,a0
 	adda.w	d6,a0
-	jsr	(sub_10F22).l
+	jsr	(WriteSRAMBitWords).l
 	moveq	#$A,d2
 	move.l	#$7430,d1
 	movea.l	#statsbuffer+$38,a0
 	adda.w	d6,a0
-	jsr	(sub_10F22).l
+	jsr	(WriteSRAMBitWords).l
 	moveq	#9,d2
 	move.l	#$7520,d1
 	movea.l	#statsbuffer+$A8,a0
 	adda.w	d6,a0
-	jsr	(sub_10F22).l
+	jsr	(WriteSRAMBitWords).l
 	asr.w	#1,d6
 	move.w	d6,d3
 	moveq	#$D,d2
 	move.l	#$75F8,d1
 	movea.l	#statsbuffer+$70,a0
-	jsr	(sub_10F22).l
+	jsr	(WriteSRAMBitWords).l
 	moveq	#$D,d2
 	move.l	#$761F,d1
 	movea.l	#statsbuffer,a0
-	jsr	(sub_10F22).l
+	jsr	(WriteSRAMBitWords).l
 	bclr	#6,(GameFlags).w
 	jsr	(MakeSRAMChecksum).l
 .2
@@ -786,27 +786,27 @@ ReadTeamStats	;Read the playoff stat totals of the po team from save RAM into st
 	move.l	#$7340,d1
 	movea.l	#statsbuffer,a0
 	adda.w	d6,a0
-	jsr	(sub_10F02).l
+	jsr	(ReadSRAMBitWords).l
 	moveq	#$A,d2
 	move.l	#$7430,d1
 	movea.l	#statsbuffer+$38,a0
 	adda.w	d6,a0
-	jsr	(sub_10F02).l
+	jsr	(ReadSRAMBitWords).l
 	moveq	#9,d2
 	move.l	#$7520,d1
 	movea.l	#statsbuffer+$A8,a0
 	adda.w	d6,a0
-	jsr	(sub_10F02).l
+	jsr	(ReadSRAMBitWords).l
 	asr.w	#1,d6
 	move.w	d6,d3
 	moveq	#$D,d2
 	move.l	#$75F8,d1
 	movea.l	#statsbuffer+$70,a0
-	jsr	(sub_10F02).l
+	jsr	(ReadSRAMBitWords).l
 	moveq	#$D,d2
 	move.l	#$761F,d1
 	movea.l	#statsbuffer,a0
-	jsr	(sub_10F02).l
+	jsr	(ReadSRAMBitWords).l
 	rts
 
 ResolveGames	;Compute winners and losers for playoff matchups

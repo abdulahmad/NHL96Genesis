@@ -1,7 +1,7 @@
 ;	The one-timer. The shot height, the pass, the target and the animation.
 
 puckvzadj	;Set puckvz for a top shelf shot from the distance to the goal line ($11E) over puckvy, at most $7FFF.
-	;Gravity word_FFD284 (word_FFD286 with PalMode). Called from doshot
+	;Gravity skillspeed (skillspeedpal with PalMode). Called from doshot
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(pucky).w,d0
 	bpl.w	.0
@@ -18,10 +18,10 @@ puckvzadj	;Set puckvz for a top shelf shot from the distance to the goal line ($
 	bpl.w	.2
 	neg.w	d1
 .2
-	move.w	(word_FFD284).w,d2
+	move.w	(skillspeed).w,d2
 	tst.w	(PalMode).w
 	beq.w	.3
-	move.w	(word_FFD286).w,d2
+	move.w	(skillspeedpal).w,d2
 .3
 	divu.w	d1,d0
 	andi.l	#$FFFF,d0

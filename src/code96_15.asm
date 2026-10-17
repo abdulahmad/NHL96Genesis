@@ -1,8 +1,8 @@
 ;	Loads for the replay icon and the home team graphics, the hi-score
 ;	screen, and clearing the penalties.
 
-LoadReplayIcon	;Load the replay icon tiles (ReplayIconMap+8) at char d4 (word_FFB030)
-	move.w	d4,(word_FFB030).w
+LoadReplayIcon	;Load the replay icon tiles (ReplayIconMap+8) at char d4 (ReplayIconChars)
+	move.w	d4,(ReplayIconChars).w
 	movea.l	#ReplayIconMap+8,a2
 	jmp	DecompressGraphicsPlain
 
@@ -182,7 +182,7 @@ HiScoreScreen	;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up to $50
 	jsr	(setVram_0).l
 	jsr	(printz).l
 	String	$BE,$0E,$03
-	movea.l	#unk_1468D6,a2
+	movea.l	#HiScoreBgMap,a2
 	movea.l	a2,a0
 	movea.l	a2,a1
 	adda.l	(a2)+,a0
@@ -196,7 +196,7 @@ HiScoreScreen	;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up to $50
 	jsr	(dobitmap).l
 	jsr	(printz).l
 	String	$BE,$10,$10
-	movea.l	#unk_147896,a2
+	movea.l	#HiScoreImg,a2
 	movea.l	a2,a0
 	movea.l	a2,a1
 	adda.l	(a2)+,a0
@@ -246,7 +246,7 @@ sub_1D920A	;Called before setpassmode / SetShotMode (input96)
 	dc.b	$62,$79,$20,$00,$00,$02,$22,$7C,$00,$1D,$92,$D6,$60,$E2,$48,$E7
 	dc.b	$FF,$BE,$30,$38,$D2,$4A,$60,$00,$FF,$6A
 
-sub_1D92EC	;Called from the game frame code (code96_06): sflags8 bit 1
+SetSflags8Bit1	;Always sets sflags8 bit 1 (the bclr is skipped)
 	bra.w	.0
 	dc.b	$08,$B8,$00,$01,$C3,$4C,$60,$00,$00,$08
 .0
@@ -396,7 +396,7 @@ clrTmPdst	;Set the 26 tmpdst words of team a0 to -2 (bench), then -1
 SetMenuPadSide	;sflags bit 1 set when the team of pad menupadnum is above 1, else cleared. Called from ManualGoalieMenu and
 	;PrintMenuItem
 	movem.l	d0/a0-a1,-(sp)
-	movea.l	#unk_1D9876,a0
+	movea.l	#padteams,a0
 	move.w	(menupadnum).w,d0
 	asl.w	#2,d0
 	movea.l	(a0,d0.w),a0
@@ -410,7 +410,7 @@ SetMenuPadSide	;sflags bit 1 set when the team of pad menupadnum is above 1, els
 .exit
 	rts
 
-unk_1D9876
+padteams	;The team word of each pad: cont1team ... cont4team
 	dc.b	$FF,$FF,$C3,$90,$FF,$FF,$C3,$92,$FF,$FF,$C3,$94,$FF,$FF,$C3,$96
 	dc.b	$08,$38,$00,$03,$C3,$3A,$66,$00,$00,$2E,$48,$E7,$A0,$80,$10,$2B
 	dc.b	$00,$62,$12,$38,$C3,$64,$B3,$00,$08,$00,$00,$06,$67,$00,$00,$44

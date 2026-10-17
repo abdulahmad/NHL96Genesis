@@ -226,7 +226,7 @@ GetJerseyNumber	;The jersey number byte of player d0 of team d7
 .2
 	movem.l	(sp)+,d0-d1/a0-a1
 	rts
-	;Not decoded in the listing and not referenced from it: kept as bytes
+	;Not decoded in the listing: kept as bytes. The trade screen calls into it
 	dc.b	$48,$E7,$C0,$00,$30,$07,$72,$36,$C0,$C1,$06,$80,$00,$00,$15,$50
 	dc.b	$4E,$B9,$00,$02,$41,$E8,$4C,$DF,$00,$03,$4E,$75,$48,$E7,$C0,$00
 	dc.b	$30,$07,$72,$36,$C0,$C1,$06,$80,$00,$00,$15,$50,$4E,$B9,$00,$02
@@ -235,7 +235,8 @@ GetJerseyNumber	;The jersey number byte of player d0 of team d7
 	dc.b	$20,$7C,$00,$20,$2A,$A0,$CE,$FC,$00,$02,$DE,$87,$DE,$80,$30,$30
 	dc.b	$78,$00,$02,$40,$00,$1F,$B0,$7C,$00,$1E,$4C,$DF,$01,$81,$4E,$75
 
-sub_103AA
+GetPositionSlot	;d0 = the position slot (0 G, 1 LD, 2 RD, 3 LW, 4 C, 5 RW) of player d0 of team d7; season roster aware,
+	;created players from their record
 	movem.l	d1/d6-d7/a0-a1,-(sp)
 	btst	#4,(sflags11).w
 	beq.w	.1
@@ -322,14 +323,14 @@ sub_103AA
 .5
 	movem.l	(sp)+,d1/d6-d7/a0-a1
 	rts
-	;Not decoded in the listing and not referenced from it: kept as bytes
+	;Not decoded in the listing: kept as bytes. ExtractTradedPlayer and InsertTradedPlayer call into it
 	dc.b	$48,$E7,$C0,$00,$30,$07,$C0,$FC,$00,$36,$06,$80,$00,$00,$15,$50
 	dc.b	$72,$36,$4E,$B9,$00,$02,$41,$E8,$4C,$DF,$00,$03,$4E,$75,$48,$E7
 	dc.b	$C0,$00,$30,$07,$C0,$FC,$00,$36,$06,$80,$00,$00,$15,$50,$72,$36
 	dc.b	$4E,$B9,$00,$02,$41,$88,$4E,$B9,$00,$02,$41,$AA,$4C,$DF,$00,$03
 	dc.b	$4E,$75
 
-sub_104EE
+GetSeasonRosterId	;(a0) = the season roster id word of player d0 of team d7, from save RAM
 	movem.l	d0/d7-a1,-(sp)
 	mulu.w	#$36,d7
 	add.w	d0,d0
@@ -343,33 +344,34 @@ sub_104EE
 	movem.l	(sp)+,d0/d7-a1
 	rts
 
-sub_1051A
+SimScore	;Simulate the score of game a0: SimTeamStrength / SimTeamGoals for both teams; a playoff tie gets a random
+	;winner
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	a0,(TempLegSpd).w
 	clr.w	d0
 	move.b	(a0),d0
 	movea.l	#$FFFF5208,a5
 	movea.l	#$FFFF5244,a4
-	bsr.w	sub_10688
+	bsr.w	SimTeamStrength
 	clr.w	d1
 	movea.l	(TempLegSpd).w,a0
 	move.b	1(a0),d1
-	bsr.w	sub_105B0
+	bsr.w	SimTeamGoals
 	move.b	d2,2(a0)
 	clr.w	d0
 	move.b	1(a0),d0
 	movea.l	#$FFFF55F0,a5
 	movea.l	#$FFFF562C,a4
-	bsr.w	sub_10688
+	bsr.w	SimTeamStrength
 	clr.w	d1
 	movea.l	(TempLegSpd).w,a0
 	move.b	(a0),d1
-	bsr.w	sub_105B0
+	bsr.w	SimTeamGoals
 	movea.l	(TempLegSpd).w,a0
 	move.b	d2,3(a0)
 	btst	#7,(GameFlags).w
 	beq.w	.0
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.0
 	move.b	2(a0),d0
 	move.b	3(a0),d1
@@ -385,9 +387,10 @@ sub_1051A
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_105B0
+SimTeamGoals	;d2 = goals of a team of strength d3 against team d1 (its defense, goalie rating, home / away adjust;
+	;SimGoalSteps / SimGoalOdds)
 	move.w	d1,(TempMaxSpd).w
-	movea.l	#unk_107F9,a1
+	movea.l	#SimTeamDefense,a1
 	move.b	(a1,d1.w),d1
 	sub.w	d1,d3
 	movea.l	#AwShots,a2
@@ -396,23 +399,23 @@ sub_105B0
 	move.w	d4,$28(a2)
 	movea.l	#TeamList,a1
 	asl.w	#2,d4
-	move.l	(a1,d4.w),(dword_FFCAE2).w
+	move.l	(a1,d4.w),(AwShots+tmdata).w
 	move.l	(GAttribOverallMask).l,d4
 	clr.w	d0
 	jsr	(CalcAttrib).l
 	muls.w	#$64,d0
 	divs.w	d1,d0
-	movea.l	#unk_10760,a0
+	movea.l	#SimRatingPoints,a0
 	clr.w	d1
 	move.b	(a0,d0.w),d1
 	move.w	(sp)+,d3
 	sub.w	d1,d3
 	movea.l	(TempLegSpd).w,a0
-	movea.l	#unk_10813,a1
+	movea.l	#SimHomeGoalAdj,a1
 	move.w	(TempMaxSpd).w,d0
 	cmp.b	(a0),d0
 	beq.w	.0
-	movea.l	#unk_1082D,a1
+	movea.l	#SimAwayGoalAdj,a1
 .0
 	move.b	(a1,d0.w),d1
 	ext.w	d1
@@ -424,7 +427,7 @@ sub_105B0
 	ble.w	.2
 	move.w	#$64,d3
 .2
-	movea.l	#unk_10670,a1
+	movea.l	#SimGoalSteps,a1
 	move.w	d3,d0
 	clr.w	d3
 .3
@@ -434,25 +437,26 @@ sub_105B0
 	bra.s	.3
 .4
 	muls.w	#$A,d3
-	movea.l	#unk_10847,a1
+	movea.l	#SimGoalOdds,a1
 	adda.l	d3,a1
 	move.w	#$64,d0
 	jsr	(randomd0).l
 	clr.w	d2
 .5
 	cmp.b	(a1,d2.w),d0
-	ble.w	locret_10686
+	ble.w	rtsSimTeamGoals
 	addq.w	#1,d2
 	bra.s	.5
 
-unk_10670
+SimGoalSteps	;SimTeamGoals: strength steps (0-100); the index picks the SimGoalOdds row
 	dc.b	$09,$13,$18,$1D,$21,$24,$27,$2A,$2D,$30,$33,$36,$39,$3C,$3F,$42
 	dc.b	$46,$4B,$50,$5A,$64,$FF
 
-locret_10686
+rtsSimTeamGoals	;SimTeamGoals: the goal count is picked
 	rts
 
-sub_10688
+SimTeamStrength	;d3 = the sim strength of team d0: SimRatingPoints of its best skaters - SimStrengthSub + SimStrengthAdd; a5 /
+	;a4 = sorted ratings / players
 	movem.l	d0-d2/d4-d7/a0-a6,-(sp)
 	move.w	d0,(TempWord1).w
 	movea.l	#$202AA0,a6
@@ -468,7 +472,7 @@ sub_10688
 	move.w	d0,$28(a2)
 	movea.l	#TeamList,a0
 	asl.w	#2,d0
-	move.l	(a0,d0.w),(dword_FFC744).w
+	move.l	(a0,d0.w),(tmstruct+tmdata).w
 	move.l	(PAttribOverallMask).l,d4
 	bsr.w	GetGoalieCount
 	move.w	d0,-(sp)
@@ -500,25 +504,25 @@ sub_10688
 	bsr.w	SortBytesByWords
 	move.w	#$D,d0
 	clr.w	d3
-	movea.l	#unk_10760,a2
+	movea.l	#SimRatingPoints,a2
 .3
 	move.w	(a5)+,d2
 	move.b	(a2,d2.w),d2
 	add.w	d2,d3
 	dbf	d0,.3
 	move.w	(TempWord1).w,d0
-	movea.l	#unk_107DF,a1
+	movea.l	#SimStrengthSub,a1
 	clr.w	d1
 	move.b	(a1,d0.w),d1
 	sub.w	d1,d3
-	movea.l	#unk_107C5,a1
+	movea.l	#SimStrengthAdd,a1
 	clr.w	d1
 	move.b	(a1,d0.w),d1
 	add.w	d1,d3
 	movem.l	(sp)+,d0-d2/d4-d7/a0-a6
 	rts
 
-unk_10760
+SimRatingPoints	;Overall rating % (0-100) to sim points 1-6 (SimTeamStrength skaters, SimTeamGoals goalie)
 	dc.b	$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
 	dc.b	$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
 	dc.b	$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
@@ -527,27 +531,27 @@ unk_10760
 	dc.b	$03,$04,$04,$04,$04,$04,$04,$04,$04,$04,$04,$05,$05,$05,$05,$05
 	dc.b	$06,$06,$06,$06,$06
 
-unk_107C5
+SimStrengthAdd	;Per team: added to the sim strength (SimTeamStrength)
 	dc.b	$1B,$2D,$28,$2C,$2B,$23,$32,$1D,$22,$21,$1F,$20,$2A,$1A,$25,$19
 	dc.b	$2E,$30,$31,$24,$2F,$1C,$27,$26,$29,$1E
 
-unk_107DF
+SimStrengthSub	;Per team: taken off the sim strength (SimTeamStrength)
 	dc.b	$1D,$26,$28,$26,$26,$21,$26,$1D,$1D,$20,$23,$22,$23,$20,$2A,$1D
 	dc.b	$26,$2B,$27,$22,$22,$1F,$25,$25,$23,$22
 
-unk_107F9
+SimTeamDefense	;Per team, 1-6: taken off the other team's strength (SimTeamGoals) and shots (SimShots)
 	dc.b	$02,$05,$06,$05,$06,$04,$06,$01,$05,$03,$01,$02,$06,$02,$04,$01
 	dc.b	$05,$02,$04,$02,$04,$03,$03,$03,$06,$01
 
-unk_10813
+SimHomeGoalAdj	;Per home team: added to the away team's strength in SimTeamGoals
 	dc.b	$01,$02,$02,$02,$01,$01,$03,$01,$01,$02,$00,$02,$02,$01,$01,$00
 	dc.b	$03,$03,$03,$01,$03,$01,$02,$01,$02,$01
 
-unk_1082D
+SimAwayGoalAdj	;Per away team: added to the home team's strength in SimTeamGoals
 	dc.b	$FD,$00,$FE,$FF,$00,$FE,$00,$FE,$00,$FE,$FF,$FD,$FF,$FD,$FF,$FD
 	dc.b	$00,$00,$00,$FF,$00,$FE,$FD,$FE,$FE,$FD
 
-unk_10847
+SimGoalOdds	;SimTeamGoals: rows of cumulative % for 0-9 goals, one row per SimGoalSteps step
 	dc.b	$0A,$19,$2E,$43,$52,$5C,$62,$64,$64,$64,$0A,$18,$2C,$40,$4E,$59
 	dc.b	$61,$64,$64,$64,$09,$17,$2A,$3D,$4B,$56,$60,$64,$64,$64,$09,$16
 	dc.b	$28,$3B,$49,$55,$60,$64,$64,$64,$08,$14,$25,$38,$46,$53,$5F,$64

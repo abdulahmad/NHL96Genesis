@@ -164,12 +164,12 @@ ClearSRAM	;Clear RAM $0-$1FFF and the save RAM, then write the defaults: the opt
 	moveq	#$28,d1
 	movea.l	#M68K_RAM+$DB4,a0
 	bsr.w	WriteSRAM
-	clr.l	(dword_FFDD7E).w
+	clr.l	(SeasonDay).w
 	clr.l	(dword_FFDD82).w
-	clr.w	(word_FFDD86).w
+	clr.w	(SeasonDay+8).w
 	move.b	#$FF,(dword_FFDD82+2).w
 	bset	#6,(GameFlags).w
-	jsr	(sub_1147E).l
+	jsr	(WriteSeasonHeader).l
 	bclr	#6,(GameFlags).w
 	move.l	#$AB,d0
 	move.l	#$F700,d1

@@ -30,7 +30,7 @@ PuckOnAttackHalf	;d0 = 1 when the puck is on the half of the goal player a3 shoo
 	movem.w	(sp)+,d0-d1
 	rts
 
-sub_1D6BE6	;Called from code96_10 (GameFlags bit 3: the pads of the teams).
+onetimershot	;Do the one-timer: a pass with GameFlags bit 3, else a shot; offsides, icing, assists and the crowd
 	;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$03,$C3,$50,$67,$00,$00,$80,$48,$E7,$FF,$FE,$30,$38
 	dc.b	$BF,$A6,$B0,$78,$C3,$84,$67,$00,$00,$30,$B0,$78,$C3,$86,$67,$00
@@ -58,19 +58,19 @@ CheckOneTimerFacing	;Findhittype on direction d0 (the angle to the goal), d0 kep
 	dc.b	$48,$A7,$80,$00,$4E,$B9,$00,$01,$6D,$36,$4C,$9F,$00,$01,$4E,$75
 	dc.b	$4E,$75
 
-InitCrowdMeter	;The crowd meter start threshold word_FFC374 = $50. Called from StartGame
+InitCrowdMeter	;The crowd meter start threshold CrowdRecord = $50. Called from StartGame
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(HomeTeam).w,d1
 	ext.l	d1
 	movea.l	#ThreeStars,a0
 	move.w	#$50,d0
-	move.w	d0,(word_FFC374).w
+	move.w	d0,(CrowdRecord).w
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
 UpdateCrowdMeter	;The crowd meter, every frame (setvideo): sflags5 bit 7 sets when CwdExciteLvl passes the threshold from
-	;word_FFC374 and clears when it drops; while set, every $14 frames CurCrowdMeter = sqrt(4 * CwdExciteLvl) + $41,
-	;the peak in word_FFC378
+	;CrowdRecord and clears when it drops; while set, every $14 frames CurCrowdMeter = sqrt(4 * CwdExciteLvl) + $41,
+	;the peak in CrowdPeak
 	btst	#7,(sflags).w	;gmclock: clock stopped
 	bne.w	.0
 	btst	#0,(gmode2).w
@@ -87,9 +87,9 @@ UpdateCrowdMeter	;The crowd meter, every frame (setvideo): sflags5 bit 7 sets wh
 .ex
 	rts
 .1
-	move.w	(word_FFC374).w,d0
-	move.w	d0,(word_FFC376).w
-	subi.w	#$B,(word_FFC376).w
+	move.w	(CrowdRecord).w,d0
+	move.w	d0,(CrowdAvg).w
+	subi.w	#$B,(CrowdAvg).w
 	subi.w	#$49,d0
 	muls.w	d0,d0
 	asr.l	#2,d0
@@ -99,7 +99,7 @@ UpdateCrowdMeter	;The crowd meter, every frame (setvideo): sflags5 bit 7 sets wh
 	bset	#7,(sflags5).w
 	rts
 .2
-	move.w	(word_FFC376).w,d0
+	move.w	(CrowdAvg).w,d0
 	subi.w	#$41,d0
 	muls.w	d0,d0
 	asr.l	#2,d0
@@ -107,22 +107,22 @@ UpdateCrowdMeter	;The crowd meter, every frame (setvideo): sflags5 bit 7 sets wh
 	blt.w	.3
 	bclr	#7,(sflags5).w
 .3
-	sub.w	d7,(word_FFC36A).w
+	sub.w	d7,(CwdChkCntr).w
 	bpl.w	.0
-	move.w	#$14,(word_FFC36A).w
-	addq.w	#1,(word_FFC36C).w
+	move.w	#$14,(CwdChkCntr).w
+	addq.w	#1,(CwdChkCnt).w
 	move.w	(CwdExciteLvl).w,d0
 	ext.l	d0
 	asl.w	#2,d0
 	jsr	(sroot).l
 	addi.w	#$41,d0
 	move.w	d0,(CurCrowdMeter).w
-	cmp.w	(word_FFC378).w,d0
+	cmp.w	(CrowdPeak).w,d0
 	ble.w	.4
-	move.w	d0,(word_FFC378).w
+	move.w	d0,(CrowdPeak).w
 .4
 	move.w	(CurCrowdMeter).w,d0
-	cmp.w	(word_FFC374).w,d0
+	cmp.w	(CrowdRecord).w,d0
 	blt.w	.5
 	bra.w	*+4
 .5
@@ -695,10 +695,10 @@ CountPlayers	;homeplayers / awayplayers = players of the home / away team (GetPl
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#tmstruct,a2
 	jsr	(GetPlayerCount).l
-	move.w	d0,(word_FFD31E).w
+	move.w	d0,(homeplayers).w
 	movea.l	#AwShots,a2
 	jsr	(GetPlayerCount).l
-	move.w	d0,(word_FFD320).w
+	move.w	d0,(awayplayers).w
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 

@@ -52,13 +52,13 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 	beq.w	.4
 	clr.w	(ChkCnt).w
 	moveq	#$1B,d0
-	movea.w	#(unk_FFC856-M68K_RAM),a0
+	movea.w	#(tmstruct+$130-M68K_RAM),a0
 .0
 	clr.b	$39E(a0)
 	clr.b	(a0)+
 	dbf	d0,.0
 	addi.w	#$3E8,(crowdlevel).w
-	addi.w	#$23,(padcursorchars).w
+	addi.w	#$23,(CwdExciteLvl).w
 	clr.w	(word_FFDCEA).w
 	clr.l	(dword_FFDCE0).w
 	clr.l	(dword_FFDCE4).w
@@ -301,7 +301,7 @@ loc_C068
 	move.w	#$140,(Pencntdwn).w
 	bra.w	.1
 .0
-	bsr.w	sub_C51C
+	bsr.w	SetFightingMajors
 	bset	#5,(GameFlags).w
 .1
 	movem.l	(sp)+,d0-d3
@@ -377,21 +377,21 @@ fightinput	;Controller processing for fighting
 	move.w	d1,-(sp)
 	cmpi.w	#2,(word_FFDCDE).w
 	beq.w	.5
-	move.w	#$280,(word_FFDDB4).w
+	move.w	#$280,(fightidletimer).w
 	bne.w	.8
 .5
 	tst.w	d1
 	bne.w	.7
-	tst.w	(word_FFDDB4).w
+	tst.w	(fightidletimer).w
 	beq.w	.6
-	subq.w	#1,(word_FFDDB4).w
+	subq.w	#1,(fightidletimer).w
 	bra.w	.8
 .6
 	bset	#7,(sflags12).w
 	bne.w	.8
 	move.w	#8,(Pencntdwn).w
 .7
-	move.w	#$280,(word_FFDDB4).w
+	move.w	#$280,(fightidletimer).w
 .8
 	btst	#3,d2
 	bne.w	.19
@@ -550,7 +550,7 @@ fightinput	;Controller processing for fighting
 .34
 	jmp	SetSPA
 
-sub_C51C	;Change the first two penalties $2E in PenBuf to $26, then Pencntdwn $B40
+SetFightingMajors	;Both fighters' roughing minors in PenBuf become fighting majors; Pencntdwn $B40
 	movem.l	a1,-(sp)
 	movea.w	#(PenBuf-2-M68K_RAM),a1
 .0

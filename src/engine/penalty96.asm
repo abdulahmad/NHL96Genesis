@@ -1,7 +1,7 @@
 ;	The penalties. Big-print sits in front of AddPenalty. PenaltyManager runs
 ;	the referee, the penalty box and the power play.
 
-PrintBigChar	;Print big font char d0 (printbigtext) through the unk_1C01C table
+PrintBigChar	;Print big font char d0 (printbigtext)
 	subi.w	#$20,d0
 	btst	#6,(sflags13).w
 	beq.w	.0
@@ -51,7 +51,7 @@ PutBigTile	;Write tile d3 + d6 at column d4, row d5 of the map at VmMap1 + print
 	movem.l	(sp)+,d1/a0
 	rts
 
-unk_1C01C	;PrintBigChar: the char table
+BigControlCodeJumpTable	;printbigtext control codes indexed by -byte (as ControlCodeJumpTable); the handlers follow
 	dc.b	$00,$01,$F8,$4A,$00,$01,$C0,$50,$00,$01,$C0,$62,$00,$01,$C0,$88
 	dc.b	$00,$01,$C0,$9A,$00,$01,$C0,$AC,$00,$01,$C0,$BE,$00,$01,$C0,$D0
 	dc.b	$00,$01,$C0,$40,$61,$00,$00,$20,$61,$00,$00,$0A,$61,$00,$00,$3E
@@ -85,22 +85,22 @@ printbigz2	;printbig2 with the String after the call
 	movea.l	(sp)+,a1
 	rts
 
-printbig1	;printbigcur with the font map BigFontMap (chars word_FFB016)
+printbig1	;printbigcur with the font map BigFontMap (chars bigfont1chars)
 	bclr	#2,(sflags11).w
 	move.l	#BigFontMap,(bigfontptr).l
-	move.w	(word_FFB016).w,(word_FFB014).w
+	move.w	(bigfont1chars).w,(printbigchars).w
 	jmp	printbigcur
 
 printbig2	;printbigcur with the font map BigFontMap3 (chars BigFontChars)
 	bclr	#2,(sflags11).w
 	move.l	#BigFontMap3,(bigfontptr).l
-	move.w	(BigFontChars).w,(word_FFB014).w
+	move.w	(BigFontChars).w,(printbigchars).w
 	jmp	printbigcur
 	;After printbig2: code that nothing in the listing reaches.
 	;Code the listing does not decode: kept as bytes
 	dc.b	$31,$C4,$B0,$1C,$24,$7C,$00,$17,$9A,$7E,$60,$00,$F5,$AE
 
-sub_1C184	;DecompressGraphicsPlain of Framermap+8 (the framer tiles) at char d4 (framercset)
+AddFramer	;Load the framer tiles (Framermap+8) at char d4, framercset = d4
 	movea.l	#Framermap+8,a2
 	move.w	d4,(framercset).w
 	bra.w	DecompressGraphicsPlain
@@ -258,7 +258,7 @@ chkprogress	;Control the progress of the ref and the game through penalty events
 	move.w	#$18,(palcount).w
 	rts
 
-sub_1C3C6	;d0 = the unk_EBF8 word of penalty d0 when it is not negative
+DoubleMinorChk	;Penalty d0 becomes its 4 minute double minor when its DoubleMinorPenalties entry is not negative
 	movem.l	d1-d3/a0,-(sp)
 	movea.l	#$EBF8,a0
 	move.w	(a0,d0.w),d1
@@ -631,7 +631,7 @@ UpdatePA	;Animate the ref in the ref window (RefCnt, SetPA2)
 	sub.w	d7,(penmsgtimer).w
 	bpl.w	rtss2
 	move.w	#$7FFF,(penmsgtimer).w
-	bsr.w	sub_1CC32
+	bsr.w	ErasePenaltyMessage
 	bsr.w	printz
 	String	$BF,$11,$0B
 	bsr.w	GetPlayerName
@@ -715,7 +715,7 @@ PushRef	;Tell vblank what to display: ref frame d0
 	adda.l	4(a0),a0
 	addq.w	#4,a0
 	adda.w	d0,a0
-	movea.w	#(unk_FFC44C-M68K_RAM),a1
+	movea.w	#(RefRamMap-M68K_RAM),a1
 	move.w	(ExtraChars).w,d2
 	ori.w	#$8000,d2	;priority
 	moveq	#$37,d0	;(refheight*refwidth)-1
@@ -730,7 +730,7 @@ PushRef	;Tell vblank what to display: ref frame d0
 	bne.w	.4
 	btst	#4,(sflags9).w
 	bne.w	.4
-	movea.w	#(unk_FFC44C-M68K_RAM),a1
+	movea.w	#(RefRamMap-M68K_RAM),a1
 	moveq	#$37,d0	;(refheight*refwidth)-1
 .3
 	move.w	#$7FF,(a1)+	;blank tile
@@ -788,7 +788,7 @@ prefmes	;Print the penalty message: the player, the penalty and its length (Pena
 	bmi.w	.8
 	cmpi.w	#$3E8,(glovecords).w
 	bne.w	.3
-	cmpi.w	#$3E8,(word_FFBF16).w
+	cmpi.w	#$3E8,(glovecords+2).w
 	beq.w	.4
 .3
 	jsr	(ClearMessageLine).l
@@ -869,7 +869,7 @@ PenaltyTimeTxt	;prefmes: the penalty lengths
 	String	'4 minute db minor'
 	String	'5 minute major'
 
-sub_1CC32	;Erase the penalty message window
+ErasePenaltyMessage	;Erase the penalty message box prefmes draws
 	jsr	(printz).l
 	String	$BF,$0B,$02
 	move.w	#$14,d0
@@ -947,27 +947,27 @@ ProcessPenaltyList	;a2 = team. Walk the penalty box list: count down the penalty
 	moveq	#2,d1
 	moveq	#2,d3
 
-loc_1CD04
+.next
 	clr.w	d0
 	move.b	(a0)+,d0
 	bmi.w	.done
 	btst	#6,$6C(a2,d0.w)
-	bne.w	loc_1CD76
+	bne.w	.coinpen
 	subq.w	#1,d1
-	bmi.s	loc_1CD04
+	bmi.s	.next
 	move.w	d0,(a1)+
 	subq.w	#1,$6C(a2,d0.w)
 	bne.w	.cont
 	bsr.w	RemovePlayerFromList
 .cont
-	bra.s	loc_1CD04
+	bra.s	.next
 .done
 	move.w	(mesarea).w,d0
 	cmp.w	#1,d1
-	beq.w	sub_1CD50
+	beq.w	.5
 	tst.w	d1
 	bne.w	.3
-	bsr.w	sub_1CD50
+	bsr.w	.5
 	bra.w	.two
 .3
 	cmp.w	#$FFFF,d1
@@ -975,7 +975,7 @@ loc_1CD04
 .two
 	move.w	(TextBuffer).w,d0
 
-sub_1CD50	;ProcessPenaltyList: a player d0 whose time is nearly up beeps; at 0 he is released (releasepl)
+.5	;ProcessPenaltyList: a player d0 whose time is nearly up beeps; at 0 he is released (releasepl)
 	cmpi.w	#5,$6C(a2,d0.w)
 	bgt.w	rtss2
 	move.w	#1,-(sp)
@@ -987,10 +987,10 @@ sub_1CD50	;ProcessPenaltyList: a player d0 whose time is nearly up beeps; at 0 h
 	jsr	(sfx).l
 	rts
 
-loc_1CD76
+.coinpen
 	subq.w	#1,$6C(a2,d0.w)
 	btst	#3,$6C(a2,d0.w)
-	beq.s	loc_1CD04
+	beq.s	.next
 	btst	#4,$6C(a2,d0.w)
 	bne.w	.clr
 	move.w	#$1000,$6C(a2,d0.w)
@@ -1100,18 +1100,18 @@ updatepwrplay	;The power play box: the team and the time left (GetLowestPen). Ca
 	lea	$39E(a2),a3
 	move.w	$24(a2),d0
 	sub.w	$24(a3),d0
-	beq.w	sub_1CFCE
+	beq.w	.clrpwrplay
 	bpl.w	.0
 	btst	#6,(sflags2).w
 	bne.w	.1
-	bsr.w	sub_1CFCE
+	bsr.w	.clrpwrplay
 	bset	#6,(sflags2).w
 	bra.w	.1
 .0
 	exg	a2,a3
 	btst	#6,(sflags2).w
 	beq.w	.1
-	bsr.w	sub_1CFCE
+	bsr.w	.clrpwrplay
 	bclr	#6,(sflags2).w
 .1
 	btst	#5,(sflags2).w
@@ -1124,7 +1124,7 @@ updatepwrplay	;The power play box: the team and the time left (GetLowestPen). Ca
 	addq.w	#1,4(a3)
 .4
 	movem.l	d0-d1/a3,-(sp)
-	bsr.w	sub_1D004
+	bsr.w	DrawPowerPlayBox
 	movem.l	(sp)+,d0-d1/a3
 	cmpa.w	#(tmstruct-M68K_RAM),a3
 	bne.w	.3
@@ -1135,7 +1135,7 @@ updatepwrplay	;The power play box: the team and the time left (GetLowestPen). Ca
 .5
 	bclr	#7,(sflags11).w
 	beq.w	.6
-	bsr.w	sub_1D004
+	bsr.w	DrawPowerPlayBox
 .6
 	jsr	(printz).l
 	String	$BF,$17,$19
@@ -1166,14 +1166,14 @@ updatepwrplay	;The power play box: the team and the time left (GetLowestPen). Ca
 	bset	#3,(disflags).w
 	rts
 
-sub_1CFCE	;With sflags2 bit 5 set, clear it and erase the power play box (sub_1CFE4)
+.clrpwrplay	;With sflags2 bit 5 set, clear it and erase the power play box (ErasePowerPlayBox)
 	bclr	#5,(sflags2).w
 	beq.w	rtss2
-	bsr.w	sub_1CFE4
+	bsr.w	ErasePowerPlayBox
 	bset	#3,(disflags).w
 	rts
 
-sub_1CFE4	;Erase the power play box
+ErasePowerPlayBox	;Erase the power play box
 	jsr	(printz).l
 	String	$BF,$13,$18
 	move.w	#$C,d0
@@ -1182,14 +1182,14 @@ sub_1CFE4	;Erase the power play box
 	jsr	(eraser).l
 	rts
 
-sub_1D004	;Draw the power play box frame (Framer)
+DrawPowerPlayBox	;Draw the power play box frame (Framer)
 	jsr	(printz).l
 	String	$BF,$13,$18
 	move.w	#$C,d0
 	move.w	#4,d1
 	jmp	Framer
 
-sub_1D01E	;Called from the faceoff and pause code.
+ClrHor	;Back to the vertical rink: reload the rink graphics, SprSort, clear the screen unless paused
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$B8,$00,$07,$C3,$3A,$31,$FC,$03,$E8,$BD,$30
 	dc.b	$4E,$B9,$00,$01,$54,$D8,$61,$00,$43,$78,$08,$38,$00,$00,$C3,$3A
@@ -1197,7 +1197,7 @@ sub_1D01E	;Called from the faceoff and pause code.
 	dc.b	$72,$1C,$34,$3C,$07,$FF,$61,$00,$E9,$20,$61,$00,$00,$08,$4C,$DF
 	dc.b	$7F,$FF,$4E,$75
 
-nullsub_4
+printscores1	;The scoreboard redraw: an empty rts in 96
 	rts
 
 EASNLogo	;Draw the EASN logo

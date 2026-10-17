@@ -1,14 +1,14 @@
 ;	The pictures. A map is one file: the 8-byte header, the tiles, the palette
 ;	and the map. The tiles start eight bytes in.
 
-unk_8F2C6	;A map used from code96_20
-	incbin	..\Extracted\NHL96\Graphics\unk_8F2C6.map.jim
+NHLShieldMap	;The NHL shield logo on the trademark and credits pages (CreditsScreen)
+	incbin	..\Extracted\NHL96\Graphics\NHLShieldMap.map.jim
 
-unk_90686	;A map used from code96_20
-	incbin	..\Extracted\NHL96\Graphics\unk_90686.map.jim
+NHLPALogoMap	;The NHLPA logo on the trademark and credits pages (CreditsScreen)
+	incbin	..\Extracted\NHL96\Graphics\NHLPALogoMap.map.jim
 
-unk_911B8	;A map used from code96_20
-	incbin	..\Extracted\NHL96\Graphics\unk_911B8.map.jim
+CreditsBgMap	;The background of the trademark and credits pages (CreditsScreen)
+	incbin	..\Extracted\NHL96\Graphics\CreditsBgMap.map.jim
 
 Framermap	;The Framermap map (Framer); +8 the framer tiles
 	incbin	..\Extracted\NHL96\Graphics\Framermap.map.jim
@@ -67,14 +67,14 @@ ReplayIconMap	;The replay icon map (ShowReplayIcon); continued in data96_07
 ReplayBannerMap	;The replay banner map (ShowReplayBanner)
 	incbin	..\Extracted\NHL96\Graphics\ReplayBannerMap.map.jim
 
-unk_1417B6	;A map used from code96_14
+unk_1417B6	;Used by the table after RunArenaAnim (the dead arena animation): a frame offset table, not a plain picture
 	incbin	..\Extracted\NHL96\Graphics\unk_1417B6.map.jim
 
-unk_1468D6	;A map used from code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_1468D6.map.jim
+HiScoreBgMap	;The high score screen background (HiScoreScreen)
+	incbin	..\Extracted\NHL96\Graphics\HiScoreBgMap.map.jim
 
-unk_147896	;A map used from code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_147896.map.jim
+HiScoreImg	;The high score screen picture (HiScoreScreen)
+	incbin	..\Extracted\NHL96\Graphics\HiScoreImg.map.jim
 
 TeamBlockANH	;The setup team block bitmap of ANH (TeamBlockPtrs)
 	incbin	..\Extracted\NHL96\Graphics\TeamBlockANH.map.jim
@@ -310,8 +310,8 @@ SmallLogoWSH	;The small team logo of WSH (SmallLogoPtrs)
 SmallLogoWPG	;The small team logo of WPG (SmallLogoPtrs)
 	incbin	..\Extracted\NHL96\Graphics\SmallLogoWPG.map.jim
 
-unk_170B0C	;A map used from code96_05 and code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_170B0C.map.jim
+IceBgMap	;The plain ice background behind most menu screens on map 2
+	incbin	..\Extracted\NHL96\Graphics\IceBgMap.map.jim
 
 ControllerBgMap	;The controller setup screen background map (ControllerSetupScreen)
 	incbin	..\Extracted\NHL96\Graphics\ControllerBgMap.map.jim
@@ -331,215 +331,215 @@ BigFontMap2	;The big font map (printbig, bigfontptr); +8 the tiles
 BigFontMap4	;The big font map printbig takes with sflags11 bit 2; +8 the tiles
 	incbin	..\Extracted\NHL96\Graphics\BigFontMap4.map.jim
 
-unk_17C2AE	;Data used from code96_16, code96_17, code96_18
+unk_17C2AE	;A 16-colour palette (PStatsPalette, PStatsPalette2, SaveTeamLine copy it); what it colours is not known
 	incbin	..\Extracted\NHL96\Graphics\unk_17C2AE.map.jim
 
-unk_17C2CE	;A map used from code96_05
-	incbin	..\Extracted\NHL96\Graphics\unk_17C2CE.map.jim
+LeagueOptionsBgMap	;The League Options screen background
+	incbin	..\Extracted\NHL96\Graphics\LeagueOptionsBgMap.map.jim
 
-unk_17DBDC	;A map used from code96_05
-	incbin	..\Extracted\NHL96\Graphics\unk_17DBDC.map.jim
+LeagueOptionsTitleMap	;The League Options title banner
+	incbin	..\Extracted\NHL96\Graphics\LeagueOptionsTitleMap.map.jim
 
-unk_17E3FC	;Data used from code96_05
-	incbin	..\Extracted\NHL96\Graphics\unk_17E3FC.map.jim
+LeagueOptionsSprites	;The League Options screen sprites (a SetSframe frame list); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\LeagueOptionsSprites.map.jim
 
-unk_17ECEA	;A map used from code96_05
-	incbin	..\Extracted\NHL96\Graphics\unk_17ECEA.map.jim
+SelectTeamSeasonBgMap	;The select team screen background in a season (TeamSelectGfx)
+	incbin	..\Extracted\NHL96\Graphics\SelectTeamSeasonBgMap.map.jim
 
-unk_1808B8	;Data used from code96_05
-	incbin	..\Extracted\NHL96\Graphics\unk_1808B8.map.jim
+SelectTeamSeasonSprites	;The select team screen sprites in a season (TeamSelectScreen); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\SelectTeamSeasonSprites.map.jim
 
-unk_180C36	;A map used from code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_180C36.map.jim
+StandingsTitleMap	;The NHL Standings title banner
+	incbin	..\Extracted\NHL96\Graphics\StandingsTitleMap.map.jim
 
-unk_181456	;A map used from code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_181456.map.jim
+StandingsBgMap	;The NHL Standings screen background
+	incbin	..\Extracted\NHL96\Graphics\StandingsBgMap.map.jim
 
-unk_183024	;Data used from code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_183024.map.jim
+StandingsSprites	;The NHL Standings screen sprites; +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\StandingsSprites.map.jim
 
-unk_1833A2	;A map used from code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_1833A2.map.jim
+GameOptionsBgMap	;The Game Options screen background
+	incbin	..\Extracted\NHL96\Graphics\GameOptionsBgMap.map.jim
 
-unk_185770	;A map used from code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_185770.map.jim
+GameOptionsTitleMap	;The Game Options title banner
+	incbin	..\Extracted\NHL96\Graphics\GameOptionsTitleMap.map.jim
 
-unk_185F90	;Data used from code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_185F90.map.jim
+GameOptionsSprites	;The Game Options screen sprites; +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\GameOptionsSprites.map.jim
 
-unk_18633E	;A map used from code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_18633E.map.jim
+LeadersBgMap	;The League / Playoff Leaders screen background
+	incbin	..\Extracted\NHL96\Graphics\LeadersBgMap.map.jim
 
-unk_18800C	;A map used from code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_18800C.map.jim
+LeagueLeadersTitleMap	;The League Leaders title banner
+	incbin	..\Extracted\NHL96\Graphics\LeagueLeadersTitleMap.map.jim
 
-unk_18882C	;Data used from code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_18882C.map.jim
+LeadersSprites	;The League / Playoff Leaders screen sprites; +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\LeadersSprites.map.jim
 
-unk_188C4A	;A map used from code96_15
-	incbin	..\Extracted\NHL96\Graphics\unk_188C4A.map.jim
+PlayoffLeadersTitleMap	;The Playoff Leaders title banner
+	incbin	..\Extracted\NHL96\Graphics\PlayoffLeadersTitleMap.map.jim
 
-unk_18948A	;A map used from code96_16, data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_18948A.map.jim
+PlayerStatsBgMap	;The player stats screen background (PStatsSetup, PListSetup)
+	incbin	..\Extracted\NHL96\Graphics\PlayerStatsBgMap.map.jim
 
-unk_18ACD8	;A map used from code96_16
-	incbin	..\Extracted\NHL96\Graphics\unk_18ACD8.map.jim
+SeasonStatsTitleMap	;The Season Stats title banner (PStatsSetup)
+	incbin	..\Extracted\NHL96\Graphics\SeasonStatsTitleMap.map.jim
 
-unk_18B4F8	;Data used from code96_15, code96_16, data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_18B4F8.map.jim
+PlayerStatsSprites	;The player stats screen sprites (SeasonPlayoffStats, PlayerStatsList); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\PlayerStatsSprites.map.jim
 
-unk_18B916	;A map used from code96_16, data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_18B916.map.jim
+PlayoffStatsTitleMap	;The Playoff Stats title banner (PStatsSetup, PListSetup)
+	incbin	..\Extracted\NHL96\Graphics\PlayoffStatsTitleMap.map.jim
 
-unk_18C136	;A map used from code96_05
-	incbin	..\Extracted\NHL96\Graphics\unk_18C136.map.jim
+SelectTeamTitleMap	;The Select Team title banner (TeamSelectGfx)
+	incbin	..\Extracted\NHL96\Graphics\SelectTeamTitleMap.map.jim
 
-unk_18C936	;A map used from code96_05
-	incbin	..\Extracted\NHL96\Graphics\unk_18C936.map.jim
+SelectTeamBgMap	;The select team screen background outside a season (TeamSelectGfx)
+	incbin	..\Extracted\NHL96\Graphics\SelectTeamBgMap.map.jim
 
-unk_18DE04	;Data used from code96_05, data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_18DE04.map.jim
+SelectTeamSprites	;The select team screen sprites outside a season (TeamSelectGfx; PeriodStatsTeam too); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\SelectTeamSprites.map.jim
 
-unk_18E152	;A map used from code96_16
-	incbin	..\Extracted\NHL96\Graphics\unk_18E152.map.jim
+TransactionsTitleMap	;The Transactions title banner (PlayoffMenuSetup)
+	incbin	..\Extracted\NHL96\Graphics\TransactionsTitleMap.map.jim
 
-unk_18E932	;A map used from code96_16
-	incbin	..\Extracted\NHL96\Graphics\unk_18E932.map.jim
+TransactionsBgMap	;The Transactions (roster menu) screen background (PlayoffMenuSetup)
+	incbin	..\Extracted\NHL96\Graphics\TransactionsBgMap.map.jim
 
-unk_190380	;Data used from code96_16
-	incbin	..\Extracted\NHL96\Graphics\unk_190380.map.jim
+TransactionsSprites	;The Transactions screen sprites (PlayoffMenuScreen); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\TransactionsSprites.map.jim
 
-unk_1906FE	;A map used from data96_11
-	incbin	..\Extracted\NHL96\Graphics\unk_1906FE.map.jim
+TradeTitleMap	;The Trade Players title banner
+	incbin	..\Extracted\NHL96\Graphics\TradeTitleMap.map.jim
 
-unk_190EFE	;A map used from data96_11
-	incbin	..\Extracted\NHL96\Graphics\unk_190EFE.map.jim
+TradeBgMap	;The trade screen background
+	incbin	..\Extracted\NHL96\Graphics\TradeBgMap.map.jim
 
-unk_19262C	;Data used from data96_11
-	incbin	..\Extracted\NHL96\Graphics\unk_19262C.map.jim
+TradeSprites	;The trade screen sprites (TradePlayers); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\TradeSprites.map.jim
 
-unk_1929FA	;A map used from data96_11
-	incbin	..\Extracted\NHL96\Graphics\unk_1929FA.map.jim
+CreateTitleMap	;The Create Player title banner
+	incbin	..\Extracted\NHL96\Graphics\CreateTitleMap.map.jim
 
-unk_19321A	;A map used from data96_11
-	incbin	..\Extracted\NHL96\Graphics\unk_19321A.map.jim
+CreateBgMap	;The create player screen background (the name list)
+	incbin	..\Extracted\NHL96\Graphics\CreateBgMap.map.jim
 
-unk_194C48	;Data used from data96_11
-	incbin	..\Extracted\NHL96\Graphics\unk_194C48.map.jim
+CreateSprites	;The create player screen sprites; +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\CreateSprites.map.jim
 
-unk_195086	;A map used from data96_11
-	incbin	..\Extracted\NHL96\Graphics\unk_195086.map.jim
+CreateRatingsBgMap	;The create player ratings screen background (ModifyRatings)
+	incbin	..\Extracted\NHL96\Graphics\CreateRatingsBgMap.map.jim
 
-unk_1969B4	;Data used from data96_11
-	incbin	..\Extracted\NHL96\Graphics\unk_1969B4.map.jim
+CreateRatingsSprites	;The create player ratings screen sprites (ModifyRatings); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\CreateRatingsSprites.map.jim
 
-unk_196E0A	;A map used from code96_17
-	incbin	..\Extracted\NHL96\Graphics\unk_196E0A.map.jim
+SignPlayersTitleMap	;The Sign Players title banner (SignFreeAgents)
+	incbin	..\Extracted\NHL96\Graphics\SignPlayersTitleMap.map.jim
 
-unk_19762A	;Data used from code96_17
-	incbin	..\Extracted\NHL96\Graphics\unk_19762A.map.jim
+SignPlayersSprites	;The sign free agents screen sprites (SignFreeAgents); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\SignPlayersSprites.map.jim
 
-unk_197A60	;A map used from code96_17
-	incbin	..\Extracted\NHL96\Graphics\unk_197A60.map.jim
+ReleasePlayersTitleMap	;The Release Players title banner (ReleaseGfx)
+	incbin	..\Extracted\NHL96\Graphics\ReleasePlayersTitleMap.map.jim
 
-unk_198260	;A map used from code96_17
-	incbin	..\Extracted\NHL96\Graphics\unk_198260.map.jim
+SignReleaseBgMap	;The sign free agents and release players screen background
+	incbin	..\Extracted\NHL96\Graphics\SignReleaseBgMap.map.jim
 
-unk_1997AE	;Data used from code96_17
-	incbin	..\Extracted\NHL96\Graphics\unk_1997AE.map.jim
+ReleasePlayersSprites	;The release players screen sprites (ReleasePlayers); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\ReleasePlayersSprites.map.jim
 
-unk_199BE4	;A map used from code96_17
-	incbin	..\Extracted\NHL96\Graphics\unk_199BE4.map.jim
+MainMenuTitleMap	;The Main Menu title banner (OptionsScreenSetup)
+	incbin	..\Extracted\NHL96\Graphics\MainMenuTitleMap.map.jim
 
-unk_19A3E4	;A map used from code96_17
-	incbin	..\Extracted\NHL96\Graphics\unk_19A3E4.map.jim
+MainMenuBgMap	;The main menu (OptionsScreen) background
+	incbin	..\Extracted\NHL96\Graphics\MainMenuBgMap.map.jim
 
-unk_19C232	;Data used from code96_17
-	incbin	..\Extracted\NHL96\Graphics\unk_19C232.map.jim
+MainMenuSprites	;The main menu (OptionsScreen) sprites; +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\MainMenuSprites.map.jim
 
-unk_19C628	;A map used from code96_18, data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_19C628.map.jim
+EditLinesTitleMap	;The Edit Lines title banner (LineEditor)
+	incbin	..\Extracted\NHL96\Graphics\EditLinesTitleMap.map.jim
 
-unk_19CE08	;A map used from code96_18, data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_19CE08.map.jim
+LineEditorBgMap2	;The second line editor background, also behind the shootout setup (DrawLineIcons, ShootersMove)
+	incbin	..\Extracted\NHL96\Graphics\LineEditorBgMap2.map.jim
 
-unk_19E7F6	;A map used from code96_18, data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_19E7F6.map.jim
+LineEditorBgMap	;The line editor background (LineEditor, ShootoutShooters); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\LineEditorBgMap.map.jim
 
-unk_1A0244	;Data used from code96_18, data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A0244.map.jim
+LineEditorSprites2	;The sprites drawn with LineEditorBgMap2 (DrawLineIcons, ShootersMove); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\LineEditorSprites2.map.jim
 
-unk_1A0632	;Data used from code96_18, data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A0632.map.jim
+LineEditorSprites	;The line editor sprites (LineEditor, ShootoutShooters); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\LineEditorSprites.map.jim
 
-unk_1A0A58	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A0A58.map.jim
+TeamRosterBgMap	;The Team Roster screen background (TeamRosterScreen)
+	incbin	..\Extracted\NHL96\Graphics\TeamRosterBgMap.map.jim
 
-unk_1A1EC6	;Data used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A1EC6.map.jim
+TeamRosterSprites	;The Team Roster screen sprites (TeamRosterScreen); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\TeamRosterSprites.map.jim
 
-unk_1A22FC	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A22FC.map.jim
+TeamRosterTitleMap	;The Team Roster title banner (TeamRosterScreen)
+	incbin	..\Extracted\NHL96\Graphics\TeamRosterTitleMap.map.jim
 
-unk_1A2B1C	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A2B1C.map.jim
+SummaryBgMap	;The scoring and penalty summary background
+	incbin	..\Extracted\NHL96\Graphics\SummaryBgMap.map.jim
 
-unk_1A454A	;Data used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A454A.map.jim
+SummarySprites	;The scoring and penalty summary sprites; +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\SummarySprites.map.jim
 
-unk_1A4968	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A4968.map.jim
+ScoringTitleMap	;The Scoring summary title banner (ScoringSummaryScreen)
+	incbin	..\Extracted\NHL96\Graphics\ScoringTitleMap.map.jim
 
-unk_1A5148	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A5148.map.jim
+PenaltiesTitleMap	;The Penalties summary title banner (PenaltySummaryScreen)
+	incbin	..\Extracted\NHL96\Graphics\PenaltiesTitleMap.map.jim
 
-unk_1A5928	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A5928.map.jim
+PeriodStatsTitleMap	;The Period Stats title banner (PeriodStatsScreen)
+	incbin	..\Extracted\NHL96\Graphics\PeriodStatsTitleMap.map.jim
 
-unk_1A6148	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A6148.map.jim
+PeriodStatsMap	;The period stats screen background (PeriodStatsScreen)
+	incbin	..\Extracted\NHL96\Graphics\PeriodStatsMap.map.jim
 
-unk_1A76B6	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A76B6.map.jim
+GameStatsTitleMap	;The Game Stats title banner (GameStatisticsScreen)
+	incbin	..\Extracted\NHL96\Graphics\GameStatsTitleMap.map.jim
 
-unk_1A7ED6	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A7ED6.map.jim
+GameStatsBgMap	;The game stats screen background (GameStatisticsScreen)
+	incbin	..\Extracted\NHL96\Graphics\GameStatsBgMap.map.jim
 
-unk_1A98A4	;Data used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A98A4.map.jim
+GameStatsSprites	;The game stats screen sprites (GameStatisticsScreen); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\GameStatsSprites.map.jim
 
-unk_1A9C72	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1A9C72.map.jim
+ShootoutSetupTitleMap	;The Shootout Setup title banner (ShootoutShooters)
+	incbin	..\Extracted\NHL96\Graphics\ShootoutSetupTitleMap.map.jim
 
-unk_1AA452	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1AA452.map.jim
+RecordHoldersTitleMap	;The Record Holders title banner (RecordHoldersScreen)
+	incbin	..\Extracted\NHL96\Graphics\RecordHoldersTitleMap.map.jim
 
-unk_1AAC72	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1AAC72.map.jim
+RecordHoldersBgMap	;The record holders screen background (RecordHoldersScreen)
+	incbin	..\Extracted\NHL96\Graphics\RecordHoldersBgMap.map.jim
 
-unk_1AC3A0	;Data used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1AC3A0.map.jim
+RecordHoldersSprites	;The record holders screen sprites (RecordHoldersScreen); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\RecordHoldersSprites.map.jim
 
-unk_1AC7C6	;A map used from data96_12
-	incbin	..\Extracted\NHL96\Graphics\unk_1AC7C6.map.jim
+PlayerStatsTitleMap	;The Player Stats title banner (PListSetup)
+	incbin	..\Extracted\NHL96\Graphics\PlayerStatsTitleMap.map.jim
 
-unk_1ACFE6	;A map used from code96_19
-	incbin	..\Extracted\NHL96\Graphics\unk_1ACFE6.map.jim
+NameEntryTitleMap	;The User Entry title banner (NameEntryGfx)
+	incbin	..\Extracted\NHL96\Graphics\NameEntryTitleMap.map.jim
 
-unk_1AD7C6	;A map used from code96_19
-	incbin	..\Extracted\NHL96\Graphics\unk_1AD7C6.map.jim
+NameEntryBgMap	;The name entry screen background (NameEntryGfx)
+	incbin	..\Extracted\NHL96\Graphics\NameEntryBgMap.map.jim
 
-unk_1AEB94	;Data used from code96_19
-	incbin	..\Extracted\NHL96\Graphics\unk_1AEB94.map.jim
+NameEntrySprites	;The name entry screen sprites (NameEntryScreen); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\NameEntrySprites.map.jim
 
-unk_1AEF62	;A map used from code96_19
-	incbin	..\Extracted\NHL96\Graphics\unk_1AEF62.map.jim
+AwardsTitleMap	;The NHL Awards title banner (AwardsScreenSetup)
+	incbin	..\Extracted\NHL96\Graphics\AwardsTitleMap.map.jim
 
-unk_1AF782	;A map used from code96_19
-	incbin	..\Extracted\NHL96\Graphics\unk_1AF782.map.jim
+AwardsBgMap	;The awards screen background (AwardsScreenSetup)
+	incbin	..\Extracted\NHL96\Graphics\AwardsBgMap.map.jim
 
-unk_1B11B0	;A map used from code96_19
-	incbin	..\Extracted\NHL96\Graphics\unk_1B11B0.map.jim
+AwardsSprites	;The awards screen sprites (AwardsScreenSetup); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\AwardsSprites.map.jim
 
 PresidentsPic	;Award picture: Presidents Trophy
 	incbin	..\Extracted\NHL96\Graphics\PresidentsPic.map.jim
@@ -586,59 +586,59 @@ PadCursorMap	;The pad cursor map (DrawPadIcon); +8 the tiles
 ControllerTitleMap	;The controller setup screen title map (ControllerSetupScreen)
 	incbin	..\Extracted\NHL96\Graphics\ControllerTitleMap.map.jim
 
-unk_1B773A	;A map used from the controller setup
-	incbin	..\Extracted\NHL96\Graphics\unk_1B773A.map.jim
+ControllerFrameMap	;The controller setup screen frame on map 1 (ControllerSetupScreen)
+	incbin	..\Extracted\NHL96\Graphics\ControllerFrameMap.map.jim
 
-BigFontMap	;The big font map of printbig1 (chars word_FFB016); +8 the tiles (LoadBigFonts)
+BigFontMap	;The big font map of printbig1 (chars bigfont1chars); +8 the tiles (LoadBigFonts)
 	incbin	..\Extracted\NHL96\Graphics\BigFontMap.map.jim
 
 BigFontMap3	;The big font map of printbig2 (chars BigFontChars); +8 the tiles (LoadBigFonts)
 	incbin	..\Extracted\NHL96\Graphics\BigFontMap3.map.jim
 
-unk_1B9ED8	;A map used from code96_09, code96_18
-	incbin	..\Extracted\NHL96\Graphics\unk_1B9ED8.map.jim
+DigitFontMap	;The big digit font printbig uses in mode 3; +8 the tiles (the pause screen)
+	incbin	..\Extracted\NHL96\Graphics\DigitFontMap.map.jim
 
-unk_1BA4BE	;A map used from code96_18
-	incbin	..\Extracted\NHL96\Graphics\unk_1BA4BE.map.jim
+PauseRinkMap	;The pause screen rink background on map 2 (PauseScreenDraw)
+	incbin	..\Extracted\NHL96\Graphics\PauseRinkMap.map.jim
 
-unk_1BBBEC	;A map used from code96_18
-	incbin	..\Extracted\NHL96\Graphics\unk_1BBBEC.map.jim
+PauseBgBitmap	;The pause screen board (PauseScreenDraw)
+	incbin	..\Extracted\NHL96\Graphics\PauseBgBitmap.map.jim
 
-unk_1BCBFA	;Data used from code96_18
-	incbin	..\Extracted\NHL96\Graphics\unk_1BCBFA.map.jim
+PauseSprites	;The pause screen sprites (PauseScreenDraw); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\PauseSprites.map.jim
 
-unk_1BCF78	;A map used from code96_18
-	incbin	..\Extracted\NHL96\Graphics\unk_1BCF78.map.jim
+FoxBannerMap	;The NHL on FOX banner on the pause screen (PauseScreenDraw)
+	incbin	..\Extracted\NHL96\Graphics\FoxBannerMap.map.jim
 
-unk_1BD5E6	;A map used from code96_18
-	incbin	..\Extracted\NHL96\Graphics\unk_1BD5E6.map.jim
+HockeyNewsBannerMap	;The Hockey News banner on the pause screen (PauseScreenDraw)
+	incbin	..\Extracted\NHL96\Graphics\HockeyNewsBannerMap.map.jim
 
-unk_1BDCD4	;Data used from code96_19
-	incbin	..\Extracted\NHL96\Graphics\unk_1BDCD4.map.jim
+PlayoffTreeMap	;The playoff tree bracket (PlayoffScreen); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\PlayoffTreeMap.map.jim
 
-unk_1C0302	;A map used from code96_19
-	incbin	..\Extracted\NHL96\Graphics\unk_1C0302.map.jim
+PlayoffTreeBgMap	;The playoff tree ice background on map 2 (PlayoffScreen)
+	incbin	..\Extracted\NHL96\Graphics\PlayoffTreeBgMap.map.jim
 
-unk_1C4810	;A map used from code96_19
-	incbin	..\Extracted\NHL96\Graphics\unk_1C4810.map.jim
+PlayoffTeamFrameMap	;The frame DrawTeamBlocks draws around the user's team in the playoff tree; +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\PlayoffTeamFrameMap.map.jim
 
-unk_1C4C4E	;A map used from code96_15, code96_17, code96_18
-	incbin	..\Extracted\NHL96\Graphics\unk_1C4C4E.map.jim
+PuckAnimMap	;The spinning puck animation, 7x7 tiles a frame (OptionsAnimFrame); +8 the tiles
+	incbin	..\Extracted\NHL96\Graphics\PuckAnimMap.map.jim
 
-unk_1C6C4C	;A map used from code96_20
-	incbin	..\Extracted\NHL96\Graphics\unk_1C6C4C.map.jim
+CupChampsMap	;The Stanley Cup champions team picture (CupChampionsScreen)
+	incbin	..\Extracted\NHL96\Graphics\CupChampsMap.map.jim
 
-unk_1CAEFA	;A map used from code96_20
-	incbin	..\Extracted\NHL96\Graphics\unk_1CAEFA.map.jim
+CupChampsMap2	;The champions picture layer in the team palette (CupChampionsScreen)
+	incbin	..\Extracted\NHL96\Graphics\CupChampsMap2.map.jim
 
-unk_1CCBA8	;Data used from code96_20
-	incbin	..\Extracted\NHL96\Graphics\unk_1CCBA8.map.jim
+CupChampsPals	;One palette per team for the Stanley Cup champions picture (CupChampionsScreen)
+	incbin	..\Extracted\NHL96\Graphics\CupChampsPals.map.jim
 
-unk_1CCEE8	;Data used from code96_20
+unk_1CCEE8	;The sprites CupCelebration animates over the rink
 	incbin	..\Extracted\NHL96\Graphics\unk_1CCEE8.map.jim
 
-unk_1D5420	;A map used from code96_20
+unk_1D5420	;A picture CupCelebrationSetup draws at 6,$C
 	incbin	..\Extracted\NHL96\Graphics\unk_1D5420.map.jim
 
-unk_1D579E	;Data used from code96_06
-	incbin	..\Extracted\NHL96\Graphics\unk_1D579E.map.jim
+revframetbl	;One word per sprite frame: the frame for a reverse angle replay (RevReplayAdj)
+	incbin	..\Extracted\NHL96\Graphics\revframetbl.map.jim

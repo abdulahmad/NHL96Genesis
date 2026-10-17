@@ -1,7 +1,7 @@
 ;	Between periods and back to the title. IntermissionStart ends a period,
 ;	Opening runs the title, and EASportsScreen is the logo.
 
-sub_215DC	;Called from the faceoff code.
+PeriodOver	;End of period: next period, overtime or game over (gsp 4); forceblack, then into IntermissionStart
 	;Code the listing does not decode: kept as bytes
 	dc.b	$52,$78,$C4,$BC,$08,$78,$00,$01,$C3,$38,$0C,$78,$00,$03,$C4,$BC
 	dc.b	$6D,$00,$00,$2C,$67,$00,$00,$16,$31,$FC,$00,$03,$C4,$BC,$4A,$78
@@ -81,9 +81,9 @@ Opening	;Title screen, then into Opening2
 	move.w	#7,d0
 	move.w	#0,d1
 	jsr	(SoundCmd).l
-	jsr	(sub_1E89FC).l
-	jsr	(sub_1E889C).l
-	bra.w	loc_217BE
+	jsr	(CreditsScreen).l
+	jsr	(TitleScreen).l
+	bra.w	OpeningClear
 
 Opening2	;Restart the sound, reset the stack and clear the variables, then the main menu and the season flow
 	jsr	(stop_current_song).l	;stop the song
@@ -107,12 +107,12 @@ Opening2	;Restart the sound, reset the stack and clear the variables, then the m
 	bne.w	.0
 	move.w	#3,-(sp)
 	jsr	(song).l
-	bra.w	loc_217BE
+	bra.w	OpeningClear
 .0
 	move.w	#0,-(sp)
 	jsr	(song).l
 
-loc_217BE
+OpeningClear	;Reset the stack and clear the game variables (keeping the season data), then the options or the season flow
 	movea.w	#(Stack-M68K_RAM),sp
 	btst	#7,(GameFlags).w
 	beq.w	.3
@@ -139,13 +139,13 @@ loc_217BE
 	dbf	d0,.pal
 	move.w	(a0),(gamenum).w
 	bset	#7,(GameFlags).w
-	jsr	(sub_1149E).l
-	btst	#2,(dword_FFDD7E+2).w
+	jsr	(ReadSeasonHeader).l
+	btst	#2,(SeasonFlags).w
 	beq.w	.2
 	jsr	(ReadPassData).l
 	jsr	(maketree).l
 	jsr	(ContinuePlayoffs).l
-	btst	#1,(dword_FFDD7E+2).w
+	btst	#1,(SeasonFlags).w
 	bne.w	*+4
 .2
 	bra.w	.5
@@ -163,75 +163,75 @@ loc_217BE
 	btst	#6,(sflags10).w
 	beq.w	.7
 .6
-	jsr	(sub_11814).l
+	jsr	(TeamSelectScreen).l
 	move.w	(VDP_CNTR).l,(seed).w
 	move.w	(VDP_CNTR).l,(seed+2).w
-	jsr	(sub_10FB4).l
+	jsr	(StartNewSeason).l
 .7
 	btst	#7,(GameFlags).w
 	beq.w	.playoffs
-	jsr	(sub_1149E).l
-	jsr	(sub_115EA).l
-	btst	#0,(dword_FFDD7E+2).w
+	jsr	(ReadSeasonHeader).l
+	jsr	(LoadSeasonOptions).l
+	btst	#0,(SeasonFlags).w
 	beq.w	.8
-	btst	#1,(dword_FFDD7E+2).w
+	btst	#1,(SeasonFlags).w
 	bne.w	.11
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.11
 .8
-	jsr	(sub_1116A).l
-	jsr	(sub_11510).l
+	jsr	(BuildSeasonTeamList).l
+	jsr	(FindUserGame).l
 	cmpa.l	#0,a2
 	beq.w	.9
-	jsr	(sub_113C2).l
+	jsr	(UserGamePlayed).l
 	beq.w	.13
 .9
-	move.w	#1,(word_FFDDB0).w
+	move.w	#1,(simdays).w
 .10
-	jsr	(sub_11024).l
+	jsr	(SimSeasonDays).l
 	bset	#1,(byte_FFC35A).w
-	btst	#0,(dword_FFDD7E+2).w
+	btst	#0,(SeasonFlags).w
 	beq.s	.8
 .11
-	btst	#1,(dword_FFDD7E+2).w
+	btst	#1,(SeasonFlags).w
 	bne.w	.17
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	bne.w	.12
-	move.l	#unk_122A4,(dword_FFDDAC).w
-	jsr	(sub_1223E).l
-	jsr	(sub_1E827A).l
+	move.l	#SeasonMenuScreen,(NextScreenPtr).w
+	jsr	(RunSeasonMenu).l
+	jsr	(SetSeasonAwardWinners).l
 	jsr	(NewPO).l
 	btst	#1,(sflags11).w
 	bne.w	.16
 .12
 	bra.s	.8
 .13
-	jsr	(sub_1169C).l
-	move.l	#unk_122A4,(dword_FFDDAC).w
-	jsr	(sub_1223E).l
-	btst	#0,(dword_FFDD7E+2).w
+	jsr	(SetupSeasonGame).l
+	move.l	#SeasonMenuScreen,(NextScreenPtr).w
+	jsr	(RunSeasonMenu).l
+	btst	#0,(SeasonFlags).w
 	beq.w	.14
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.s	.11
 .14
-	tst.w	(word_FFDDB0).w
+	tst.w	(simdays).w
 	bne.s	.10
 	bclr	#5,(sflags10).w
-	jsr	(sub_11814).l
+	jsr	(TeamSelectScreen).l
 .playoffs
 	jsr	(SetContTeams).l
 	jsr	(UserNameEntry).l
 	jsr	(PlayoffScreen).l
 	btst	#0,(gmode2).w
 	bne.w	.15
-	jsr	(nullsub_3).l
+	jsr	(ScoutingReport).l
 .15
 	jmp	StartGame
 .16
 	jsr	(SeasonAwards).l
-	bset	#1,(dword_FFDD7E+2).w
+	bset	#1,(SeasonFlags).w
 	bclr	#6,(GameFlags).w
-	jsr	(sub_1147E).l
+	jsr	(WriteSeasonHeader).l
 	bclr	#7,(GameFlags).w
 	bra.w	Opening2
 .17
@@ -239,23 +239,23 @@ loc_217BE
 	beq.w	.18
 	bra.w	.20
 .18
-	btst	#3,(dword_FFDD7E+2).w
+	btst	#3,(SeasonFlags).w
 	beq.w	.19
-	jsr	(sub_1E8C5E).l
+	jsr	(CupCelebration).l
 .19
 	jsr	(PlayoffScreen).l
-	btst	#3,(dword_FFDD7E+2).w
+	btst	#3,(SeasonFlags).w
 	beq.w	.21
 .20
 	move.w	#0,-(sp)
 	jsr	(song).l
-	jsr	(sub_1E8544).l
+	jsr	(CupChampionsScreen).l
 .21
 	jsr	(SeasonAwards).l
 	btst	#1,(sflags13).w
 	bne.w	.22
-	move.l	#unk_122A4,(dword_FFDDAC).w
-	jsr	(sub_1223E).l
+	move.l	#SeasonMenuScreen,(NextScreenPtr).w
+	jsr	(RunSeasonMenu).l
 .22
 	bclr	#7,(GameFlags).w
 	bra.w	Opening2
@@ -298,7 +298,7 @@ EASportsScreen	;Called from Begin. Show the EA Sports screen until a button or a
 	moveq	#$F,d5
 	bsr.w	dobitmap
 	move.w	#$EEE,(palfadenew).w
-	move.w	#0,(word_FFBD4C).w
+	move.w	#0,(palfadenew+$E).w
 	move.w	#$18,(palcount).w
 	move	#$2500,sr
 	move.w	#$50,(seed).w

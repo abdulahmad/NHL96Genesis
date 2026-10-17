@@ -6,7 +6,7 @@ CreatePlayer	;The create player screen (roster menu item Create Players)
 	dc.b	$42,$40,$10,$39,$00,$20,$1B,$B9,$B0,$7C,$00,$14,$6D,$00,$00,$08
 	dc.b	$08,$F8,$00,$07,$C3,$58
 
-loc_1DD93C	;Jumped to from loc_1DDDF0
+.redraw	;Redraw the create screen: reset the field row and the mode, read and draw the name list
 	;Code the listing does not decode: kept as bytes
 	dc.b	$42,$78,$D4,$84,$42,$78,$D4,$86,$42,$78,$D3,$12,$61,$00,$09,$D0
 	dc.b	$20,$7C,$00,$19,$4C,$48,$4E,$B9,$00,$01,$21,$8A,$4E,$B9,$00,$1D
@@ -29,12 +29,12 @@ loc_1DD93C	;Jumped to from loc_1DDDF0
 	dc.b	$00,$04,$66,$00,$03,$B4,$60,$00,$FF,$7A,$20,$7C,$00,$1D,$DA,$78
 	dc.b	$30,$38,$D4,$86,$E5,$40,$20,$70,$00,$00,$4E,$D0
 
-unk_1DDA78	;Used from CreatePlayer: the routine addresses
-	dc.l	loc_1DDBF6,loc_1DDAA0,loc_1DDAF2,loc_1DDB1E,loc_1DDB80
+.fieldjumps	;Field routine of each create row, then: next field, after the last one finish the name
+	dc.l	.namefield,.posfield,.handfield,.weightfield,.jerseyfield
 	dc.b	$52,$78,$D4,$86,$0C,$78,$00,$05,$D4,$86,$6D,$00,$FF,$46,$4E,$F9
 	dc.b	$00,$1D,$DD,$F0
 
-loc_1DDAA0	;unk_1DDA78 entry 1
+.posfield	;Position field: left / right change the position slot 0-5
 	;Code the listing does not decode: kept as bytes
 	dc.b	$08,$01,$00,$07,$66,$E6,$08,$01,$00,$04,$66,$00,$03,$68,$08,$01
 	dc.b	$00,$02,$67,$00,$00,$1A,$10,$39,$FF,$FF,$56,$08,$48,$80,$53,$40
@@ -43,13 +43,13 @@ loc_1DDAA0	;unk_1DDA78 entry 1
 	dc.b	$B0,$7C,$00,$05,$6E,$00,$FF,$00,$13,$C0,$FF,$FF,$56,$08,$60,$00
 	dc.b	$FE,$EE
 
-loc_1DDAF2	;unk_1DDA78 entry 2
+.handfield	;Hand field: left / right toggle the shooting hand
 	;Code the listing does not decode: kept as bytes
 	dc.b	$08,$01,$00,$07,$66,$94,$08,$01,$00,$04,$66,$00,$03,$16,$08,$01
 	dc.b	$00,$02,$67,$00,$00,$0E,$0A,$39,$00,$01,$FF,$FF,$56,$04,$60,$00
 	dc.b	$FE,$CC,$08,$01,$00,$03,$67,$00,$FE,$CC,$60,$EA
 
-loc_1DDB1E	;unk_1DDA78 entry 3
+.weightfield	;Weight field: left / right change the weight
 	;Code the listing does not decode: kept as bytes
 	dc.b	$08,$01,$00,$07,$66,$00,$FF,$68,$08,$01,$00,$04,$66,$00,$02,$E8
 	dc.b	$08,$01,$00,$02,$67,$00,$00,$2C,$10,$39,$FF,$FF,$56,$01,$E8,$48
@@ -59,7 +59,7 @@ loc_1DDB1E	;unk_1DDA78 entry 3
 	dc.b	$E8,$48,$02,$40,$00,$0F,$B0,$7C,$00,$0F,$67,$00,$FE,$6C,$52,$00
 	dc.b	$60,$C8
 
-loc_1DDB80	;unk_1DDA78 entry 4
+.jerseyfield	;Jersey field: left / right change the BCD jersey number
 	;Code the listing does not decode: kept as bytes
 	dc.b	$08,$01,$00,$07,$66,$00,$FF,$06,$08,$01,$00,$04,$66,$00,$02,$86
 	dc.b	$08,$01,$00,$02,$67,$00,$00,$2E,$10,$39,$FF,$FF,$56,$00,$67,$00
@@ -70,7 +70,7 @@ loc_1DDB80	;unk_1DDA78 entry 4
 	dc.b	$B2,$3C,$00,$09,$66,$00,$00,$0C,$06,$00,$00,$10,$02,$00,$00,$F0
 	dc.b	$60,$C8,$52,$00,$60,$C4
 
-loc_1DDBF6	;unk_1DDA78 entry 0
+.namefield	;Name field: the pads edit the name (grid), start checks it (BuildEnteredName) and goes to the next field
 	;Code the listing does not decode: kept as bytes
 	dc.b	$70,$FF,$08,$01,$00,$07,$67,$00,$00,$9E,$61,$00,$0C,$B8,$6B,$00
 	dc.b	$00,$34,$61,$00,$02,$FA,$4E,$B9,$00,$01,$BA,$2E,$00,$24,$FE,$07
@@ -108,7 +108,7 @@ CreateListMove	;CreatePlayer: move in the name list
 	dc.b	$67,$00,$00,$02,$61,$00,$00,$68,$20,$7C,$FF,$FF,$D3,$AC,$22,$7C
 	dc.b	$00,$1E,$6B,$04,$10,$31,$50,$00,$11,$80,$40,$00,$60,$00,$FB,$F0
 
-loc_1DDDF0	;Jumped to from CreatePlayer
+CreateNameDone	;All fields done: SaveCreateName (fail: redraw), InitCreateRecord, the checksum, then ModifyRatings
 	;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$09,$82,$6B,$00,$00,$18,$61,$00,$0B,$92,$08,$B8,$00,$06
 	dc.b	$C3,$50,$4E,$B9,$00,$02,$41,$AA,$4E,$F9,$00,$1D,$EA,$5A,$4E,$F9
@@ -395,7 +395,7 @@ CreateRecordTail1	;8 byte record tail (record byte $1F clear)
 CreateRecordTail2	;8 byte record tail (record byte $1F set)
 	dc.b	$20,$82,$22,$22,$22,$22,$22,$27
 
-loc_1DEA5A	;Jumped to from loc_1DDDF0
+ModifyRatings	;Modify Ratings screen: up / down pick a rating, A / B lower / raise it (EditField), start commits the player
 	;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$0C,$B0,$20,$7C,$00,$19,$69,$B4,$4E,$B9,$00,$01,$21,$8A
 	dc.b	$4E,$B9,$00,$1D,$BB,$92,$31,$FC,$00,$18,$BD,$3C,$08,$B8,$00,$02
@@ -966,7 +966,7 @@ OvrGoalWgtList2	;Goalie attribute weights
 AttribWgtList2	;Single attribute weights (create player)
 	dc.b	$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02,$02
 
-sub_1DFA1C	;Clear save RAM bytes $DE6-$E5D
+ClearFreeAgentStats	;Clear the saved stat words of the free agent slots in save RAM
 	movem.l	d0-d1/a0,-(sp)
 	move.l	#$DE6,d0
 	moveq	#$78,d1
@@ -981,7 +981,7 @@ ClearCreatedPlayers	;Clear the created players list at M68K_RAM+$DB4 (20 x $8000
 .loop
 	move.w	#$8000,(a0)+
 	dbf	d6,.loop
-	move.b	#0,(byte_FF0DDC).l
+	move.b	#0,(M68K_RAM+$DDC).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
@@ -1242,7 +1242,7 @@ ReleasePlayers	;The release player screen (roster menu item Release Player)
 	dc.b	$61,$00,$FC,$A2,$4A,$79,$FF,$FF,$27,$10,$67,$00,$00,$08,$53,$79
 	dc.b	$FF,$FF,$27,$10,$60,$00,$FD,$1A,$60,$00,$FD,$94
 
-sub_1E0872	;Used from ReleasePlayers
+CheckMinGoalies	;Z if team d7 has only 2 goalies (GetGoalieCountD7), so none can be released
 	;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$57,$74,$B0,$7C,$00,$02,$4E,$75
 
@@ -1300,7 +1300,7 @@ ReleaseMsgText	;ReleasePlayers: the message when the free agent list is full
 	dc.b	$20,$82,$58,$48,$51,$CC,$FF,$E2,$4A,$46,$66,$D2,$4C,$DF,$7F,$FF
 	dc.b	$4E,$75
 
-sub_1E0B76	;Called from ReleasePlayers: vram, fonts and the screen bitmaps
+ReleaseGfx	;Release Player screen video set up: fonts, bitmaps and the pos / overall headers
 	;Code the listing does not decode: kept as bytes
 	dc.b	$08,$F8,$00,$05,$C3,$56,$21,$FC,$00,$01,$2D,$46,$D2,$44,$08,$B8
 	dc.b	$00,$00,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$08,$B8,$00,$01,$BF,$B2
@@ -1334,12 +1334,12 @@ sub_1E0B76	;Called from ReleasePlayers: vram, fonts and the screen bitmaps
 	dc.b	$6C,$61,$79,$65,$72,$FD,$15,$FA,$01,$61,$2F,$62,$2D,$73,$77,$69
 	dc.b	$74,$63,$68,$20,$74,$65,$61,$6D,$73,$00,$4C,$DF,$7F,$FF,$4E,$75
 
-sub_1E0D66	;Called from SignFreeAgents and ReleasePlayers: 8 palette longs to palfadenew+$40
+PStatsPalette2	;The PStatsPalette palette to palfadenew+$40 (sign free agents and release screens)
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$00,$C0,$20,$7C,$00,$17,$C2,$AE,$22,$7C,$FF,$FF,$BD,$7E
 	dc.b	$30,$3C,$00,$07,$22,$D8,$51,$C8,$FF,$FC,$4C,$DF,$03,$00,$4E,$75
 
-sub_1E0D86	;Called from sub_1DD086, SignFreeAgents and ReleasePlayers
+sub_1E0D86	;Called from ExecuteTrade, SignFreeAgents and ReleasePlayers
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$30,$39,$00,$20,$00,$00,$53,$00,$B0,$07,$66,$00
 	dc.b	$00,$06,$61,$00,$00,$2C,$30,$39,$00,$20,$18,$72,$53,$00,$B0,$07

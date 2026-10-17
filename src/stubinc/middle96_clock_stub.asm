@@ -22,7 +22,7 @@ printbig2 = $01C15A		;penalty96
 eraser = $01B976		;video96
 SkipStrings = $01D7F2		;hockey96_inter
 TeamList = $00077E		;teamdata96
-sub_1CFE4 = $01CFE4		;penalty96
+ErasePowerPlayBox = $01CFE4		;penalty96
 EASNLogo = $01D064		;penalty96
 BigFontMap = $1B89C8		;graphics96
 

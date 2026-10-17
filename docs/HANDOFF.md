@@ -336,7 +336,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   `engine/logic96.asm` is asstab through the penalty texts ($00C548-$00EC2F).
   `engine/lines96.asm` is the line change box (SetLCmode through lcfound2, $00EC30-$00EEFF). code96_03 is gone.
   `engine/input96_shot.asm` is the shot and the pass (shotdiradj through sub_1008E, $00F374-$0100BF).
-  `engine/lines96_set.asm` is the team line writer (NullSaveClear, sub_EF02, $00EF00-$00F373).
+  `engine/lines96_set.asm` is the team line writer (NullSaveClear, GetTeamLines, $00EF00-$00F373).
   `front/trade96.asm` is the roster names (DefaultRosters through the name tables, $0100C0-$010919).
   `front/season96_sim.asm` is the season simulation (SimGameStats through PickSimGoalie, $01091A-$010CB1).
   `front/season96.asm` is code96_05 renamed (season and save screens, $010CB2-$012BFD). The routines stay `sub_` until the bodies are read.
@@ -413,7 +413,108 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   Three renames, now that the files exist: getGoalieSCnum is FindGoalie (control96), ClearShootout is ShootoutInit (shootout96_path), LetterGrid is CreateLetterGrid (records96). LetterGridPos is a different routine and keeps its name.
   `code96_14` ($1D6B66-$1D7FA5) and `code96_15` ($1D8E5C-$1D9CC5) stay numbered. Each head mixes several subsystems.
   Names taken from the matching 95 body: getplayernameD7 and getnamea0 (trade96), chkpk (logic96_puck), PenShotTable and UpdatePenaltyShotEnd (shootout96), a2touchpuck (logic96_pull), SetScroll2, ClockDigitChar, DoDMAList, DumpSprites2, rtsShowCrowd and ButtonLabelCharTable (display96), setteams (control96_team), InitCreateRecord and InitCreateRecord2 (create96). The big-font clock helper in middle96_clock is BigClockDigitChar. SegaInit locals are in the name map. LoadEnergyBarTiles, LoadCrowdFrames, LoadRefTiles, LoadRefTilesHor, LoadFaceOffSprites and LoadFaceOffMap decompress those pictures. DumpPadSprites, DumpSpriteTable, SetGloveAndSetupPad and JumpToShowClock are named from what they do. VBlank_SpriteFade (summary96) is the period-summary and awards vbint. setup96_menu already owns VBlank_SetOptions.
-  Next: the finish plan in `docs/align95_plan.md` (section "Finish plan"). Decoded names first (`lines96_set`, then the small leftovers, then `season96`), then `dc.b` entries, one more 95G body search, graphics `unk_` labels, RAM, then the symbols pass. A generic label is finished when it has a real name or a closed-list row. Do not guess. Do not name the lone rts at $02032C rtss2. Do not reopen a numbered graphics or sound dump.
+  Next: see "Naming pass" below. Steps 1-6 of the finish plan in `docs/align95_plan.md` are done except the Unsure
+  rows; then the symbols pass (step 7). Earlier text: Decoded names first (`lines96_set`, then the small leftovers, then `season96`), then `dc.b` entries, one more 95G body search, graphics `unk_` labels, RAM, then the symbols pass. A generic label is finished when it has a real name or a closed-list row. Do not guess. Do not name the lone rts at $02032C rtss2. Do not reopen a numbered graphics or sound dump.
+
+## Naming pass (Oct 2026, second session)
+Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the body; a parent name only when body and callers match.
+- lines96_set: GetTeamLines (a0 = the line sets of team d7: the team data `.ls` while CheckDefaultRoster says the saved
+  roster is the DefaultRosters one, else built in RAM), BuildPosList (per position slot, sorted by CalcAttribRating),
+  AddBestGoalie, AddLineSkaters, AddDefensePair, AddFourForwards, AddLinePlayer, TakePosListPlayer, TakeFallbackPlayer,
+  ClearUsedPlayers, ClearPosListUsed, and the three fallback list tables. No 95G body: 95G LoadTeamLines is the parent of
+  96 SetOriginalLines (already named), which copies sets 0 and 2-7 (OptLine) or 1-7 of GetTeamLines' result.
+
+- season96: the save RAM season code. 95G names where the job, arguments and callers are the same and only the storage
+  changed to bit fields (ReadSeasonHeader, WriteSeasonHeader, RecordGameResult, RecordTeamResult, ReadStandings,
+  TickTeamInjuries, BuildSeasonTeamList, ClearSeasonData; WriteDayGames also matches 13/16 words). New-in-96 names from
+  the code: SaveGameStats, AddTeamGameStats, AddSavedStats, Read/WriteSRAMBitWords, StartNewSeason, SimSeasonDays,
+  SaveUserGame, UserGamePlayed, ReadUserGameCount, FindUserGame, LoadSeasonOptions, SetupSeasonGame, the team select
+  screen (TeamSelectScreen, TeamSelectGfx, the rank printers, TeamRankPtrs, the logo drawers, TeamSelectSide,
+  RedrawTeamRanks), RunSeasonMenu and SeasonMenuScreen (its menu text), LoadScreenSprite / DrawScreenSprite (seven
+  screens use them), SetMenuScroll, DrawTeamLogoD7. homegoalies doubles as the menu background scroll.
+
+- playoff96: folds. maketree's six inner labels are locals now (.loop, .bypoints, .reseed2, .reseed4, .next, .nogames; the
+  clashing locals renamed .final, .keep, .p1-.p3, .nofinal, .games). FigureJoy keeps its 95G locals (.9, .10, .fjnpo, .ex,
+  16/16 and 20/20 words). FirstRoundSeeds (read by maketree, not SetTreeGameTeams) and NOPJoyTbl (95G, 14/14 words).
+- Arena animation (shootout96_path): 94G names. The three nullsubs are 94G AddArenaAnimSprite, RunArenaAnim and
+  StartArenaAnim with an rts put first (the dead bodies match 47/52, 20/20, 20/20 words, same callers); SetFaceoffAnim and
+  EndArenaAnim match all their words. ShowCrowdFrame2 is the `.spr` tail of AddArenaAnimSprite (folded).
+- title96: TitleScreen, CreditsScreen, PrintCreditsPage, the two wait-frame helpers, VBlank_LineScroll and its unused copy
+  VBlank_LineScroll2 (nothing sets either), the Cup win scene (CupCelebration, its setup, sprites and cheer delays).
+- awards96_show: DrawAwardWinnerLogo, GetAwardWinnerTeam, SetSeasonAwardWinners, SetPlayoffAwardWinners,
+  CupChampionsScreen (MightyDucksTxt / OfAnaheimTxt). season96_menu: BuildPlayerLeaders and PlayerLeaderJumps (95G),
+  BlankStatsRow. stats96: FormatLineName. summary96: BlankMenuBox, PeriodGoalsTxt, PeriodShotsTxt. playoff96_tree: the
+  scroll tables.
+
+- Season sim (trade96 / season96_sim): SimScore (95G: role, caller and the playoff-tie tail match), SimTeamStrength, the
+  goal model tables and the sim penalties, scorers, assists and shots. SimTeamGoals, SimScorers and SimShots carry the
+  95G names by role and interface (the bodies are new). GetPositionSlot, GetSeasonRosterId.
+- Trade (trade96_edit): ExecuteTrade (95G, masked 18/20 and 14/16), ExtractTradedPlayer (95G, four 14-word windows),
+  FixJerseyNumber (95G 11/12), DeleteStatSlot / InsertStatSlot (new: packed stat fields), WaitMenuFrame, EraseBlank.
+  The old ExecuteTrade label at $1DD09A sat inside the operand of a jsr and nothing used it: removed. TradeDone moved
+  six bytes later, past the blt / rts that end the routine before it (no byte moves).
+- Create (create96): the field handlers and their table fold into CreatePlayer (.redraw, .fieldjumps, .namefield,
+  .posfield, .handfield, .weightfield, .jerseyfield). CreateNameDone stays global (CreateListMove, closed list, sits
+  between). ModifyRatings and CheckMinGoalies (95G), ClearFreeAgentStats, ReleaseGfx, PStatsPalette2.
+
+- logic96: the asstab entries $1-$6 (assdefo, assdefd, asswingd, asswingo, asscenterd, asscentero) by the 94 numbering and
+  role, not by bytes: 96 opens each with a tmap test (players on the ice) that switches to a short-handed variant, so the
+  bodies no longer match 94 / 95 by masked bytes. The pairs they switch between (1-2, 3-4, 5-6), aioff / aidef and the
+  helpers they call agree with 94. The variants are new: ass...5 (one man short, tmap 5) and ass...4 (two short); asswingo4
+  and asswingd4 are a lone rts. DoubleMinorPenalties (the 4 minute Roughing and Cross Check).
+- logic96_vec: skateto (94G, the whole $C0 bytes; 95G from +8), FacePuck, GetHot2a / 2b / 2c (HotList2 hot spots).
+- collide96: the label holdcheck was on 94G Bcheck (same body line for line, CCStart's SPA216A / SPA052C entry): now
+  Bcheck, and the real holdcheck (the hold / hook entry) takes the name. checkcheck (95G), checkinglist (95G),
+  CheckPenalties, puckgoalie (94G, 32 words). Folds: checkcx's exits are .exit / .exit4 (95G locals) with the new
+  .droppuck between; FallDown's table and tail are .23, .24, .25, .hitter (95G locals; the hitter's own .0-.7 are .h0-.h7).
+  FallDown's comment said a3 falls: a2 falls and a3 is the hitter.
+
+- Engine leftovers. Parent names by body: AddFramer, InitScores, PeriodOver, updatefaceoff, ExitStatsScreen,
+  SetSflags8Bit1 (94G); reenergizeteam, Findhittype, padteams, shotsets, onetimershot, ClrHor (95G / 94G). Call-slot
+  names for empty rts stubs where every caller is a 94 / 95 call site of that routine: printscores1, ScoutingReport.
+  dostop: 95G dostop's body and callers are the routine that was loc_1AD6C; the old dostop label was its inner non-pad
+  branch (.cpu now), with .stop / .glide. Folds: getlchoice2 .tab, ReplayMode .top, doplayeracc .ftab,
+  ProcessPenaltyList .next / .5 / .coinpen, updatepwrplay .clrpwrplay, SetScore .3, JumpToShowClock .digit / .digits
+  (all 95G / 94G locals). loc_10000 was not a label: setpassmode's `cmp.l #$10000,d0` is a constant (95G writes it so);
+  the label and its unused `.0` are gone, and locret_10054 is sub_FFD0's .exit.
+- New names from the code: JumpToDoplayeracc, SetFightingMajors, ClearTeamRoles / CheckRoles / CheckTeamRoles (the role
+  byte $65), VBlank_Menus (95G VBlank_SetOptions shape; that name is taken in 96), ArmIcing, BigControlCodeJumpTable,
+  DoubleMinorChk, ErasePenaltyMessage, Erase/DrawPowerPlayBox, SetGoalieFromLines, OpeningClear, TurnGoalieFromNet,
+  ChecksumSkipStart / End. PauseScreenDraw takes the 95G name by role and caller (body rewritten).
+
+- RAM (ram96): 99 of the 145 IDA names closed. 95G / 94G names where the same routine uses the variable at the same point
+  (rinkvrcset, spritechars, ReplayIconChars, clockram, shotpflags, RefRamMap, the stats screen block DispAttribCtr /
+  VertLineScrolling / PlayerScrollCtr / screentimer, homeplayers / awayplayers, the shootout variables, NameEntryMode,
+  namelogarrows, sopathdir, the 94 crowd meter CwdChkCntr / CwdChkCnt / CrowdRecord / CrowdAvg / CrowdPeak, PuckZCntr /
+  TmpPuckZ, SeasonDay with SeasonFlags = SeasonDay+2). New-in-96 variables named from their one job (the pstats... clone
+  of the stats screen block, team select and award logo chars, the font char bases, options animation, skill speed,
+  NextScreenPtr, simdays, fightidletimer, IntermissionTimer, ...). Labels that were only an offset into a named variable
+  are written as that expression (padcont+4, tmstruct+tmap, potree+$1C, LineSetsBuf+$43, SeasonDay+8, ...) and dropped.
+  LineSetsBuf is GetTeamLines' buffer (shares ThreeStars). fight96 now writes CwdExciteLvl (93G) where it had the
+  setup screen alias of that address; lines96_bar writes #ScoreSum-6 (95G ChkCnt).
+
+- Graphics (graphics96, scout96): 91 of the 95 unk_ pictures named; the extractor, incbin paths and extracted files follow
+  the names. HiScoreBgMap and HiScoreImg are the 95G pictures (tiles, palette and map identical). The rest are new art,
+  named by the screen whose routine draws them; each screen's 19x3 title banner was rendered and read (LEAGUE OPTIONS,
+  NHL STANDINGS, GAME OPTIONS, LEAGUE / PLAYOFF LEADERS, SEASON / PLAYOFF / PLAYER STATS, SELECT TEAM, TRANSACTIONS, TRADE
+  PLAYERS, CREATE PLAYER, SIGN / RELEASE PLAYERS, MAIN MENU, EDIT LINES, TEAM ROSTER, SCORING, PENALTIES, PERIOD STATS,
+  GAME STATS, SHOOTOUT SETUP, RECORD HOLDERS, USER ENTRY, NHL AWARDS). The ...Sprites files are SetSframe frame lists with
+  their tiles at +8. Where 95G has a picture with the same role, its name is used (TitleScreenImg, PauseBgBitmap,
+  AwardsBgMap, TradeBgMap, CreateBgMap, NameEntryBgMap, PlayerStatsBgMap, PlayerStatsTitleMap, PeriodStatsMap,
+  LineEditorBgMap). revframetbl is not a picture: RevReplayAdj's frame table (95G role).
+
+- Found inside dc.b blocks, not labelled yet (a label there needs the dc.b line split at the address; no byte moves):
+  avdgoal $1A110 and skatetopuck $1A24A (94G / 95G bodies match) in skateto's bytes, with a new skatetopuck entry at
+  $1A210; 94G ReloadRinkGraphics at $154D8 (ExitStatsScreen + 4; ClrHor and ReplayMode call it); TagTradePositions
+  $1DD19E (ExecuteTrade); PrintCreateName $1DEB4C and DrawRatings $1DECCE (ModifyRatings); BuildPlayerLeaders' exit
+  after its jmp (a0); the jmp assreplace stub at $C608 and jmp donothing at $CAE4 (the assignment code's long branches);
+  the screen setup code of NHL Standings (in CanBlock's bytes), Game Options (SortStandings), the leaders (after
+  BlankStatsRow), the scoring summary (GoalTypeTbl), Game Stats (TeamStatTextTblNoPen), Record Holders
+  (ReadTeamRecords) and League Options (after SetMenuScroll); the menu handlers after VBlank_Menus' rte.
+  InitializeGameStructures' first instructions sit 6 bytes before its label, inside NOPJoyTbl's bytes (no callers).
+- Possible original bugs, kept as they are: maketree's first .bypoints call sorts seed numbers as team numbers (the call
+  after the loop orders the finalists correctly); SimTeamStrength reads its save RAM roster flag a goalie-count off;
+  RandomInjuryGames reads the high byte of the SeasonDay word.
 
 ## Unsure
 
@@ -433,3 +534,38 @@ Labels the masked search found inside bytes that are still unnamed. Do not inven
 Named from the matching 95 body: chkpk, UpdatePenaltyShotEnd, PenShotTable, a2touchpuck, SetScroll2, ClockDigitChar, DoDMAList, DumpSprites2, rtsShowCrowd, ButtonLabelCharTable, Goal (collide96), GoalTypeTbl (summary96), setteams, InitCreateRecord, getplayernameD7, getnamea0, InitializeGameStructures, GetRandomUnusedTeam. VBlank_SpriteFade is the summary96 vbint. setup96_menu already owns VBlank_SetOptions. rtsBigClock is the shared return of the big-font clock.
 
 SegaInit locals exist in `src/sega/SegaInit.asm` and in `docs/name_map.csv`. Do not invent a second copy.
+
+Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidence below is found.
+- sub_11582 (season96): called last by ClearPlayoffSave (Reset Rosters). Clears the player stat totals, the injuries,
+  the free agent stat words (the block ClearFreeAgentStats clears) and one more save RAM block ($DDD, 9 bytes) whose use
+  is not known yet; name it once that block is identified.
+- For Abdul: BlankMenuBox (summary96) has the callers and job of 95G ClearMenuBox (TimeoutMenu, SelectGoalieMenu), but
+  95 calls eraser and 96 prints blank big-font rows, so it was named from the job. Rename to ClearMenuBox if role is enough.
+- For Abdul: CupChampionsScreen (awards96_show) has the job of 95G StanleyCupScreen with a different body; same question.
+- sub_1E0D86 (create96): clears the $41-byte save RAM block at 0 or $C39 that belongs to team d7, called where 95 called
+  CheckSavedLines (ExecuteTrade, SignFreeAgents, ReleasePlayers). $41 is 95's saved line set size, but no reader of the
+  blocks was found. Candidate ClearSavedLinesD7 once a reader confirms it.
+- For Abdul: names kept from 95G by role and interface where the body is new: SimTeamGoals, SimScorers, SimShots
+  (season sim), ClearSeasonData (season96). Swap for new names if role is not enough.
+- For Abdul: the asstab entries $1-$6 are named by role and the 94 numbering, not a byte match (see the logic96 bullet).
+- sub_AFDA (input96): start + dpad sets SPA288C, pflags2 bit 1 and Xvel + $64. What SPA288C is, is not known.
+- loc_C068 (fight96): a fighter engages (SPA3128); the second one turns the roughing calls into fighting majors.
+  Reached from assfight and fightinput, so it stays global; the meaning of SPA3128 is not proven.
+- sub_FD14, sub_FD80, sub_FFD0 (input96_shot): once a second they rework the role byte $65 of each team around its last
+  puck carrier by puck zone. The role scheme is not understood well enough to name them.
+- nullsub_2 (teamgfx96): an rts called once, at game over after EncodePW; 94 / 95 have no call there.
+- sub_14804 (hockey96): clears save RAM $E68-$ECD in StartGame (OptPlayMode above 1); what lives there is not known.
+- sub_1D920A (code96_15): called before setpassmode / SetShotMode and has no effect (the movem undoes the load).
+- For Abdul: PauseScreenDraw (pause96_return) has 95G's caller and job but a rewritten body.
+- RAM: 46 IDA names stay. No uses at all (unk_FFB65E, unk_FFB6DE, byte_FFB7BC, unk_FFC058, unk_FFCFB4, dword_FFD234, the
+  unused tmstruct / AwShots offsets word_FFC73C, word_FFC74C, byte_FFC756, word_FFCADA, word_FFCAEA, byte_FFCAF4,
+  unk_FFFFF6, unk_FFFFFF). Two jobs at one address (word_FF2720, word_FFB8C4, word_FFD238). The rest have uses in code
+  whose job is not known yet (the fight counters word_FFDCDE ... byte_FFDCEC, the role carriers word_FFD23A / C, the pad
+  objects unk_FFBE72 / unk_FFBE8E, word_FFD036 / word_FFD038 in the stats block, byte_FFC35A, unk_FFC38C, word_FFBF88,
+  word_FFBFF0, word_FFD300, word_FFD310, byte_FFD474 / byte_FFD47E (94 arenaanim / faceoffanim by the dead 94 code only),
+  byte_FFDCA6, byte_FFDCF9, dword_FFDD82, word_FFDDB6, word_FFDDBE, byte_FF2710, word_FF1388). unk_FFC4C6 is ScoreSum-6 but has no uses left.
+- Graphics: unk_1417B6 (a frame offset table used only by the dead arena animation), unk_17C2AE (a palette; what it
+  colours is not shown), unk_1CCEE8 and unk_1D5420 (CupCelebration's sprites and banner; not identified by content).
+- For Abdul: names that the pictures now contradict. OptionsScreen's banner reads MAIN MENU (the GAME OPTIONS screen is
+  other code); PlayoffMenuScreen / PlayoffMenuSetup draw TRANSACTIONS and run RosterMenuList; ControllerBgMap is also the
+  background of the select team, main menu and transactions screens. Left as they are (not IDA names).

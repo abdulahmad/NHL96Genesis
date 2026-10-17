@@ -31,7 +31,7 @@ doplayeracc	;Player acceleration toward direction d0 by his speed rating (dirtab
 	bne.w	.4
 	move.w	Xvel(a3),d0
 	or.w	Yvel(a3),d0	;OR Yvel with Xvel
-	bne.w	loc_1AD6C
+	bne.w	dostop
 .4
 	btst	#1,pflags2(a3)
 	beq.s	SetSPA
@@ -120,7 +120,7 @@ doplayeracc	;Player acceleration toward direction d0 by his speed rating (dirtab
 	move.w	facedir(a3),d2	;facedir into d2
 	sub.w	d2,d0
 	andi.w	#7,d0
-	movea.l	#unk_1A820,a0
+	movea.l	#.ftab,a0
 	asl.w	#1,d0
 	tst.w	(a0,d0.w)
 	beq.w	noturn0
@@ -163,7 +163,7 @@ doplayeracc	;Player acceleration toward direction d0 by his speed rating (dirtab
 	bhi.w	noturn
 	rts
 
-unk_1A820	;Signed x offsets by direction (goalieacc)
+.ftab	;Turn step by direction difference (0, +$10, 0, -$10)
 	dc.w	$0,$10,$10,$10,$0,$FFF0,$FFF0,$FFF0
 
 goalieacc	;Goalie movement
@@ -358,7 +358,7 @@ noturn0	;doplayeracc: no turn
 	add.w	d4,d0
 	andi.w	#7,d0
 	cmp.w	#4,d0
-	blt.w	loc_1AD6C
+	blt.w	dostop
 .1
 	addq.w	#1,$54(a3)
 	btst	#3,4(a3)
@@ -558,35 +558,35 @@ MaxSpeed	;Max speed values for each rating level 0-$F
 	dc.l	$388B190,$3CA77F1,$40E8D24,$454F129
 	dc.l	$49DA400,$4E8A5A9,$535F624,$5859571
 
-loc_1AD6C
+dostop
 	btst	#3,$62(a3)
-	beq.w	dostop
+	beq.w	.cpu
 	cmpi.w	#$1000,$28(a3)
-	bgt.w	loc_1ADD8
+	bgt.w	.glide
 	cmpi.w	#$F000,$28(a3)
-	blt.w	loc_1ADD8
+	blt.w	.glide
 	cmpi.w	#$1000,$2A(a3)
-	bgt.w	loc_1ADD8
+	bgt.w	.glide
 	cmpi.w	#$F000,$2A(a3)
-	blt.w	loc_1ADD8
-	bra.w	loc_1ADCA
+	blt.w	.glide
+	bra.w	.stop
 
-dostop	;Stop player a3: under $1000 speed in x and y the velocities are cleared, else slowed
+.cpu
 	cmpi.w	#$2000,Xvel(a3)
-	bgt.w	loc_1ADD8
+	bgt.w	.glide
 	cmpi.w	#$E000,Xvel(a3)
-	blt.w	loc_1ADD8
+	blt.w	.glide
 	cmpi.w	#$2000,Yvel(a3)
-	bgt.w	loc_1ADD8
+	bgt.w	.glide
 	cmpi.w	#$E000,Yvel(a3)
-	blt.w	loc_1ADD8
+	blt.w	.glide
 
-loc_1ADCA
+.stop
 	tst.w	$34(a3)
 	bne.w	stopna2
 	jmp	stopfast
 
-loc_1ADD8
+.glide
 	move.w	(puckc).w,d1
 	cmp.w	$52(a3),d1
 	bne.w	.1

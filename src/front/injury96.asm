@@ -11,7 +11,7 @@ RandomInjuryGames	;setInjuryType in a season: a random games count (SetInjuryGam
 	clr.w	d0
 	move.b	#$50,d0
 	clr.w	d1
-	move.b	(dword_FFDD7E).w,d1
+	move.b	(SeasonDay).w,d1
 	sub.w	d1,d0
 	movem.w	(sp)+,d1
 	cmp.w	#2,d0

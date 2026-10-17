@@ -9,28 +9,28 @@ updateplayers	;This routine calls all collision/animation/assignment code for al
 	cmpi.w	#5,(puckz).w
 	bgt.w	.14
 .13
-	clr.w	(word_FFDCC6).w
+	clr.w	(PuckZCntr).w
 	bra.w	.16
 .14
-	move.w	(word_FFDCCA).w,d0
+	move.w	(TmpPuckZ).w,d0
 	cmp.w	(puckz).w,d0
 	beq.w	.15
-	move.w	(puckz).w,(word_FFDCCA).w
+	move.w	(puckz).w,(TmpPuckZ).w
 	bra.s	.13
 .15
-	addq.w	#1,(word_FFDCC6).w
-	cmpi.w	#$10,(word_FFDCC6).w
+	addq.w	#1,(PuckZCntr).w
+	cmpi.w	#$10,(PuckZCntr).w
 	blt.w	.16
-	clr.w	(word_FFDCC6).w
+	clr.w	(PuckZCntr).w
 	subq.w	#1,(puckz).w
 .16
 	bclr	#6,(sflags7).w
 	move.w	(CurCrowdMeter).w,d0
-	cmp.w	(word_FFC374).w,d0
+	cmp.w	(CrowdRecord).w,d0
 	blt.w	.17
 	bset	#6,(sflags7).w
 .17
-	jsr	(sub_1D92EC).l
+	jsr	(SetSflags8Bit1).l
 	tst.w	(puckc).w
 	bmi.w	.18
 	bclr	#7,(sflags8).w
@@ -140,10 +140,10 @@ updateplayers	;This routine calls all collision/animation/assignment code for al
 	cmpi.w	#SPA1F76,SPA(a3)
 	ble.w	.done
 .22
-	move.w	(word_FFD284).w,d4
+	move.w	(skillspeed).w,d4
 	tst.w	(PalMode).w
 	beq.w	.23
-	move.w	(word_FFD286).w,d4
+	move.w	(skillspeedpal).w,d4
 .23
 	cmpi.w	#2,(OptSkill).w
 	bne.w	.24
@@ -772,8 +772,7 @@ restorepl	;d1 = old player (back to the computer), d0 = new player (joystick con
 	movem.l	(sp)+,a0
 	rts
 
-sub_16D36	;Direction d0 made relative to facedir and the x flip, then tested against the mask $1E (or $F0 when
-	;flipped): the zero flag
+Findhittype	;Z by direction d0 relative to facedir and the hand (attribute bit 3): forehand or backhand
 	movem.l	d0-d1,-(sp)
 	move.w	#8,d1
 	sub.w	facedir(a3),d1

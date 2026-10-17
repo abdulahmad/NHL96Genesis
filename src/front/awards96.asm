@@ -1,12 +1,12 @@
-;	The playoff seeding. nullsub_3 is an rts. ResolveDayGames scores the day's series.
+;	The playoff seeding. ScoutingReport is an rts. ResolveDayGames scores the day's series.
 ;	BeginPlayoffs and InitPlayoffs seed the conferences, and SetupPlayoffs writes the bracket
 ;	into the save RAM.
 
-nullsub_3
+ScoutingReport	;The pre-game scouting report: an empty rts in 96
 	rts
 
 ResolveDayGames	;Compute winners and losers for the playoff matchups of the day: the series wins (gsstruct),
-	;WinBits and gamelevel when the round is over; at gamelevel 4 the final flags in dword_FFDD7E, else
+	;WinBits and gamelevel when the round is over; at gamelevel 4 the final flags in SeasonDay, else
 	;maketree; then the save RAM write
 	movem.l	d0-d7/a0-a6,-(sp)
 	clr.w	(rosterscroll).w
@@ -92,7 +92,7 @@ ResolveDayGames	;Compute winners and losers for the playoff matchups of the day:
 .4
 	cmpi.w	#4,(gamelevel).w
 	bne.w	.7
-	bset	#1,(dword_FFDD7E+2).w
+	bset	#1,(SeasonFlags).w
 	movem.l	d0/a0-a1,-(sp)
 	movea.l	#$FFFFDCF8,a0
 	lea	2(a0),a1
@@ -102,10 +102,10 @@ ResolveDayGames	;Compute winners and losers for the playoff matchups of the day:
 	addq.w	#1,a1
 .5
 	move.b	(a1),d0
-	bclr	#3,(dword_FFDD7E+2).w
+	bclr	#3,(SeasonFlags).w
 	cmp.b	(dword_FFDD82+2).w,d0
 	bne.w	.6
-	bset	#3,(dword_FFDD7E+2).w
+	bset	#3,(SeasonFlags).w
 .6
 	movem.l	(sp)+,d0/a0-a1
 	bra.w	.8
@@ -118,7 +118,7 @@ ResolveDayGames	;Compute winners and losers for the playoff matchups of the day:
 	bclr	#4,(sflags).w
 	move.w	#$FFFF,(lastsfx).w
 	move.l	#M68K_RAM,(recbpr).w
-	jsr	(sub_11226).l
+	jsr	(WriteDayGames).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
@@ -149,7 +149,7 @@ InitPlayoffs	;Seed the playoffs: the two conferences (ConferenceTeams1 / 2) sort
 	movea.l	#ConferenceTeams2,a1
 	bsr.w	CopyBytes
 	movea.l	#SeedStandings,a0
-	jsr	(sub_1161E).l
+	jsr	(ReadStandings).l
 	bsr.w	CalcSeedPoints
 	move.w	#$C,(SeedCount).l
 	movea.l	#AwardIds,a0
@@ -323,7 +323,7 @@ SetupPlayoffs	;Start the playoffs: save the season header (SRSeasonHeaderSave) a
 	;OptPlayMode 1
 	movem.l	d0-d7/a0-a6,-(sp)
 	bset	#6,(GameFlags).w
-	move.b	(dword_FFDD7E+3).w,-(sp)
+	move.b	(SeasonDay+3).w,-(sp)
 	move.b	(dword_FFDD82).w,-(sp)
 	move.b	(dword_FFDD82+1).w,-(sp)
 	move.b	(dword_FFDD82+2).w,-(sp)
@@ -336,14 +336,14 @@ SetupPlayoffs	;Start the playoffs: save the season header (SRSeasonHeaderSave) a
 	dbf	d0,.save
 	movea.l	#SaveRAM+SRSeasonHeader,a0
 	clr.l	(a0)
-	jsr	(sub_1149E).l
-	bset	#2,(dword_FFDD7E+2).w
+	jsr	(ReadSeasonHeader).l
+	bset	#2,(SeasonFlags).w
 	move.b	(sp)+,(dword_FFDD82+2).w
 	move.b	(sp)+,(dword_FFDD82+1).w
 	move.b	(sp)+,(dword_FFDD82).w
-	move.b	(sp)+,(dword_FFDD7E+3).w
+	move.b	(sp)+,(SeasonDay+3).w
 	clr.b	(dword_FFDD82+3).w
-	jsr	(sub_1147E).l
+	jsr	(WriteSeasonHeader).l
 	move.l	#$CBF,d0
 	move.w	#$54,d1
 	jsr	(ClearSRAMBytes).l
@@ -359,7 +359,7 @@ SetupPlayoffs	;Start the playoffs: save the season header (SRSeasonHeaderSave) a
 	move.l	#$89,d0
 	move.l	#$6C0,d1
 	jsr	(ClearSRAMBytes).l
-	jsr	(sub_1DFA1C).l
+	jsr	(ClearFreeAgentStats).l
 	moveq	#$4D,d0
 	moveq	#$A,d1
 	jsr	(ClearSRAMBytes).l

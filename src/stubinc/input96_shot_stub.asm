@@ -14,7 +14,7 @@
 ; External addresses outside, read from lst/nhl96.bin.
 rtss7 = $00A3DA		;faceoff96
 FindGoalie = $0168B8		;control96
-sub_16D36 = $016D36		;control96
+Findhittype = $016D36		;control96
 assinsert = $01A3D0		;logic96_vec
 vtoa = $01A3EE		;logic96_vec
 GetHot = $01A458		;logic96_vec

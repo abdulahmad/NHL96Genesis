@@ -75,7 +75,7 @@ ChkShotStat	;Determine if a shot was taken and add it to the stats (crowd, team,
 .0
 	movem.l	d0-d1/a1-a3,-(sp)
 	move.l	a4,-(sp)
-	movea.l	#$FFFFC4C6,a4
+	movea.l	#ScoreSum-6,a4
 	adda.w	(ScoreSumbytes).w,a4
 	movea.l	#tmstruct,a2
 	btst	#7,2(a4)
@@ -153,8 +153,8 @@ SetupTeamForIntermission	;Reset the bench (ResetBench), then for each team Setup
 	bsr.w	SetupTeamLine
 	exg	a2,a3
 
-SetupTeamLine	;The line of team a3 back on the ice (sub_1D3A6 first)
-	bsr.w	sub_1D3A6
+SetupTeamLine	;The line of team a3 back on the ice (reenergizeteam first)
+	bsr.w	reenergizeteam
 	clr.w	$16(a3)
 	tst.w	(OptLine).w
 	bne.w	rtss2
@@ -173,7 +173,8 @@ RestoreTeamEnergy	;Restore the energy of team a2.
 	dc.b	$00,$6C,$66,$00,$00,$06,$60,$00,$00,$08,$35,$BC,$10,$00,$00,$34
 	dc.b	$55,$40,$6A,$DE,$4E,$75
 
-sub_1D3A6	;Every roster player of team a2 not in the penalty box gets energy $1000; -3 becomes -2 (the bench)
+reenergizeteam	;a2 = team: energy $1000 for every player not out for the game (-4); out for the period (-3) back to the bench
+	;(-2)
 	moveq	#$36,d0
 .0
 	cmpi.w	#$FFFC,$6C(a2,d0.w)

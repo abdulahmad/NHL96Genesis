@@ -171,7 +171,7 @@ InitMenuState	;Start a menu: a0 = item list, a1 = screen draw routine; selection
 	move.l	a0,(menulist).w
 	move.l	a1,(menudraw).w
 	clr.w	(menuitem).w
-	clr.w	(word_FFD000).w
+	clr.w	(menuitem+2).w
 
 DrawMenuScreen	;Call the draw routine, print the items (UpdateMenuSelection), palcount $18
 	movea.l	(menudraw).w,a0
@@ -240,7 +240,7 @@ HandleMenuInput	;Pause menu pad d1: up / down move the selection, C runs the ite
 	eori	#4,ccr
 	rts
 
-UpdateMenuSelection	;Clamp menuitem to the list, scroll word_FFD000 to show it, and print the shown items
+UpdateMenuSelection	;Clamp menuitem to the list, scroll menuitem+2 to show it, and print the shown items
 	jsr	(printsmallz).l
 	String	$FE,$04
 	move.w	(menuitem).w,d0
@@ -261,21 +261,21 @@ UpdateMenuSelection	;Clamp menuitem to the list, scroll word_FFD000 to show it, 
 	addq.w	#1,d0
 	sub.w	d0,(menuitem).w
 	move.w	(menuitem).w,d0
-	cmp.w	(word_FFD000).w,d0
+	cmp.w	(menuitem+2).w,d0
 	bge.w	.4
-	move.w	d0,(word_FFD000).w
+	move.w	d0,(menuitem+2).w
 .4
 	subq.w	#7,d0
-	cmp.w	(word_FFD000).w,d0
+	cmp.w	(menuitem+2).w,d0
 	ble.w	.0
-	move.w	d0,(word_FFD000).w
+	move.w	d0,(menuitem+2).w
 .0
 	bsr.w	SetMenuPrintX
 	move.w	#6,(printy).w
 	movea.l	(menulist).w,a1
 	jsr	(printbigcur).l
 	adda.w	(a1),a1
-	move.w	(word_FFD000).w,d0
+	move.w	(menuitem+2).w,d0
 	bra.w	.7
 .skip
 	adda.w	(a1),a1
@@ -287,7 +287,7 @@ UpdateMenuSelection	;Clamp menuitem to the list, scroll word_FFD000 to show it, 
 	bsr.w	SetMenuPrintX
 	jsr	(printsmallz).l
 	String	$FB,$01,$FA,$02,$20,$FB,$12,$20,$FA,$FE,$FB,$EB
-	move.w	(word_FFD000).w,d0
+	move.w	(menuitem+2).w,d0
 	beq.w	.2
 	jsr	(printsmallz).l
 	String	$FE,$07,$FB,$01,$FA,$02,$7B,$FB,$12,$7B,$FA,$FE,$FE,$04

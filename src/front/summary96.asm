@@ -16,7 +16,7 @@ VBlank_SpriteFade	;vbint for the period summary and the awards screen: the sprit
 	movem.l	(sp)+,d0-d7/a0-a6
 	rte
 
-sub_1E2EAA	;Called from code96_04
+BlankMenuBox	;Blank the pause menu box (big font rows) and its corners before a submenu is drawn
 	;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$BA,$2E,$00,$14,$F8,$07,$01,$0A,$06,$20,$FD,$1D
 	dc.b	$20,$FC,$14,$FD,$0A,$20,$FD,$1D,$20,$00,$4E,$B9,$00,$01,$BE,$C4
@@ -271,10 +271,10 @@ PeriodStatsScreen	;Pause menu Period Stats
 	dc.b	$FF,$FF,$CA,$C4,$31,$FC,$00,$07,$B0,$40,$61,$00,$00,$24,$24,$7C
 	dc.b	$FF,$FF,$C7,$26,$31,$FC,$00,$1E,$B0,$40,$61,$00,$00,$14,$4E,$75
 
-unk_1E3D2C	;Used from the code above
+PeriodGoalsTxt	;PeriodStatsScreen caption while it shows goals
 	String	'goals'
 
-unk_1E3D34	;Used from the code above
+PeriodShotsTxt	;PeriodStatsScreen caption while it shows shots
 	String	'shots'
 
 PeriodStatsTeam	;PeriodStatsScreen per team: goals or shots by period up to the current one

@@ -3,24 +3,24 @@
 PlayoffScreen	;Bring up the playoff screen if in playoff mode (OptPlayMode nonzero): the tree, the series scores and
 	;the team blocks, until start
 	tst.w	(OptPlayMode).w
-	beq.w	locret_1E733A
+	beq.w	rtsPlayoffScreen
 	btst	#7,(GameFlags).w
 	beq.w	.1
-	btst	#3,(dword_FFDD7E+2).w
+	btst	#3,(SeasonFlags).w
 	bne.w	.1
 	cmpi.w	#4,(gamelevel).w
 	bne.w	.1
-	move.b	(byte_FFCFEE).w,d0
-	move.b	(byte_FFCFEF).w,d1
+	move.b	(potree+$1C).w,d0
+	move.b	(potree+$1D).w,d1
 	move.b	d0,d2
 	cmp.b	(dword_FFDD82+2).w,d2
 	bne.w	.0
 	move.b	d1,d2
 .0
-	move.b	d2,(byte_FFCFF0).w
+	move.b	d2,(potree+$1E).w
 .1
 	jsr	(forceblack).l
-	move.l	#unk_122A4,(dword_FFDDAC).w
+	move.l	#SeasonMenuScreen,(NextScreenPtr).w
 	move.w	(VSCRLPM).w,d0
 	jsr	(Vmaddr).l
 	clr.w	d0
@@ -62,10 +62,10 @@ PlayoffScreen	;Bring up the playoff screen if in playoff mode (OptPlayMode nonze
 	movea.l	#RosterFont+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.l	#RosterFont,(smallfontptr).w
-	movea.l	#unk_1BDCD4+8,a2
+	movea.l	#PlayoffTreeMap+8,a2
 	jsr	(printz).l
 	String	$FF,$00,$00
-	movea.l	#unk_1BDCD4,a0
+	movea.l	#PlayoffTreeMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -77,11 +77,11 @@ PlayoffScreen	;Bring up the playoff screen if in playoff mode (OptPlayMode nonze
 	moveq	#8,d5
 	jsr	(dobitmap).l
 	move.w	d4,(ExtraChars).w
-	movea.l	#unk_1C4810+8,a2
+	movea.l	#PlayoffTeamFrameMap+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	jsr	(printz).l
 	String	$FE,$00,$00
-	movea.l	#unk_1C0302,a0
+	movea.l	#PlayoffTreeBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -141,20 +141,20 @@ PlayoffScreen	;Bring up the playoff screen if in playoff mode (OptPlayMode nonze
 .7
 	move.w	#$18,(palcount).w
 	movem.l	d0/a0,-(sp)
-	movea.l	#unk_1E765A,a0
+	movea.l	#PlayoffScrollStart,a0
 	move.w	(gamelevel).w,d0
 	add.w	d0,d0
 	move.w	(a0,d0.w),d0
-	cmpi.w	#$3C,(word_FFD488).w
+	cmpi.w	#$3C,(userblockx).w
 	blt.w	.8
 	neg.w	d0
 .8
-	move.w	d0,(word_FFD030).w
+	move.w	d0,(DispAttribCtr).w
 	movem.l	(sp)+,d0/a0
 	move	#$2500,sr
 	clr.w	d0
 	clr.w	d4
-	clr.w	(word_FFD034).w
+	clr.w	(PlayerScrollCtr).w
 	bsr.w	UpdatePlayoffScroll
 .9
 	bsr.w	PlayoffScreen_waitvsync
@@ -168,16 +168,16 @@ HandlePlayoffInput	;Read the pads: start leaves PlayoffScreen, right / left scro
 	bne.w	PlayoffScreenExit
 	btst	#3,d3
 	beq.w	.nr
-	move.w	#$FFFC,(word_FFD034).w
+	move.w	#$FFFC,(PlayerScrollCtr).w
 .nr
 	btst	#2,d3
 	beq.w	UpdatePlayoffScroll
-	move.w	#4,(word_FFD034).w
+	move.w	#4,(PlayerScrollCtr).w
 
 UpdatePlayoffScroll	;Move the tree one step and stop on a page boundary
-	move.w	(word_FFD034).w,d0
-	beq.w	locret_1E733A
-	add.w	(word_FFD030).w,d0
+	move.w	(PlayerScrollCtr).w,d0
+	beq.w	rtsPlayoffScreen
+	add.w	(DispAttribCtr).w,d0
 	move.w	(gamelevel).w,d1
 	cmp.w	#3,d1
 	bls.w	.0
@@ -185,17 +185,17 @@ UpdatePlayoffScroll	;Move the tree one step and stop on a page boundary
 .0
 	move.w	#3,d1
 	movem.l	a0,-(sp)
-	movea.l	#unk_1E7650,a0
+	movea.l	#PlayoffScrollStops,a0
 	add.w	d1,d1
 	move.w	(a0,d1.w),d1
 	move.w	d1,(jerseynum).w
 	movem.l	(sp)+,a0
 	cmp.w	d1,d0
-	bgt.w	locret_1E733A
+	bgt.w	rtsPlayoffScreen
 	neg.w	d1
 	cmp.w	d1,d0
-	blt.w	locret_1E733A
-	move.w	d0,(word_FFD030).w
+	blt.w	rtsPlayoffScreen
+	move.w	d0,(DispAttribCtr).w
 	clr.w	(word_FFB8C4).w
 	move.w	d0,d1
 	addi.w	#$100,d1
@@ -206,33 +206,33 @@ UpdatePlayoffScroll	;Move the tree one step and stop on a page boundary
 	move.w	d1,(word_FFB8C4).w
 .nox
 	ext.l	d0
-	movea.l	#unk_1E7650,a0
+	movea.l	#PlayoffScrollStops,a0
 .1
 	move.w	(a0)+,d0
-	cmp.w	(word_FFD030).w,d0
+	cmp.w	(DispAttribCtr).w,d0
 	beq.w	.2
 	neg.w	d0
-	cmp.w	(word_FFD030).w,d0
+	cmp.w	(DispAttribCtr).w,d0
 	beq.w	.2
-	cmpa.l	#unk_1E7658,a0
+	cmpa.l	#PlayoffScrollStopsEnd,a0
 	blt.s	.1
 	rts
 .2
-	clr.w	(word_FFD034).w
+	clr.w	(PlayerScrollCtr).w
 	rts
 
 PlayoffScreenExit	;Drop HandlePlayoffInput's return address and return from PlayoffScreen
 	jsr	(forceblack).l
 	addq.w	#4,sp
 
-locret_1E733A
+rtsPlayoffScreen	;Shared rts of PlayoffScreen and UpdatePlayoffScroll
 	rts
 
 PlayoffScreen_waitvsync	;Wait for the next frame; flash a colour each time palcount runs out
 	tst.w	(palcount).w
 	bpl.w	.wait
 	movem.l	d0-d1/a0-a1,-(sp)
-	movea.l	#word_FFBD62,a0
+	movea.l	#palfadenew+$24,a0
 	move.w	#$C,d1
 	move.w	(a0),d0
 .0
@@ -241,7 +241,7 @@ PlayoffScreen_waitvsync	;Wait for the next frame; flash a colour each time palco
 	move.w	(sp)+,d0
 	addq.l	#2,a0
 	dbf	d1,.0
-	move.w	(word_FFBD7C).w,(word_FFBD62).w
+	move.w	(palfadenew+$3E).w,(palfadenew+$24).w
 	movem.l	(sp)+,d0-d1/a0-a1
 	move.w	#3,(palcount).w
 .wait
@@ -276,7 +276,7 @@ DrawTeamBlocks	;Draw team block d1 at printx / printy; the user's team gets a fr
 	add.b	d0,d0
 	cmp.b	d0,d1
 	bne.w	.0
-	move.w	(printx).w,(word_FFD488).w
+	move.w	(printx).w,(userblockx).w
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(printx).w,-(sp)
 	move.w	(printy).w,-(sp)
@@ -285,7 +285,7 @@ DrawTeamBlocks	;Draw team block d1 at printx / printy; the user's team gets a fr
 	move.w	(ExtraChars).w,d4
 	jsr	(printsmallz).l
 	String	$FE,$00,$FF,$02
-	movea.l	#unk_1C4810,a0
+	movea.l	#PlayoffTeamFrameMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -358,12 +358,12 @@ PlayoffTreeSetup	;Playoff tree layout by gamelevel. Used by PlayoffScreen
 	dc.b	$0D,$47,$0B,$47,$0D,$29,$18,$40,$18,$34,$11,$05,$0F,$00,$1D,$02
 	dc.b	$2B,$04,$53,$06,$61,$08,$6F,$0A,$FF,$FF
 
-unk_1E7650	;Used from UpdatePlayoffScroll
+PlayoffScrollStops	;Playoff tree scroll page positions; the last entry is the scroll limit
 	dc.b	$00,$00,$00,$88,$00,$88,$01,$40
 
-unk_1E7658	;The end of unk_1E7650
+PlayoffScrollStopsEnd	;The end of PlayoffScrollStops
 	dc.b	$01,$40
 
-unk_1E765A	;Used from PlayoffScreen
+PlayoffScrollStart	;The start scroll of the playoff tree by gamelevel (negated for the other side)
 	dc.b	$01,$40,$01,$40,$00,$88,$00,$00,$00,$00
 

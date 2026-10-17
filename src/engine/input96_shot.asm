@@ -114,7 +114,7 @@ SetShotMode	;Start the shot mode (C button)
 	beq.w	.13
 	move.w	#$2E40,d1
 .13
-	jsr	(sub_16D36).l
+	jsr	(Findhittype).l
 	beq.w	.4
 	move.w	#$FB6,d1
 	btst	#0,(GameFlags).w
@@ -190,7 +190,7 @@ doshot	;Shoot the puck
 	bclr	#3,(sflags).w
 	bra.w	.4
 .0
-	move.b	pflags(a3),(byte_FFC364).w
+	move.b	pflags(a3),(shotpflags).w
 	bclr	#4,(gmode2).w
 	btst	#1,pflags3(a3)	;check if player on breakaway
 	beq.w	.cont
@@ -255,7 +255,7 @@ doshot	;Shoot the puck
 .7
 	move.w	(passdir).w,d2	;passdir into d2
 	asl.w	#2,d2	;mult by 4
-	lea	unk_F874(pc),a0	;table of shot directions
+	lea	shotsets(pc),a0	;table of shot directions
 	move.w	(a0,d2.w),d0
 	move.w	2(a0,d2.w),d2	;z offset
 	sub.w	(puckx).w,d0
@@ -371,7 +371,7 @@ doshot	;Shoot the puck
 	movem.l	(sp)+,d0-d7/a0-a3
 	rts
 
-unk_F874
+shotsets	;Offsets (x, z) of the shot target for each passdir 0-8
 	dc.b	$00,$00,$00,$0C,$00,$10,$00,$0C,$00,$10,$00,$06,$00,$10,$00,$00
 	dc.b	$00,$00,$00,$00,$FF,$F0,$00,$00,$FF,$F0,$00,$06,$FF,$F0,$00,$0C
 	dc.b	$00,$00,$00,$06
@@ -472,7 +472,7 @@ dopass	;Pass the puck
 	muls.w	d0,d0	;square d0 = max is 490000 decimal
 	btst	#1,(GameFlags).w
 	bne.w	.3
-	cmp.l	#loc_10000,d0
+	cmp.l	#$10000,d0
 	bhi.w	.next
 .3
 	muls.w	d1,d1	;square d1 (dX)
@@ -548,7 +548,7 @@ dopass	;Pass the puck
 	beq.w	.13
 	move.w	#$A70,d1
 .13
-	jsr	(sub_16D36).l
+	jsr	(Findhittype).l
 	beq.w	.9
 	move.w	#$B1A,d1
 	btst	#1,(GameFlags).w
@@ -734,7 +734,7 @@ passtoa0	;Pass the puck to player a0
 
 sub_FD14
 	movem.l	d0-d7/a0-a5,-(sp)
-	bsr.w	sub_10070
+	bsr.w	CheckRoles
 	move.w	(puckx).w,d0
 	cmp.w	#$32,d0
 	bgt.w	.0
@@ -751,14 +751,14 @@ sub_FD14
 	movea.l	#SortCords,a5
 	move.w	(word_FFD23A).w,d6
 	bmi.w	.3
-	cmpi.w	#6,(word_FFC74A).w
+	cmpi.w	#6,(tmstruct+tmap).w
 	bne.w	.3
 	bsr.w	sub_FD80
 .3
 	movea.l	#SortCords+$300,a5
 	move.w	(word_FFD23C).w,d6
 	bmi.w	.4
-	cmpi.w	#6,(word_FFCAE8).w
+	cmpi.w	#6,(AwShots+tmap).w
 	bne.w	.4
 	bsr.w	sub_FD80
 .4
@@ -884,7 +884,7 @@ sub_FD80
 
 sub_FFD0
 	tst.w	(puckc).w
-	bmi.w	locret_10054
+	bmi.w	.exit
 	movem.l	d0-d4/a0-a3,-(sp)
 	move.w	(puckc).w,d0
 	asl.w	#7,d0	;#scsize
@@ -896,11 +896,8 @@ sub_FFD0
 	adda.w	#$300,a0
 .0
 	move.w	(pucky).w,d0
-
-loc_10000
 	move.w	#$76,d1
 	btst	#7,$62(a3)
-.0
 	beq.w	.1
 	neg.w	d0
 .1
@@ -927,11 +924,10 @@ loc_10000
 	dbf	d1,.4
 .5
 	movem.l	(sp)+,d0-d4/a0-a3
-
-locret_10054
+.exit
 	rts
 
-sub_10056
+ClearTeamRoles	;Role byte $65 = -1 (play the own position) for the 6 players of team a0
 	movem.l	d1/a0,-(sp)
 	move.w	#5,d1
 .0
@@ -941,16 +937,16 @@ sub_10056
 	movem.l	(sp)+,d1/a0
 	rts
 
-sub_10070
+CheckRoles	;CheckTeamRoles for both teams
 	movem.l	d0-d1/a0-a1,-(sp)
 	movea.l	#SortCords,a0
-	bsr.w	sub_1008E
+	bsr.w	CheckTeamRoles
 	movea.l	#SortCords+$300,a0
-	bsr.w	sub_1008E
+	bsr.w	CheckTeamRoles
 	movem.l	(sp)+,d0-d1/a0-a1
 	rts
 
-sub_1008E
+CheckTeamRoles	;Team a0: when two players have the same role ($65, else the position) clear the team's roles (ClearTeamRoles)
 	movea.l	a0,a1
 	clr.w	d2
 	move.w	#5,d0
@@ -964,7 +960,7 @@ sub_1008E
 	bset	d1,d2
 	beq.w	.2
 	movea.l	a1,a0
-	bsr.s	sub_10056
+	bsr.s	ClearTeamRoles
 	bra.w	.3
 .2
 	adda.w	#$80,a0

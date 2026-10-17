@@ -1103,8 +1103,8 @@ PeriodLabelTable	;String list for FormatAndPrintTime
 	String	' 3'
 	String	'OT'
 
-PushTime	;a1 = String "M:SS" of the time d0 (seconds), built back from unk_FFC010
-	movea.w	#(unk_FFC010-M68K_RAM),a1
+PushTime	;a1 = String "M:SS" of the time d0 (seconds), built back from mesarea+30
+	movea.w	#(mesarea+30-M68K_RAM),a1
 	move.l	d0,-(sp)
 	move.l	a1,-(sp)
 	ext.l	d0
@@ -1258,7 +1258,7 @@ printbigtext	;Print with the font map at bigfontptr. Lower case is printed as up
 	move.w	(printa).w,d6
 	btst	#2,(sflags11).w
 	bne.w	.3
-	add.w	(word_FFB014).w,d6
+	add.w	(printbigchars).w,d6
 	bra.w	.4
 .3
 	add.w	(BigFontChars).w,d6
@@ -1273,7 +1273,7 @@ printbigtext	;Print with the font map at bigfontptr. Lower case is printed as up
 	bpl.w	.nocom
 	neg.w	d0
 	asl.w	#2,d0
-	movea.l	#unk_1C01C,a2
+	movea.l	#BigControlCodeJumpTable,a2
 	movea.l	(a2,d0.w),a2
 	jsr	(a2)
 	bra.w	.1

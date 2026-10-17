@@ -147,10 +147,11 @@ DrawTradeRosterRows	;Draw the roster rows of team d7 (name, position, rating), *
 	dc.b	$31,$FC,$00,$1E,$B0,$40,$42,$40,$10,$2C,$00,$03,$4E,$B9,$00,$1D
 	dc.b	$93,$02,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9,$00,$01
 	dc.b	$BA,$40,$58,$8C,$52,$78,$B0,$42,$52,$46,$BC,$7C,$00,$06
+	dc.b	$6D,$00,$FF,$3E,$4E,$75
 
 TradeDone	;After a trade
 	;Code the listing does not decode: kept as bytes
-	dc.b	$6D,$00,$FF,$3E,$4E,$75,$22,$7C,$FF,$FF,$D0,$16,$24,$7C,$FF,$FF
+	dc.b	$22,$7C,$FF,$FF,$D0,$16,$24,$7C,$FF,$FF
 	dc.b	$3A,$98,$3E,$38,$C3,$A0,$3C,$39,$FF,$FF,$2A,$FC,$61,$00,$05,$C4
 	dc.b	$22,$7C,$FF,$FF,$D0,$1E,$24,$7C,$FF,$FF,$88,$B8,$3E,$38,$C3,$A2
 	dc.b	$3C,$39,$FF,$FF,$2B,$02,$61,$00,$05,$AA,$20,$7C,$FF,$FF,$3A,$98
@@ -250,7 +251,7 @@ InvalidTradeText	;CheckTrade: the reasons a trade is refused
 	String	$FD,$08,$FC,$09,'no players selected on',$FD,$08,$FC,$0A,'one or more teams'
 	String	$FD,$08,$FC,$09,'more than 3 players',$FA,$01,$FD,$08,'selected for trade on',$FA,$01,$FD,$08,'one or more teams'
 
-sub_1DCC8A	;Called from code96_17
+WaitMenuFrame	;Wait for the next frame (vcount), then SetMenuScroll; d0 kept
 	;Code the listing does not decode: kept as bytes
 	dc.b	$3F,$00,$30,$38,$B0,$52,$B0,$78,$B0,$52,$67,$FA,$4E,$B9,$00,$01
 	dc.b	$26,$40,$30,$1F,$4E,$75
@@ -311,7 +312,7 @@ BuildTradeList	;Trade list of team d7: the chosen players ($FFFF = none)
 	dc.b	$72,$74,$2D,$45,$76,$61,$6C,$75,$61,$74,$65,$00,$31,$DF,$B0,$1C
 	dc.b	$4E,$75
 
-sub_1DCFE2	;Called from TradePlayers and CheckTrade
+EraseBlank	;Erase a d0 x d1 rectangle at printx / printy with the blank char $7FF (eraser)
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$F8,$C0,$3F,$38,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$34,$3C
 	dc.b	$07,$FF,$4E,$B9,$00,$01,$B9,$76,$31,$DF,$BF,$B2,$4C,$DF,$03,$1F
@@ -325,13 +326,11 @@ sub_1DCFE2	;Called from TradePlayers and CheckTrade
 	dc.b	$00,$01,$B3,$20,$4A,$41,$67,$00,$00,$06,$60,$00,$00,$06,$51,$CE
 	dc.b	$FF,$88,$4E,$75
 
-sub_1DD086	;Called from TradePlayers
+ExecuteTrade	;Do the trade: clear both teams' saved blocks, tag the positions, move each chosen player (ExtractTradedPlayer
+	;/ InsertTradedPlayer)
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$3E,$38,$D0,$16,$4E,$B9,$00,$1E,$0D,$86,$3E,$38
 	dc.b	$D0,$1E,$4E,$B9
-
-ExecuteTrade	;Do the trade
-	;Code the listing does not decode: kept as bytes
 	dc.b	$00,$1E,$0D,$86,$20,$7C,$FF,$FF,$D0,$16,$61,$00,$00,$F8,$20,$7C
 	dc.b	$FF,$FF,$D0,$1E,$61,$00,$00,$EE,$30,$7C,$D0,$16,$32,$7C,$D0,$1E
 	dc.b	$3C,$3C,$00,$02,$24,$7C,$FF,$FF,$D3,$C8,$31,$D0,$BF,$4A,$30,$30
@@ -364,7 +363,7 @@ ShiftTradeDown	;Trade list: the later player numbers after a removed player go d
 	dc.b	$60,$00,$6B,$00,$00,$16,$B0,$30,$60,$01,$6E,$00,$00,$06,$53,$30
 	dc.b	$60,$01,$54,$46,$BC,$7C,$00,$08,$6D,$E4,$4C,$DF,$7F,$FF,$4E,$75
 
-sub_1DD212	;Called from code96_17
+ExtractTradedPlayer	;Take player TempWord1 out of team TempRawSpd into buffer a2 (roster id, jersey, stats, injury)
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$2F,$0A,$3E,$38,$BF,$4A,$4E,$B9,$00,$01,$57,$74
 	dc.b	$31,$C0,$D4,$88,$08,$F8,$00,$06,$C3,$50,$30,$38,$BF,$46,$02,$40
@@ -410,7 +409,8 @@ sub_1DD212	;Called from code96_17
 	dc.b	$C3,$58,$61,$00,$00,$10,$08,$B8,$00,$05,$C3,$58,$24,$5F,$4C,$DF
 	dc.b	$7F,$FF,$4E,$75
 
-sub_1DD4B6	;Called from code96_17
+DeleteStatSlot	;Packed stat block d1 (d2 bits, d3 players, d4 bits a team) of team d7: player TempWord1's value to (a2)+,
+	;later ones down
 	;Code the listing does not decode: kept as bytes
 	dc.b	$20,$7C,$FF,$FF,$D1,$30,$48,$E7,$78,$80,$4E,$B9,$00,$01,$0F,$02
 	dc.b	$26,$7C,$FF,$FF,$D1,$30,$30,$38,$BF,$46,$02,$40,$00,$FF,$B0,$38
@@ -467,7 +467,8 @@ InsertTradedPlayer	;Put the player in the buffer a2 into team TradeToTeam at Tem
 	dc.b	$BF,$48,$02,$40,$00,$FF,$3E,$38,$BF,$4C,$4E,$B9,$00,$1D,$D8,$32
 	dc.b	$24,$5F,$4E,$B9,$00,$02,$41,$AA,$4C,$DF,$7F,$FF,$4E,$75
 
-sub_1DD7D4	;Called from code96_17
+InsertStatSlot	;Packed stat block d1 (d2 bits, d3 players, d4 bits a team) of team d7: insert (a2)+ at player TempWord2, later
+	;ones up
 	;Code the listing does not decode: kept as bytes
 	dc.b	$20,$7C,$FF,$FF,$D1,$30,$48,$E7,$78,$80,$4E,$B9,$00,$01,$0F,$02
 	dc.b	$26,$7C,$FF,$FF,$D1,$30,$30,$38,$BF,$48,$02,$40,$00,$FF,$B0,$38
@@ -476,7 +477,7 @@ sub_1DD7D4	;Called from code96_17
 	dc.b	$37,$81,$30,$00,$55,$43,$B6,$40,$6F,$00,$00,$04,$60,$EE,$32,$1A
 	dc.b	$37,$81,$30,$00,$4C,$DF,$01,$1E,$4E,$F9,$00,$01,$0F,$22
 
-sub_1DD832	;Called from InsertTradedPlayer
+FixJerseyNumber	;Give player d0 of team d7 a jersey number no teammate has: step it up in BCD, 99 wraps to 1
 	;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$34,$00,$4E,$B9,$00,$01,$57,$B2,$36,$00,$20,$7C
 	dc.b	$FF,$FF,$D1,$30,$CE,$FC,$00,$1B,$48,$C7,$06,$87,$00,$00,$1B,$00

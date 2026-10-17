@@ -126,11 +126,11 @@ checkcx	;d4 = obj. # * 2 for possible collision so check x range and distance fo
 	movea.l	#SortCords,a2
 	adda.w	d4,a2
 	btst	#2,pflags(a2)
-	bne.w	loc_1DB62
+	bne.w	.exit
 	btst	#5,pflags2(a2)
-	bne.w	loc_1DB62
+	bne.w	.exit
 	cmpi.w	#$B,SCnum(a2)
-	bgt.w	loc_1DB62
+	bgt.w	.exit
 	move.w	(a2),d0
 	btst	#7,(sflags).w
 	beq.w	.0
@@ -138,14 +138,14 @@ checkcx	;d4 = obj. # * 2 for possible collision so check x range and distance fo
 .0
 	sub.w	d2,d0
 	cmp.w	#$FFF0,d0
-	blt.w	loc_1DB62
+	blt.w	.exit
 	cmp.w	#$10,d0
-	bgt.w	loc_1DB62
+	bgt.w	.exit
 	muls.w	d5,d5
 	muls.w	d0,d0
 	add.l	d5,d0
 	cmp.l	#$100,d0
-	bgt.w	loc_1DB62
+	bgt.w	.exit
 	move.w	#0,(word_FFBFF0).w
 	move.b	pflags(a3),d6
 	move.b	pflags(a2),d0
@@ -164,7 +164,7 @@ checkcx	;d4 = obj. # * 2 for possible collision so check x range and distance fo
 	muls.w	d3,d1
 	muls.w	d2,d0
 	add.l	d0,d1
-	bmi.w	loc_1DBB6
+	bmi.w	.exit4
 	asr.l	#4,d1
 	btst	#6,d6
 	beq.w	.not
@@ -195,18 +195,18 @@ checkcx	;d4 = obj. # * 2 for possible collision so check x range and distance fo
 	jsr	(newcheck).l
 .4
 	bsr.w	checkint
-	bsr.w	sub_1DCC0
+	bsr.w	checkcheck
 	jsr	(checkfight).l
 .not
 	move.w	d1,d4
 	movem.w	(sp)+,d0-d1
 	tst.w	(collflag).w
-	bmi.w	loc_1DB62
+	bmi.w	.exit
 	movem.l	d0/a0,-(sp)
 	movea.l	a3,a0
-	bsr.w	sub_1DB68
+	bsr.w	.droppuck
 	movea.l	a2,a0
-	bsr.w	sub_1DB68
+	bsr.w	.droppuck
 	movem.l	(sp)+,d0/a0
 	muls.w	d2,d1
 	muls.w	d3,d0
@@ -283,38 +283,38 @@ checkcx	;d4 = obj. # * 2 for possible collision so check x range and distance fo
 	add.w	d3,Yvel(a2)
 	st	(collflag).w
 
-loc_1DB62
+.exit
 	movem.l	(sp)+,d0-d7/a0-a3
 	rts
 
-sub_1DB68	;A pad controlled puck carrier a0 that is nearly stopped (a check target)
+.droppuck	;A pad controlled puck carrier a0 at speed 2 or less loses the puck (puckc -1, nopuck $1E)
 	tst.w	position(a0)
-	beq.w	.2
+	beq.w	.done
 	btst	#3,pflags(a0)
-	beq.w	.2
+	beq.w	.done
 	move.w	(puckc).w,d0
 	cmp.w	SCnum(a0),d0
-	bne.w	.2
+	bne.w	.done
 	move.w	Xvel(a0),d0
-	bpl.w	.0
+	bpl.w	.absx
 	neg.w	d0
-.0
+.absx
 	cmp.w	#2,d0
-	bgt.w	.2
+	bgt.w	.done
 	move.w	Yvel(a0),d0
-	bpl.w	.1
+	bpl.w	.absy
 	neg.w	d0
-.1
+.absy
 	cmp.w	#2,d0
-	bgt.w	.2
+	bgt.w	.done
 	st	(puckc).w
 	move.b	#$1E,nopuck(a0)
-.2
+.done
 	rts
 
-loc_1DBB6
+.exit4
 	addq.w	#4,sp
-	bra.s	loc_1DB62
+	bra.s	.exit
 
 checkint	;Check for interference penalty. player a2 interferes with a3 or vice-versa; goalie is only player who can
 	;cause an interference call. Called from checkcx. .ci (checkint .1): a2 = goalie, a3 = player interfering with
@@ -392,7 +392,7 @@ checkint	;Check for interference penalty. player a2 interferes with a3 or vice-v
 	moveq	#$22,d0
 	jmp	AddPenalty
 
-sub_1DCC0	;A stopped pad controlled puck carrier a2 loses the puck
+checkcheck	;Contact: a stopped pad controlled puck carrier a2 loses the puck, then CCStart for a3 on a2 and for a2 on a3
 	movem.l	d0-d4/a0-a3,-(sp)
 	btst	#3,pflags(a2)
 	beq.w	.0
@@ -415,15 +415,15 @@ sub_1DCC0	;A stopped pad controlled puck carrier a2 loses the puck
 
 CCStart	;Player a3 is checking player a2
 	cmpi.w	#$169C,SPA(a2)
-	beq.w	loc_1DF52
+	beq.w	holdcheck
 	cmpi.w	#$16EE,SPA(a2)
-	beq.w	loc_1DF52
+	beq.w	holdcheck
 	cmpi.w	#$1792,SPA(a2)
-	beq.w	loc_1DF52
+	beq.w	holdcheck
 	cmpi.w	#$216A,SPA(a2)
-	beq.w	holdcheck
+	beq.w	Bcheck
 	cmpi.w	#$52C,SPA(a2)
-	beq.w	holdcheck
+	beq.w	Bcheck
 	cmpi.w	#$2C5C,SPA(a3)
 	bne.w	rtss2
 	btst	#0,(gmode).w
@@ -445,7 +445,7 @@ CCStart	;Player a3 is checking player a2
 	andi.w	#7,d0
 .1
 	asl.w	#1,d0
-	lea	unk_1DE70(pc),a0
+	lea	checkinglist(pc),a0
 	move.w	(a0,d0.w),d1
 	bset	#5,pflags(a3)
 	bsr.w	SetSPA
@@ -493,22 +493,22 @@ CCStart	;Player a3 is checking player a2
 	move.b	(seed+1).w,d0
 	andi.w	#3,d0
 	move.l	a0,-(sp)
-	movea.l	#unk_1DE80,a0
+	movea.l	#CheckPenalties,a0
 	add.w	d0,d0
 	move.w	(a0,d0.w),d0
 	movea.l	(sp)+,a0
 	jsr	(PenShotChk).l
 	bpl.w	.3
-	jsr	(sub_1C3C6).l
+	jsr	(DoubleMinorChk).l
 .3
 	jsr	(AddPenalty).l
 .4
 	bra.w	FallDown
 
-unk_1DE70	;CCStart table
+checkinglist	;Check animation by the direction from a3 to a2 (CCStart)
 	dc.b	$15,$26,$14,$94,$14,$94,$14,$94,$14,$94,$15,$26,$15,$26,$15,$26
 
-unk_1DE80	;CCStart table
+CheckPenalties	;Penalties a check can draw: Roughing, Cross Check, Elbowing, High Sticking (one picked by seed)
 	dc.b	$00,$1A,$00,$1C,$00,$30,$00,$32
 
 checkagr	;Aggression check
@@ -573,7 +573,8 @@ checkagr	;Aggression check
 .4
 	rts
 
-loc_1DF52
+holdcheck	;Player a2 in a hold or hook animation holds a3 (within 1 direction of where a2 faces): both get the average
+	;velocity, the hold animations, and checkagr rolls penalty $24 or $1E
 	btst	#5,pflags(a3)
 	bne.w	rtss2
 	tst.w	position(a3)
@@ -645,9 +646,9 @@ loc_1DF52
 	st	(collflag).w
 	rts
 
-holdcheck	;Player a2 is in a hold animation looking to hold opponent a3. Entered from CCStart. a3 must be within 1
-	;direction of where a2 faces. Both get the average velocity, a3 goes to SPA $1F68, a2 to $E42 or $EA6, and
-	;checkagr rolls penalty $24 or $1E
+Bcheck	;a2 B-checks a3 (CCStart, SPA216A / SPA052C). With OptPen off and a pad controlled a2 it needs randomd0($20 +
+	;a2 checking - a3 legstr) >= $18; a3 within 1 direction of where a2 faces falls (FallDown) and checkagr may
+	;call tripping ($20). Sets collflag
 	btst	#5,pflags(a3)
 	bne.w	rtss2
 	tst.w	position(a3)
@@ -697,7 +698,7 @@ holdcheck	;Player a2 is in a hold animation looking to hold opponent a3. Entered
 	st	(collflag).w
 	rts
 
-FallDown	;Player a3 falls down (a check or the puck): the fall animation, the injury chance, the penalty
+FallDown	;Player a2 falls down (hit by a3, or the puck): the fall animation, the injury chance, the penalty
 	cmpi.w	#$B,SCnum(a2)
 	bgt.w	rtss2
 	cmpi.w	#SPA17E4,SPA(a2)
@@ -738,7 +739,7 @@ FallDown	;Player a3 falls down (a check or the puck): the fall animation, the in
 	cmp.w	impact(a2),d0	;compare impact value to d0.
 	ble.w	.cont2
 	move.b	#$3C,$5F(a2)	;move 3C (60 decimal) into nopuck
-	bra.w	loc_1E462
+	bra.w	.hitter
 .cont2
 	tst.w	position(a3)	;check for goalie
 	beq.w	.chkpos
@@ -764,10 +765,10 @@ FallDown	;Player a3 falls down (a check or the puck): the fall animation, the in
 	sub.w	Ypos(a2),d1	;sub Ypos
 	bsr.w	vtoa
 	tst.w	position(a2)
-	beq.w	loc_1E41A
+	beq.w	.24
 	jsr	(wallcollduringcheck).l	;check for wall collision
 	btst	#4,pflags3(a2)	;check wall collision bit
-	beq.w	loc_1E41A
+	beq.w	.24
 	movem.l	d1-d4,-(sp)
 	move.w	Xvel(a2),d1
 	bpl.w	.yvel
@@ -808,7 +809,7 @@ FallDown	;Player a3 falls down (a check or the puck): the fall animation, the in
 	bra.w	.chkawayfromcenterice
 .chktowardcenterice
 	movem.l	(sp)+,d1-d4
-	bra.w	loc_1E41A
+	bra.w	.24
 .chkawayfromcenterice
 	movem.l	(sp)+,d1-d4	;pop from stack
 	bra.w	*+4	;to the next instruction (.playerpos)
@@ -821,7 +822,7 @@ FallDown	;Player a3 falls down (a check or the puck): the fall animation, the in
 	bgt.w	.chkawayfrommiddle
 	cmpi.w	#$FF8A,(a2)
 	blt.w	.chkawayfrommiddle
-	bra.w	loc_1E41A
+	bra.w	.24
 .chkawayfrommiddle
 	cmpi.w	#$B,SCnum(a3)
 	bgt.w	.12
@@ -855,7 +856,7 @@ FallDown	;Player a3 falls down (a check or the puck): the fall animation, the in
 	move.w	#4,d0
 .getchkanim
 	add.w	d0,d0
-	movea.l	#unk_1E40A,a0
+	movea.l	#.23,a0
 	move.w	(a0,d0.w),d1
 	move.w	Ypos(a2),(FallYPos).w
 	move.w	(a2),(FallXPos).w
@@ -867,7 +868,7 @@ FallDown	;Player a3 falls down (a check or the puck): the fall animation, the in
 	blt.w	.2
 	move.w	d0,-(sp)
 	move.w	#7,d0
-	jsr	(nullsub_7).l
+	jsr	(StartArenaAnim).l
 	move.w	(sp)+,d0
 	addq.w	#3,(ChkCnt).w
 	move.w	#SPAboardmidl,d1
@@ -901,105 +902,105 @@ FallDown	;Player a3 falls down (a check or the puck): the fall animation, the in
 	bset	#5,pflags3(a2)	;set falldown bit
 	bset	#0,pflags(a2)
 	movem.l	(sp)+,d0/a0	;pop from stack
-	bra.w	loc_1E434
+	bra.w	.25
 
-unk_1E40A	;FallDown table
+.23	;Board check animation by side of the rink (two words a side)
 	dc.b	$22,$AE,$22,$AE,$23,$60,$23,$60,$24,$12,$24,$12,$24,$C4,$24,$C4
 
-loc_1E41A
+.24
 	move.w	#$26C8,d1
 	sub.w	$54(a2),d0
 	addq.w	#1,d0
 	andi.w	#7,d0
 	cmp.w	#2,d0
-	bls.w	loc_1E462
+	bls.w	.hitter
 	move.w	#$2576,d1
 
-loc_1E434
+.25
 	move.w	$54(a2),d0
 	andi.w	#3,d0
-	bne.w	loc_1E462
+	bne.w	.hitter
 	cmpi.b	#$14,$76(a3)
-	blt.w	loc_1E462
+	blt.w	.hitter
 	cmpi.w	#$B,$52(a3)	;check if SCNum of checker is a player
-	bgt.w	loc_1E462
+	bgt.w	.hitter
 	btst	#5,$64(a2)	;check if falldown bit is set for player
-	bne.w	loc_1E462
+	bne.w	.hitter
 	move.w	#$F14,d1
 
-loc_1E462
+.hitter
 	exg	a2,a3	;swap a2 and a3
 	bset	#5,$62(a3)
 	bsr.w	SetSPA
 	exg	a2,a3
 	tst.w	$34(a3)
-	beq.w	.0
+	beq.w	.h0
 	tst.w	$34(a2)
-	beq.w	.0
+	beq.w	.h0
 	addi.w	#$12C,(crowdlevel).w
 	addi.w	#$F,(CwdExciteLvl).w
-.0
+.h0
 	move.w	(puckc).w,d0	;move puck carrier SCNum into d0
-	bmi.w	.6
+	bmi.w	.h6
 	cmp.w	$52(a2),d0	;check if puck carrier is a2
-	bne.w	.6
+	bne.w	.h6
 	st	(puckc).w	;clear out puck carrier
 	btst	#4,(gmode).w	;check if highlight
-	bne.w	.4
+	bne.w	.h4
 	cmpi.w	#$26C8,$58(a2)
-	bne.w	.4
+	bne.w	.h4
 	move.w	$54(a2),d0	;facedir into d0
 	andi.w	#3,d0	;pass first 2 bits of d0
-	bne.w	.4
+	bne.w	.h4
 	btst	#4,$63(a2)	;check if player is unavailable
-	bne.w	.4
+	bne.w	.h4
 	move.w	#$DC,d0
 	bsr.w	randomd0
 	cmp.w	$32(a2),d0	;compare impact to d0
-	bgt.w	.4
+	bgt.w	.h4
 	btst	#0,(gmode).w	;check if clock running
-	bne.w	.4
+	bne.w	.h4
 	exg	a2,a3
 	move.w	#$17E4,d1
 	btst	#0,(seed+1).w
-	beq.w	.1
+	beq.w	.h1
 	move.w	#$1EAC,d1
-.1
+.h1
 	bsr.w	SetSPA
 	exg	a2,a3
 	bsr.w	setInjuryType
 	btst	#5,(sflags7).w	;check if clock running
-	bne.w	.3
+	bne.w	.h3
 	exg	a2,a3
 	move.w	#$188E,d1
 	btst	#0,(seed+1).w
-	bne.w	.2
+	bne.w	.h2
 	move.w	#$1F76,d1
-.2
+.h2
 	bsr.w	SetSPA
 	exg	a2,a3
-.3
+.h3
 	move.w	#4,(InjCntDown).w
 	moveq	#$14,d0
 	tst.w	$34(a3)
-	beq.w	.7
+	beq.w	.h7
 	tst.w	(OptPen).w
-	beq.w	.7
+	beq.w	.h7
 	moveq	#$12,d0
 	jsr	(AddPenalty2).l
 	jmp	Stop4Pen
-.4
+.h4
 	addq.w	#5,(ChkCnt).w
 	move.w	#$B,-(sp)
 	btst	#6,$62(a2)
-	bne.w	.5
+	bne.w	.h5
 	move.w	#$C,(sp)
-.5
+.h5
 	jsr	(song).l
 	rts
-.6
+.h6
 	jmp	newcheck
-.7
+.h7
 	jmp	AddPenalty2
 
 setInjuryType	;a2 injured: out for the period ($FFFD) or the game ($FFFC); in a season a random games count (SetInjuryGames)
@@ -1420,7 +1421,7 @@ Goal	;A goal: the shootout count, EndPenaltyShotPlay, the score and both teams
 	bsr.w	ChkShotStat
 	bsr.w	PenGoalStuff
 	bclr	#3,(BA_PS_flags).w
-	bsr.w	nullsub_4
+	bsr.w	printscores1
 	move.w	#$2710,(crowdnoisedelay).w
 	btst	#0,(gmode2).w
 	beq.w	.24
@@ -2026,7 +2027,7 @@ puckbody	;Puck hits player a2. a3 = puck. The puck bounces off; a high fast puck
 rtss2	;The shared rts many routines branch to
 	rts
 
-sub_1F84C	;Called from the code before puckbody.
+puckgoalie	;Puck hits goalie a2 (a3 = puck, d0 / d1 = goalie - puck x / y): a save bounces it, a slow puck is held
 	;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$04,$C3,$38,$66,$F6,$42,$42,$0C,$6B,$00,$08,$00,$18
 	dc.b	$6E,$00,$00,$04,$54,$42,$44,$40,$44,$41,$61,$00,$AB,$86,$90,$6A

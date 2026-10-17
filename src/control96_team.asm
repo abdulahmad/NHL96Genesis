@@ -38,8 +38,8 @@ clearTeamStats	;Clear both team structs, keeping the start of each hot / cold ta
 	movem.l	(sp)+,a1-a3
 	move.w	(sp)+,(AwShots+$26).w
 	move.w	(sp)+,(tmstruct+$26).w
-	st	(byte_FFC7CA).w
-	st	(byte_FFCB68).w
+	st	(tmstruct+$A4).w
+	st	(AwShots+$A4).w
 
 setteams	;Use HomeTeam / VisTeam to set team structures (InitTeamStructure for each). Falls in from clearTeamStats
 	movem.l	d0/a0-a2,-(sp)
@@ -60,13 +60,13 @@ InitTeamStructure	;Set up team struct a2 for team d0: the team number at $28 and
 	asl.w	#2,d0
 	move.l	(a0,d0.w),$1E(a2)
 
-SetOriginalLines	;The lines of team struct a2: with OptLine the team's lines (sub_EF02), else the default lines. The
+SetOriginalLines	;The line sets of team struct a2 from GetTeamLines: with OptLine sets 0 and 2-7, else sets 1-7. The
 	;"Set Original lines" item of the line menus
 	tst.w	(OptLine).w
 	beq.w	.0
 	move.w	d7,-(sp)
 	move.w	$28(a2),d7
-	jsr	(sub_EF02).l
+	jsr	(GetTeamLines).l
 	move.w	(sp)+,d7
 	lea	$184(a2),a1
 	move.l	(a0)+,(a1)+
@@ -76,23 +76,23 @@ SetOriginalLines	;The lines of team struct a2: with OptLine the team's lines (su
 .loop
 	move.l	(a0)+,(a1)+
 	dbf	d0,.loop
-	bsr.w	sub_215A0
+	bsr.w	SetGoalieFromLines
 	rts
 .0
 	moveq	#$D,d0
 	move.w	d7,-(sp)
 	move.w	$28(a2),d7
-	jsr	(sub_EF02).l
+	jsr	(GetTeamLines).l
 	move.w	(sp)+,d7
 	addq.w	#8,a0
 	lea	$184(a2),a1
 .loop2
 	move.l	(a0)+,(a1)+
 	dbf	d0,.loop2
-	bsr.w	sub_215A0
+	bsr.w	SetGoalieFromLines
 	rts
 
-sub_215A0	;tmgoalie of team a2 = byte $184 - 1
+SetGoalieFromLines	;tmgoalie of team a2 = the first byte of its line sets ($184) - 1
 	move.w	d0,-(sp)
 	clr.w	d0
 	move.b	$184(a2),d0

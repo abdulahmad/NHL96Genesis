@@ -113,7 +113,7 @@ AssignPads	;Give each pad on a team a player.
 	dc.b	$00,$01,$68,$B8,$38,$3C,$00,$06,$4E,$B9,$00,$01,$6C,$74,$4C,$DF
 	dc.b	$09,$01,$60,$00,$00,$0A,$78,$06,$4E,$B9,$00,$01,$6A,$46,$4E,$75
 
-loc_19B16	;Jumped to from outside the segment.
+updatefaceoff	;Faceoff drop countdown: the fofdata frame from temp1; at 0 erase the faceoff box at fodropx / fodropy
 	;Code the listing does not decode: kept as bytes
 	dc.b	$30,$2B,$00,$40,$67,$00,$00,$1A,$5C,$40,$E6,$48,$B0,$7C,$00,$02
 	dc.b	$6E,$00,$5D,$22,$44,$40,$06,$40,$00,$0A,$31,$C0,$BD,$C6,$4E,$75
@@ -183,7 +183,8 @@ a2touchpuck	;Player a2 touched the puck: last touch, scorer / assist slots, offs
 	dc.b	$26,$5F,$4E,$75,$08,$2A,$00,$07,$00,$62,$67,$DA,$61,$00,$00,$04
 	dc.b	$4E,$75
 
-sub_19E6E	;Called from outside the segment.
+ArmIcing	;Icing start for a2: iflags cleared, icingPlayer, direction; bit 2 when shot from his own half and not short
+	;handed
 	;Code the listing does not decode: kept as bytes
 	dc.b	$42,$38,$BF,$BA,$11,$EA,$00,$53,$BF,$BB,$30,$38,$B7,$72,$08,$2A
 	dc.b	$00,$07,$00,$62,$67,$00,$00,$0A,$08,$F8,$00,$01,$BF,$BA,$44,$40

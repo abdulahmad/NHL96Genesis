@@ -13,7 +13,7 @@
 
 ; External addresses outside, read from lst/nhl96.bin.
 printz = $01BB8E		;video96
-unk_122A4 = $0122A4		;season96
+SeasonMenuScreen = $0122A4		;season96
 forceblack = $01AF52		;video96
 dobitmap = $01B692		;video96
 DecompressGraphicsPlain = $01B730		;video96
@@ -26,9 +26,9 @@ RosterFont = $179168		;graphics96
 TeamBlockPtrs = $012BFE		;teamgfx96
 Vmaddr = $01B678		;video96
 rtss2 = $01F84A		;collide96
-unk_1BDCD4 = $1BDCD4		;graphics96
-unk_1C0302 = $1C0302		;graphics96
-unk_1C4810 = $1C4810		;graphics96
+PlayoffTreeMap = $1BDCD4		;graphics96
+PlayoffTreeBgMap = $1C0302		;graphics96
+PlayoffTeamFrameMap = $1C4810		;graphics96
 
 
 ; Main segment code

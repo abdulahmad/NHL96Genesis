@@ -43,7 +43,7 @@ None: every row of the ROM map is matched. Remaining work is the finish plan in 
 ## Rules (SNASM68k, from 95G)
 
 - Write real `cmp`, `cmpi`, and `exg`. `tools/fixopcodes.js` rewrites `cmp #imm` from SNASM's `CMPI` to EA's `CMP` opcode using the listing; a real `cmpi.l #imm,d0` stays `0C80`. Do not write a compare as `dc.w`.
-- `jsr name` only when SNASM emits the same opcode. `jsr (name).l` is `4EB9`, `jsr (name).w` is `4EB8`; `bsr.w` stays `bsr.w`. IDA writes `jsr (sub_1E9038).l`: keep the `.l`.
+- `jsr name` only when SNASM emits the same opcode. `jsr (name).l` is `4EB9`, `jsr (name).w` is `4EB8`; `bsr.w` stays `bsr.w`. IDA writes `jsr (ValidationRoutine).l`: keep the `.l`.
 - A global label ends local-label scope. A local that another routine branches to stays global. SNASM symbols are case-insensitive.
 - Keep each comment line under 200 characters. A longer line makes SNASM write an empty bin.
 - A MATCH of 0 bytes is a failure; the byte count must be the segment's range.
@@ -67,16 +67,16 @@ Every row is matched. Rows are in ROM order and tile `$000000` up to the `$FF` f
 | goal96 | matched, 1402 bytes | $00B04E | $00B5C7 | code | goal95 | SetContTeams, DrawPadSetup, DrawPadIcon, ControllerSetupScreen, PrintSetupStr(Hi), ReadAllPads |
 | fourway96 | matched, 216 bytes | $00B5C8 | $00B69F | code | fourway95 | Detect4WayPlay, ReadJoySwapPad1-4 |
 | fight96 | matched, 3752 bytes | $00B6A0 | $00C547 | code | - | new in 96: checkfight, startfight, SetInst, fightinput, ClearMessageLine; assfight and assfwatch as bytes |
-| logic96 | matched, 9960 bytes | $00C548 | $00EC2F | code | logic95, penalty95 | asstab, the assignment routines (bytes, labelled at their asstab entries), Penaltylist, PenShotPenalties, unk_EBF8 |
+| logic96 | matched, 9960 bytes | $00C548 | $00EC2F | code | logic95, penalty95 | asstab, the assignment routines (bytes, labelled at their asstab entries), Penaltylist, PenShotPenalties, DoubleMinorPenalties |
 | lines96 | matched, 720 bytes | $00EC30 | $00EEFF | code | lines95 | SetLCmode, SetLCmode2, setlccords, getlchoice, lineinput, lcfound, lcfound2 |
-| lines96_set | matched, 1140 bytes | $00EF00 | $00F373 | code | lines95 | NullSaveClear, sub_EF02 (writes a team's lines) |
+| lines96_set | matched, 1140 bytes | $00EF00 | $00F373 | code | lines95 | NullSaveClear, GetTeamLines (the team data lines, or lines built from the ratings: BuildPosList, AddLineSkaters, AddLinePlayer) |
 | input96_shot | matched, 3404 bytes | $00F374 | $0100BF | code | input95 | shotdiradj, shotdirmath, SetShotMode, ShotMode, doshot, setpassmode, passmode, dopass, passtoa0 |
 | trade96 | matched, 2138 bytes | $0100C0 | $010919 | code | trade95 | DefaultRosters, FormatPlayerNameD7, GetRosterName, GetJerseyNumber |
 | season96_sim | matched, 920 bytes | $01091A | $010CB1 | code | season95 | SimGameStats, SimGoalieStats, SimGoalie, PickSimGoalie |
-| season96 | matched, 8012 bytes | $010CB2 | $012BFD | code | - | Season and save RAM handling and its screens, mostly new in 96 (IDA names); DrawSetupTeamBlock |
-| teamgfx96 | matched, 2394 bytes | $012BFE | $013557 | data | - | TeamBlockPtrs, TeamLogoPtrs, SmallLogoPtrs, unk_12D46 (bytes), nullsub_2 |
+| season96 | matched, 8012 bytes | $010CB2 | $012BFD | code | - | SaveGameStats, TickTeamInjuries, SimSeasonDays, WriteDayGames, Read/WriteSeasonHeader, ReadStandings, TeamSelectScreen, RunSeasonMenu, SeasonMenuScreen, DrawSetupTeamBlock |
+| teamgfx96 | matched, 2394 bytes | $012BFE | $013557 | data | - | TeamBlockPtrs, TeamLogoPtrs, SmallLogoPtrs, VBlank_Menus (bytes), nullsub_2 |
 | schedule96 | matched, 2376 bytes | $013558 | $013E9F | data | schedule95 | SeasonSchedule (Day) |
-| awards96 | matched, 1374 bytes | $013EA0 | $0143FD | code | awards95 | nullsub_3, ResolveDayGames, BeginPlayoffs, InitPlayoffs, SeedPairings, SortSeeds, CalcSeedPoints, SetupPlayoffs, GetTeamPOSlot, BuildPOSlots |
+| awards96 | matched, 1374 bytes | $013EA0 | $0143FD | code | awards95 | ScoutingReport, ResolveDayGames, BeginPlayoffs, InitPlayoffs, SeedPairings, SortSeeds, CalcSeedPoints, SetupPlayoffs, GetTeamPOSlot, BuildPOSlots |
 | pause96_list | matched, 590 bytes | $0143FE | $01464B | code | pause95 | PrintMenuList, ScrollClearTxt, PrintMenuList2 |
 | hockey96 | matched, 1660 bytes | $01464C | $014CC7 | code | hockey95 | Begin, StartGame, StartPer, Gameloop, DoGameFrame, DoFrameUpdates, ResetClock, restoreteams, RestoreBenchEnergy, updatecrowdf, clockcont |
 | pause96 | matched, 1330 bytes | $014CC8 | $0151F9 | code | pause95 | demoread, EndDemoOnPress, startpause1-4, Pausemode, SetupPauseScreen, seta2, InitMenuState, HandleMenuInput, UpdateMenuSelection, PrintMenuItem, vcountwait |
@@ -118,11 +118,11 @@ Every row is matched. Rows are in ROM order and tile `$000000` up to the `$FF` f
 | sram96 | matched, 778 bytes | $023F1C | $024225 | code | sram95 | InitSaveRAM, SRAMWaitVblank, VBcount, ValidateSRAM, ClearSRAM, WriteSRAM, MakeSRAMChecksum, ReadSRAM, ClearSRAMBytes |
 | video96_pad | matched, 346 bytes | $024226 | $02437F | code | video95 | ReadJoyData, ReadPad4Way1-4, ReadPad1, ReadPad2, PadDirTable, ResetZ80Bus |
 | logic96_do | matched, 32 bytes | $024380 | $02439F | code | logic95 | doassignment |
-| video96_font | matched, 126 bytes | $0243A0 | $02441D | code | video95 | LoadSmallFont, LoadBigFonts, sub_243DA |
+| video96_font | matched, 126 bytes | $0243A0 | $02441D | code | video95 | LoadSmallFont, LoadBigFonts, TurnGoalieFromNet |
 | logic96_crease | matched, 96 bytes | $02441E | $02447D | code | logic95 | GoalieInCrease |
 | pause96_play | matched, 8 bytes | $02447E | $024485 | code | pause95 | PlayGame |
 | sound96 | matched, 410500 bytes | $024486 | $088809 | code | sound95, video95 | p_music_vblank, SndDriver, Z80Program, SoundBanks, the 168 bank items, SoundCmd, sfx, song, ChooseSong, newcheck |
-| scout96 | matched, 27324 bytes | $08880A | $08F2C5 | data | scout95 | ScoutTextScript, unk_88A18 |
+| scout96 | matched, 27324 bytes | $08880A | $08F2C5 | data | scout95 | ScoutTextScript, TitleScreenImg |
 | graphics96 | matched, 1340252 bytes | $08F2C6 | $1D6621 | data | graphics95 | one incbin per picture: the screen maps, Sprites, Spritetiles, the fonts, TeamBlock / TeamLogo / SmallLogo, the award pictures |
 | logic96_timer | matched, 1348 bytes | $1D6622 | $1D6B65 | code | logic95, input95 | puckvzadj, OneTimerPass, OneTimerTarget, OneTimerNearTbl, OneTimerFarTbl, OneTimerGoalieTbl, assonetimer, setonetimeranim |
 | code96_14 | matched, 5184 bytes | $1D6B66 | $1D7FA5 | code | middle95, scout95, collide95, records95, lines95 | PuckOnAttackHalf, InitCrowdMeter, UpdateCrowdMeter, stopfast, checkcornercoll, Create_HotCold_Table, AttributeCalc, Read/WriteTeamRecord, UpdateRecords, CountGoalies, CalcAttrib, the attribute weights |
