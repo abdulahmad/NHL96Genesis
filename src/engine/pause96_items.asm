@@ -28,7 +28,7 @@ PauseMenu	;The pause menu
 	String	'    EDIT LINES    '
 	dc.l	LineEditor
 	String	'    GAME STATS    '
-	dc.l	GameStatisticsScreen
+	dc.l	StatsReport
 	String	'   PLAYER STATS   '
 	dc.l	PlayerStatsScreen
 	String	' Scoring Summary  '
@@ -61,7 +61,7 @@ PauseMenuNoTimeout	;The pause menu once the team has used its timeout (team stru
 	String	'    Edit Lines    '
 	dc.l	LineEditor
 	String	'    Game Stats    '
-	dc.l	GameStatisticsScreen
+	dc.l	StatsReport
 	String	'   Player Stats   '
 	dc.l	PlayerStatsScreen
 	String	' Scoring Summary  '
@@ -137,7 +137,7 @@ IntermissionMenu	;Between periods
 	String	'   Resume Game    '
 	dc.l	PlayGame
 	String	'    Game Stats    '
-	dc.l	GameStatisticsScreen
+	dc.l	StatsReport
 	String	'   Player Stats   '
 	dc.l	PlayerStatsScreen
 	String	' Scoring Summary  '
@@ -164,7 +164,7 @@ GameOverMenu	;After the game
 	String	'    quit Game     '
 	dc.l	PlayGame
 	String	'    Game Stats    '
-	dc.l	GameStatisticsScreen
+	dc.l	StatsReport
 	String	'   Player Stats   '
 	dc.l	PlayerStatsScreen
 	String	' Scoring Summary  '
@@ -185,7 +185,7 @@ PlayoffGameOverMenu	;After a playoff game
 	String	'    quit Game     '
 	dc.l	PlayGame
 	String	'    Game Stats    '
-	dc.l	GameStatisticsScreen
+	dc.l	StatsReport
 	String	'   Player Stats   '
 	dc.l	PlayerStatsScreen
 	String	' Scoring Summary  '
