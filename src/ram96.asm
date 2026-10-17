@@ -251,6 +251,10 @@ PenFighting	equ	$26
 PenFighting2	equ	$28
 PenInst	equ	$2A
 PenDelay	equ	$2C
+; Sprite object counts and sizes (92 names)
+ssosize	equ	$14						;bytes per sso object
+ssonum	equ	4						;screen objects not tied to the rink scroll
+ffonum	equ	8						;objects tied to the rink scroll
 Pencntdwn equ $FFFFC3E8
 Penaltytimer equ $FFFFC3EA
 PBnum equ $FFFFC3EC

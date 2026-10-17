@@ -438,7 +438,7 @@ checksso							;Do graphics for sso structure: arrows for the players when they 
 	move.w	#$72E,d3				;SPFarrow, the first arrow frame
 	bsr.w	.ca
 	adda.w	#$1C,a0					;ffosize
-	adda.w	#$14,a3					;ssosize
+	adda.w	#ssosize,a3				;ssosize
 	move.w	#$731,d3
 	bsr.w	.ca
 	tst.w	(cont3team).w
@@ -1059,7 +1059,7 @@ LoadFaceOffMap						;Decompress FaceOffMap at ExtraChars
 defaultsprites						;The screen objects (sso) from .listsso, then the pads from .listffo
 	movea.l	#.listsso,a2
 	movea.w	#(sso-M68K_RAM),a3
-	moveq	#3,d0					;#ssonum-1 into d0
+	moveq	#ssonum-1,d0			;#ssonum-1 into d0
 .ssotop
 	move.w	#$FFFF,8(a3)			;screen objects not locked to scroll of screen
 	move.w	(a2)+,(a3)
@@ -1068,11 +1068,11 @@ defaultsprites						;The screen objects (sso) from .listsso, then the pads from 
 	move.w	(a2)+,4(a3)
 	move.w	d4,$12(a3)
 	add.w	(a2)+,d4
-	adda.w	#$14,a3					;#ssosize
+	adda.w	#ssosize,a3				;#ssosize
 	dbf	d0,.ssotop
 	movea.l	#.listffo,a2
 	movea.l	#$FFFFBDCA,a3			;ffo
-	moveq	#7,d0					;#ffonum-1
+	moveq	#ffonum-1,d0			;#ffonum-1
 .ffotop
 	st	8(a3)						;objects tied to screen scrolling (not players/net/puck)
 	move.w	(a2)+,(a3)
