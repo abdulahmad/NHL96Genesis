@@ -22,7 +22,7 @@ ReturnToGame	;Back to the game after a menu: restart the sound driver, RestoreGa
 	movea.l	#VDP_DATA,a0
 	move.w	#$9100,4(a0)
 	move.w	#$9200,4(a0)
-	bclr	#0,(sflags).w
+	bclr	#sfpz,(sflags).w
 	jsr	(setvideo).l
 	movea.l	#tmstruct+$30,a0
 	btst	#1,(a0)
@@ -52,7 +52,7 @@ RestoreGameScreen	;Rebuild the game screen: the vdp maps, palettes, vram, framer
 	move.l	#$FFFFFFFF,(padcont+8).w
 	clr.w	(printfontset).w
 	move.l	#VBlank,(vbint).w
-	bset	#1,(disflags).w
+	bset	#df32c,(disflags).w
 	move.w	#$C000,(VmMap2).w
 	move.w	#6,(Map2col1).w
 	move.w	#$DC00,(VSPRITES).w
@@ -89,7 +89,7 @@ RestoreGameScreen	;Rebuild the game screen: the vdp maps, palettes, vram, framer
 	jsr	(DumpPadSprites).l
 	btst	#4,(disflags).w
 	beq.w	.ref
-	btst	#3,(sflags2).w
+	btst	#sf2replay,(sflags2).w
 	bne.w	.ref
 	move.w	(ExtraChars).w,d4
 	movea.l	#FaceOffMap+8,a2
@@ -101,7 +101,7 @@ RestoreGameScreen	;Rebuild the game screen: the vdp maps, palettes, vram, framer
 	bra.w	.rink
 .ref
 	move.w	(ExtraChars).w,d4
-	btst	#3,(sflags2).w
+	btst	#sf2replay,(sflags2).w
 	beq.w	.2
 	movea.l	#ReplayBannerMap+8,a2
 	bra.w	.load
@@ -114,32 +114,32 @@ RestoreGameScreen	;Rebuild the game screen: the vdp maps, palettes, vram, framer
 	jsr	(DecompressGraphicsPlain).l
 .rink
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	move.w	#$7D0,(Oldrow).w
 	clr.w	d4
 	move.w	d4,(rinkvrcset).w
 	movea.l	#Rinktilelist+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	jsr	(LoadHomeTeamGfx).l
-	btst	#3,(sflags2).w
+	btst	#sf2replay,(sflags2).w
 	beq.w	.0
 	jsr	(LoadReplayIcon).l
 .0
 	jsr	(setplayercolors).l
 	jsr	(setupIceRinkPal).l
 	move.w	(sp)+,(disflags).w
-	bclr	#0,(disflags).w
-	bclr	#2,(disflags).w
+	bclr	#dfok,(disflags).w
+	bclr	#dfng,(disflags).w
 	move	#$2300,sr
 	jsr	(SprSort).l
 	move.w	(vcount).w,d0
 .wait
 	cmp.w	(vcount).w,d0
 	beq.s	.wait
-	bset	#3,(disflags).w
+	bset	#dfclock,(disflags).w
 	jsr	(printscores1).l
 	bset	#7,(sflags11).w
-	btst	#3,(sflags2).w
+	btst	#sf2replay,(sflags2).w
 	bne.w	.6
 	move.w	#$64,(palcount).w
 .6

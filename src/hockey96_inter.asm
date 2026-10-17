@@ -38,7 +38,7 @@ Intermission	;Before the period: at game over (gsp 4) the records (UpdateRecords
 	beq.w	.3
 	movea.l	#ShootoutIntermissionMenu,a0
 .3
-	bset	#0,(sflags).w
+	bset	#sfpz,(sflags).w
 	movea.l	#SetupPauseScreen,a1
 	jsr	(InitMenuState).l
 	move.w	#$A8C,(IntermissionTimer).w

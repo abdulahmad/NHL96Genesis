@@ -52,7 +52,7 @@ OptionsScreen	;The game options screen: play mode, rosters, period length, goali
 	jsr	(DrawScreenSprite).l
 	jsr	(PStatsPalette).l
 	move.w	#$18,(palcount).w
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 .4
 	bsr.w	OptionsMenuDraw
 	move	#$2500,sr
@@ -223,9 +223,9 @@ OptionsMenuDraw	;OptionsScreen: draw the menu (PrintMenuList2)
 OptionsScreenSetup	;OptionsScreen: vram, fonts, the screen bitmaps and the row labels
 	bset	#5,(sflags12).w
 	move.l	#VBlank_Menus,(vbint).w
-	bclr	#0,(disflags).w
-	bset	#2,(disflags).w
-	bclr	#1,(disflags).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
 	move.w	#$B800,(VmMap3).w

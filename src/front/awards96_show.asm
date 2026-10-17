@@ -7,7 +7,7 @@ SeasonAwards	;End of season awards: left / right go through the 9 awards (pictur
 	bsr.w	SetPlayoffAwardWinners
 	bsr.w	AwardsScreenSetup
 	move.w	#$18,(palcount).w
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	clr.w	(PlayerScrollCtr).w
 .draw
 	jsr	(DrawAwardWinnerLogo).l
@@ -181,9 +181,9 @@ TeamAwardFlags	;Nonzero for a team award
 AwardsScreenSetup	;Awards screen setup: vram, fonts and the background bitmaps
 	bset	#5,(sflags12).w
 	move.l	#VBlank_Menus,(vbint).w
-	bclr	#0,(disflags).w
-	bset	#2,(disflags).w
-	bclr	#1,(disflags).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMap3).w
@@ -468,9 +468,9 @@ CupChampionsScreen	;The user's team won the Cup: a full screen picture with the 
 	beq.w	.3
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	#VBlank_SpriteFade,(vbint).w
-	bclr	#0,(disflags).w
-	bset	#2,(disflags).w
-	bclr	#1,(disflags).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMap3).w
@@ -594,7 +594,7 @@ CupChampionsScreen	;The user's team won the Cup: a full screen picture with the 
 	move.l	#BigFontMap,(bigfontptr).w
 	jsr	(printbigcur).l
 	move.w	#$18,(palcount).w
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	move	#$2500,sr
 	move.w	(vcount).w,d0
 .loop2

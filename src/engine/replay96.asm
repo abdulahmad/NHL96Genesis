@@ -197,9 +197,9 @@ ClampReplayView	;Clamp Hpos to -$3C..$3C and Vpos to -$C8..$100.
 	dc.b	$BD,$2E,$6F,$00,$00,$06,$31,$C0,$BD,$2E,$30,$1F,$4E,$75
 
 updatereplay	;Called every frame to save replay events, d7 = elapsed frames
-	btst	#4,(gmode).w	;check if highlight
+	btst	#gmhl,(gmode).w	;check if highlight
 	bne.w	rtss8	;exit if so
-	btst	#2,(sflags2).w	;check if replay record disabled
+	btst	#sf2drec,(sflags2).w	;check if replay record disabled
 	beq.w	.0	;branch if not
 	tst.w	(replaydelay).w
 	beq.w	.rec
@@ -211,7 +211,7 @@ updatereplay	;Called every frame to save replay events, d7 = elapsed frames
 	addi.l	#$64,(recbpr).w
 	cmpi.l	#replayend,(recbpr).w
 	bne.w	.rec
-	bset	#4,(sflags).w
+	bset	#sfwrap,(sflags).w
 	move.l	#M68K_RAM,(recbpr).w
 .rec
 	movea.l	(recbpr).w,a0

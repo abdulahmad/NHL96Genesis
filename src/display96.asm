@@ -68,7 +68,7 @@ setvideo	;This is not vblank code but sets up ram for vblank transfers. Called o
 	;Pausemode, ...).
 	movem.l	d0-d7/a0-a6,-(sp)
 .p
-	btst	#0,(disflags).w	;dfok: wait for vblank to take the last frame
+	btst	#dfok,(disflags).w	;dfok: wait for vblank to take the last frame
 	bne.s	.p
 	movea.w	#(DMAList-M68K_RAM),a5	;dma transfer list
 	bsr.w	updatescroll
@@ -94,12 +94,12 @@ setvideo	;This is not vblank code but sets up ram for vblank transfers. Called o
 	lsr.w	#1,d0	;words
 	move.w	d0,(Sattsize).w
 	move.l	a5,(DMAlistend).w
-	bset	#0,(disflags).w	;dfok
+	bset	#dfok,(disflags).w	;dfok
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
 updatescroll	;Scroll the rink window: Hscroll / Vscroll from Hpos / Vpos
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	bne.w	rtss2
 	moveq	#-64,d0
 	sub.w	(Hpos).w,d0
@@ -164,7 +164,7 @@ updatescroll	;Scroll the rink window: Hscroll / Vscroll from Hpos / Vpos
 	rts
 
 showref	;Ref window: when sflags2 bit 1 is set add the 8 RefRamMap rows to the dma list at a5 (VmMap1)
-	bclr	#1,(sflags2).w
+	bclr	#sf2refref,(sflags2).w
 	beq.w	rtss2
 	movea.w	#(RefRamMap-M68K_RAM),a0
 	movea.w	#(VmMap1-M68K_RAM),a1
@@ -174,7 +174,7 @@ showref	;Ref window: when sflags2 bit 1 is set add the 8 RefRamMap rows to the d
 	moveq	#2,d1
 	asl.w	d2,d1
 	addq.w	#2,d0
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	beq.w	.1
 	addi.w	#$B,d0
 .1
@@ -191,9 +191,9 @@ showref	;Ref window: when sflags2 bit 1 is set add the 8 RefRamMap rows to the d
 	rts
 
 checkfo	;Check for faceoff sprites: the fofdata2 entries (frame, flags) as sprites
-	btst	#0,(sflags).w
+	btst	#sfpz,(sflags).w
 	bne.w	rtss2
-	btst	#4,(disflags).w	;face off flag
+	btst	#dffaceoff,(disflags).w	;face off flag
 	beq.w	rtss2
 	movea.w	#(fofdata2-M68K_RAM),a3
 	moveq	#2,d0
@@ -449,7 +449,7 @@ checksso	;Do graphics for sso structure: arrows for the players when they are of
 	move.w	(a0),d0
 	btst	#0,(gmode2).w
 	bne.w	.0
-	btst	#3,(sflags2).w
+	btst	#sf2replay,(sflags2).w
 	bne.w	.0
 	btst	#2,(BA_PS_flags).w
 	beq.w	.7
@@ -467,7 +467,7 @@ checksso	;Do graphics for sso structure: arrows for the players when they are of
 	move.w	(sp)+,d0
 .7
 	move.w	Ypos(a0),d1
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	beq.w	.10
 	exg	d0,d1
 	neg.w	d0
@@ -843,7 +843,7 @@ addframe2	;d0/d1 = x/y coord on screen, a3 = object, a5 = dma trans, a6 = sprite
 
 find3d	;Input: d0 = xfield, d1 = yfield, d2 = height off field. Output: d0 = xscreen, d1 = yscreen (the horizontal
 	;rink with sflags bit 7)
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	beq.w	.0
 	exg	d0,d1
 	neg.w	d0
@@ -882,7 +882,7 @@ KillCrowd	;Silence the crowd noise (psg)
 
 setupice	;Set all variables, send non purgeable graphics, build sprite frame lists for ice rink
 	movem.l	d0-d7/a0-a6,-(sp)
-	bset	#1,(disflags).w
+	bset	#df32c,(disflags).w
 	move.w	#$C000,(VmMap2).w
 	move.w	#6,(Map2col1).w
 	move.w	#$DC00,(VSPRITES).w
@@ -893,9 +893,9 @@ setupice	;Set all variables, send non purgeable graphics, build sprite frame lis
 	move.w	#$FC00,(VSCRLPM).w
 	moveq	#0,d0
 	bsr.w	setVram
-	bclr	#0,(sflags).w
+	bclr	#sfpz,(sflags).w
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	clr.w	(Hpos).w
 	clr.w	(Vpos).w
 	move.w	#$7D0,(Oldrow).w
@@ -928,7 +928,7 @@ setupice	;Set all variables, send non purgeable graphics, build sprite frame lis
 	jsr	(LoadSmallFont).l
 	jsr	(LoadBigFonts).l
 	move.w	d4,(ExtraChars).w
-	btst	#1,(gmode).w
+	btst	#gmdir,(gmode).w
 	beq.w	.2
 	movea.w	#(SortCords-M68K_RAM),a3
 	moveq	#$B,d0
@@ -949,8 +949,8 @@ setupice	;Set all variables, send non purgeable graphics, build sprite frame lis
 	bsr.w	DumpPadSprites
 	move.w	(sp)+,(disflags).w
 	move.l	#VBlank,(vbint).w
-	bclr	#0,(disflags).w
-	bclr	#2,(disflags).w
+	bclr	#dfok,(disflags).w
+	bclr	#dfng,(disflags).w
 	move	#$2300,sr
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
@@ -1149,7 +1149,7 @@ SprSort	;Sort objects in struct SortObj and set corresponding tables for keeping
 	move.w	#$F,d3	;Sortobjs -1
 .loop0
 	move.w	$14(a0),d4
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	beq.w	.2
 	move.w	(a0),d4
 .2

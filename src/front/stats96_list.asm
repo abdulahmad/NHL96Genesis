@@ -15,7 +15,7 @@ PlayerStatsList	;Stats screen for team a2, d7 = 0 game / 1 playoff (plistplayoff
 	movea.l	#PlayerStatsSprites,a0
 	jsr	(DrawScreenSprite).l
 	move.w	#$18,(palcount).w
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	clr.w	(VertLineScrolling).w
 	move.w	#$D,(word_FFD036).w
 	move.w	#$C,(PlayerScrollCtr).w
@@ -65,11 +65,11 @@ PlayerStatsList	;Stats screen for team a2, d7 = 0 game / 1 playoff (plistplayoff
 	cmp.w	(vcount).w,d0
 	beq.s	.7
 	jsr	(SetMenuScroll).l
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	bsr.w	PListPrint
 	bsr.w	PListArrows
 	move	#$2500,sr
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 .input
 	bsr.w	ReadAnyPad
 	tst.w	d1
@@ -260,9 +260,9 @@ PListSetup	;PlayerStatsList: vram, fonts and the screen bitmaps
 	move.l	a2,-(sp)
 	bset	#5,(sflags12).w
 	move.l	#VBlank_Menus,(vbint).w
-	bclr	#0,(disflags).w
-	bset	#2,(disflags).w
-	bclr	#1,(disflags).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
 	move.w	#$B800,(VmMap3).w

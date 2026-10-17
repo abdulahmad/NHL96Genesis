@@ -47,7 +47,7 @@ SetContTeams	;The controller setup screen: pick the team of each pad (cont1team 
 	jsr	(vcountwait).l
 	jsr	(vcountwait).l
 	move.w	#$18,(palcount).w
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	clr.w	(carddelay).w
 .frame
 	move.w	(vcount).w,d0
@@ -226,9 +226,9 @@ ControllerSetupScreen	;Build the controller setup screen: vram, fonts, the pad g
 	;and the team logos of VisTeam / HomeTeam
 	move.l	#VBlank_SetOptions,(vbint).l
 	move	#$2500,sr
-	bclr	#0,(disflags).w
-	bset	#2,(disflags).w
-	bclr	#1,(disflags).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
 	move.w	#$B800,(VmMap3).w

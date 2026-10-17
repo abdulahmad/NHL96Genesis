@@ -6,8 +6,8 @@ TitleScreen	;Title screen: the picture TitleScreenImg and song 0, until start or
 	move.w	(VDP_CNTR).l,(seed+2).w
 	bset	#5,(sflags12).w
 	move.l	#VBlank_Menus,(vbint).w
-	bclr	#0,(disflags).w
-	bclr	#1,(disflags).w
+	bclr	#dfok,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#5,(Map3col1).w
 	move.w	#$A000,(VmMap2).w
 	move.w	#7,(Map2col1).w
@@ -45,7 +45,7 @@ TitleScreen	;Title screen: the picture TitleScreenImg and song 0, until start or
 	move.w	#$F,d5
 	jsr	(dobitmap).l
 	move	#$2500,sr
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	move.w	#0,-(sp)
 	jsr	(song).l
 	move.w	#$18,(palcount).w
@@ -81,8 +81,8 @@ CreditsScreen	;The legal and credits pages (CreditsList) over three pictures; st
 	move.w	(VDP_CNTR).l,(seed+2).w
 	bset	#5,(sflags12).w
 	move.l	#VBlank_Menus,(vbint).w
-	bclr	#0,(disflags).w
-	bclr	#1,(disflags).w
+	bclr	#dfok,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#5,(Map3col1).w
 	move.w	#$A000,(VmMap2).w
 	move.w	#7,(Map2col1).w
@@ -150,7 +150,7 @@ CreditsScreen	;The legal and credits pages (CreditsList) over three pictures; st
 	moveq	#0,d5
 	jsr	(dobitmap).l
 	move	#$2500,sr
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	move.w	#$18,(palcount).w
 	clr.w	(DispAttribCtr).w
 	clr.w	(VertLineScrolling).w
@@ -250,7 +250,7 @@ CupCelebration	;The user's team won the Cup: the rink scene with the team's spri
 	btst	#7,d1
 	bne.w	.3
 .0
-	btst	#0,(disflags).w
+	btst	#dfok,(disflags).w
 	bne.s	.0
 	addq.w	#1,(DispAttribCtr).w
 	cmpi.w	#$A,(DispAttribCtr).w
@@ -289,7 +289,7 @@ CupCelebration	;The user's team won the Cup: the rink scene with the team's spri
 	lsr.w	#1,d0	;words
 	move.w	d0,(Sattsize).w
 	move.l	a5,(DMAlistend).w
-	bset	#0,(disflags).w	;dfok
+	bset	#dfok,(disflags).w	;dfok
 	bra.w	.loop2
 .3
 	jsr	(forceblack).l
@@ -324,7 +324,7 @@ CupCelebrationSetup	;CupCelebration: vram, the team and rink palettes, the rink 
 	move.w	#$38,(Hpos).w
 	clr.w	(printfontset).w
 	move.l	#VBlank,(vbint).w
-	bset	#1,(disflags).w
+	bset	#df32c,(disflags).w
 	move.w	#$C000,(VmMap2).w
 	move.w	#6,(Map2col1).w
 	move.w	#$DC00,(VSPRITES).w
@@ -371,11 +371,11 @@ CupCelebrationSetup	;CupCelebration: vram, the team and rink palettes, the rink 
 	movea.l	#unk_1D5420+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	move.w	#$7D0,(Oldrow).w
 	move.w	(sp)+,(disflags).w
-	bclr	#0,(disflags).w
-	bclr	#2,(disflags).w
+	bclr	#dfok,(disflags).w
+	bclr	#dfng,(disflags).w
 	move	#$2300,sr
 	move.w	(vcount).w,d0
 .loop2

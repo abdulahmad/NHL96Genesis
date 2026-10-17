@@ -97,7 +97,7 @@ OneTimerTarget	;One-timer pass target for receiver a3: an offset by facing from 
 	bra.w	.2
 .0
 	move.w	Ypos(a3),d0
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.1
 	neg.w	d0
 .1
@@ -109,7 +109,7 @@ OneTimerTarget	;One-timer pass target for receiver a3: an offset by facing from 
 	bclr	#2,(sflags6).w
 .2
 	move.w	$54(a3),d0
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.3
 	addq.w	#4,d0
 	andi.w	#7,d0
@@ -133,7 +133,7 @@ OneTimerTarget	;One-timer pass target for receiver a3: an offset by facing from 
 	bgt.w	.6
 	move.w	#$119,d2
 .6
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.7
 	neg.w	d1
 	neg.w	d2

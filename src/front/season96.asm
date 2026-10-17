@@ -835,7 +835,7 @@ TeamSelectScreen	;Team select: up / down change the team, left / right pick home
 .11
 	bsr.w	DrawScreenSprite
 	move.w	#$18,(palcount).w
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	btst	#7,(GameFlags).w
 	bne.w	.9
 	bsr.w	PrintHomeRanks
@@ -1029,9 +1029,9 @@ TeamSelectScreen	;Team select: up / down change the team, left / right pick home
 TeamSelectGfx	;Team select video set up: backgrounds, the logos and the five rank names
 	bset	#5,(sflags12).w
 	move.l	#VBlank_Menus,(vbint).l
-	bclr	#0,(disflags).w
-	bset	#2,(disflags).w
-	bclr	#1,(disflags).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
 	move.w	#$B800,(VmMap3).w
@@ -1324,7 +1324,7 @@ DrawScreenSprite	;Put frame 0 of sprite file a0 at the screen's top left (char 1
 	subi.l	#$FFFFC066,d0
 	lsr.w	#1,d0
 	move.w	d0,(Sattsize).w
-	bset	#0,(disflags).w
+	bset	#dfok,(disflags).w
 	rts
 
 TeamSelectSide	;Team select: word_FFDDB6 = the highlighted side (0 season, 1 home, 2 visitors)
