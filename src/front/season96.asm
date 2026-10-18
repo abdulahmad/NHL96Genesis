@@ -1,7 +1,6 @@
 ;	The season: the save RAM stats, injuries, standings and game log (96 keeps them as bit fields,
-;	ReadSRAMBits / WriteSRAMBits), the day's games and the simulated days, the season header, the team select
-;	screen with the team ranks, and the season menu. DrawSetupTeamBlock draws a team block of the controller
-;	setup screen.
+;	ReadSRAMBits / WriteSRAMBits), the day's games and the simulated days, the team select
+;	screen and the season menu.
 
 SortBytesByWords					;Sort a5 words descending and swap the parallel a4 bytes. Stops at a
 									;negative byte

@@ -1,7 +1,6 @@
-;	The faceoff. faceoffinput stores the dpad pull and starts the faceoff. DrawFaceoffWindow
-;	draws the window and limitfo keeps the spot inside the rink. The assignment routines
-;	(assfaceoff, assfaceoffpl, puckfaceoff, puckfaceoff2) and Endfaceoff are the bytes the
-;	listing does not decode.
+;	The faceoff: input, the faceoff window, keeping the spot inside the rink, and the assignment
+;	routines that run the players and the puck. The assignment bytes are what the listing
+;	left undecoded.
 
 faceoffinput						;The faceoff player (assignment $17): store the dpad pull (fodir1 /
 									;fodir2) and start the faceoff

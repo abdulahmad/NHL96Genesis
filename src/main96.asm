@@ -1,8 +1,9 @@
 ;	Startup. This file holds the vector table and the cartridge header, runs Sega's startup code,
 ;	checks the region and the checksum, and then starts the game.
-;	The region lock reads the country code as one hex digit of region bits (1 Japan, 2 Asia PAL, 4 USA, 8
-;	Europe). If the console's region is not in it, it draws "DEVELOPED FOR USE ONLY WITH ... SYSTEMS." and
-;	hangs.
+;
+;	The region lock reads the country code as one hex digit of region bits (1 Japan, 2 Asia PAL, 4 USA,
+;	8 Europe). If the console's region is not in it, it draws "DEVELOPED FOR USE ONLY WITH ... SYSTEMS."
+;	and hangs.
 
 InitialSP = $FFFFF6					;reset vector 0. 24-bit form of $FFFFFFF6. Begin moves the stack to Stack
 

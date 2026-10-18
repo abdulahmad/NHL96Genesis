@@ -1,7 +1,6 @@
-;	Fighting, new in 96. checkfight starts a fight when two players hit hard enough;
-;	startfight and SetInst set the two of them up, fightinput reads their pads, and
-;	assfight and assfwatch run the fighters and the players around them. The assignment
-;	bytes are what the listing left undecoded.
+;	Fighting, new in 96. checkfight starts a fight when two players hit hard enough, and the
+;	fighters and the players around them are run by assignment routines whose bytes are
+;	what the listing left undecoded.
 
 checkfight							;Look for the start of a fight between players a2 and a3 (impact $A or
 									;more on both, no animation lock, no goalie, no faceoff): SetInst both

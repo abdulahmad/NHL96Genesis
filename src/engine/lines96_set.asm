@@ -1,7 +1,8 @@
-;	The team's lines. NullSaveClear is the rts ClearSRAM calls. GetTeamLines returns the line sets of a team:
-;	the team data lines while its saved roster is still the default one, else lines built in RAM from the
-;	players' overall ratings. Each position gets a list of its players, best first; a line takes the player of
-;	the asked rank from a list and marks him used, or the next free player from the fallback lists.
+;	The team's lines. GetTeamLines returns the line sets of a team: the team data lines while its
+;	saved roster is still the default one, else lines built in RAM from the players' overall ratings.
+;
+;	Each position gets a list of its players, best first; a line takes the player of the asked rank
+;	and marks him used, or the next free player from the fallback lists.
 
 NullSaveClear						;An rts. Called from ClearSRAM
 	rts
