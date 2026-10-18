@@ -326,7 +326,7 @@ PeriodStatsTeam						;PeriodStatsScreen per team: goals or shots by
 	dc.b	$73,$00,$20,$7C,$00,$18,$DE,$04,$4E,$B9,$00,$01,$21,$8A,$24,$5F
 	dc.b	$4E,$75
 
-StatsReport							;(was GameStatisticsScreen) Pause menu Game Stats Code the listing does
+StatsReport							;Pause menu Game Stats Code the listing does
 									;not decode: kept as bytes
 	dc.b	$42,$78,$D0,$32,$31,$FC,$00,$10,$D0,$30,$4A,$78,$D2,$62,$66,$00
 	dc.b	$00,$08,$31,$FC,$00,$0C,$D0,$30,$08,$F8,$00,$05,$C3,$56,$61,$00

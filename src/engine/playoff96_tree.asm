@@ -228,7 +228,7 @@ PlayoffScreenExit					;Drop HandlePlayoffInput's return address and return from 
 rtsPlayoffScreen					;Shared rts of PlayoffScreen and UpdatePlayoffScroll
 	rts
 
-waitxc1								;(was PlayoffScreen_waitvsync) Wait for the next frame; flash a colour
+waitxc1								;Wait for the next frame; flash a colour
 									;each time palcount runs out
 	tst.w	(palcount).w
 	bpl.w	.wait
