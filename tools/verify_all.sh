@@ -15,7 +15,7 @@ say() { echo "$*" >>$sum; [ $quiet = 1 ] && [[ "$*" == *": MATCH"* ]] || echo "$
 export NHL_PREBUILD_DONE=1
 rm -rf Extracted; node tools/prebuild.js retail >output/prebuild.log 2>&1 || { say "PREBUILD FAIL (output/prebuild.log)"; cat output/prebuild.log; exit 1; }
 rm -f output/nhl96.bin output/modified_nhl96.bin
-wine cmd /c "set rev=0&& set checksum=1&& build96.bat" >output/top.log 2>&1
+wine cmd /c "set checksum=1&& build96.bat" >output/top.log 2>&1
 grep -qP '^[1-9]\d* error' output/Build96.log && { say "TOP ERRORS in output/Build96.log"; fail=1; }
 [ -s output/nhl96.bin ] || { say "TOP NO BIN"; fail=1; }
 node tools/fixopcodes.js "output/nhl96 .lst" output/nhl96.bin >>output/top.log 2>&1

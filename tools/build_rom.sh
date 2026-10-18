@@ -6,7 +6,7 @@ export WINEDEBUG=-all NHL_PREBUILD_DONE=1
 mkdir -p output; log=output/build_rom.log
 node tools/prebuild.js retail >$log 2>&1 || { cat $log; exit 1; }
 rm -f output/nhl96.bin output/modified_nhl96.bin
-wine cmd /c "set rev=0&& set checksum=1&& build96.bat" >>$log 2>&1
+wine cmd /c "set checksum=1&& build96.bat" >>$log 2>&1
 if [ ! -s output/nhl96.bin ] || grep -qP '^[1-9]\d* error' output/Build96.log; then
   echo "ASSEMBLY FAILED: see output/Build96.log"; grep -i error output/Build96.log | head -20; exit 1; fi
 node tools/fixopcodes.js "output/nhl96 .lst" output/nhl96.bin >>$log 2>&1
