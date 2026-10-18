@@ -23,6 +23,7 @@ ReadSRAMBitWords = $010F02			;season96
 WriteSRAMBitWords = $010F22			;season96
 GetGoalieCountD7 = $015774			;players96_count
 WriteSRAM = $024188					;sram96
+playoffseats = $0054F0					;teamdata96
 
 
 ; Main segment code

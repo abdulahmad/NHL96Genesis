@@ -26,6 +26,7 @@ printbig2 = $01C15A					;penalty96
 prefmes = $01C9FA					;penalty96
 setplayer = $01FEA0					;players96
 FormatPlayerNumInitial = $022F44	;middle96
+TeamList = $00077E					;teamdata96
 
 
 ; Main segment code

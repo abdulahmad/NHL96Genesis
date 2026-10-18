@@ -347,7 +347,7 @@ CupCelebrationSetup					;CupCelebration: vram, the team and rink palettes, the r
 	clr.w	d1
 	move.b	(dword_FFDD82+2).w,d1
 	asl.w	#2,d1
-	movea.l	#$77E,a2
+	movea.l	#TeamList,a2
 	movea.l	(a2,d1.w),a2
 	clr.w	d1
 	adda.w	2(a2),a2				;Palettedata

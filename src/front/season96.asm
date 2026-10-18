@@ -1406,7 +1406,7 @@ RunSeasonMenu						;Run the season screens: call the routine in NextScreenPtr
 	jsr	(song).l
 .0
 	movea.l	(NextScreenPtr).w,a0
-	cmpa.l	#$772,a0
+	cmpa.l	#ZeroLong,a0
 	beq.w	.1
 	move.w	(HomeTeam).w,-(sp)
 	move.w	(VisTeam).w,-(sp)

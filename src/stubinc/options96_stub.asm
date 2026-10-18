@@ -45,6 +45,7 @@ PuckAnimMap = $1C4C4E				;graphics96
 ShootoutInit = $1D8180				;shootout96_path
 PStatsPalette = $1DBB92				;season96_menu
 PlayoffMenuScreen = $1DBBB2			;season96_menu
+ZeroLong = $000772					;main96
 
 
 ; Main segment code

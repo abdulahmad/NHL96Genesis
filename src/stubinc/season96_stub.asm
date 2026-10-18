@@ -56,6 +56,7 @@ SelectTeamSprites = $18DE04			;graphics96
 Create_HotCold_Table = $1D6F24		;code96_14
 InitShooters = $1D8262				;shootout96_path
 SetSframe = $1DA6C0					;season96_menu
+ZeroLong = $000772					;main96
 
 
 ; Main segment code

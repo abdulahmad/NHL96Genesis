@@ -256,7 +256,7 @@ BuildPosList						;List at a3 (count, 0, player numbers) of the players of posit
 	adda.w	(a1),a1
 	addq.w	#8,a1
 	movea.l	a1,a0
-	movea.l	#$F300,a4
+	movea.l	#CheckDefaultRoster,a4
 	movea.l	#OvrGoalWgtList2,a6
 	move.l	(GAttribOverallMask).l,d4
 	tst.w	d5

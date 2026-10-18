@@ -291,7 +291,7 @@ DrawTeamBlocks						;Draw team block d1 at printx / printy; the user's team gets
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
 	adda.l	(a2)+,a1
-	movea.l	#$772,a2
+	movea.l	#ZeroLong,a2
 	clr.w	d0
 	clr.w	d1
 	move.w	(a1),d2
@@ -313,7 +313,7 @@ DrawTeamBlocks						;Draw team block d1 at printx / printy; the user's team gets
 	movea.l	a0,a1
 	adda.l	(a0),a0
 	adda.l	4(a1),a1
-	movea.w	#$772,a2
+	movea.w	#ZeroLong,a2
 	clr.w	d0
 	clr.w	d1
 	move.w	(a1),d2

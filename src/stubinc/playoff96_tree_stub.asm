@@ -29,6 +29,7 @@ rtss2 = $01F84A						;collide96
 PlayoffTreeMap = $1BDCD4			;graphics96
 PlayoffTreeBgMap = $1C0302			;graphics96
 PlayoffTeamFrameMap = $1C4810		;graphics96
+ZeroLong = $000772					;main96
 
 
 ; Main segment code

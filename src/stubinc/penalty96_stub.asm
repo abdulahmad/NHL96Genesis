@@ -51,6 +51,10 @@ BigFontMap3 = $1B9416				;graphics96
 ShootoutWonBy = $1D82A2				;shootout96_path
 updatePPTeamTime = $1D8618			;shootout96_path
 SkipStrings = $01D7F2				;hockey96_inter
+ZeroLong = $000772					;main96
+Penaltylist = $00E818					;logic96
+PenShotPenalties = $00EBC2					;logic96
+DoubleMinorPenalties = $00EBF8					;logic96
 
 
 ; Main segment code

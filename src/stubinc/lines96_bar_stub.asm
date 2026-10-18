@@ -17,6 +17,7 @@ rtss2 = $01F84A						;collide96
 ResetBench = $01FDF4				;players96
 priolist = $023426					;players96_sub
 EnergyBarMap = $13D290				;graphics96
+ZeroLong = $000772					;main96
 
 
 ; Main segment code

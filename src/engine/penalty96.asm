@@ -151,7 +151,7 @@ AddPenalty2							;Forced penalties like faceoff and game over. d0 = penalty num
 	bne.w	.noplayer
 	move.b	$53(a3),-(a1)
 	move.b	d0,-(a1)
-	movea.l	#$E818,a0
+	movea.l	#Penaltylist,a0
 	adda.w	(a0,d0.w),a0
 	tst.b	1(a0)					;penalty minutes
 	beq.w	.noplayer
@@ -234,7 +234,7 @@ chkprogress							;Control the progress of the ref and the game through penalty 
 	beq.w	rtss2
 	clr.w	d0
 	move.b	-2(a0),d0
-	movea.l	#$E818,a1
+	movea.l	#Penaltylist,a1
 	adda.w	(a1,d0.w),a1
 	tst.b	1(a1)					;penalty minutes
 	beq.s	.4
@@ -267,7 +267,7 @@ chkprogress							;Control the progress of the ref and the game through penalty 
 DoubleMinorChk						;Penalty d0 becomes its 4 minute double minor when its
 									;DoubleMinorPenalties entry is not negative
 	movem.l	d1-d3/a0,-(sp)
-	movea.l	#$EBF8,a0
+	movea.l	#DoubleMinorPenalties,a0
 	move.w	(a0,d0.w),d1
 	bmi.w	.0
 	move.w	d1,d0
@@ -288,7 +288,7 @@ PenShotChk							;A breakaway shooter hit: a penalty shot when penalty d0 allows
 	move.w	#$FFFF,d1
 	bra.w	.end
 .0
-	movea.l	#$EBC2,a0
+	movea.l	#PenShotPenalties,a0
 	move.w	(a0,d0.w),d1
 	bmi.w	.end
 	move.w	SCnum(a2),d2			;SCnum
@@ -384,7 +384,7 @@ InProgress							;Ref in progress: update the graphics, stats and penalty inform
 .Sa
 	clr.w	d0
 	move.b	(a0),d0
-	movea.l	#$E818,a1
+	movea.l	#Penaltylist,a1
 	adda.w	(a1,d0.w),a1
 	bclr	#5,(sflags5).w
 	clr.w	d2
@@ -525,7 +525,7 @@ checkfornewpen						;Look for a new penalty (entered through AddPenalty / AddPen
 	bne.w	.iscalled
 	clr.w	d0
 	move.b	-2(a0),d0
-	movea.l	#$E818,a1
+	movea.l	#Penaltylist,a1
 	adda.w	(a1,d0.w),a1
 	tst.b	1(a1)					;time for penalty
 	beq.w	.callit
@@ -544,7 +544,7 @@ checkfornewpen						;Look for a new penalty (entered through AddPenalty / AddPen
 	bne.s	.0
 	clr.w	d0
 	move.b	-2(a0),d0				;penalty called
-	movea.l	#$E818,a1
+	movea.l	#Penaltylist,a1
 	adda.w	(a1,d0.w),a1
 	clr.w	d1
 	move.b	(a1),d1					;delay for stopping action
@@ -685,7 +685,7 @@ SetPA2								;Update the ref animation: next frame / delay pair from the Penalt
 	move.w	(RefStep).w,d0
 	addq.w	#2,(RefStep).w
 	move.w	(RefPen).w,d1
-	movea.l	#$E818,a0
+	movea.l	#Penaltylist,a0
 	adda.w	(a0,d1.w),a0
 	addq.w	#2,a0
 	adda.w	(a0),a0
@@ -774,7 +774,7 @@ prefmes								;Print the penalty message: the player, the penalty and its lengt
 .0
 	bsr.w	printz
 	String	$BF,$05,$0A
-	movea.l	#$E818,a1
+	movea.l	#Penaltylist,a1
 	adda.w	(a1,d0.w),a1
 	addq.w	#2,a1
 	move.w	(a1),d0
@@ -817,7 +817,7 @@ prefmes								;Print the penalty message: the player, the penalty and its lengt
 	move.w	#$15,(printx).w
 	move.w	#3,(printy).w
 	move.w	(sp)+,d0
-	movea.l	#$E818,a1
+	movea.l	#Penaltylist,a1
 	adda.w	(a1,d0.w),a1
 	addq.w	#2,a1
 	move.w	(a1),d0
@@ -863,7 +863,7 @@ prefmes								;Print the penalty message: the player, the penalty and its lengt
 	move.w	(sp)+,d0
 	lsr.w	#8,d0
 	andi.w	#$FF,d0
-	movea.l	#$E818,a1
+	movea.l	#Penaltylist,a1
 	adda.w	(a1,d0.w),a1
 	move.w	(a1),d0
 	andi.w	#$FF,d0
@@ -1230,7 +1230,7 @@ EASNLogo							;Draw the EASN logo
 	String	$BF,$01,$15
 	movea.l	#EASNmap,a1
 	adda.l	4(a1),a1
-	movea.w	#$772,a2
+	movea.w	#ZeroLong,a2
 	clr.w	d0
 	clr.w	d1
 	move.w	(a1),d2

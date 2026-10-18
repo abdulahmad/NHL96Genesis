@@ -169,7 +169,7 @@ ShootoutWonBy						;Shootout: "SHOOTOUT WON BY" and the winning team (printbig1)
 	move.w	(VisTeam).w,d1
 .0
 	asl.w	#2,d1
-	movea.l	#$77E,a1
+	movea.l	#TeamList,a1
 	movea.l	(a1,d1.w),a1
 	adda.w	4(a1),a1
 	move.w	(a1),d0
