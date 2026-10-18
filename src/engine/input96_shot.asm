@@ -33,7 +33,7 @@ shotdiradj							;Adjust the shot direction by the pad and the shooter
 	muls.w	d1,d1					;square d1
 	add.l	d1,d0					;add d1 to d0
 	addq.l	#1,d0					;add 1 to d0
-	jsr	(sroot).l
+	jsr	(Sroot).l
 	move.w	d0,d2					;move result into d2
 	movem.w	(sp)+,d0-d1				;pop from stack (distance x and y from G to puck)
 	moveq	#$12,d3					;post?
@@ -264,7 +264,7 @@ doshot								;Shoot the puck
 	muls.w	d0,d0
 	muls.w	d1,d1
 	add.l	d1,d0
-	jsr	(sroot).l
+	jsr	(Sroot).l
 	tst.w	d0						;distance in pix to goal
 	bne.w	.8
 	addq.w	#1,d0
@@ -627,7 +627,7 @@ passtoa0							;Pass the puck to player a0
 	move.w	d4,d0					;d0 = j
 	muls.w	d0,d0					;j^2
 	sub.l	d3,d0					;j^2 - ((k*a^2)/4)
-	jsr	(sroot).l
+	jsr	(Sroot).l
 	moveq	#1,d3					;limit infinite loop
 	asr.w	#2,d5					;k divide by 4
 	bne.w	.1

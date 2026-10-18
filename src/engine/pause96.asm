@@ -72,9 +72,9 @@ Pausemode							;Game is in pause mode now: restart the sound driver, run the pa
 									;then restart the sound driver again
 	jsr	(forceblack).l
 	move.w	d0,-(sp)
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop
 	move.w	(sp)+,d0
 	jsr	(SoundOff).l
@@ -357,12 +357,12 @@ PrintMenuItem						;printsmall item String a1; an item that starts with x prints
 
 vcountwait							;Wait for the next vblank
 	move.w	d0,-(sp)
-	move.w	(oldvcount).w,d0
-	move.w	(oldvcount).w,d0
+	move.w	(OldVcount).w,d0
+	move.w	(OldVcount).w,d0
 .wait
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.wait
-	move.w	(oldvcount).w,(vcount).w
+	move.w	(OldVcount).w,(Vcount).w
 	move.w	(sp)+,d0
 	rts
 

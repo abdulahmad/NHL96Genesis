@@ -273,7 +273,7 @@ updatereplay						;Called every frame to save replay events, d7 = elapsed frames
 	bset	#7,(lastsfx+1).w
 	move.b	d7,(a0)+
 	move.w	(PadControlBits+2).w,(a0)+
-	move.w	(crowdframe).w,(a0)+
+	move.w	(Crowdframe).w,(a0)+
 	move.w	(glovecords).w,(a0)+
 	move.w	(glovecords+2).w,(a0)+
 	move.b	(PBnum).w,(a0)+

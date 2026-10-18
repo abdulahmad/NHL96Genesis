@@ -45,15 +45,15 @@ PlayerStatsList						;Stats screen for team a2, d7 = 0 game / 1 playoff (plistpl
 	move.w	d0,(word_FFD038).w
 .draw
 	bsr.w	PListBuild
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	jsr	(PStatsClearList).l
 .5
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .6
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.6
 	jsr	(SetMenuScroll).l
 	bsr.w	PListCategory
@@ -61,9 +61,9 @@ PlayerStatsList						;Stats screen for team a2, d7 = 0 game / 1 playoff (plistpl
 	bsr.w	PListHelp
 	bsr.w	PListHeading
 	move	#$2500,sr
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .7
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.7
 	jsr	(SetMenuScroll).l
 	bset	#dfng,(disflags).w
@@ -199,10 +199,10 @@ ReadAnyPad							;Wait for a press on pad 1 or 2 (3 and 4 with
 	move.l	#$5460,d6
 .wait
 	move.w	#$64,d6
-	move.w	(vcount).w,d1
-	sub.w	(oldvcount).w,d1
+	move.w	(Vcount).w,d1
+	sub.w	(OldVcount).w,d1
 	beq.s	.wait
-	move.w	(vcount).w,(oldvcount).w
+	move.w	(Vcount).w,(OldVcount).w
 	jsr	(SetMenuScroll).l
 	jsr	(ReadJoy1).l
 	jsr	(ProcessInputWithRepeat).l
@@ -262,17 +262,17 @@ PListArrows							;PlayerStatsList: the scroll marks { (VertLineScrolling above 
 PListSetup							;PlayerStatsList: vram, fonts and the screen bitmaps
 	move.l	a2,-(sp)
 	bset	#5,(sflags12).w
-	move.l	#VBlank_Menus,(vbint).w
+	move.l	#VBlank_Menus,(VBint).w
 	bclr	#dfok,(disflags).w
 	bset	#dfng,(disflags).w
 	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
-	move.w	#$B800,(VmMap3).w
+	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
-	move.w	#$C000,(VmMap2).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col1).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col1).w
 	move.w	#0,d0
 	bset	#5,(disflags).w
@@ -289,7 +289,7 @@ PListSetup							;PlayerStatsList: vram, fonts and the screen bitmaps
 	movea.l	#SmallFontMap2+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.l	#RosterFont,(smallfontptr).w
-	move.w	d4,(BigFontChars).w
+	move.w	d4,(BigFontchars).w
 	movea.l	#BigFontMap4+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	bset	#2,(sflags11).w

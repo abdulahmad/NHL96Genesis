@@ -105,12 +105,12 @@ showclockdma						;When dfclock is set queue the clock chars in the dma list (a5
 	move.w	d0,-(a0)
 	move.l	a0,(a5)+
 	move.w	#7,(a5)+
-	movea.w	#(VmMap1-M68K_RAM),a1
+	movea.w	#(VmMAP1-M68K_RAM),a1
 	moveq	#$19,d0
 	moveq	#1,d2
 	btst	#sfhor,(sflags).w
 	beq.w	.0
-	movea.w	#(VmMap2-M68K_RAM),a1
+	movea.w	#(VmMAP2-M68K_RAM),a1
 	moveq	#5,d0
 	moveq	#$D,d2
 .0
@@ -157,12 +157,12 @@ showclockdma						;When dfclock is set queue the clock chars in the dma list (a5
 	move.w	d0,-(a0)
 	move.l	a0,(a5)+
 	move.w	#7,(a5)+
-	movea.w	#(VmMap1-M68K_RAM),a1
+	movea.w	#(VmMAP1-M68K_RAM),a1
 	moveq	#$1A,d0
 	moveq	#1,d2
 	btst	#sfhor,(sflags).w
 	beq.w	.4
-	movea.w	#(VmMap2-M68K_RAM),a1
+	movea.w	#(VmMAP2-M68K_RAM),a1
 	moveq	#5,d0
 	moveq	#$D,d2
 .4

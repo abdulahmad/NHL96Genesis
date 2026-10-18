@@ -118,7 +118,7 @@ UpdateCrowdMeter					;The crowd meter, every frame (setvideo): sflags5 bit 7 set
 	move.w	(CwdExciteLvl).w,d0
 	ext.l	d0
 	asl.w	#2,d0
-	jsr	(sroot).l
+	jsr	(Sroot).l
 	addi.w	#$41,d0
 	move.w	d0,(CurCrowdMeter).w
 	cmp.w	(CrowdPeak).w,d0
@@ -201,7 +201,7 @@ checkcornercoll						;Corner circles and side walls for object a3 at d2 / d3 (wc
 	cmp.l	#$1000,d3
 	bls.w	.2
 	exg	d0,d3
-	jsr	(sroot).l
+	jsr	(Sroot).l
 	exg	d0,d3
 	ext.l	d0
 	asl.l	#8,d0

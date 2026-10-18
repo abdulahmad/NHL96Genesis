@@ -62,7 +62,7 @@ OneTimerPass						;One-timer pass: puckvz = sqrt(12 * onetimerheight), then puck
 	mulu.w	d1,d0
 	swap	d0
 	andi.l	#$FFFF0000,d0
-	jsr	(sroot).l
+	jsr	(Sroot).l
 	move.w	d0,(puckvz).w
 	ext.l	d0
 	move.w	#3,d4

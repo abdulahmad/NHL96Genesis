@@ -280,7 +280,7 @@ doinput								;Process controller input for player a3: d0 = dpad, d1 = new butt
 .43
 	btst	#pfalock,pflags(a3)
 	bne.w	doinput_islocked
-	jmp	holdplayer
+	jmp	Holdplayer
 .11
 	tst.w	position(a3)
 	beq.w	.12
@@ -437,7 +437,7 @@ doinput_goaliedive					;Goalie: A with a dpad direction dives that way (SPAgdive
 	jsr	(SetSPA).l
 	bset	#pf2aip,pflags2(a3)
 	bset	#pfalock,pflags(a3)
-	addi.w	#$96,(crowdlevel).w
+	addi.w	#$96,(Crowdlevel).w
 
 rtss15								;The shared rts of doinput_goaliedive and doinput_cbut
 	rts
@@ -511,7 +511,7 @@ doinput_cbut						;Button C (bit 5): new press: face the puck (vtoa) and go on b
 	movem.w	(sp)+,d0-d1
 	bra.w	.near
 .far
-	jsr	(sroot).l
+	jsr	(Sroot).l
 	moveq	#1,d2
 	add.w	d0,d2
 	moveq	#$12,d4

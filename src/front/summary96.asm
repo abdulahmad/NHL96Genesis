@@ -1,7 +1,7 @@
 ;	The pause-menu summaries: roster, scoring, penalties, the periods,
 ;	the game, the shootout shooters and the record holders.
 
-VBlank_SpriteFade					;vbint for the period summary and the awards screen: the sprite table when
+VBlank_SpriteFade					;VBint for the period summary and the awards screen: the sprite table when
 									;dfok is set, then cramfade unless dfng
 	movem.l	d0-d7/a0-a6,-(sp)
 	btst	#dfng,(disflags).w
@@ -12,7 +12,7 @@ VBlank_SpriteFade					;vbint for the period summary and the awards screen: the s
 .fade
 	jsr	(cramfade).l
 .nograph
-	addq.w	#1,(vcount).w
+	addq.w	#1,(Vcount).w
 	jsr	(p_music_vblank).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	rte

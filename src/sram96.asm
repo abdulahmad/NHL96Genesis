@@ -8,7 +8,7 @@ InitSaveRAM							;Called from Begin. Copy the $2000 byte save RAM (the odd byte
 									;$12,$34,$56,$78 to bytes 0-3 and flashes the screen green, or red at the
 									;first bad byte; Start+B+C held flashes green if bytes 0-3 are $12345678,
 									;else red
-	move.l	#VBcount,(vbint).l
+	move.l	#VBcount,(VBint).l
 	move	#$2500,sr
 	clr.w	(ValidSRAM).w
 	jsr	(ReadJoy1).l				;get joypad buttons held
@@ -81,7 +81,7 @@ SRAMWaitVblank						;Wait for the next vblank. Called from InitSaveRAM
 	jsr	(vcountwait).l
 	rts
 
-VBcount								;vbint handler while InitSaveRAM runs: vcount + 1 only.
+VBcount								;VBint handler while InitSaveRAM runs: Vcount + 1 only.
 									;Code the listing does not decode: kept as bytes
 	dc.b	$52,$78,$B0,$52,$4E,$73
 
@@ -139,7 +139,7 @@ ClearSRAM							;Clear RAM $0-$1FFF and the save RAM, then write the defaults: t
 	clr.w	(OptNOP).w
 	move.w	#6,(Opt1team).w
 	move.w	#$C,(Opt2team).w
-	clr.w	(OptPerlen).w
+	clr.w	(Optperlen).w
 	clr.w	(OptGoalie).w
 	clr.w	(OptUserRec).w
 	move.w	#1,(OptPen).w

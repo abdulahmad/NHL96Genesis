@@ -62,7 +62,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   sub_1A614 in 96) until the code using them is converted; then rename them (name_map.csv). The 96 animation
   routine is sub_16654 (95 updateanim): it only uses attribute bit 0 (loop) and stops a direction at its first
   negative time; pairs after it are marked "past the end" (the code may still index them directly).
-- RAM: dword_FFD244 is now vbint.
+- RAM: dword_FFD244 is now VBint.
 - code96_02 converted: the listing range as SNASM source, names from 95G where the routine matches (instruction
   alignment of the 96 and 95 IDA listings, then the 95G source for locals and comments; RAM names only where the
   address offset agrees with its neighbours or the code shows it). MATCH (segment and ROM).
@@ -73,7 +73,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   is 95G source, same bytes). Code bytes after sub_975A have no reference and no name.
 - Kept as IDA names (no clear match): sub_AFDA, sub_B6A0, loc_AFD4, and outside loc_14D6E-loc_14D84 (doinput start
   button), loc_EE0E (95 jumps to lineinput there, but the 96 code differs), loc_1A62A, loc_16934, loc_C26C.
-- RAM: about 80 IDA names renamed (ram96.asm, name_map.csv). crowdlevel and padiconchars2 share $FFFFB8B2 (the setup
+- RAM: about 80 IDA names renamed (ram96.asm, name_map.csv). Crowdlevel and padiconchars2 share $FFFFB8B2 (the setup
   screen keeps pad icon chars in game RAM). 96 tmstruct is $FFFFC726 with size $39E (equals.inc tmsize is still 95's
   $366). The 96 cont1team ... cont4team are $FFFFC390-$FFFFC396.
 - frames96: the goalie tables named from ClampTargetY's unreferenced SPA list and doinput_goaliedive (SPAgglover,
@@ -112,17 +112,17 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
 - Byte runs with labels: GetNameandAttrib, attribjmp (written as offsets) and the Attrib column handlers
   (StatusTextTbl, InjuryGamesTbl, HandedTextTbl as Strings; 96 adds RatingToWeight / WeightTbl), TimeoutMenu and
   SelectGoalieMenu (found from the pause menu lists), RestoreSeasonHeader (95G shape, unreferenced), PrintMenuList
-  (jsr from code96_05) and the vbint handler unk_12D46. Code after Pausemode has no reference and no name.
+  (jsr from code96_05) and the VBint handler unk_12D46. Code after Pausemode has no reference and no name.
 - Save RAM in 96 is byte addressed (SaveRAM+offset, odd bytes): ram96.asm has SRSeasonHeader, SRPOPairings,
   SRSeasonHeaderSave, SRPOSlots as offsets. The seeding work lists sit at the start of RAM (AwardIds, SeedStandings,
   SeedPoints, SeedGames, SeedCount, POPairingsTmp).
 - RAM: 50 more names (gsp, gsstruct, bosgames, gamelevel, WinBits, menuitem, menulist, OptPlayMode, PALflag, ...).
-  crowdcnt and CwdExciteLvl share $FFFFB8B6 / $FFFFB8B8 with the pad icon chars, as crowdlevel does.
+  Crowdcnt and CwdExciteLvl share $FFFFB8B6 / $FFFFB8B8 with the pad icon chars, as Crowdlevel does.
   Outside routines named where this code proves them: SoundCmd, SoundOff, KillCrowd, stop_current_song, song,
   Z80Program, SoundBanks, Opening, vb2, ChooseSong, sfx, ExitToOpening, ClearPenalties, ClearPenaltyBuffer,
   LockScroll, setupice, Create_HotCold_Table.
 - code96_06 converted: updatereplay, updateplayers, updateanim, checkwindow, the pad switches (chgplayer,
-  setcplayer, setc1-4player, restorepl, setpads), burst, holdplayer, FindGoalie, GetGoalieCount(D7) and
+  setcplayer, setc1-4player, restorepl, setpads), burst, Holdplayer, FindGoalie, GetGoalieCount(D7) and
   GetPlayerCount(D7) (96 reads the counts from save RAM SRTeamCounts). MATCH (segment and ROM).
 - The 96 asstab uses the 94 assignment numbers (NHL94Genesis data94.asm asstab), not 95's: entry n of the 96 table
   matches the 94 routine n by bytes (RAM words masked). So the asstab entries take their 95 / 94 names by index:
@@ -136,19 +136,19 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
 - SPA values used here renamed with their 95 names (SPAboardmidl ... SPAboardbot, SPAhook, SPAHold, SPAburst);
   the tables of every named SPA value are now <name>_table, as name_map.csv already said for the earlier ones.
 - Outside routines named: getpde, setpde, PlaceBoardFall, dirtab. RAM: Vpos, Hpos, glovecords, bholdtimer34,
-  yc1, yleader, PBnum, BA_Sktr_SCnum, FallXPos, replaydelay, replayend, crowdframe (shares padiconchars1).
+  yc1, yleader, PBnum, BA_Sktr_SCnum, FallXPos, replaydelay, replayend, Crowdframe (shares padiconchars1).
 - code96_07 converted: AdjustFacingDirection, goaliesave (saveanim written with the SPA names), chkpk2, checkob,
   EndPenaltyShotPlay, ChkGoalies, CPgoalie. MATCH (segment and ROM). Most of the segment is code the listing does
   not decode: labelled bytes at the asstab entries (assgoalietopuck, chkpuckc, asspuckc, assbreakaway, assnearest,
   asspassrec, assshoot, puckshootout, puckpenshot, pucknorm, puckunflip) and where outside jsr / jmp / movea.l
   targets match a 95 routine by masked bytes (breakaway, BreakawayOffsidesFlagSet, EvadePC, check4check,
-  SelectPenaltyShotSkater, ReturnGoalies, CompLine, AssignPads, ChkOffsides, a2offsides, puckIChk); the others
+  SelectPenaltyShotSkater, ReturnGoalies, CompLine, AssignPads, ChkOffsides, a2offsides, PuckIChk); the others
   keep address names (loc_19B16, sub_19E6E).
 - The listing decodes btst Dn,#imm (btst d1,#$42) as a blank mnemonic and garbage; written by hand in
   AdjustFacingDirection (code96_06 sub_16D36 has the same form).
 - RAM: savednewpnum, puckz, RefCnt. Outside: PushRef, setpersonel, CountShootoutGoals.
 - code96_08 converted: the player movement core (SetSPA, doplayeracc, goalieacc, playeracc, dostop, stopna2) and the
-  shared low level code (vtoa, GetHot, random numbers, sroot, the pads, dma, vram, palette fades, the graphics
+  shared low level code (vtoa, GetHot, random numbers, Sroot, the pads, dma, vram, palette fades, the graphics
   decompressor, the print routines). MATCH (segment and ROM). Undecoded parts labelled from 95G bytes: the
   DecompressBytecode opcodes (jump_table written as offsets), the print control codes (ControlCodeJumpTable written
   with their names), cramfade, forceblack2, DoDMA_nd2, FormatAndPrintTime, PeriodLabelTable, PushNumber, findpc,
@@ -157,7 +157,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   with the font map at smallfontptr, which is 95's print; it is printcur / printcurz here because print and printz
   already name $1BBA0 / $1BB8E everywhere (clash rule). printbig / printbigz set bigfontptr; printbigcur /
   printbigcurz print with the font already there. All the z forms take the String after the call.
-- RAM: pad4way1-4, lj1-4, callbackPtr, ThreeStars, nibblebuffer, seed, dmaram, PushWidthBuf, BigFontChars,
+- RAM: pad4way1-4, lj1-4, callbackPtr, ThreeStars, nibblebuffer, seed, dmaram, PushWidthBuf, BigFontchars,
   bigfontptr, framercset, printa, printm, printfontset, repeatdelayframes, palfadenew, waitxpad.
 - code96_09 converted: penalties and the ref window, the penalty box and power play box, line energy, shot stats,
   intermission and the other games' scores, the collision and check code. MATCH (segment and ROM).
@@ -166,7 +166,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   code with a bogus sub_1CBDC; written as Strings. Some instructions IDA dropped after a String were put back by
   hand from the ROM bytes (moveq, movea.l, cmpi.b, two bsr.w).
 - Game code had picked up the setup-screen names of the shared crowd RAM (padiconchars2 / padcursorchars);
-  it now uses crowdlevel, CwdExciteLvl, crowdcnt, crowdframe and the new crowdtblidx.
+  it now uses Crowdlevel, CwdExciteLvl, Crowdcnt, Crowdframe and the new crowdtblidx.
 - RAM: sflags4, sflags8, Ylist, OOlist(pos), PenSum, energybarchars, EASNcset, wcradiusx/y, ltx, lty, collflag,
   msgtimer, Penaltytimer, penmsgtimer, RefStep, RefPen, TempPlOffset, TickerNum, BA_Team, BA_Goalie_Offset,
   BA_Checker_Offset, pspenalty. Outside: ResetBench, checkwallcoll, UpdateRecords, FallDown.
@@ -187,12 +187,12 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
 - IntermissionStart ($2161E), ExitToOpening, Opening and Opening2 sit together here; StartGame (data96_01) jumps
   to IntermissionStart.
 - RAM: DMAList, DMAlistend, Satt, sso, pads, padcont, fofdata2, Joy1/3/4Struct, potree, postarts, potreeteam,
-  pojoy, OptNOP, Opt1team, Opt2team, animchars, faceoffvrcset, Oldrow, Hscroll, Vscroll, zamx.
+  pojoy, OptNOP, Opt1team, Opt2team, animchars, faceoffvrcset, Oldrow, Hscroll, Vscroll, Zamx.
 - code96_12 converted: the playoff pass bits (ReadPassBits, EncodePW, WritePassBits, the 5 word arithmetic), the
   playoff team stats in save RAM, ResolveGames, the Stars of the Game box, the injury, penalty shot and goal boxes,
   the player name strings and the exception vectors (crash, the 94 handler). MATCH (segment and ROM).
 - ResolveGames is $22670 (95 ResolveGames by bytes); the data96_01 routine that had the name is ResolveDayGames.
-  $21CF4 (code96_11) is maketree (EncodePW calls ResolveGames then it); $14AD4 (data96_01) is CheckInjury, the
+  $21CF4 (code96_11) is MakeTree (EncodePW calls ResolveGames then it); $14AD4 (data96_01) is CheckInjury, the
   timer head of ShowInjuryBox. The injury box ($22A2C) was undecoded in the listing and is written out by hand.
 - getplayername ($101C6) is GetPlayerNamePointer as in the 95 source: SNASM labels ignore case, so it clashed
   with GetPlayerName ($22E70).
@@ -233,7 +233,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   reference (kept as dc.b). MATCH (segment and ROM). RAM: ltack.
 - data96_05 converted: graphics. The maps chain one after another, each as its header (dc.l .pal-X,.map-X), the
   tile count and tiles (dc.b), the palette (.pal, dc.w) and the map (.map: width, height, the words): unk_8F2C6,
-  unk_90686, unk_911B8 (used from code96_20, purpose not known yet), Framermap, FaceOffMap, Rinktilelist, RefTiles,
+  unk_90686, unk_911B8 (used from code96_20, purpose not known yet), FramerMap, FaceOffMap, Rinktilelist, RefTiles,
   RefTilesHor (95 names by use); then Sprites (header: the palette and frameSprData offsets land in data96_06) and
   the start of Spritetiles. MATCH (segment and ROM).
 - The +8 references (the tiles) are written Label+8 in the other files. code96_11's sub_2109A is setupIceRinkPal.
@@ -242,7 +242,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   and frameSprData at $12F608 (Sprites + $94B6A).
 - data96_06 converted: graphics, dc.b with labels at the resources the code uses (95 names by use): the rest of
   Spritetiles, SpritePalette and frameSprData (the Sprites header offsets), HotList, HotList2 (the GetHot variants in
-  code96_08), CrowdFrameList, FaceOffSprites, EnergyBarMap and EASNmap (written as maps), EASportsMap, RevRinkTilelist
+  code96_08), Crowdframelist, FaceOffSprites, EnergyBarMap and EASNmap (written as maps), EASportsMap, RevRinkTilelist
   and the start of ReplayIconMap (used by ShowReplayIcon; its tiles at +8 open data96_07). MATCH (segment and ROM).
   code96_11's sub_210B0 is setupEASNmap.
 - data96_07 converted: graphics maps, each written as a map (header, tiles, .pal, .map): the rest of ReplayIconMap,
@@ -412,7 +412,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   `tools/extractAssets96.js` writes those files, the team palettes included. `tools/prebuild.js` runs it. data96_02 through data96_10 and code96_13 are gone.
   Three renames, now that the files exist: getGoalieSCnum is FindGoalie (control96), ClearShootout is ShootoutInit (shootout96_path), LetterGrid is CreateLetterGrid (records96). LetterGridPos is a different routine and keeps its name.
   `code96_14` ($1D6B66-$1D7FA5) and `code96_15` ($1D8E5C-$1D9CC5) stay numbered. Each head mixes several subsystems.
-  Names taken from the matching 95 body: getplayernameD7 and getnamea0 (trade96), chkpk (logic96_puck), PenShotTable and UpdatePenaltyShotEnd (shootout96), a2touchpuck (logic96_pull), SetScroll2, ClockDigitChar, DoDMAList, DumpSprites2, rtsShowCrowd and ButtonLabelCharTable (display96), setteams (control96_team), InitCreateRecord and InitCreateRecord2 (create96). The big-font clock helper in middle96_clock is BigClockDigitChar. SegaInit locals are in the name map. LoadEnergyBarTiles, LoadCrowdFrames, LoadRefTiles, LoadRefTilesHor, LoadFaceOffSprites and LoadFaceOffMap decompress those pictures. DumpPadSprites, DumpSpriteTable, SetGloveAndSetupPad and JumpToShowClock are named from what they do. VBlank_SpriteFade (summary96) is the period-summary and awards vbint. setup96_menu already owns VBlank_SetOptions.
+  Names taken from the matching 95 body: getplayernameD7 and getnamea0 (trade96), chkpk (logic96_puck), PenShotTable and UpdatePenaltyShotEnd (shootout96), a2touchpuck (logic96_pull), SetScroll2, ClockDigitChar, dodmalist, DumpSprites2, rtsShowCrowd and ButtonLabelCharTable (display96), setteams (control96_team), InitCreateRecord and InitCreateRecord2 (create96). The big-font clock helper in middle96_clock is BigClockDigitChar. SegaInit locals are in the name map. LoadEnergyBarTiles, LoadCrowdFrames, LoadRefTiles, LoadRefTilesHor, LoadFaceOffSprites and LoadFaceOffMap decompress those pictures. DumpPadSprites, DumpSpriteTable, SetGloveAndSetupPad and JumpToShowClock are named from what they do. VBlank_SpriteFade (summary96) is the period-summary and awards VBint. setup96_menu already owns VBlank_SetOptions.
   Next: see "Naming pass" below. Steps 1-6 of the finish plan in `docs/align95_plan.md` are done except the Unsure
   rows; then the symbols pass (step 7). Earlier text: Decoded names first (`lines96_set`, then the small leftovers, then `season96`), then `dc.b` entries, one more 95G body search, graphics `unk_` labels, RAM, then the symbols pass. A generic label is finished when it has a real name or a closed-list row. Do not guess. Do not name the lone rts at $02032C rtss2. Do not reopen a numbered graphics or sound dump.
 
@@ -433,9 +433,9 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
   RedrawTeamRanks), RunSeasonMenu and SeasonMenuScreen (its menu text), LoadScreenSprite / DrawScreenSprite (seven
   screens use them), SetMenuScroll, DrawTeamLogoD7. homegoalies doubles as the menu background scroll.
 
-- playoff96: folds. maketree's six inner labels are locals now (.loop, .bypoints, .reseed2, .reseed4, .next, .nogames; the
+- playoff96: folds. MakeTree's six inner labels are locals now (.loop, .bypoints, .reseed2, .reseed4, .next, .nogames; the
   clashing locals renamed .final, .keep, .p1-.p3, .nofinal, .games). FigureJoy keeps its 95G locals (.9, .10, .fjnpo, .ex,
-  16/16 and 20/20 words). FirstRoundSeeds (read by maketree, not SetTreeGameTeams) and NOPJoyTbl (95G, 14/14 words).
+  16/16 and 20/20 words). FirstRoundSeeds (read by MakeTree, not SetTreeGameTeams) and NOPJoyTbl (95G, 14/14 words).
 - Arena animation (shootout96_path): 94G names. The three nullsubs are 94G AddArenaAnimSprite, RunArenaAnim and
   StartArenaAnim with an rts put first (the dead bodies match 47/52, 20/20, 20/20 words, same callers); SetFaceoffAnim and
   EndArenaAnim match all their words. ShowCrowdFrame2 is the `.spr` tail of AddArenaAnimSprite (folded).
@@ -512,7 +512,7 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
   BlankStatsRow), the scoring summary (GoalTypeTbl), Game Stats (TeamStatTextTblNoPen), Record Holders
   (ReadTeamRecords) and League Options (after SetMenuScroll); the menu handlers after VBlank_Menus' rte.
   InitializeGameStructures' first instructions sit 6 bytes before its label, inside NOPJoyTbl's bytes (no callers).
-- Possible original bugs, kept as they are: maketree's first .bypoints call sorts seed numbers as team numbers (the call
+- Possible original bugs, kept as they are: MakeTree's first .bypoints call sorts seed numbers as team numbers (the call
   after the loop orders the finalists correctly); SimTeamStrength reads its save RAM roster flag a goalie-count off;
   RandomInjuryGames reads the high byte of the SeasonDay word.
 
@@ -531,7 +531,7 @@ Labels the masked search found inside bytes that are still unnamed. Do not inven
 
 - $02032C rtss2 (display96; 96 already uses rtss2 for the shared rts in collide96)
 
-Named from the matching 95 body: chkpk, UpdatePenaltyShotEnd, PenShotTable, a2touchpuck, SetScroll2, ClockDigitChar, DoDMAList, DumpSprites2, rtsShowCrowd, ButtonLabelCharTable, Goal (collide96), GoalTypeTbl (summary96), setteams, InitCreateRecord, getplayernameD7, getnamea0, InitializeGameStructures, GetRandomUnusedTeam. VBlank_SpriteFade is the summary96 vbint. setup96_menu already owns VBlank_SetOptions. rtsBigClock is the shared return of the big-font clock.
+Named from the matching 95 body: chkpk, UpdatePenaltyShotEnd, PenShotTable, a2touchpuck, SetScroll2, ClockDigitChar, dodmalist, DumpSprites2, rtsShowCrowd, ButtonLabelCharTable, Goal (collide96), GoalTypeTbl (summary96), setteams, InitCreateRecord, getplayernameD7, getnamea0, InitializeGameStructures, GetRandomUnusedTeam. VBlank_SpriteFade is the summary96 VBint. setup96_menu already owns VBlank_SetOptions. rtsBigClock is the shared return of the big-font clock.
 
 SegaInit locals exist in `src/sega/SegaInit.asm` and in `docs/name_map.csv`. Do not invent a second copy.
 

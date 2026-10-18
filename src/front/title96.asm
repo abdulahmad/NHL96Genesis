@@ -6,15 +6,15 @@ TitleScreen							;Title screen: the picture TitleScreenImg and song 0, until st
 	move.w	(HVcount).l,(seed).w
 	move.w	(HVcount).l,(seed+2).w
 	bset	#5,(sflags12).w
-	move.l	#VBlank_Menus,(vbint).w
+	move.l	#VBlank_Menus,(VBint).w
 	bclr	#dfok,(disflags).w
 	bclr	#df32c,(disflags).w
 	move.w	#5,(Map3col1).w
-	move.w	#$A000,(VmMap2).w
+	move.w	#$A000,(VmMAP2).w
 	move.w	#7,(Map2col1).w
-	move.w	#$C000,(VmMap1).w
+	move.w	#$C000,(VmMAP1).w
 	move.w	#7,(Map1col1).w
-	move.w	#$F000,(VmMap3).w
+	move.w	#$F000,(VmMAP3).w
 	move.w	#$F800,(VSPRITES).w
 	move.w	#$FC00,(VSCRLPM).w
 	move.w	#0,d0
@@ -62,7 +62,7 @@ TitleScreen							;Title screen: the picture TitleScreenImg and song 0, until st
 	rts
 
 VBlank_LineScroll					;A vblank handler nothing sets: the line scroll table (SortCords),
-									;Vscroll, cramfade, vcount, the music
+									;Vscroll, cramfade, Vcount, the music
 									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$2C,$30,$7C
 	dc.b	$B0,$5E,$32,$38,$B0,$00,$30,$3C,$01,$C0,$4E,$B9,$00,$01,$B3,$EC
@@ -70,10 +70,10 @@ VBlank_LineScroll					;A vblank handler nothing sets: the line scroll table (Sor
 	dc.b	$BD,$36,$4E,$B9,$00,$01,$AF,$D6,$52,$78,$B0,$52,$4E,$B9,$00,$02
 	dc.b	$44,$86,$4C,$DF,$7F,$FF,$4E,$73
 
-TitleWaitFrame						;TitleScreen: wait for the next frame (vcount)
-	move.w	(vcount).w,d0
+TitleWaitFrame						;TitleScreen: wait for the next frame (Vcount)
+	move.w	(Vcount).w,d0
 .loop
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop
 	rts
 
@@ -83,15 +83,15 @@ CreditsScreen						;The legal and credits pages (CreditsList) over three picture
 	move.w	(HVcount).l,(seed).w
 	move.w	(HVcount).l,(seed+2).w
 	bset	#5,(sflags12).w
-	move.l	#VBlank_Menus,(vbint).w
+	move.l	#VBlank_Menus,(VBint).w
 	bclr	#dfok,(disflags).w
 	bclr	#df32c,(disflags).w
 	move.w	#5,(Map3col1).w
-	move.w	#$A000,(VmMap2).w
+	move.w	#$A000,(VmMAP2).w
 	move.w	#7,(Map2col1).w
-	move.w	#$C000,(VmMap1).w
+	move.w	#$C000,(VmMAP1).w
 	move.w	#7,(Map1col1).w
-	move.w	#$F000,(VmMap3).w
+	move.w	#$F000,(VmMAP3).w
 	move.w	#$F800,(VSPRITES).w
 	move.w	#$FC00,(VSCRLPM).w
 	move.w	#0,d0
@@ -218,10 +218,10 @@ VBlank_LineScroll2					;A copy of VBlank_LineScroll; nothing sets it
 	dc.b	$BD,$36,$4E,$B9,$00,$01,$AF,$D6,$52,$78,$B0,$52,$4E,$B9,$00,$02
 	dc.b	$44,$86,$4C,$DF,$7F,$FF,$4E,$73
 
-CreditsWaitFrame					;CreditsScreen: wait for the next frame (vcount)
-	move.w	(vcount).w,d0
+CreditsWaitFrame					;CreditsScreen: wait for the next frame (Vcount)
+	move.w	(Vcount).w,d0
 .loop
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop
 	rts
 
@@ -247,9 +247,9 @@ CupCelebration						;The user's team won the Cup: the rink scene with the team's
 	jsr	(sfx).l
 	move.w	#1,(padiconchars1).w
 	clr.w	(DispAttribCtr).w
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	jsr	(FindHeldMenuPad).l
 	btst	#7,d1
@@ -329,14 +329,14 @@ CupCelebrationSetup					;CupCelebration: vram, the team and rink palettes, the r
 	clr.w	(Vpos).w
 	move.w	#$38,(Hpos).w
 	clr.w	(printfontset).w
-	move.l	#VBlank,(vbint).w
+	move.l	#VBlank,(VBint).w
 	bset	#df32c,(disflags).w
-	move.w	#$C000,(VmMap2).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col1).w
 	move.w	#$DC00,(VSPRITES).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col1).w
-	move.w	#$F000,(VmMap3).w
+	move.w	#$F000,(VmMAP3).w
 	move.w	#5,(Map3col1).w
 	move.w	#$FC00,(VSCRLPM).w
 	movea.w	#(palfadenew-M68K_RAM),a0
@@ -361,7 +361,7 @@ CupCelebrationSetup					;CupCelebration: vram, the team and rink palettes, the r
 	jsr	(setupIceRinkPal).l
 	jsr	(setVram_0).l
 	move.w	#$800,d0
-	move.w	(VmMap1).w,d1
+	move.w	(VmMAP1).w,d1
 	move.w	#$7FF,d2
 	jsr	(DoFill).l
 	clr.w	d4
@@ -383,9 +383,9 @@ CupCelebrationSetup					;CupCelebration: vram, the team and rink palettes, the r
 	bclr	#dfok,(disflags).w
 	bclr	#dfng,(disflags).w
 	move	#$2300,sr
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	jsr	(printz).l
 	String	$FF,$06,$0C

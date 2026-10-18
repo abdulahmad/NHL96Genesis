@@ -243,23 +243,23 @@ SeasonPlayoffStats					;The playoff stats screen in a season (PlayoffStatsMenu w
 	move.w	d0,(pstatslast).w
 .draw
 	bsr.w	PStatsBuildList
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	bsr.w	PStatsClearList
 .4
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .7
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.7
 	bsr.w	PStatsCategory
 	bsr.w	PStatsTeamBlock
 	bsr.w	PStatsHelp
 	bsr.w	PStatsHeading
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop3
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop3
 	bset	#dfng,(disflags).w
 	jsr	(SetMenuScroll).l
@@ -373,11 +373,11 @@ WaitAnyPad							;Wait for a press on pad 1 or 2 (3 and 4 with
 	move.l	#$5460,d6
 .wait
 	move.w	#$64,d6
-	move.w	(vcount).w,d1
-	sub.w	(oldvcount).w,d1
+	move.w	(Vcount).w,d1
+	sub.w	(OldVcount).w,d1
 	beq.s	.wait
 	jsr	(SetMenuScroll).l
-	move.w	(vcount).w,(oldvcount).w
+	move.w	(Vcount).w,(OldVcount).w
 	jsr	(ReadJoy1).l
 	jsr	(ProcessInputWithRepeat).l
 	tst.w	d1
@@ -448,17 +448,17 @@ PStatsClearList						;SeasonPlayoffStats: erase the list area
 PStatsSetup							;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the heading, the
 									;team block and the help
 	bset	#5,(sflags12).w
-	move.l	#VBlank_Menus,(vbint).w
+	move.l	#VBlank_Menus,(VBint).w
 	bclr	#dfok,(disflags).w
 	bset	#dfng,(disflags).w
 	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
-	move.w	#$B800,(VmMap3).w
+	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
-	move.w	#$C000,(VmMap2).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col1).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col1).w
 	move.w	#0,d0
 	bset	#5,(disflags).w
@@ -475,7 +475,7 @@ PStatsSetup							;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the h
 	movea.l	#SmallFontMap2+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.l	#RosterFont,(smallfontptr).w
-	move.w	d4,(BigFontChars).w
+	move.w	d4,(BigFontchars).w
 	movea.l	#BigFontMap4+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	bset	#2,(sflags11).w
@@ -922,7 +922,7 @@ PStatsPalette						;The palette of unk_17C2AE to palfadenew+$20
 	rts
 
 PlayoffMenuScreen					;The playoff menu screen: the playoff tree from save RAM (ReadPassData,
-									;ReadPassBits, maketree), then the
+									;ReadPassBits, MakeTree), then the
 									;roster menu loop (RosterMenuList); Reset Rosters asks Yes / No
 									;(YesNoMenuList) before ClearPlayoffSave
 	movem.l	d0-d7/a0-a6,-(sp)
@@ -938,7 +938,7 @@ PlayoffMenuScreen					;The playoff menu screen: the playoff tree from save RAM (
 	beq.w	.0
 	move.w	(GameFlags).w,-(sp)
 	bclr	#7,(GameFlags).w
-	jsr	(maketree).l
+	jsr	(MakeTree).l
 	move.w	(sp)+,(GameFlags).w
 	movea.l	#potree,a0
 	move.w	(potreeteam).w,d2
@@ -957,9 +957,9 @@ PlayoffMenuScreen					;The playoff menu screen: the playoff tree from save RAM (
 .draw
 	bsr.w	PlayoffMenuDraw
 .frame
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	jsr	(SetMenuScroll).l
 	cmpi.w	#$5460,(carddelay).w
@@ -1070,17 +1070,17 @@ PlayoffMenuInit						;PlayoffMenuScreen: menulist = RosterMenuList, item 0
 
 PlayoffMenuSetup					;PlayoffMenuScreen: vram and the screen bitmaps
 	bset	#5,(sflags12).w
-	move.l	#VBlank_Menus,(vbint).w
+	move.l	#VBlank_Menus,(VBint).w
 	bclr	#dfok,(disflags).w
 	bset	#dfng,(disflags).w
 	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
-	move.w	#$B800,(VmMap3).w
+	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
-	move.w	#$C000,(VmMap2).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col1).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col1).w
 	move.w	#0,d0
 	bset	#5,(disflags).w

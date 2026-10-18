@@ -379,7 +379,7 @@ SimScore							;Simulate the score of game a0: SimTeamStrength / SimTeamGoals fo
 	move.b	3(a0),d1
 	cmp.b	d0,d1
 	bne.w	.0
-	btst	#2,(vcount).w
+	btst	#2,(Vcount).w
 	beq.w	.1
 	addq.b	#1,3(a0)
 	bra.w	.0

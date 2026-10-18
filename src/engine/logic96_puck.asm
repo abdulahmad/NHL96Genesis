@@ -168,7 +168,7 @@ goaliesave							;The goalie a3 makes a save of the puck crossing at a0: the sav
 	move.w	#SPA02C0,d1
 .8
 	bsr.w	SetSPA
-	addi.w	#$96,(crowdlevel).w
+	addi.w	#$96,(Crowdlevel).w
 	addi.w	#$A,(CwdExciteLvl).w
 	asr	Xvel(a3)
 	asr	Xvel(a3)

@@ -26,15 +26,15 @@ PlayoffScreen						;Bring up the playoff screen if in playoff mode (OptPlayMode 
 	clr.w	d0
 	move.w	d0,(a0)
 	move.w	d0,2(a0)
-	move.l	#VBlank_Playoff,(vbint).l
+	move.l	#VBlank_Playoff,(VBint).l
 	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$BC00,(VSPRITES).w
-	move.w	#$B000,(VmMap3).w
+	move.w	#$B000,(VmMAP3).w
 	move.w	#6,(Map3col1).w
-	move.w	#$C000,(VmMap2).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#7,(Map2col1).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#7,(Map1col1).w
 	move.w	#0,d0
 	jsr	(setVram).l
@@ -246,10 +246,10 @@ waitxc1								;(was PlayoffScreen_waitvsync) Wait for the next frame; flash a c
 	movem.l	(sp)+,d0-d1/a0-a1
 	move.w	#3,(palcount).w
 .wait
-	move.w	(vcount).w,d0
-	cmp.w	(oldvcount).w,d0
+	move.w	(Vcount).w,d0
+	cmp.w	(OldVcount).w,d0
 	beq.s	.wait
-	move.w	d0,(oldvcount).w
+	move.w	d0,(OldVcount).w
 	rts
 
 PrintSeriesScore					;Print best of 7 wins "t-b" for game struct a2 at printx / printy
@@ -323,7 +323,7 @@ DrawTeamBlocks						;Draw team block d1 at printx / printy; the user's team gets
 	movem.l	(sp)+,d0-d7/a0-a3
 	rts
 
-VBlank_Playoff						;The PlayoffScreen vblank handler (vbint)
+VBlank_Playoff						;The PlayoffScreen vblank handler (VBint)
 									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$20,$30,$38
 	dc.b	$B0,$00,$4E,$B9,$00,$01,$B6,$78,$30,$3C,$FE,$C0,$D0,$78,$D0,$30
