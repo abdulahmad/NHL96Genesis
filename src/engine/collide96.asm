@@ -839,7 +839,7 @@ FallDown							;Player a2 falls down (hit by a3, or the puck): the fall animatio
 	cmpi.w	#$B,SCnum(a3)
 	bgt.w	.12
 	addi.w	#$A,(CwdExciteLvl).w
-	addi.w	#$96,(crowdlevel).w
+	addi.w	#$96,(Crowdlevel).w
 	move.w	d1,-(sp)				;push to stack
 	move.b	#0,$40(a3)
 	move.b	#0,$66(a3)
@@ -949,7 +949,7 @@ FallDown							;Player a2 falls down (hit by a3, or the puck): the fall animatio
 	beq.w	.h0
 	tst.w	$34(a2)
 	beq.w	.h0
-	addi.w	#$12C,(crowdlevel).w
+	addi.w	#$12C,(Crowdlevel).w
 	addi.w	#$F,(CwdExciteLvl).w
 .h0
 	move.w	(puckc).w,d0			;move puck carrier SCNum into d0
@@ -1021,7 +1021,7 @@ setInjuryType						;a2 injured: out for the period ($FFFD) or the game ($FFFC); 
 	addq.w	#5,(ChkCnt).w
 	move.w	d0,-(sp)
 	bset	#pf2unav,pflags2(a2)
-	addi.w	#$12C,(crowdlevel).w
+	addi.w	#$12C,(Crowdlevel).w
 	addi.w	#$1E,(CwdExciteLvl).w
 	move.w	#$D,-(sp)				;sound effect
 	jsr	(sfx).l
@@ -1112,7 +1112,7 @@ checkwallcoll						;d2/d3 = x/y to test, a3 = object, wcradiusx/wcradiusy = radi
 	cmp.l	#$1000,d3
 	bls.w	.exit
 	exg	d0,d3
-	bsr.w	sroot
+	bsr.w	Sroot
 	exg	d0,d3
 	ext.l	d0
 	asl.l	#8,d0
@@ -1244,7 +1244,7 @@ checkgoal							;Check object a3 against the goal / net a2: the puck scores (Goa
 	btst	#gmclock,(gmode).w		;gmclock: no goal after the whistle
 	bne.w	.5
 	move.w	#8,(sp)					;sfx 8 and crowd
-	addi.w	#$12C,(crowdlevel).w
+	addi.w	#$12C,(Crowdlevel).w
 	addi.w	#$28,(CwdExciteLvl).w
 .5
 	jsr	(sfx).l
@@ -1323,16 +1323,16 @@ Goal								;A goal: the shootout count, EndPenaltyShotPlay, the score and both 
 	bsr.w	ChkShotStat
 	jsr	(stop_current_song).l
 	move.w	d0,-(sp)
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop
 	move.w	(sp)+,d0
 	addq.w	#5,(ChkCnt).w
 	move.w	#0,-(sp)
 	jsr	(sfx).l
 	jsr	(LockScroll).l
-	addi.w	#$1F4,(crowdlevel).w
+	addi.w	#$1F4,(Crowdlevel).w
 	movea.w	#(tmstruct-M68K_RAM),a2
 	lea	$39E(a2),a1
 	tst.w	Ypos(a3)
@@ -1544,7 +1544,7 @@ checkgoalp							;Check for player a3 collision with goal/net a2. Entered from c
 	muls.w	d0,d0
 	muls.w	d1,d1
 	add.l	d1,d0
-	bsr.w	sroot
+	bsr.w	Sroot
 	move.w	d0,d2
 	movem.w	(sp)+,d0-d1
 	addq.w	#1,d2
@@ -1599,7 +1599,7 @@ checkgoalp							;Check for player a3 collision with goal/net a2. Entered from c
 	muls.w	d0,d0
 	muls.w	d1,d1
 	add.l	d1,d0
-	bsr.w	sroot
+	bsr.w	Sroot
 	move.w	d0,d2
 	movem.w	(sp)+,d0-d1
 	addq.w	#1,d2
@@ -1686,7 +1686,7 @@ wallcollb							;Bounce off the boards
 	movea.l	(sp)+,a3
 	move.w	#$E,-(sp)
 	jsr	(sfx).l
-	addi.w	#$258,(crowdlevel).w
+	addi.w	#$258,(Crowdlevel).w
 	addi.w	#$F,(CwdExciteLvl).w
 .1
 	bset	#sfslock,(sflags).w

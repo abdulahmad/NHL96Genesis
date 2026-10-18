@@ -9,12 +9,12 @@ LoadSmallFont						;Load the small font tiles (SmallFontMap+8) at char d4 (small
 	rts
 
 LoadBigFonts						;Load the fonts at char d4: BigFontMap+8 (bigfont1chars), then the big
-									;font BigFontMap3+8 (BigFontChars); d4 =
+									;font BigFontMap3+8 (BigFontchars); d4 =
 									;next char
 	move.w	d4,(bigfont1chars).w
 	movea.l	#BigFontMap+8,a2
 	jsr	(DecompressGraphicsPlain).l
-	move.w	d4,(BigFontChars).w
+	move.w	d4,(BigFontchars).w
 	movea.l	#BigFontMap3+8,a2
 	jmp	DecompressGraphicsPlain
 

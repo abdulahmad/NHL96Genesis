@@ -99,7 +99,7 @@ ChkShotStat							;Determine if a shot was taken and add it to the stats (crowd,
 	bra.w	.addShot
 .Cwdupdate
 	movem.l	d0-d1/a1-a3,-(sp)
-	addi.w	#$64,(crowdlevel).w
+	addi.w	#$64,(Crowdlevel).w
 	addi.w	#$A,(CwdExciteLvl).w
 	move.w	(shotplayer).w,d0
 .addShot

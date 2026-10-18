@@ -1,7 +1,7 @@
 ;	The picture. VBlank runs the frame, setvideo builds the dma list, and the
 ;	crowd, the referee and the sprites are drawn here.
 
-VBlank								;The game vertical blank handler (vbint): the dma list, sprites, scroll,
+VBlank								;The game vertical blank handler (VBint): the dma list, sprites, scroll,
 									;palette fade, pads.
 									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$14,$08,$B8
@@ -37,7 +37,7 @@ DumpSprites2						;Transfer the sprite table, then the dma list
 	move.w	(VSPRITES).w,d1
 	bsr.w	DoDMA
 
-DoDMAList							;Transfer data from the dma list
+dodmalist							;Transfer data from the dma list
 	movea.l	(DMAlistend).w,a6
 	cmpa.l	#DMAList,a6
 	beq.w	rtss2
@@ -131,7 +131,7 @@ updatescroll						;Scroll the rink window: Hscroll / Vscroll from Hpos / Vpos
 	addi.w	#$1E,d0
 	andi.w	#$1F,d0
 	asl.w	#7,d0
-	add.w	(VmMap2).w,d0
+	add.w	(VmMAP2).w,d0
 	move.w	d0,6(a5)
 	move.w	#$1E,d0
 	sub.w	d1,d0
@@ -151,7 +151,7 @@ updatescroll						;Scroll the rink window: Hscroll / Vscroll from Hpos / Vpos
 	addi.w	#$1D,d0
 	andi.w	#$1F,d0
 	asl.w	#7,d0
-	add.w	(VmMap2).w,d0
+	add.w	(VmMAP2).w,d0
 	move.w	d0,6(a5)
 	move.w	#$3D,d0
 	sub.w	d1,d0
@@ -167,11 +167,11 @@ updatescroll						;Scroll the rink window: Hscroll / Vscroll from Hpos / Vpos
 	rts
 
 showref								;Ref window: when sflags2 bit 1 is set add the 8 RefRamMap rows to the dma
-									;list at a5 (VmMap1)
+									;list at a5 (VmMAP1)
 	bclr	#sf2refref,(sflags2).w
 	beq.w	rtss2
 	movea.w	#(RefRamMap-M68K_RAM),a0
-	movea.w	#(VmMap1-M68K_RAM),a1
+	movea.w	#(VmMAP1-M68K_RAM),a1
 	move.w	2(a1),d2
 	moveq	#2,d0					;refy: Xpos on ice screen
 	asl.w	d2,d0
@@ -278,10 +278,10 @@ checkfo								;Check for faceoff sprites: the fofdata2 entries (frame, flags) a
 	dc.b	$FF,$D2,$4C,$DF,$01,$3F,$4E,$75
 
 showcrowd							;Crowd sprites: the penalty box frames per PBnum nibble (ShowCrowdPb),
-									;then the crowdframe frame
+									;then the Crowdframe frame
 	btst	#4,(sflags4).w			;check if reverse angle replay
 	bne.w	rtsShowCrowd
-	movea.l	#CrowdFrameList,a1
+	movea.l	#Crowdframelist,a1
 	adda.l	4(a1),a1
 	move.w	(Hpos).w,d4
 	move.w	(Vpos).w,d5
@@ -903,12 +903,12 @@ setupice							;Set all variables, send non purgeable graphics, build sprite fra
 									;for ice rink
 	movem.l	d0-d7/a0-a6,-(sp)
 	bset	#df32c,(disflags).w
-	move.w	#$C000,(VmMap2).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col1).w
 	move.w	#$DC00,(VSPRITES).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col1).w
-	move.w	#$F000,(VmMap3).w
+	move.w	#$F000,(VmMAP3).w
 	move.w	#5,(Map3col1).w
 	move.w	#$FC00,(VSCRLPM).w
 	moveq	#0,d0
@@ -919,9 +919,9 @@ setupice							;Set all variables, send non purgeable graphics, build sprite fra
 	clr.w	(Hpos).w
 	clr.w	(Vpos).w
 	move.w	#$7D0,(Oldrow).w
-	st	(zamx).w
+	st	(Zamx).w
 	move.w	#$800,d0
-	move.w	(VmMap1).w,d1
+	move.w	(VmMAP1).w,d1
 	move.w	#$7FF,d2
 	bsr.w	DoFill
 	clr.w	d4
@@ -968,7 +968,7 @@ setupice							;Set all variables, send non purgeable graphics, build sprite fra
 	st	(c4playernum).w
 	bsr.w	DumpPadSprites
 	move.w	(sp)+,(disflags).w
-	move.l	#VBlank,(vbint).w
+	move.l	#VBlank,(VBint).w
 	bclr	#dfok,(disflags).w
 	bclr	#dfng,(disflags).w
 	move	#$2300,sr
@@ -1007,7 +1007,7 @@ DumpPadSprites						;The six pad sprites (addframe2), then the dma list
 	bsr.w	addframe2
 	bclr	#0,(sflags12).w
 	move.l	a5,(DMAlistend).w
-	bsr.w	DoDMAList
+	bsr.w	dodmalist
 	rts
 
 setupIceRinkPal						;Copy the rink palettes (at the Rinktilelist header) to palfadenew
@@ -1031,9 +1031,9 @@ LoadEnergyBarTiles					;Decompress EnergyBarMap at energybarchars
 	movea.l	#EnergyBarMap+8,a2
 	bra.w	DecompressGraphicsPlain
 
-LoadCrowdFrames						;Decompress CrowdFrameList at animchars
+LoadCrowdFrames						;Decompress Crowdframelist at animchars
 	move.w	(animchars).w,d4
-	movea.l	#CrowdFrameList+8,a2
+	movea.l	#Crowdframelist+8,a2
 	bra.w	DecompressGraphicsPlain
 
 LoadRefTilesHor						;Decompress RefTilesHor at ExtraChars

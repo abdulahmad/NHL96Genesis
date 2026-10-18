@@ -31,7 +31,7 @@ SmallLogoPtrs						;The small team logo of each team, a long pointer per team (r
 	dc.l	SmallLogoSTL,SmallLogoTB,SmallLogoTOR,SmallLogoVAN
 	dc.l	SmallLogoWSH,SmallLogoWPG
 
-VBlank_Menus						;The front-end vbint (most menu screens): sprites (dfok), cramfade, the
+VBlank_Menus						;The front-end VBint (most menu screens): sprites (dfok), cramfade, the
 									;menu background scroll, the music
 									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$18,$08,$B8

@@ -8,7 +8,7 @@ ScoutingReport						;The pre-game scouting report: an empty rts in 96
 ResolveDayGames						;Compute winners and losers for the playoff matchups of the day:
 									;the series wins (gsstruct),
 									;WinBits and gamelevel when the round is over; at gamelevel 4 the final
-									;flags in SeasonDay, else maketree; then the save RAM write
+									;flags in SeasonDay, else MakeTree; then the save RAM write
 	movem.l	d0-d7/a0-a6,-(sp)
 	clr.w	(rosterscroll).w
 	jsr	(GetShifter).l
@@ -111,7 +111,7 @@ ResolveDayGames						;Compute winners and losers for the playoff matchups of the
 	movem.l	(sp)+,d0/a0-a1
 	bra.w	.8
 .7
-	jsr	(maketree).l
+	jsr	(MakeTree).l
 .8
 	movea.w	#(pwddatabuffer-M68K_RAM),a3
 	jsr	(WritePassBits).l
@@ -133,7 +133,7 @@ BeginPlayoffs						;Seed the playoffs with sflags11 bit 0 (the pairings to POPai
 	btst	#1,(sflags11).w
 	bsr.w	SetupPlayoffs
 	bsr.w	InitPlayoffs
-	jsr	(maketree).l
+	jsr	(MakeTree).l
 	bclr	#6,(GameFlags).w
 	jsr	(MakeSRAMChecksum).l
 	rts

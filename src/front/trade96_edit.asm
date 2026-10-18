@@ -256,7 +256,7 @@ InvalidTradeText					;CheckTrade: the reasons a trade is refused
 	String	$FD,$08,$FC,$09,'no players selected on',$FD,$08,$FC,$0A,'one or more teams'
 	String	$FD,$08,$FC,$09,'more than 3 players',$FA,$01,$FD,$08,'selected for trade on',$FA,$01,$FD,$08,'one or more teams'
 
-WaitMenuFrame						;Wait for the next frame (vcount), then SetMenuScroll; d0 kept Code the
+WaitMenuFrame						;Wait for the next frame (Vcount), then SetMenuScroll; d0 kept Code the
 									;listing does not decode: kept as bytes
 	dc.b	$3F,$00,$30,$38,$B0,$52,$B0,$78,$B0,$52,$67,$FA,$4E,$B9,$00,$01
 	dc.b	$26,$40,$30,$1F,$4E,$75

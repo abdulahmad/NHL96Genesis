@@ -1,7 +1,6 @@
-;	Fighting, new in 96. checkfight starts a fight when two players hit hard enough;
-;	startfight and SetInst set the two of them up, fightinput reads their pads, and
-;	assfight and assfwatch run the fighters and the players around them. The assignment
-;	bytes are what the listing left undecoded.
+;	Fighting, new in 96. checkfight starts a fight when two players hit hard enough, and the
+;	fighters and the players around them are run by assignment routines whose bytes are
+;	what the listing left undecoded.
 
 checkfight							;Look for the start of a fight between players a2 and a3 (impact $A or
 									;more on both, no animation lock, no goalie, no faceoff): SetInst both
@@ -58,7 +57,7 @@ checkfight							;Look for the start of a fight between players a2 and a3 (impac
 	clr.b	$39E(a0)
 	clr.b	(a0)+
 	dbf	d0,.0
-	addi.w	#$3E8,(crowdlevel).w
+	addi.w	#$3E8,(Crowdlevel).w
 	addi.w	#$23,(CwdExciteLvl).w
 	clr.w	(word_FFDCEA).w
 	clr.l	(dword_FFDCE0).w
@@ -118,11 +117,11 @@ checkfight							;Look for the start of a fight between players a2 and a3 (impac
 	rts
 
 startfight							;Start the fight for player a3 against a2: AddPenalty2 $2E, setd0player,
-									;assignment $14, push a3 back by facing, the fight SPA and Pencntdwn $140
+									;assignment $14, push a3 back by facing, the fight SPA and PenCntDwn $140
 	move.w	SCnum(a2),impactp(a3)
 	move.w	#$2E,d0
 	jsr	(AddPenalty2).l
-	move.w	#$140,(Pencntdwn).w
+	move.w	#$140,(PenCntDwn).w
 	clr.w	(word_FFDCDE).w
 	move.w	SCnum(a3),d0
 	jsr	(setd0player).l
@@ -300,7 +299,7 @@ loc_C068
 	jsr	(SetSPA).l
 	cmpi.w	#2,(word_FFDCDE).w
 	beq.w	.0
-	move.w	#$140,(Pencntdwn).w
+	move.w	#$140,(PenCntDwn).w
 	bra.w	.1
 .0
 	bsr.w	SetFightingMajors
@@ -364,7 +363,7 @@ fightinput							;Controller processing for fighting
 .1
 	tst.w	temp3(a3)
 	bmi.w	rtsfight
-	tst.w	(Pencntdwn).w
+	tst.w	(PenCntDwn).w
 	bmi.w	rtsfight
 	cmpi.w	#SPA3128,SPA(a3)
 	beq.w	rtsfight
@@ -392,7 +391,7 @@ fightinput							;Controller processing for fighting
 .6
 	bset	#7,(sflags12).w
 	bne.w	.8
-	move.w	#8,(Pencntdwn).w
+	move.w	#8,(PenCntDwn).w
 .7
 	move.w	#$280,(fightidletimer).w
 .8
@@ -512,7 +511,7 @@ fightinput							;Controller processing for fighting
 	bne.w	.29
 	bra.s	.25
 .27
-	tst.w	(Pencntdwn).w
+	tst.w	(PenCntDwn).w
 	bmi.s	.25
 	btst	#6,d2
 	bne.w	.28
@@ -554,7 +553,7 @@ fightinput							;Controller processing for fighting
 	jmp	SetSPA
 
 SetFightingMajors					;Both fighters' roughing minors in PenBuf become fighting majors;
-									;Pencntdwn $B40
+									;PenCntDwn $B40
 	movem.l	a1,-(sp)
 	movea.w	#(PenBuf-2-M68K_RAM),a1
 .0
@@ -567,6 +566,6 @@ SetFightingMajors					;Both fighters' roughing minors in PenBuf become fighting 
 	cmpi.b	#$2E,(a1)
 	bne.s	.1
 	move.b	#$26,(a1)
-	move.w	#$B40,(Pencntdwn).w
+	move.w	#$B40,(PenCntDwn).w
 	movem.l	(sp)+,a1
 	rts

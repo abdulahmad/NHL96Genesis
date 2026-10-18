@@ -197,7 +197,7 @@ ArmIcing							;Icing start for a2: iflags cleared, icingPlayer, direction; bit 
 	dc.b	$00,$62,$67,$00,$00,$04,$44,$40,$6B,$00,$59,$A2,$08,$F8,$00,$02
 	dc.b	$BF,$BA,$4E,$75
 
-puckIChk							;Icing check.
+PuckIChk							;Icing check.
 									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$02,$BF,$BA,$67,$00,$59,$90,$08,$38,$00,$00,$BF,$BA
 	dc.b	$66,$00,$59,$86,$4A,$78,$B7,$BE,$6A,$00,$59,$7E,$30,$3C,$01,$1E

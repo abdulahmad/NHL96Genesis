@@ -480,7 +480,7 @@ burst								;C button speed burst: take $BA energy unless OptLine is set, add a
 	move.w	#SPAburst,d1
 	bra.w	SetSPA
 
-holdplayer							;Hold check (SPAhook, SPAHold with the stick up); a puck carrier the
+Holdplayer							;Hold check (SPAhook, SPAHold with the stick up); a puck carrier the
 									;checked player stops loses the puck.
 									;Jumped to from doinput
 	bset	#pfalock,pflags(a3)		;lock animation

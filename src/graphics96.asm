@@ -10,8 +10,8 @@ NHLPALogoMap						;The NHLPA logo on the trademark and credits pages (CreditsScr
 CreditsBgMap						;The background of the trademark and credits pages (CreditsScreen)
 	incbin	..\Extracted\NHL96\Graphics\CreditsBgMap.map.jim
 
-Framermap							;The Framermap map (Framer); +8 the framer tiles
-	incbin	..\Extracted\NHL96\Graphics\Framermap.map.jim
+FramerMap							;The FramerMap map (Framer); +8 the framer tiles
+	incbin	..\Extracted\NHL96\Graphics\FramerMap.map.jim
 
 FaceOffMap							;The face-off map; +8 the tiles
 	incbin	..\Extracted\NHL96\Graphics\FaceOffMap.map.jim
@@ -44,8 +44,8 @@ HotList								;The hot spot byte pair of each frame (GetHot)
 HotList2							;The hot spot list of the GetHot variants
 	incbin	..\Extracted\NHL96\Graphics\HotList2.bin
 
-CrowdFrameList						;The crowd sprite frames (showcrowd); +8 the crowd tiles (animchars)
-	incbin	..\Extracted\NHL96\Graphics\CrowdFrameList.map.jim
+Crowdframelist						;The crowd sprite frames (showcrowd); +8 the crowd tiles (animchars)
+	incbin	..\Extracted\NHL96\Graphics\Crowdframelist.map.jim
 
 FaceOffSprites						;The face-off sprites (checkfo); +8 the tiles
 	incbin	..\Extracted\NHL96\Graphics\FaceOffSprites.map.jim
@@ -601,7 +601,7 @@ BigFontMap							;The big font map of printbig1 (chars bigfont1chars); +8 the ti
 									;(LoadBigFonts)
 	incbin	..\Extracted\NHL96\Graphics\BigFontMap.map.jim
 
-BigFontMap3							;The big font map of printbig2 (chars BigFontChars); +8 the tiles
+BigFontMap3							;The big font map of printbig2 (chars BigFontchars); +8 the tiles
 									;(LoadBigFonts)
 	incbin	..\Extracted\NHL96\Graphics\BigFontMap3.map.jim
 

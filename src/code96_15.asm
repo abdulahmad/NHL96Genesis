@@ -166,14 +166,14 @@ chkFgtBit1							;Z set when $77(a2) is 2 or less (d0 kept)
 
 HiScoreScreen						;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up to $50 * 4
 									;frames or a button (waitx)
-	move.l	#vb2,(vbint).w
+	move.l	#vb2,(VBint).w
 	bclr	#df32c,(disflags).w
 	move.w	#5,(Map3col1).w
-	move.w	#$A000,(VmMap2).w
+	move.w	#$A000,(VmMAP2).w
 	move.w	#7,(Map2col1).w
-	move.w	#$C000,(VmMap1).w
+	move.w	#$C000,(VmMAP1).w
 	move.w	#7,(Map1col1).w
-	move.w	#$F000,(VmMap3).w
+	move.w	#$F000,(VmMAP3).w
 	move.w	#$F800,(VSPRITES).w
 	move.w	#$FC00,(VSCRLPM).w
 	jsr	(forceblack).l
@@ -373,12 +373,12 @@ LeadSong							;Not in a shootout (gmode2 bit 1) and one team has more players o
 	dc.b	$D4,$8E,$4E,$B9,$00,$08,$86,$88,$60,$E2,$08,$B8,$00,$05,$C3,$3C
 	dc.b	$4E,$75,$31,$DF,$C3,$3C,$4C,$DF,$0F,$01,$4E,$75
 
-ClearPenalties						;Clear the penalties: PBnum, Penaltytimer, Pencntdwn, PenBuf and both
+ClearPenalties						;Clear the penalties: PBnum, Penaltytimer, PenCntDwn, PenBuf and both
 									;teams' penalty slots (clrTmPdst)
 	movem.l	d0/a0,-(sp)
 	clr.w	(PBnum).w
 	clr.w	(Penaltytimer).w
-	clr.w	(Pencntdwn).w
+	clr.w	(PenCntDwn).w
 	move.w	#$10,d0
 	movea.l	#$FFFFC3A6,a0
 .loop

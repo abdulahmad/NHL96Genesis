@@ -548,7 +548,7 @@ playeracc							;Player acceleration with facing d2 (doplayeracc entry used by t
 	bsr.w	setpde
 	btst	#0,$73(a3)
 	beq.w	.6
-	btst	#0,(vcount+1).w
+	btst	#0,(Vcount+1).w
 	beq.w	.6
 	addq.w	#1,d0
 	bra.w	setpde

@@ -14,15 +14,15 @@ IntermissionStart					;The end of a period: ResetClock, restart the sound driver
 									;then GameOver or StartPer
 	jsr	(ResetClock).l
 	move.w	d0,-(sp)
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .vb
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.vb						;wait for the next vblank
 	jsr	(SoundOff).l
 	move.w	d0,-(sp)
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop					;wait for the next vblank
 	move.w	(sp)+,d0
 	jsr	(stop_current_song).l		;stop the song
@@ -147,7 +147,7 @@ OpeningClear						;Reset the stack and clear the game variables (keeping the sea
 	btst	#2,(SeasonFlags).w
 	beq.w	.2
 	jsr	(ReadPassData).l
-	jsr	(maketree).l
+	jsr	(MakeTree).l
 	jsr	(ContinuePlayoffs).l
 	btst	#1,(SeasonFlags).w
 	bne.w	*+4
@@ -270,14 +270,14 @@ AbortGame							;The "ABORT GAME" menu item: back to the title (Opening2).
 	dc.b	$00,$00,$B0,$4E,$50,$F8,$D2,$76,$4E,$F9,$00,$02,$17,$4A
 
 EASportsScreen						;Called from Begin. Show the EA Sports screen until a button or a time out
-	move.l	#vb2,(vbint).w			;vblank handler
+	move.l	#vb2,(VBint).w			;vblank handler
 	bclr	#df32c,(disflags).w
 	move.w	#5,(Map3col1).w
-	move.w	#$A000,(VmMap2).w
+	move.w	#$A000,(VmMAP2).w
 	move.w	#7,(Map2col1).w
-	move.w	#$C000,(VmMap1).w
+	move.w	#$C000,(VmMAP1).w
 	move.w	#7,(Map1col1).w
-	move.w	#$F000,(VmMap3).w
+	move.w	#$F000,(VmMAP3).w
 	move.w	#$F800,(VSPRITES).w
 	move.w	#$FC00,(VSCRLPM).w
 	movea.w	#(palfadenew-M68K_RAM),a0

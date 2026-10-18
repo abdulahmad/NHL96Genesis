@@ -19,7 +19,7 @@ OptionsScreen						;The game options screen: play mode, rosters, period length, 
 	move.w	(gamelevel).w,d0
 	or.w	(bosgames).w,d0
 	beq.w	.0
-	jsr	(maketree).l
+	jsr	(MakeTree).l
 .0
 	jsr	(ReadSeasonHeader).l
 	bclr	#1,(sflags13).w
@@ -59,9 +59,9 @@ OptionsScreen						;The game options screen: play mode, rosters, period length, 
 	bsr.w	OptionsMenuDraw
 	move	#$2500,sr
 .frame
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	jsr	(SetMenuScroll).l
 	addq.w	#1,(carddelay).w
@@ -179,7 +179,7 @@ OptionsScreen						;The game options screen: play mode, rosters, period length, 
 	clr.w	(demoflag).w
 	clr.w	(OptPlayMode).w
 	clr.w	(OptRosters).w
-	clr.w	(OptPerlen).w
+	clr.w	(Optperlen).w
 	move.w	#1,(OptGoalie).w
 	clr.w	(OptUserRec).w
 	move.w	#2,(OptPen).w
@@ -209,11 +209,11 @@ OptionsScreen						;The game options screen: play mode, rosters, period length, 
 	bne.w	.19
 	jmp	NewPO
 .19
-	jsr	(maketree).l
+	jsr	(MakeTree).l
 	rts
 
 OptionVars							;OptionsScreen: the option of each menu row
-	dc.l	OptPlayMode,OptRosters,OptPerlen,OptGoalie,OptUserRec
+	dc.l	OptPlayMode,OptRosters,Optperlen,OptGoalie,OptUserRec
 	dc.l	OptPen,OptLine,OptFighting,OptSkill
 
 OptionsMenuDraw						;OptionsScreen: draw the menu (PrintMenuList2)
@@ -224,17 +224,17 @@ OptionsMenuDraw						;OptionsScreen: draw the menu (PrintMenuList2)
 
 OptionsScreenSetup					;OptionsScreen: vram, fonts, the screen bitmaps and the row labels
 	bset	#5,(sflags12).w
-	move.l	#VBlank_Menus,(vbint).w
+	move.l	#VBlank_Menus,(VBint).w
 	bclr	#dfok,(disflags).w
 	bset	#dfng,(disflags).w
 	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
-	move.w	#$B800,(VmMap3).w
+	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
-	move.w	#$C000,(VmMap2).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col1).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col1).w
 	move.w	#0,d0
 	bset	#5,(disflags).w

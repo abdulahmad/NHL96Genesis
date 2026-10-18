@@ -1,7 +1,6 @@
 ;	The season: the save RAM stats, injuries, standings and game log (96 keeps them as bit fields,
-;	ReadSRAMBits / WriteSRAMBits), the day's games and the simulated days, the season header, the team select
-;	screen with the team ranks, and the season menu. DrawSetupTeamBlock draws a team block of the controller
-;	setup screen.
+;	ReadSRAMBits / WriteSRAMBits), the day's games and the simulated days, the team select
+;	screen and the season menu.
 
 SortBytesByWords					;Sort a5 words descending and swap the parallel a4 bytes. Stops at a
 									;negative byte
@@ -169,10 +168,10 @@ AddSavedStats						;Add d3+1 values from a0 to the d2-bit save RAM fields at bit
 	beq.w	.4
 	ext.l	d4
 	divu.w	#$3C,d4
-	cmpi.w	#2,(OptPerlen).w
+	cmpi.w	#2,(Optperlen).w
 	beq.w	.4
 	asl.w	#1,d4
-	cmpi.w	#1,(OptPerlen).w
+	cmpi.w	#1,(Optperlen).w
 	beq.w	.4
 	asl.w	#1,d4
 .4
@@ -281,8 +280,8 @@ SimSeasonDays						;Simulate simdays days: every unplayed game of each day, save
 									;(WriteDayGames), step the day or
 									;end the season
 	movem.l	d0-d7/a0-a6,-(sp)
-	move.w	(OptPerlen).w,-(sp)
-	move.w	#2,(OptPerlen).w
+	move.w	(Optperlen).w,-(sp)
+	move.w	#2,(Optperlen).w
 	bset	#6,(GameFlags).w
 	move.w	(simdays).w,d7
 	bra.w	.12
@@ -367,7 +366,7 @@ SimSeasonDays						;Simulate simdays days: every unplayed game of each day, save
 	clr.w	(simdays).w
 	bclr	#6,(GameFlags).w
 	jsr	(MakeSRAMChecksum).l
-	move.w	(sp)+,(OptPerlen).w
+	move.w	(sp)+,(Optperlen).w
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
@@ -726,8 +725,8 @@ sub_11582
 LoadSeasonOptions					;Take the game options from the season header (period length, penalties,
 									;line changes); OptPlayMode 1 in the
 									;playoffs
-	clr.w	(OptPerlen).w
-	move.b	(SeasonDay+3).w,(OptPerlen+1).w
+	clr.w	(Optperlen).w
+	move.b	(SeasonDay+3).w,(Optperlen+1).w
 	clr.w	(OptPen).w
 	move.b	(dword_FFDD82).w,(OptPen+1).w
 	clr.w	(OptLine).w
@@ -871,9 +870,9 @@ TeamSelectScreen					;Team select: up / down change the team, left / right pick 
 	bclr	#2,(byte_FF2710).l
 	move.w	#1,(word_FF2720).l
 .frame
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	jsr	(SetMenuScroll).l
 	tst.w	(demoflag).w
@@ -1050,17 +1049,17 @@ TeamSelectScreen					;Team select: up / down change the team, left / right pick 
 
 TeamSelectGfx						;Team select video set up: backgrounds, the logos and the five rank names
 	bset	#5,(sflags12).w
-	move.l	#VBlank_Menus,(vbint).l
+	move.l	#VBlank_Menus,(VBint).l
 	bclr	#dfok,(disflags).w
 	bset	#dfng,(disflags).w
 	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
-	move.w	#$B800,(VmMap3).w
+	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
-	move.w	#$C000,(VmMap2).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col1).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col1).w
 	move.w	#0,d0
 	bset	#5,(disflags).w
@@ -1077,7 +1076,7 @@ TeamSelectGfx						;Team select video set up: backgrounds, the logos and the fiv
 	movea.l	#BigFontMap2+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	bclr	#2,(sflags11).w
-	move.w	d4,(BigFontChars).w
+	move.w	d4,(BigFontchars).w
 	movea.l	#BigFontMap2+8,a2
 	jsr	(DecompressGraphicsWithCallback).l
 	dc.b	$01,$2A,$15,$6E,$F9,$AB,$CD,$EF	;remap table
@@ -1161,7 +1160,7 @@ PrintHomeRanks						;Team select: the home team's ranks (TeamRankPtrs) as ordina
 	move.w	(printbigchars).w,-(sp)
 	cmpi.w	#1,(word_FFDDB6).w
 	bne.w	.0
-	move.w	(BigFontChars).w,(printbigchars).w
+	move.w	(BigFontchars).w,(printbigchars).w
 .0
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),$1E,$10,$00
@@ -1194,7 +1193,7 @@ PrintVisRanks						;Team select: the visiting team's ranks as ordinals, highligh
 	move.w	(printbigchars).w,-(sp)
 	cmpi.w	#2,(word_FFDDB6).w
 	bne.w	.0
-	move.w	(BigFontChars).w,(printbigchars).w
+	move.w	(BigFontchars).w,(printbigchars).w
 .0
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),$06,$10,$00

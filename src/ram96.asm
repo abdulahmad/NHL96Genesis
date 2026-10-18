@@ -32,16 +32,16 @@ CreatePoints equ $FFFF7536
 replayend equ $FFFFAF64				;End of the replay buffer from M68K_RAM: updatereplay wraps recbpr there
 VSCRLPM equ $FFFFB000
 VSPRITES equ $FFFFB002
-VmMap1 equ $FFFFB004
+VmMAP1 equ $FFFFB004
 Map1col1 equ $FFFFB006
-VmMap2 equ $FFFFB008
+VmMAP2 equ $FFFFB008
 Map2col1 equ $FFFFB00A
-VmMap3 equ $FFFFB00C
+VmMAP3 equ $FFFFB00C
 Map3col1 equ $FFFFB00E
 bigfontptr equ $FFFFB010
 printbigchars equ $FFFFB014			;The char base printbigtext adds: the font printbig1 / printbig2 chose
 bigfont1chars equ $FFFFB016			;Chars of BigFontMap (printbig1, the clock digits)
-BigFontChars equ $FFFFB018
+BigFontchars equ $FFFFB018
 smallfontchars equ $FFFFB01C
 smallfont2chars equ $FFFFB01E		;Second small font chars (help lines and highlight)
 energybarchars equ $FFFFB020
@@ -65,8 +65,8 @@ printfontset equ $FFFFB048
 fodropx equ $FFFFB04A
 fodropy equ $FFFFB04C
 recbpr equ $FFFFB04E
-vcount equ $FFFFB052
-oldvcount equ $FFFFB054
+Vcount equ $FFFFB052
+OldVcount equ $FFFFB054
 repeatdelayframes equ $FFFFB056
 asv equ $FFFFB058
 lldisp equ $FFFFB05A
@@ -89,20 +89,20 @@ OOlist equ $FFFFB89E
 lastpuckc equ $FFFFB8AE
 padiconchars1 equ $FFFFB8B0			;ControllerSetupScreen: PadIconMap1 ... 4 chars
 	;(PadIconChars), in game RAM
-crowdframe equ $FFFFB8B0			;The crowd frame (updatecrowdf; saved by
+Crowdframe equ $FFFFB8B0			;The crowd frame (updatecrowdf; saved by
 	;updatereplay). Shares padiconchars1
-crowdlevel equ $FFFFB8B2			;crowd noise level; the controller setup screen keeps padiconchars2 here
+Crowdlevel equ $FFFFB8B2			;crowd noise level; the controller setup screen keeps padiconchars2 here
 padiconchars2 equ $FFFFB8B2
 padiconchars3 equ $FFFFB8B4
 crowdtblidx equ $FFFFB8B4			;updatecrowdf: the crowd frame step. Shares padiconchars3
 padiconchars4 equ $FFFFB8B6
-crowdcnt equ $FFFFB8B6				;updatecrowdf: frames to the next crowd frame. Shares padiconchars4
+Crowdcnt equ $FFFFB8B6				;updatecrowdf: frames to the next crowd frame. Shares padiconchars4
 padcursorchars equ $FFFFB8B8		;ControllerSetupScreen: PadCursorMap chars
 CwdExciteLvl equ $FFFFB8B8			;Crowd excitement (StartPer: gamelevel * 16). Shares padcursorchars
 MaxCwdExciteLvl equ $FFFFB8BA
 NumCwdExciteLvl equ $FFFFB8BC
 SumCwdExciteLvl equ $FFFFB8BE
-zamx equ $FFFFB8C2
+Zamx equ $FFFFB8C2
 word_FFB8C4 equ $FFFFB8C4
 optanimframe equ $FFFFB8C6			;OptionsScreen: animation frame 0-7
 optanimdelay equ $FFFFB8C8			;OptionsScreen: frames to the next animation frame
@@ -255,7 +255,7 @@ PenDelay	equ	$2C
 ssosize	equ	$14						;bytes per sso object
 ssonum	equ	4						;screen objects not tied to the rink scroll
 ffonum	equ	8						;objects tied to the rink scroll
-Pencntdwn equ $FFFFC3E8
+PenCntDwn equ $FFFFC3E8
 Penaltytimer equ $FFFFC3EA
 PBnum equ $FFFFC3EC
 InjCntDown equ $FFFFC442
@@ -324,7 +324,7 @@ dword_FFD234 equ $FFFFD234
 word_FFD238 equ $FFFFD238
 word_FFD23A equ $FFFFD23A
 word_FFD23C equ $FFFFD23C
-vbint equ $FFFFD244					;vertical blank handler address (VBjsr jumps through it)
+VBint equ $FFFFD244					;vertical blank handler address (VBjsr jumps through it)
 pad1user equ $FFFFD248
 pad2user equ $FFFFD24A
 pad3user equ $FFFFD24C
@@ -335,7 +335,7 @@ OptPlayMode equ $FFFFD254
 OptNOP equ $FFFFD256
 Opt1team equ $FFFFD258
 Opt2team equ $FFFFD25A
-OptPerlen equ $FFFFD25C
+Optperlen equ $FFFFD25C
 OptGoalie equ $FFFFD25E
 OptUserRec equ $FFFFD260
 OptPen equ $FFFFD262

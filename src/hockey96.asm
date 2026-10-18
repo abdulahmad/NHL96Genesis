@@ -45,14 +45,14 @@ Begin								;Cold start, entered from Start. Clear RAM, init sound and menus, g
 	jmp	Opening
 
 StartGame							;Reset game state for a new game, then start the first period
-	move.l	#VBlank,(vbint).l
+	move.l	#VBlank,(VBint).l
 	clr.w	(RefStep).w
 	bclr	#5,(GameFlags).w
 	st	(byte_FFD474).w
 	jsr	(ReadJoy1).l
 	cmp.b	#$E0,d3
 	bne.w	.0
-	move.w	#3,(OptPerlen).w
+	move.w	#3,(Optperlen).w
 .0
 	clr.b	(gmode).w
 	cmpi.w	#1,(OptPen).w
@@ -152,7 +152,7 @@ ResetClock							;gameclock = PerTimeTotal = the period length (GetPeriodTime; o
 	rts
 
 GetPeriodTime						;Return d0 = period length in seconds for the period length option
-	move.w	(OptPerlen).w,d0
+	move.w	(Optperlen).w,d0
 	asl.w	#1,d0
 	lea	.times(pc),a0
 	move.w	(a0,d0.w),d0
@@ -207,7 +207,7 @@ StartPer							;Start a period: reset stack, rink and clock, face off, run the g
 	bclr	#sfwrap,(sflags).w
 	move.w	#$FFFF,(lastsfx).w
 	move.l	#M68K_RAM,(recbpr).w
-	move.w	(vcount).w,(oldvcount).w
+	move.w	(Vcount).w,(OldVcount).w
 	bsr.w	DoGameFrame
 	move.w	#$FFFF,(palcount).w
 	bsr.w	DoGameFrame
@@ -233,10 +233,10 @@ Gameloop							;Main loop for game
 	bra.s	Gameloop
 
 DoGameFrame							;Wait for at least one vblank, then run one frame of game logic
-	move.w	(vcount).w,d7
-	sub.w	(oldvcount).w,d7
+	move.w	(Vcount).w,d7
+	sub.w	(OldVcount).w,d7
 	beq.s	DoGameFrame
-	move.w	(vcount).w,(oldvcount).w
+	move.w	(Vcount).w,(OldVcount).w
 	bsr.w	DoFrameUpdates
 	btst	#6,(sflags3).w
 	beq.w	.0
@@ -316,18 +316,18 @@ RestoreBenchEnergy					;Unless OptLine: every bench player of both teams gets 9 
 	rts
 
 updatecrowdf						;Every game loop, d7 = elapsed frames: the crowd level falls (faster when
-									;loud); every crowdcnt frames the next crowd frame
-	cmpi.w	#$15E,(crowdlevel).w
+									;loud); every Crowdcnt frames the next crowd frame
+	cmpi.w	#$15E,(Crowdlevel).w
 	blt.w	.dec
-	subq.w	#3,(crowdlevel).w
+	subq.w	#3,(Crowdlevel).w
 .dec
-	sub.w	d7,(crowdlevel).w
+	sub.w	d7,(Crowdlevel).w
 	bpl.w	.1
-	clr.w	(crowdlevel).w
+	clr.w	(Crowdlevel).w
 .1
-	sub.w	d7,(crowdcnt).w
+	sub.w	d7,(Crowdcnt).w
 	bpl.w	.2
-	move.w	(crowdlevel).w,d0
+	move.w	(Crowdlevel).w,d0
 	lsr.w	#1,d0
 	cmp.w	#$7F,d0
 	bls.w	.0
@@ -338,16 +338,16 @@ updatecrowdf						;Every game loop, d7 = elapsed frames: the crowd level falls (
 	andi.w	#$1E,(crowdtblidx).w
 	add.w	(crowdtblidx).w,d0
 	movea.l	#CrowdFrameTbl,a0
-	move.b	(a0,d0.w),(crowdframe+1).w
+	move.b	(a0,d0.w),(Crowdframe+1).w
 	clr.w	d1
 	move.b	1(a0,d0.w),d1
 	move.w	(HVcount).l,d2
 	and.w	d1,d2
 	add.w	d2,d1
-	move.w	d1,(crowdcnt).w
+	move.w	d1,(Crowdcnt).w
 .2
-	clr.b	(crowdframe).w
-	cmpi.w	#$118,(crowdlevel).w
+	clr.b	(Crowdframe).w
+	cmpi.w	#$118,(Crowdlevel).w
 	bls.w	rtss8
 	move.w	(HVcount).l,d0
 	andi.w	#$7F,d0
@@ -355,7 +355,7 @@ updatecrowdf						;Every game loop, d7 = elapsed frames: the crowd level falls (
 	blt.w	rtss8
 	cmp.w	#$19,d0
 	bgt.w	rtss8
-	move.b	d0,(crowdframe).w
+	move.b	d0,(Crowdframe).w
 	rts
 
 clockcont							;At the end of the period clock (gameclock 0): the horn, then the end of
@@ -421,7 +421,7 @@ clockcont							;At the end of the period clock (gameclock 0): the horn, then th
 	dbf	d2,.t2
 .eog
 	jsr	(ClearPenaltyBuffer).l
-	addi.w	#$3E8,(crowdlevel).w
+	addi.w	#$3E8,(Crowdlevel).w
 	bset	#gmclock,(gmode).w
 	bset	#6,(gmode).w
 	jsr	(ClearPenalties).l

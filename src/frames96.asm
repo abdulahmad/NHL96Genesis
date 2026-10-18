@@ -4,8 +4,9 @@
 
 ;	Table: 8 words, the offset of each direction's frame,time pairs (0-7), then the attribute word
 ;	(bit 0: start again at the end; clear, the animation stops). A negative time marks the last
-;	pair; pairs after it are marked "past the end". Tables not named yet carry their SPA value
-;	in the name until the code that uses them is converted.
+;	pair; pairs after it are marked "past the end".
+;
+;	Tables not named yet carry their SPA value in the name until the code that uses them is converted.
 
 SPAlist								;The animation tables: the animation code adds SPA to it
 	dc.w	0

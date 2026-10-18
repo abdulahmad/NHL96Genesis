@@ -1,9 +1,9 @@
 ;	Team data. TeamList points to one record per team, and the playoff seeds follow the teams.
 ;	96 has no All-Star teams: the two All-Star slots of TeamList point to Boston and Montreal.
-;	VBjsr, the vertical blank vector's jump through vbint, sits in front of the team data.
+;	VBjsr, the vertical blank vector's jump through VBint, sits in front of the team data.
 
-VBjsr								;Vertical blank interrupt (level 6), jumps through the vbint RAM vector
-	move.l	(vbint).l,-(sp)			;push handler address
+VBjsr								;Vertical blank interrupt (level 6), jumps through the VBint RAM vector
+	move.l	(VBint).l,-(sp)			;push handler address
 	rts								;and "return" into it
 
 TeamList							;Team number = index (ANH 0 ... WPG 25, then the All-Star slots ASE 26 and

@@ -11,7 +11,7 @@
 	include	externs96.asm			;outside addresses still in incbin segments. Equates only
 
 ; External addresses outside, read from lst/nhl96.bin.
-VBjsr = $000776						;vertical blank interrupt, jumps through vbint
+VBjsr = $000776						;vertical blank interrupt, jumps through VBint
 Begin = $01464C						;hockey96
 IRQ7 = $0202E4						;display96
 AdrErr = $023144					;crash96

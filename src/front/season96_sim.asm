@@ -3,7 +3,7 @@
 
 SimGameStats
 	movem.l	d0-d7/a0-a6,-(sp)
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 	jsr	(randomd0).l
 	movea.l	#tmstruct,a1
 	move.w	#$39D,d0

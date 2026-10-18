@@ -58,19 +58,19 @@ forceblack2							;Forceblack with palcount $64 (one step,
 	dc.b	$FF,$FA,$31,$FC,$00,$64,$BD,$3C,$61,$00,$00,$10,$70,$1F,$21,$1F
 	dc.b	$51,$C8,$FF,$FC,$4C,$DF,$01,$01,$4E,$75
 
-forcefade							;Run the palette fade to the end: vbint = vb2 (fades only), interrupts on,
+forcefade							;Run the palette fade to the end: VBint = vb2 (fades only), interrupts on,
 									;wait for palcount to go negative
 	move	sr,-(sp)
-	move.l	(vbint).w,-(sp)
+	move.l	(VBint).w,-(sp)
 	move.w	(disflags).w,-(sp)
 	bclr	#dfng,(disflags).w
-	move.l	#vb2,(vbint).l
+	move.l	#vb2,(VBint).l
 	move	#$2500,sr
 .1
 	tst.w	(palcount).w
 	bpl.s	.1
 	move.w	(sp)+,(disflags).w
-	move.l	(sp)+,(vbint).w
+	move.l	(sp)+,(VBint).w
 	move	(sp)+,sr
 	rts
 
@@ -132,7 +132,7 @@ randomd0							;d0 = random number 0 to d0-1 (seed * $BB40E62D + 1)
 	movem.l	(sp)+,d1-d2
 	rts
 
-sroot								;d0 = square root of d0 (long). Small values by odd subtraction, else
+Sroot								;d0 = square root of d0 (long). Small values by odd subtraction, else
 									;Newton steps, else a binary search
 	tst.l	d0
 	beq.w	rtss2
@@ -192,7 +192,7 @@ waitx								;Wait -d0 frames, or until a button on any pad
 									;(waitxpad = the buttons held)
 	clr.w	(waitxpad).w
 	neg.w	d0
-	move.w	d0,(vcount).w
+	move.w	d0,(Vcount).w
 .0
 	bsr.w	ReadJoy1
 	move.w	d3,(waitxpad).w
@@ -213,9 +213,9 @@ waitx								;Wait -d0 frames, or until a button on any pad
 	tst.w	d1
 	bne.w	rtss2
 .1
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.2
 	tst.w	d0
 	bmi.s	.0
@@ -524,16 +524,16 @@ setVram_0							;Second half of setVram without the fade: clear vram and set the
 .i64
 	move.w	d0,4(a0)
 	move.w	#$8200,d0
-	move.b	(VmMap1).w,d0
+	move.b	(VmMAP1).w,d0
 	lsr.b	#2,d0
 	andi.b	#$38,d0
 	move.w	d0,4(a0)
 	move.w	#$8400,d0
-	move.b	(VmMap2).w,d0
+	move.b	(VmMAP2).w,d0
 	lsr.b	#5,d0
 	move.w	d0,4(a0)
 	move.w	#$8300,d0
-	move.b	(VmMap3).w,d0
+	move.b	(VmMAP3).w,d0
 	lsr.b	#2,d0
 	andi.b	#$3E,d0
 	move.w	d0,4(a0)
@@ -754,7 +754,7 @@ FlushOutputBuffer					;Write the full ring buffer to vram.
 	dc.b	$32,$03,$D6,$40,$D6,$40,$20,$49,$4A,$94,$67,$00,$00,$0A,$22,$54
 	dc.b	$4E,$95,$60,$00,$00,$04,$4E,$96,$4C,$DF,$03,$03,$4E,$75
 
-xyVmMap								;Set the vdp write address to printx, printy in the map at VmMap1 + printm
+xyVmMap								;Set the vdp write address to printx, printy in the map at VmMAP1 + printm
 	movem.l	d0-d2,-(sp)
 	move.w	(printx).w,d0
 	move.w	(printy).w,d1
@@ -797,7 +797,7 @@ Framer								;Draw a d0 x d1 frame at printx / printy from the framer map
 	movem.w	d0-d1,-(sp)
 	move.w	(printa).w,d2
 	add.w	(framercset).w,d2
-	movea.l	#Framermap,a1
+	movea.l	#FramerMap,a1
 	adda.l	4(a1),a1
 	addq.w	#4,a1
 	clr.w	d4
@@ -1280,7 +1280,7 @@ printbigtext						;Print with the font map at bigfontptr. Lower
 	add.w	(printbigchars).w,d6
 	bra.w	.4
 .3
-	add.w	(BigFontChars).w,d6
+	add.w	(BigFontchars).w,d6
 .4
 	move.w	(a1)+,d3
 	subq.w	#2,d3

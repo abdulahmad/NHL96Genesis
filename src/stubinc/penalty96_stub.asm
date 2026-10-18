@@ -42,7 +42,7 @@ priolist = $023426					;players96_sub
 sfx = $088470						;sound96
 song = $088586						;sound96
 stop_current_song = $0885FC			;sound96
-Framermap = $091B86					;graphics96
+FramerMap = $091B86					;graphics96
 RefTiles = $097E72					;graphics96
 RefTilesHor = $098F30				;graphics96
 EASNmap = $13D59E					;graphics96
@@ -52,9 +52,9 @@ ShootoutWonBy = $1D82A2				;shootout96_path
 updatePPTeamTime = $1D8618			;shootout96_path
 SkipStrings = $01D7F2				;hockey96_inter
 ZeroLong = $000772					;main96
-Penaltylist = $00E818					;logic96
-PenShotPenalties = $00EBC2					;logic96
-DoubleMinorPenalties = $00EBF8					;logic96
+Penaltylist = $00E818				;logic96
+PenShotPenalties = $00EBC2			;logic96
+DoubleMinorPenalties = $00EBF8		;logic96
 
 
 ; Main segment code

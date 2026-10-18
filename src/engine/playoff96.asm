@@ -1,5 +1,5 @@
 ;	The playoff tree and the saved series. ContinuePlayoffs reads the bits,
-;	maketree builds the bracket, and ResolveGames picks the winners.
+;	MakeTree builds the bracket, and ResolveGames picks the winners.
 
 ContinuePlayoffs					;Continue the playoffs: read the saved bits (ReadPassBits)
 	movem.l	d0-d7/a0-a3,-(sp)
@@ -8,7 +8,7 @@ ContinuePlayoffs					;Continue the playoffs: read the saved bits (ReadPassBits)
 	move.w	(gamelevel).w,d0
 	or.w	(bosgames).w,d0
 	beq.w	.x
-	bsr.w	maketree
+	bsr.w	MakeTree
 	moveq	#7,d0
 	tst.w	(FourWayPlay).w
 	beq.w	.0
@@ -97,7 +97,7 @@ NewPO								;New playoff tree
 .4
 	clr.w	(WinBits).w
 
-maketree							;Make the playoff tree (potree) from the playoff seeds and WinBits, then
+MakeTree							;Make the playoff tree (potree) from the playoff seeds and WinBits, then
 									;FigureJoy; with GameFlags bit 7
 									;the seeds come from save RAM. Called after ResolveGames, ResolveDayGames
 									;and BeginPlayoffs
@@ -294,7 +294,7 @@ maketree							;Make the playoff tree (potree) from the playoff seeds and WinBit
 	rts
 
 FirstRoundSeeds						;The seed of each first round team in tree order (1-8, 4-5, 3-6, 2-7),
-									;both conferences; maketree copies it
+									;both conferences; MakeTree copies it
 	dc.b	$08,$01,$05,$04,$06,$03,$07,$02,$08,$01,$05,$04,$06,$03,$07,$02
 
 SetTreeGameTeams					;Put the two teams at a0 in game a1: flipped (gsstruct flags bit 0) except
@@ -526,7 +526,7 @@ EncodePW							;After a playoff game compute winners and save the bits if needed
 	move.w	#1,(OptPlayMode).w		;continue playoffs
 	move.w	#1,(TempOptPlayMode).w
 	bsr.w	ResolveGames
-	bsr.w	maketree
+	bsr.w	MakeTree
 	cmpi.w	#4,(gamelevel).w
 	beq.w	.2						;finished playoffs
 	btst	#7,(GameFlags).w
@@ -544,7 +544,7 @@ EncodePW							;After a playoff game compute winners and save the bits if needed
 	beq.w	.1
 	movea.w	#(tpassbits-M68K_RAM),a3
 	bsr.w	ReadPassBits
-	bsr.w	maketree
+	bsr.w	MakeTree
 .1
 	bclr	#6,(GameFlags).w
 	jsr	(MakeSRAMChecksum).l

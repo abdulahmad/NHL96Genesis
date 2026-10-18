@@ -12,9 +12,9 @@ ShowThreeStars						;End of game Stars of the Game box. Waits for RefCnt <= $40 
 	jsr	(ErasePowerPlayBox).l
 	movem.l	d0/a1,-(sp)
 	bset	#dfclock,(disflags).w
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	movem.l	(sp)+,d0/a1
 	movem.l	d0-d5/a0-a4,-(sp)

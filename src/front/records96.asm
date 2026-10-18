@@ -47,9 +47,9 @@ NameEntryScreen						;Name entry screen for pad slot a5: the name log, then edit
 .1
 	move	#$2500,sr
 .frame
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	jsr	(SetMenuScroll).l
 	cmpa.l	#pad1user,a5
@@ -642,17 +642,17 @@ NameEntryGfx						;Name entry: vram, fonts, the screen bitmaps, the pad icon
 									;(NameEntryPadIcons), the team block and the
 									;heading
 	bset	#5,(sflags12).w
-	move.l	#VBlank_Menus,(vbint).w
+	move.l	#VBlank_Menus,(VBint).w
 	bclr	#dfok,(disflags).w
 	bset	#dfng,(disflags).w
 	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
-	move.w	#$B800,(VmMap3).w
+	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
-	move.w	#$C000,(VmMap2).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col1).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col1).w
 	move.w	#0,d0
 	bset	#5,(disflags).w
@@ -670,7 +670,7 @@ NameEntryGfx						;Name entry: vram, fonts, the screen bitmaps, the pad icon
 	jsr	(DecompressGraphicsWithCallback).l
 	dc.b	$01,$23,$AB,$CE,$89,$AB,$CD,$EF	;remap table
 	move.l	#RosterFont,(smallfontptr).w
-	move.w	d4,(BigFontChars).w
+	move.w	d4,(BigFontchars).w
 	movea.l	#BigFontMap4+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	bset	#2,(sflags11).w

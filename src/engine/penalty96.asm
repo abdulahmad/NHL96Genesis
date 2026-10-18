@@ -35,7 +35,7 @@ PrintBigChar						;Print big font char d0 (printbigtext)
 	dbf	d2,.loop
 	rts
 
-PutBigTile							;Write tile d3 + d6 at column d4, row d5 of the map at VmMap1 + printm
+PutBigTile							;Write tile d3 + d6 at column d4, row d5 of the map at VmMAP1 + printm
 	add.w	d6,d3
 	movem.l	d1/a0,-(sp)
 	move.w	d5,d0
@@ -92,17 +92,17 @@ printbig1							;printbigcur with the font map BigFontMap (chars bigfont1chars)
 	move.w	(bigfont1chars).w,(printbigchars).w
 	jmp	printbigcur
 
-printbig2							;printbigcur with the font map BigFontMap3 (chars BigFontChars)
+printbig2							;printbigcur with the font map BigFontMap3 (chars BigFontchars)
 	bclr	#2,(sflags11).w
 	move.l	#BigFontMap3,(bigfontptr).l
-	move.w	(BigFontChars).w,(printbigchars).w
+	move.w	(BigFontchars).w,(printbigchars).w
 	jmp	printbigcur
 	;After printbig2: code that nothing in the listing reaches.
 	;Code the listing does not decode: kept as bytes
 	dc.b	$31,$C4,$B0,$1C,$24,$7C,$00,$17,$9A,$7E,$60,$00,$F5,$AE
 
-AddFramer							;Load the framer tiles (Framermap+8) at char d4, framercset = d4
-	movea.l	#Framermap+8,a2
+AddFramer							;Load the framer tiles (FramerMap+8) at char d4, framercset = d4
+	movea.l	#FramerMap+8,a2
 	move.w	d4,(framercset).w
 	bra.w	DecompressGraphicsPlain
 
@@ -133,7 +133,7 @@ AddPenalty2							;Forced penalties like faceoff and game over. d0 = penalty num
 	movem.l	d1/a0-a1,-(sp)
 	cmp.w	#$E,d0					;goal and up
 	blt.w	.nonoise
-	addi.w	#$C8,(crowdlevel).w		;200
+	addi.w	#$C8,(Crowdlevel).w		;200
 	addq.w	#5,(ChkCnt).w
 	move.w	#$C,-(sp)				;song $C for the home team
 	btst	#pfteam,pflags(a3)
@@ -212,9 +212,9 @@ chkprogress							;Control the progress of the ref and the game through penalty 
 .3
 	btst	#gmpen,(gmode).w		;gmpen: penalty called
 	beq.w	rtss2
-	tst.w	(Pencntdwn).w
+	tst.w	(PenCntDwn).w
 	bmi.w	InProgress
-	sub.w	d7,(Pencntdwn).w
+	sub.w	d7,(PenCntDwn).w
 	bpl.w	rtss2
 	movea.l	#$FFFFC3A6,a0
 .1
@@ -549,9 +549,9 @@ checkfornewpen						;Look for a new penalty (entered through AddPenalty / AddPen
 	clr.w	d1
 	move.b	(a1),d1					;delay for stopping action
 	asl.w	#5,d1
-	cmp.w	(Pencntdwn).w,d1
+	cmp.w	(PenCntDwn).w,d1
 	ble.s	.0
-	move.w	d1,(Pencntdwn).w
+	move.w	d1,(PenCntDwn).w
 	bra.s	.0
 .3
 	bset	#gmpendel,(gmode).w
@@ -620,7 +620,7 @@ Stop4Pen							;a0 = Penaltylist penalty + 2. Stop the clock, set the faceoff sp
 	addq.w	#4,sp
 	jsr	(limitfo).l
 .5
-	clr.w	(Pencntdwn).w
+	clr.w	(PenCntDwn).w
 	bset	#gmpen,(gmode).w
 	jsr	(stop_current_song).l
 	move.w	#3,-(sp)				;whistle
