@@ -63,7 +63,7 @@ NewPO								;New playoff tree
 	addq.w	#1,d0
 	andi.w	#$1F,d0
 	asl.w	#4,d0
-	movea.l	#$54F0,a0
+	movea.l	#playoffseats,a0
 	adda.w	d0,a0
 	lsr.w	#4,d0
 .2
@@ -114,7 +114,7 @@ maketree							;Make the playoff tree (potree) from the playoff seeds and WinBit
 	move.w	(postarts).w,d1
 	asl.w	#4,d1
 	movea.w	#(potree-M68K_RAM),a0
-	movea.l	#$54F0,a1
+	movea.l	#playoffseats,a1
 	adda.w	d1,a1
 	btst	#7,(GameFlags).w
 	beq.w	.1

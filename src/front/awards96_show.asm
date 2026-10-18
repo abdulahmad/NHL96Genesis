@@ -561,7 +561,7 @@ CupChampionsScreen					;The user's team won the Cup: a full screen picture with 
 	jsr	(dobitmap).l
 	jsr	(printz).l
 	String	$AF,$14,$16
-	movea.l	#$77E,a1
+	movea.l	#TeamList,a1
 	clr.w	d0
 	move.b	(dword_FFDD82+2).w,d0
 	asl.w	#2,d0
@@ -580,7 +580,7 @@ CupChampionsScreen					;The user's team won the Cup: a full screen picture with 
 	jsr	(printbigcur).l
 	jsr	(printz).l
 	String	$AF,$14,$18
-	movea.l	#$77E,a1
+	movea.l	#TeamList,a1
 	clr.w	d0
 	move.b	(dword_FFDD82+2).w,d0
 	asl.w	#2,d0

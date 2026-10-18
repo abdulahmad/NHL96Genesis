@@ -17,7 +17,7 @@ linebar								;Draw the energy bar of line d0 for team a2 at printx / printy
 	clr.w	d0
 	movea.l	#EnergyBarMap,a1
 	adda.l	4(a1),a1
-	movea.w	#$772,a2
+	movea.w	#ZeroLong,a2
 	move.w	(a1),d2
 	moveq	#1,d3
 	move.w	(energybarchars).w,d4

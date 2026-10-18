@@ -624,7 +624,7 @@ OptionsAnimFrame					;OptionsScreen: draw frame optanimframe of the animation (P
 	moveq	#7,d2
 	moveq	#7,d3
 	moveq	#0,d5
-	movea.l	#$772,a2
+	movea.l	#ZeroLong,a2
 	jsr	(dobitmap).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
