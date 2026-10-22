@@ -24,3 +24,7 @@ Start with `START_HERE.md` (setup, build, contributor workflow), then `SEGMENT_A
 | `docs/` | `HANDOFF.md`, `name_map.csv`. |
 
 Build: Windows `npm run build:retail` / `npm run seg:<name>`; Linux with wine `tools/build_rom.sh` / `tools/verify_segment.sh <name>` / `tools/verify_all.sh`. Logs go to `output/`.
+
+## Credits
+
+Thanks to chaos, StaticEck, McMarkis, Drezz, smozoma and kingraph for their help with the disassembly.
