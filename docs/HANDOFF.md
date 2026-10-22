@@ -302,7 +302,8 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   SetLineSlot, LoadTeamLine, SaveTeamLine), ReturnToGame (the tail of 95's Pausemode as its own routine),
   RestoreGameScreen, ClearOldFrames, and sub_1E2970 (bytes, called from code96_04's undecoded bytes) with
   PeriodText, DigitText and PrintDigit. MATCH (segment and ROM). word_FFD284 / word_FFD286 are set by skill level
-  (SkillLevelTbl / SkillLevelPalTbl); not renamed.
+  (SkillLevelTbl / SkillLevelPalTbl); not renamed. Full behaviour: `docs/difficulty_skill.md` (menu, SRAM, physics;
+  not the same as `gamelevel`).
 - data96_12 converted: about 10 KB of code the listing does not decode, labelled bytes: the pause menu screens
   (TeamRosterScreen, ScoringSummaryScreen, PenaltySummaryScreen, PeriodStatsScreen, GameStatisticsScreen,
   RecordHoldersScreen, PlayerStatsScreen), ShootoutShooters, and 95 masked byte matches inside them
