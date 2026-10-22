@@ -27,4 +27,6 @@ Build: Windows `npm run build:retail` / `npm run seg:<name>`; Linux with wine `t
 
 ## Credits
 
-Thanks to chaos, StaticEck, McMarkis, Drezz, smozoma and kingraph for their help with the disassembly.
+Thanks to chaos, StaticEck, McMarkis and Drezz for their help with the disassembly.
+
+Special thanks to smozoma and kingraph, whose past contributions to the NHL modding community made this work easier.
