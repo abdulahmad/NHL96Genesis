@@ -25,6 +25,10 @@ Start with `START_HERE.md` (setup, build, contributor workflow), then `SEGMENT_A
 
 Build: Windows `npm run build:retail` / `npm run seg:<name>`; Linux with wine `tools/build_rom.sh` / `tools/verify_segment.sh <name>` / `tools/verify_all.sh`. Logs go to `output/`.
 
+## AI assistance
+
+This project is AI-assisted. The work is directed by a strict ruleset and curated by hand, with the aim of producing correctly labelled and commented code that matches the spirit of what the original source code would have been. We can't guarantee it's perfect, and ultimately this will always be a work in progress. If you see something that needs fixing, raise an issue, or even better, raise a PR.
+
 ## Credits
 
 Thanks to chaos, StaticEck, McMarkis and Drezz for their help with the disassembly.
