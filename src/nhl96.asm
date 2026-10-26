@@ -74,7 +74,7 @@
 	include	engine\video96_font.asm	; $0243A0  fonts
 	include	engine\logic96_crease.asm	; $02441E  crease
 	include	engine\pause96_play.asm	; $02447E  resume game
-	include	sound96.asm				; $024486  sound
+	include	sound\sound96.asm				; $024486  sound
 	include	front\scout96.asm		; $08880A  scout text
 	include	graphics96.asm			; $08F2C6  graphics
 	include	engine\logic96_timer.asm	; $1D6622  one-timer
