@@ -16,4 +16,4 @@ randomd0 = $01B0A6					;video96
 
 
 ; Main segment code
-	include	sound96.asm
+	include	sound\sound96.asm

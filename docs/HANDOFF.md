@@ -406,7 +406,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   `engine/video96_font.asm` is the font loaders (LoadSmallFont through sub_243DA, $0243A0-$02441D).
   `engine/logic96_crease.asm` is the crease test (GoalieInCrease, $02441E-$02447D).
   `engine/pause96_play.asm` is the resume-game item (PlayGame, $02447E-$024485).
-  `src/sound96.asm` is the sound driver, the Z80 program, the bank directory, the 168 bank items, the sound calls and newcheck ($024486-$088809). The Z80 program and each bank item are incbins. The SndItem directory and the calls stay source. newcheck is the last routine.
+  `src/sound/sound96.asm` is the sound driver, the Z80 program, the bank directory, the 168 bank items, the sound calls and newcheck ($024486-$088809). The Z80 program and each bank item are incbins. The SndItem directory and the calls stay source. newcheck is the last routine.
   `front/scout96.asm` is the scouting text and the picture after it (ScoutTextScript and unk_88A18, $08880A-$08F2C5).
   `src/graphics96.asm` is the pictures, one incbin per label ($08F2C6-$1D6621). A map is one file; the tiles are eight bytes in.
   `tools/extractAssets96.js` writes those files, the team palettes included. `tools/prebuild.js` runs it. data96_02 through data96_10 and code96_13 are gone.
