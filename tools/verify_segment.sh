@@ -14,5 +14,5 @@ wine cmd /c "buildseg.bat $s" >>$log 2>&1
 if [ ! -s output/$s.bin ] || grep -qP '^[1-9]\d* error' output/Build_$s.log; then
   echo "ASSEMBLY FAILED: see output/Build_$s.log"; grep -iE 'error' output/Build_$s.log | head -20; exit 1; fi
 node tools/fixopcodes.js "output/$s .lst" output/$s.bin >>$log 2>&1
-node tools/verifySegment.js $s $org lst/nhl96.bin 2>&1 | tee -a $log
+node tools/verifySegment.js $s $org retail 2>&1 | tee -a $log
 exit ${PIPESTATUS[0]}
