@@ -1,6 +1,9 @@
 // NHL 96 asset extractor.
 // Usage: node tools/extractAssets96.js lst/nhl96.bin
 // Writes Extracted/NHL96/... and Extracted/.extract-complete.json last.
+// It also writes Extracted/PlayerNames.txt and Extracted/TeamNicknames.txt: the real NHLPA player names and NHL team nicknames, one
+// per line in the order of the rows of src/teamdata96.asm, which holds placeholders; tools/prebuild.js (writeNames) puts them
+// back into the copy of the source that is assembled.
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.join(__dirname, '..');
@@ -470,6 +473,32 @@ const assets = [
     { name: 'unk_1D5420.map.jim', folder: 'NHL96/Graphics', start: 0x001d5420, end: 0x001d579e }, // unk_1D5420
     { name: 'revframetbl.map.jim', folder: 'NHL96/Graphics', start: 0x001d579e, end: 0x001d6622 }, // revframetbl
 ];
+// The licensed names of the ROM, in the order of the rows of src/teamdata96.asm (the team records in ROM order): the player names
+// (the Player rows) and the team nicknames (the .tm String of each team). TeamList ($77E) holds 28 long pointers to the team
+// records; 96 has no All-Star teams, its two All-Star slots point to Boston and Montreal. A record starts with six word offsets,
+// the first leads to the players: each is a row prefix word that counts itself, the name (padded to an even length with $00)
+// and 8 rating bytes; the word 2 (an empty String) ends them. Then come four Strings (a length word that counts itself, then the
+// text): city, abbreviation, nickname, arena.
+const TEAM_LIST = 0x77E;
+function readTeamNames(romData) {
+  const records = [];
+  for (let i = 0; i < 28; i++) records.push(romData.readUInt32BE(TEAM_LIST + i * 4));
+  const unique = [...new Set(records)].sort((a, b) => a - b);
+  const players = [], nicknames = [];
+  for (const rec of unique) {
+    let pos = rec + romData.readUInt16BE(rec);
+    for (let len = romData.readUInt16BE(pos); len > 2; len = romData.readUInt16BE(pos)) {
+      players.push(romData.toString('latin1', pos + 2, pos + len).replace(/\0/g, ''));
+      pos += len + 8;
+    }
+    pos += 2;                                            // the empty String that ends the players
+    pos += romData.readUInt16BE(pos);                    // city
+    pos += romData.readUInt16BE(pos);                    // abbreviation
+    const len = romData.readUInt16BE(pos);               // nickname
+    nicknames.push(len > 2 ? romData.toString('latin1', pos + 2, pos + len).replace(/\0/g, '') : '');
+  }
+  return { players, nicknames };
+}
 const outRoot = path.join(ROOT, 'Extracted');
 const rom = fs.readFileSync(romPath);
 const version = detectVersion(rom);
@@ -484,7 +513,13 @@ for (const asset of assets) {
   fs.writeFileSync(path.join(dir, asset.name), data);
   written.push({ path: path.posix.join(asset.folder.replace(/\\/g, '/'), asset.name), size: data.length });
 }
+const { players, nicknames } = readTeamNames(rom);
+for (const [file, lines] of [['PlayerNames.txt', players], ['TeamNicknames.txt', nicknames]]) {
+  const text = lines.join('\n') + '\n';
+  fs.writeFileSync(path.join(outRoot, file), text, 'latin1');
+  written.push({ path: file, size: text.length });
+}
 const sha1 = (b) => require('crypto').createHash('sha1').update(b).digest('hex');
 fs.writeFileSync(markerPath, JSON.stringify({ rom: version.id, romSha1: sha1(rom), extractor: path.basename(__filename),
   extractorSha1: sha1(fs.readFileSync(__filename)), files: written }, null, 1) + '\n');
-console.log('Extracted ' + assets.length + ' assets to ' + outRoot + '.');
+console.log('Extracted ' + assets.length + ' assets and ' + players.length + ' player names to ' + outRoot + '.');

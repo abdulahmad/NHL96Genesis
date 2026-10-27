@@ -107,9 +107,41 @@ if (!romPath) {
     stop(lines);
 }
 
+// The licensed names: src/teamdata96.asm holds placeholders instead of the NHLPA player names and the NHL team nicknames. The
+// extractor writes the real ones to Extracted/PlayerNames.txt and Extracted/TeamNicknames.txt (one per line, in source order);
+// this copies the file to output/names/ with each placeholder replaced, and nhl96.asm and the teamdata96 segment stub include
+// the copy. A name must have the length of its placeholder (the Player macro writes the row length). Player rows are replaced
+// in order; a nickname placeholder is 'N' + its two-digit number in TeamNicknames.txt, padded with '_'.
+function writeNames() {
+    const read = (f) => { const l = fs.readFileSync(path.join(EXTRACTED, f), 'latin1').split('\n'); if (l[l.length - 1] === '') l.pop(); return l; };
+    const players = read('PlayerNames.txt'), nicks = read('TeamNicknames.txt');
+    const fail = (msg) => { console.error('names: ' + msg); console.error('*** BUILD STOPPED: the player names could not be put back ***'); process.exit(1); };
+    let p = 0;
+    const outDir = path.join(ROOT, 'output', 'names');
+    fs.mkdirSync(outDir, { recursive: true });
+    const out = fs.readFileSync(path.join(ROOT, 'src', 'teamdata96.asm'), 'latin1')
+        .replace(/^([ \t]*Player[ \t]+')((?:[^']|'')*)(')/gm, (m, a, ph, z) => {
+            const real = players[p++];
+            if (real === undefined) fail(`src/teamdata96.asm has more Player rows than PlayerNames.txt has names (${players.length})`);
+            const want = ph.replace(/''/g, "'").length;
+            if (real.length !== want) fail(`Player row ${p}: the name '${real}' has ${real.length} characters, its placeholder '${ph}' has ${want}`);
+            return a + real.replace(/'/g, "''") + z;
+        })
+        .replace(/'(N(\d\d)_*)'/g, (m, ph, id) => {
+            const real = nicks[Number(id) - 1];
+            if (real === undefined) fail(`nickname placeholder '${ph}' has no entry in TeamNicknames.txt (${nicks.length})`);
+            if (real.length !== ph.length) fail(`nickname ${id}: '${real}' has ${real.length} characters, its placeholder '${ph}' has ${ph.length}`);
+            return "'" + real.replace(/'/g, "''") + "'";
+        });
+    fs.writeFileSync(path.join(outDir, 'teamdata96.asm'), out, 'latin1');
+    if (p !== players.length) fail(`PlayerNames.txt has ${players.length} names, src/teamdata96.asm has ${p} Player rows`);
+    console.log(`prebuild: ${p} player names, ${nicks.length} team nicknames -> output/names/`);
+}
+
 // 2. Extracted/ assets: extract again if missing or incomplete.
 const why = extractedState();
 if (!why) {
+    writeNames();
     console.log('prebuild: ROM OK, Extracted/ assets complete.');
     process.exit(0);
 }
@@ -124,4 +156,5 @@ if (after) {
 }
 const summary = out.split(/\r?\n/).filter((l) => /^ROM:|^Extracted \d+ (assets|slices)/.test(l));
 for (const l of summary) console.log('prebuild: ' + l);
+writeNames();
 console.log('prebuild: Extracted/ assets complete.');

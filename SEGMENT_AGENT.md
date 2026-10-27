@@ -10,7 +10,7 @@ Naming lineage is 92G -> 93G -> 94G -> 95G -> 96G.
 - A routine, variable or table that matches its parent takes the parent's name. 92G is the naming root. A 96 routine that matches 95G takes the 95G name.
 - Clash rule: if one name would mean two different things, the earliest game's meaning keeps the name and the later one gets a new name.
 - Fix the earliest repo first, then propagate the change down the lineage (92 -> 93 -> 94 -> 95 -> 96).
-- Team names: 93 uses the city names of its own data; 94, 95 and 96 use NYIslanders / NYRangers (short NYI / NYR).
+- Team names: 93 uses the city names of its own data; 94, 95 and 96 use NYI / NYR style abbreviations (team nicknames are not in the repo).
 
 Source style:
 - No rename-history, provenance or origin-tag comments ("was X", "from 95G", "renamed", `IDA: loc_...`). That history lives in `docs/name_map.csv` only.

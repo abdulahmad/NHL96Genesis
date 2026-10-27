@@ -1,6 +1,8 @@
 # NHL 96 Genesis
 
-> **Making a mod, hack, port or other derivative work from this repo? You must credit me (abdulahmad) and everyone credited in this repo, clearly, in your own repo and in every release. See [Credits and derivative works](#credits-and-derivative-works).**
+> **📀 Game data is not included.** This repository has the assembly code only. The graphics, team palettes, sound samples, music and the NHLPA player names and NHL team nicknames are extracted from your own copy of the original ROM when you build, and are not in the repo. You need the NHL 96 Genesis ROM at `lst/nhl96.bin` (SHA-1 in the build's message, `START_HERE.md`), or the build stops.
+
+> **🤝 Making a mod, hack, port or other derivative work from this repo? You must credit me (abdulahmad) and everyone credited in this repo, clearly, in your own repo and in every release. See [Credits and derivative works](#credits-and-derivative-works).**
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how changes are made (names, comments, layout, verification).
 
@@ -17,7 +19,7 @@ Start with `START_HERE.md` (setup, build, contributor workflow), then `SEGMENT_A
 
 | Path | What it is |
 | --- | --- |
-| `lst/nhl96.bin`, `lst/nhl96.bin.lst` | The reference ROM (2 MB) and its IDA listing (ASM68K / MRI mode, no address column). |
+| `lst/nhl96.bin`, `lst/nhl96.bin.lst` | The reference ROM (2 MB) and its IDA listing (ASM68K / MRI mode, no address column). Local files: neither is in the repo (gitignored). |
 | `src/nhl96.asm` | Top level: the equates, `org 0`, every segment in ROM order with its start address, the `$FF` fill. |
 | `src/<segment>.asm`, `src/engine/`, `src/front/` | One file per segment, no `org`. A second piece of a 95 file has a suffix. |
 | `src/stubinc/` | `<segment>_stub.asm` (org, equates, outside addresses, the segment) plus `ports.inc` and `equals.inc` (from 95G). |
