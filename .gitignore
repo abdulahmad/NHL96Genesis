@@ -11,3 +11,4 @@ lst/*.lst
 /*.bin
 /*.gen
 nhl96retail.bin
+package-lock.json
