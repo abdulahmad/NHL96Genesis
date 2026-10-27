@@ -19,14 +19,14 @@ wine cmd /c "set checksum=1&& build96.bat" >output/top.log 2>&1
 grep -qP '^[1-9]\d* error' output/Build96.log && { say "TOP ERRORS in output/Build96.log"; fail=1; }
 [ -s output/nhl96.bin ] || { say "TOP NO BIN"; fail=1; }
 node tools/fixopcodes.js "output/nhl96 .lst" output/nhl96.bin >>output/top.log 2>&1
-r=$(node tools/verifyRom.js output/modified_nhl96.bin lst/nhl96.bin 2>&1 | head -1); say "ROM: $r"; [[ $r == MATCH* ]] || fail=1
+r=$(node tools/verifyRom.js output/modified_nhl96.bin retail 2>&1 | head -1); say "ROM: $r"; [[ $r == MATCH* ]] || fail=1
 for s in $(node -e 'for(const k in require("./package.json").scripts) if(/^seg:/.test(k)) console.log(k.slice(4))'); do
   org=$(node -e "console.log(require('./package.json').scripts['seg:$s'].match(/verifySegment.js \S+ (\S+)/)[1])")
   log=output/seg_$s.log; rm -f output/$s.bin output/modified_$s.bin
   wine cmd /c "buildseg.bat $s" >$log 2>&1
   if [ ! -s output/$s.bin ] || grep -qP '^[1-9]\d* error' output/Build_$s.log; then say "$s: ASSEMBLY FAILED (output/Build_$s.log)"; fail=1; continue; fi
   node tools/fixopcodes.js "output/$s .lst" output/$s.bin >>$log 2>&1
-  r=$(node tools/verifySegment.js $s $org lst/nhl96.bin 2>&1 | tee -a $log | head -1); say "$s: $r"; [[ $r == MATCH* ]] || fail=1
+  r=$(node tools/verifySegment.js $s $org retail 2>&1 | tee -a $log | head -1); say "$s: $r"; [[ $r == MATCH* ]] || fail=1
 done
 say "$( [ $fail = 0 ] && echo 'ALL MATCH' || echo 'FAILURES: see above')"
 exit $fail
