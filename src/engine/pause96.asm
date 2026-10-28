@@ -1,7 +1,8 @@
 ;	The demo and the pause menu. demoread reads a pad during a demo and can start the pause.
 ;	Pausemode draws the pause screen and runs the menu until it ends.
 
-demoread	;In a demo (no pad on a team): start on a pad starts the pause, any other button ends the demo
+demoread							;In a demo (no pad on a team): start on a pad starts the pause, any other
+									;button ends the demo
 	tst.w	(cont1team).w
 	bne.w	rtsdemo
 	tst.w	(cont2team).w
@@ -34,7 +35,8 @@ demoread	;In a demo (no pad on a team): start on a pad starts the pause, any oth
 	beq.w	EndDemoOnPress
 	jmp	startpause4
 
-EndDemoOnPress	;A button d1 ends the demo: demoflag, then back to the title (ExitToOpening)
+EndDemoOnPress						;A button d1 ends the demo: demoflag, then back to the title
+									;(ExitToOpening)
 	tst.w	d1
 	beq.w	rtsdemo
 	st	(demoflag).w
@@ -45,33 +47,34 @@ EndDemoOnPress	;A button d1 ends the demo: demoflag, then back to the title (Exi
 rtsdemo
 	rts
 
-startpause	;Pause on (sfpz)
-	bset	#0,(sflags).w
+startpause							;Pause on (sfpz)
+	bset	#sfpz,(sflags).w
 	rts
 
-startpause1	;Pause initiated by cont 1
+startpause1							;Pause initiated by cont 1
 	clr.w	(menupadnum).w
 	bra.s	startpause
 
-startpause2	;Pause initiated by cont 2
+startpause2							;Pause initiated by cont 2
 	move.w	#1,(menupadnum).w
 	bra.s	startpause
 
-startpause3	;Pause initiated by cont 3 (4 way play)
+startpause3							;Pause initiated by cont 3 (4 way play)
 	move.w	#2,(menupadnum).w
 	bra.s	startpause
 
-startpause4	;Pause initiated by cont 4 (4 way play)
+startpause4							;Pause initiated by cont 4 (4 way play)
 	move.w	#3,(menupadnum).w
 	bra.s	startpause
 
-Pausemode	;Game is in pause mode now: restart the sound driver, run the pause menu (HandleMenuInput) until it ends,
-	;then restart the sound driver again
+Pausemode							;Game is in pause mode now: restart the sound driver, run the pause menu
+									;(HandleMenuInput) until it ends,
+									;then restart the sound driver again
 	jsr	(forceblack).l
 	move.w	d0,-(sp)
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop
 	move.w	(sp)+,d0
 	jsr	(SoundOff).l
@@ -138,11 +141,12 @@ Pausemode	;Game is in pause mode now: restart the sound driver, run the pause me
 	dc.b	$00,$02,$03,$4A,$31,$FC,$00,$18,$BD,$3C,$4A,$78,$BD,$3C,$6A,$FA
 	dc.b	$31,$F8,$B0,$52,$B0,$54,$4E,$75
 
-SetupPauseScreen	;Draw routine for the pause menu: the pause screen, then KillCrowd.
-	;Code the listing does not decode: kept as bytes
+SetupPauseScreen					;Draw routine for the pause menu: the pause screen, then KillCrowd.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$1E,$29,$70,$4E,$B9,$00,$02,$0E,$28
 
-seta2	;Set a2 to the team struct of the pause pad (menupadnum: cont1team ... cont4team)
+seta2								;Set a2 to the team struct of the pause pad
+									;(menupadnum: cont1team ... cont4team)
 	movea.l	#tmstruct,a2
 	tst.w	(menupadnum).w
 	beq.w	.seta20
@@ -166,29 +170,31 @@ seta2	;Set a2 to the team struct of the pause pad (menupadnum: cont1team ... con
 .x
 	rts
 
-InitMenuState	;Start a menu: a0 = item list, a1 = screen draw routine; selection and first shown item 0. Falls into
-	;DrawMenuScreen
+InitMenuState						;Start a menu: a0 = item list, a1 = screen draw routine; selection and
+									;first shown item 0. Falls into
+									;DrawMenuScreen
 	move.l	a0,(menulist).w
 	move.l	a1,(menudraw).w
 	clr.w	(menuitem).w
-	clr.w	(word_FFD000).w
+	clr.w	(menuitem+2).w
 
-DrawMenuScreen	;Call the draw routine, print the items (UpdateMenuSelection), palcount $18
+DrawMenuScreen						;Call the draw routine, print the items
+									;(UpdateMenuSelection), palcount $18
 	movea.l	(menudraw).w,a0
 	jsr	(a0)
 	bsr.w	UpdateMenuSelection
 	move.w	#$18,(palcount).w
 	rts
 
-SetMenuPrintX	;printx = 5, 9 with disflags bit 1 clear
+SetMenuPrintX						;printx = 5, 9 with disflags bit 1 clear
 	move.w	#5,(printx).w
-	btst	#1,(disflags).w
+	btst	#df32c,(disflags).w
 	bne.w	rtss8
 	addq.w	#4,(printx).w
 	rts
 
-HandleMenuInput	;Pause menu pad d1: up / down move the selection, C runs the item handler; start returns with the
-	;zero flag set to end the menu
+HandleMenuInput						;Pause menu pad d1: up / down move the selection, C runs the item handler;
+									;start returns with the zero flag set to end the menu
 	btst	#7,d1
 	bne.w	.2
 	btst	#1,d1
@@ -240,7 +246,8 @@ HandleMenuInput	;Pause menu pad d1: up / down move the selection, C runs the ite
 	eori	#4,ccr
 	rts
 
-UpdateMenuSelection	;Clamp menuitem to the list, scroll word_FFD000 to show it, and print the shown items
+UpdateMenuSelection					;Clamp menuitem to the list, scroll menuitem+2 to show it, and print the
+									;shown items
 	jsr	(printsmallz).l
 	String	$FE,$04
 	move.w	(menuitem).w,d0
@@ -261,21 +268,21 @@ UpdateMenuSelection	;Clamp menuitem to the list, scroll word_FFD000 to show it, 
 	addq.w	#1,d0
 	sub.w	d0,(menuitem).w
 	move.w	(menuitem).w,d0
-	cmp.w	(word_FFD000).w,d0
+	cmp.w	(menuitem+2).w,d0
 	bge.w	.4
-	move.w	d0,(word_FFD000).w
+	move.w	d0,(menuitem+2).w
 .4
 	subq.w	#7,d0
-	cmp.w	(word_FFD000).w,d0
+	cmp.w	(menuitem+2).w,d0
 	ble.w	.0
-	move.w	d0,(word_FFD000).w
+	move.w	d0,(menuitem+2).w
 .0
 	bsr.w	SetMenuPrintX
 	move.w	#6,(printy).w
 	movea.l	(menulist).w,a1
 	jsr	(printbigcur).l
 	adda.w	(a1),a1
-	move.w	(word_FFD000).w,d0
+	move.w	(menuitem+2).w,d0
 	bra.w	.7
 .skip
 	adda.w	(a1),a1
@@ -287,7 +294,7 @@ UpdateMenuSelection	;Clamp menuitem to the list, scroll word_FFD000 to show it, 
 	bsr.w	SetMenuPrintX
 	jsr	(printsmallz).l
 	String	$FB,$01,$FA,$02,$20,$FB,$12,$20,$FA,$FE,$FB,$EB
-	move.w	(word_FFD000).w,d0
+	move.w	(menuitem+2).w,d0
 	beq.w	.2
 	jsr	(printsmallz).l
 	String	$FE,$07,$FB,$01,$FA,$02,$7B,$FB,$12,$7B,$FA,$FE,$FE,$04
@@ -319,8 +326,8 @@ UpdateMenuSelection	;Clamp menuitem to the list, scroll word_FFD000 to show it, 
 	String	$FB,$01,$FC,$14,$20,$FB,$12,$20
 	rts
 
-PrintMenuItem	;printsmall item String a1; an item that starts with x prints MANUAL GOALIE or AUTO GOALIE
-	;(goaliemode1 / goaliemode2 by the pause pad)
+PrintMenuItem						;printsmall item String a1; an item that starts with x prints MANUAL
+									;GOALIE or AUTO GOALIE (goaliemode1 / goaliemode2 by the pause pad)
 	cmpi.b	#$78,2(a1)
 	bne.w	.0
 	move.l	a1,-(sp)
@@ -348,14 +355,14 @@ PrintMenuItem	;printsmall item String a1; an item that starts with x prints MANU
 .12
 	String	'   AUTO GOALIE    '
 
-vcountwait	;Wait for the next vblank
+vcountwait							;Wait for the next vblank
 	move.w	d0,-(sp)
-	move.w	(oldvcount).w,d0
-	move.w	(oldvcount).w,d0
+	move.w	(OldVcount).w,d0
+	move.w	(OldVcount).w,d0
 .wait
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.wait
-	move.w	(oldvcount).w,(vcount).w
+	move.w	(OldVcount).w,(Vcount).w
 	move.w	(sp)+,d0
 	rts
 

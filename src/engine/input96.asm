@@ -2,19 +2,19 @@
 ;	doinput handles the goalie (the dive, button C, the animation check) and the skater, including
 ;	the puck carrier. PadOnTeam reports whether the pad is on the player's team.
 
-updatepadinput	;Pad d6 (0-6): read it, run doinput for its player and keep impact
-	cmp.w	(c1playernum).w,d6	;check if cont 1 is puck carrier
+updatepadinput						;Pad d6 (0-6): read it, run doinput for its player and keep impact
+	cmp.w	(c1playernum).w,d6		;check if cont 1 is puck carrier
 	bne.w	.t0
 	jsr	(ReadJoy1).l
-	clr.w	d4	;pad index for cont 1 player
+	clr.w	d4						;pad index for cont 1 player
 	move.w	#$FFFF,(joypuckcarrier).w
 	jsr	(doinput).l
 	bra.w	.t1
 .t0
-	cmp.w	(c2playernum).w,d6	;check if cont 2 is puck carrier
+	cmp.w	(c2playernum).w,d6		;check if cont 2 is puck carrier
 	bne.w	.t1
 	jsr	(ReadJoy2).l
-	move.w	#2,d4	;pad index for cont 2 player
+	move.w	#2,d4					;pad index for cont 2 player
 	move.w	#$FFFF,(joypuckcarrier).w
 	jsr	(doinput).l
 .t1
@@ -33,28 +33,29 @@ updatepadinput	;Pad d6 (0-6): read it, run doinput for its player and keep impac
 	jsr	(doinput).l
 .t1cont
 	jsr	(doassignment).l
-	clr.w	Wallcos(a3)	;clear wallcos
-	clr.w	Wallsin(a3)	;clear wallsin
-	move.w	(a3),d2	;Xpos
-	move.w	Ypos(a3),d3	;Ypos
-	cmp.w	OldXpos(a3),d2	;compare to oldXpos
-	bne.w	.cc	;branch if not equal
-	cmp.w	OldYpos(a3),d3	;compare to oldYpos
-	beq.w	.nf	;branch if equal
+	clr.w	Wallcos(a3)				;clear wallcos
+	clr.w	Wallsin(a3)				;clear wallsin
+	move.w	(a3),d2					;Xpos
+	move.w	Ypos(a3),d3				;Ypos
+	cmp.w	OldXpos(a3),d2			;compare to oldXpos
+	bne.w	.cc						;branch if not equal
+	cmp.w	OldYpos(a3),d3			;compare to oldYpos
+	beq.w	.nf						;branch if equal
 .cc
-	jsr	(checkcoll).l	;check for collisions
+	jsr	(checkcoll).l				;check for collisions
 .nf
-	move.w	d7,d0	;move d7 into d0 (elapsed frames)
-	asl.w	#1,d0	;mult by 2
-	sub.w	d0,impact(a3)	;reduce impact at a constant rate
-	bpl.w	.nf1	;branch if positive
-	clr.w	impact(a3)	;clear impact if negative or zero
+	move.w	d7,d0					;move d7 into d0 (elapsed frames)
+	asl.w	#1,d0					;mult by 2
+	sub.w	d0,impact(a3)			;reduce impact at a constant rate
+	bpl.w	.nf1					;branch if positive
+	clr.w	impact(a3)				;clear impact if negative or zero
 .nf1
 	move.w	impact(a3),limpact(a3)	;move impact into limpact
 	rts
 
-doinput	;Process controller input for player a3: d0 = dpad, d1 = new buttons, d2 = changed buttons, d3 = held buttons,
-	;d4 = pad 0 / 2 / 4 / 6
+doinput								;Process controller input for player a3: d0 = dpad, d1 = new buttons, d2 =
+									;changed buttons, d3 = held buttons,
+									;d4 = pad 0 / 2 / 4 / 6
 	bclr	#0,(sflags13).w
 	btst	#4,d3
 	beq.w	.7
@@ -71,10 +72,10 @@ doinput	;Process controller input for player a3: d0 = dpad, d1 = new buttons, d2
 	add.w	d4,d4
 	movem.l	(sp)+,a0
 .0
-	btst	#4,d1	;B button
-	beq.w	.1	;branch if not pressed
-	btst	#5,d1	;C button
-	beq.w	.1	;branch if not pressed
+	btst	#4,d1					;B button
+	beq.w	.1						;branch if not pressed
+	btst	#5,d1					;C button
+	beq.w	.1						;branch if not pressed
 	bclr	#4,d1
 	bset	#6,pflags3(a3)
 	bra.w	.5
@@ -105,7 +106,7 @@ doinput	;Process controller input for player a3: d0 = dpad, d1 = new buttons, d2
 	move.w	d0,(TempWord1).w
 	andi.w	#$F,(TempWord1).w
 	jsr	(setpads).l
-	btst	#7,d1	;start button
+	btst	#7,d1					;start button
 	beq.w	.10
 	tst.w	position(a3)
 	beq.w	.8
@@ -132,18 +133,18 @@ doinput	;Process controller input for player a3: d0 = dpad, d1 = new buttons, d2
 	bne.w	.10
 	jmp	startpause4
 .10
-	btst	#7,(sflags).w
+	btst	#sfhor,(sflags).w
 	beq.w	.nostart
 	btst	#3,d0
 	bne.w	.nostart
 	addq.w	#2,d0
 	andi.w	#7,d0
 .nostart
-	btst	#0,(sflags2).w
+	btst	#sf2faceoff,(sflags2).w
 	bne.w	faceoffinput
-	btst	#3,pflags2(a3)
+	btst	#pf2lcm,pflags2(a3)
 	bne.w	lineinput
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	beq.w	rtss15
 	movem.l	d0-d2/a0/a3,-(sp)
 	move.w	(lastplayer).w,d0
@@ -175,9 +176,9 @@ doinput	;Process controller input for player a3: d0 = dpad, d1 = new buttons, d2
 	beq.w	.24
 	jsr	(PuckOnAttackHalf).l
 	beq.w	.24
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	bne.w	.24
-	btst	#3,pflags3(a3)
+	btst	#pf3onetimer,pflags3(a3)
 	bne.w	.24
 	move.w	d4,(inputjoy).w
 	bsr.w	PadOnTeam
@@ -200,36 +201,36 @@ doinput	;Process controller input for player a3: d0 = dpad, d1 = new buttons, d2
 	movem.w	d1,-(sp)
 	move.w	#SPA099A,d1
 	jsr	(SetSPA).l
-	bset	#5,pflags(a3)
+	bset	#pfalock,pflags(a3)
 	movem.w	(sp)+,d1
 	bra.w	doinput_islocked
 .32
-	btst	#0,pflags2(a3)
+	btst	#pf2fight,pflags2(a3)
 	beq.w	.37
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	doinput_islocked
 	bra.w	fightinput
 .37
 	move.w	(puckc).w,d5
 	cmp.w	SCnum(a3),d5
 	bne.w	.38
-	btst	#3,pflags3(a3)
+	btst	#pf3onetimer,pflags3(a3)
 	bne.w	doinput_ispc
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	beq.w	doinput_ispc
 	bra.w	doinput_islocked
 .38
 	tst.w	position(a3)
 	bne.w	.39
-	btst	#3,pflags3(a3)
+	btst	#pf3onetimer,pflags3(a3)
 	bne.w	.11
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	.39
 	bra.w	.11
 .39
-	btst	#3,pflags3(a3)
+	btst	#pf3onetimer,pflags3(a3)
 	beq.w	.57
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	doinput_islocked
 	bra.w	.11
 .57
@@ -245,7 +246,7 @@ doinput	;Process controller input for player a3: d0 = dpad, d1 = new buttons, d2
 	bset	#3,(GameFlags).w
 	rts
 .40
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	doinput_islocked
 	bra.w	.11
 .41
@@ -277,9 +278,9 @@ doinput	;Process controller input for player a3: d0 = dpad, d1 = new buttons, d2
 	move.w	(sp)+,d0
 	rts
 .43
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	doinput_islocked
-	jmp	holdplayer
+	jmp	Holdplayer
 .11
 	tst.w	position(a3)
 	beq.w	.12
@@ -404,7 +405,7 @@ doinput	;Process controller input for player a3: d0 = dpad, d1 = new buttons, d2
 	movea.l	#SortCords,a3
 	asl.w	#7,d0
 	adda.w	d0,a3
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	movem.l	(sp)+,d0/a3
 	bne.w	rtss15
 	tst.w	d4
@@ -424,7 +425,7 @@ doinput	;Process controller input for player a3: d0 = dpad, d1 = new buttons, d2
 	tst.w	position(a3)
 	bne.w	doinput_skater
 
-doinput_goaliedive	;Goalie: A with a dpad direction dives that way (SPAgdive)
+doinput_goaliedive					;Goalie: A with a dpad direction dives that way (SPAgdive)
 	btst	#6,d1
 	beq.w	doinput_cbut
 	move.w	(TempWord1).w,d0
@@ -434,15 +435,15 @@ doinput_goaliedive	;Goalie: A with a dpad direction dives that way (SPAgdive)
 	move.b	#8,nopuck(a3)
 	move.w	#SPAgdive,d1
 	jsr	(SetSPA).l
-	bset	#1,pflags2(a3)
-	bset	#5,pflags(a3)
-	addi.w	#$96,(crowdlevel).w
+	bset	#pf2aip,pflags2(a3)
+	bset	#pfalock,pflags(a3)
+	addi.w	#$96,(Crowdlevel).w
 
-rtss15	;The shared rts of doinput_goaliedive and doinput_cbut
+rtss15								;The shared rts of doinput_goaliedive and doinput_cbut
 	rts
 
-doinput_cbut	;Button C (bit 5): new press: face the puck (vtoa) and go on below; held: hold the SPA frame
-	;(SPAcnt $A) at the end
+doinput_cbut						;Button C (bit 5): new press: face the puck (vtoa) and go on below; held:
+									;hold the SPA frame (SPAcnt $A) at the end
 	btst	#5,d1
 	bne.w	.press
 	btst	#5,d3
@@ -470,7 +471,7 @@ doinput_cbut	;Button C (bit 5): new press: face the puck (vtoa) and go on below;
 	move.w	#$A,SPAcnt(a3)
 	rts
 .press
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	doinput_chkanim
 	movem.w	d0-d1,-(sp)
 	move.w	(puckx).w,d0
@@ -510,11 +511,11 @@ doinput_cbut	;Button C (bit 5): new press: face the puck (vtoa) and go on below;
 	movem.w	(sp)+,d0-d1
 	bra.w	.near
 .far
-	jsr	(sroot).l
+	jsr	(Sroot).l
 	moveq	#1,d2
 	add.w	d0,d2
 	moveq	#$12,d4
-	btst	#3,(sflags).w
+	btst	#sfssdir,(sflags).w
 	beq.w	.6
 	addq.w	#8,d4
 .6
@@ -533,21 +534,22 @@ doinput_cbut	;Button C (bit 5): new press: face the puck (vtoa) and go on below;
 	cmpi.w	#$C,2(a0)
 	cmpi.w	#$11E,(pucky).w
 	cmpi.w	#$FEE2,(pucky).w
-	bset	#1,pflags2(a3)
+	bset	#pf2aip,pflags2(a3)
 	bne.w	doinput_chkanim
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#puckcross,a0
 	move.w	#$11E,d3
-	btst	#7,pflags(a3)
-	beq.w	.save	;branch if bottom net
+	btst	#pfgoal,pflags(a3)
+	beq.w	.save					;branch if bottom net
 	neg.w	d3
-	addq.w	#4,a0	;puckcross+4 (for bottom goalie)
+	addq.w	#4,a0					;puckcross+4 (for bottom goalie)
 .save
 	jsr	(goaliesave).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-ClampTargetY	;Clamp target y d1 to $119 / $FEE7, then d1 - d3; d0 = 0 for the puck carrier
+ClampTargetY						;Clamp target y d1 to $119 / $FEE7, then d1 - d3; d0 = 0 for the puck
+									;carrier
 	move.w	(puckc).w,d2
 	cmp.w	SCnum(a3),d2
 	bne.w	.0
@@ -567,13 +569,14 @@ ClampTargetY	;Clamp target y d1 to $119 / $FEE7, then d1 - d3; d0 = 0 for the pu
 	;SPAgstickl, then SPAgglover, SPAgglovel, SPAgstickr, SPAgstickl
 	dc.w	SPAgglover,SPAgglovel,SPAgstackr,SPAgstackl,SPAgstickr,SPAgstickl,SPAgglover,SPAgglovel,SPAgstickr,SPAgstickl
 
-doinput_chkanim	;Animation in progress (pflags2 bit 1): rts. Then the goalie checks, then playeracc with TempWord1
-	btst	#1,pflags2(a3)
+doinput_chkanim						;Animation in progress (pflags2 bit 1): rts. Then the goalie checks, then
+									;playeracc with TempWord1
+	btst	#pf2aip,pflags2(a3)
 	beq.w	.0
 	rts
 .0
 	tst.w	position(a3)
-	bne.w	loc_AFD4
+	bne.w	JumpToDoplayeracc
 	bclr	#1,(BA_PS_flags).w
 	cmpi.w	#$24,(a3)
 	ble.w	.1
@@ -594,7 +597,7 @@ doinput_chkanim	;Animation in progress (pflags2 bit 1): rts. Then the goalie che
 	bgt.w	.4
 	cmpi.w	#$FF19,Ypos(a3)
 	ble.w	.4
-	bra.w	*+4	;to the next instruction
+	bra.w	*+4						;to the next instruction
 .3
 	movem.w	d0-d1,-(sp)
 	move.w	Ypos(a3),d0
@@ -612,12 +615,12 @@ doinput_chkanim	;Animation in progress (pflags2 bit 1): rts. Then the goalie che
 	move.w	(TempWord1).w,d0
 	jmp	doplayeracc
 
-doinput_skater	;Skater input (doinput, position not 0)
+doinput_skater						;Skater input (doinput, position not 0)
 	move.w	(TempWord1).w,d0
-	btst	#3,pflags3(a3)
+	btst	#pf3onetimer,pflags3(a3)
 	bne.w	rtss7
 	btst	#5,d1
-	beq.w	loc_AFD4
+	beq.w	JumpToDoplayeracc
 	movem.l	d7-a0,-(sp)
 	move.w	(lastplayer).w,d7
 	asl.w	#7,d7
@@ -650,16 +653,16 @@ doinput_skater	;Skater input (doinput, position not 0)
 	move.w	(sp)+,d0
 	rts
 
-doinput_ispc	;The puck carrier: checkob, then pass mode, shot mode, or the buttons
+doinput_ispc						;The puck carrier: checkob, then pass mode, shot mode, or the buttons
 	jsr	(checkob).l
 	tst.w	position(a3)
 	bne.w	.42
-	btst	#1,pflags2(a3)
+	btst	#pf2aip,pflags2(a3)
 	bne.w	rtss15
 .42
-	btst	#2,(sflags).w
+	btst	#sfspdir,(sflags).w
 	bne.w	passmode
-	btst	#3,(sflags).w
+	btst	#sfssdir,(sflags).w
 	bne.w	ShotMode
 	btst	#4,d1
 	beq.w	.0
@@ -711,7 +714,7 @@ doinput_ispc	;The puck carrier: checkob, then pass mode, shot mode, or the butto
 	cmp.w	#$76,d0
 	blt.w	.55
 	move.w	(pucky).w,d0
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.53
 	neg.w	d0
 .53
@@ -722,7 +725,7 @@ doinput_ispc	;The puck carrier: checkob, then pass mode, shot mode, or the butto
 	bne.w	.3
 	movem.w	d1,-(sp)
 	move.w	#1,d1
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.2
 	move.w	#0,d1
 .2
@@ -734,7 +737,7 @@ doinput_ispc	;The puck carrier: checkob, then pass mode, shot mode, or the butto
 	bset	#2,(GameFlags).w
 	jmp	setpassmode
 .3
-	bset	#0,(GameFlags).w	;fake shot (A released in the attacking zone)
+	bset	#0,(GameFlags).w		;fake shot (A released in the attacking zone)
 	bne.w	.54
 	jmp	SetShotMode
 .54
@@ -753,11 +756,11 @@ doinput_ispc	;The puck carrier: checkob, then pass mode, shot mode, or the butto
 	jmp	doplayeracc
 .7
 	btst	#5,d1
-	beq.w	loc_AFD4
+	beq.w	JumpToDoplayeracc
 	jsr	(sub_1D920A).l
 	bra.w	SetShotMode
 
-doinput_islocked	;B with the player not the carrier: change player (chgplayer)
+doinput_islocked					;B with the player not the carrier: change player (chgplayer)
 	move.w	(puckc).w,d5
 	cmp.w	SCnum(a3),d5
 	beq.w	rtss15
@@ -796,33 +799,34 @@ doinput_islocked	;B with the player not the carrier: change player (chgplayer)
 	movem.l	(sp)+,d0/a0
 	rts
 
-loc_AFD4	;jmp doplayeracc, shared by doinput_chkanim, doinput_skater and doinput_islocked
+JumpToDoplayeracc					;jmp doplayeracc, shared by doinput_chkanim,
+									;doinput_skater and doinput_islocked
 	jmp	doplayeracc
 
-sub_AFDA	;Start with a dpad direction: SPA288C with pflags2 bit 1 set and Xvel + $64,
-	;not while pflags2 bit 2 or gmode bit 0 is set
+sub_AFDA							;Start with a dpad direction: SPA288C with pflags2 bit 1 set and Xvel +
+									;$64, not while pflags2 bit 2 or gmode bit 0 is set
 	btst	#2,pflags2(a3)
 	bne.w	.0
-	btst	#0,(gmode).w
+	btst	#gmclock,(gmode).w
 	bne.w	.0
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	#SPA288C,d1
 	jsr	(SetSPA).l
-	bset	#1,pflags2(a3)
+	bset	#pf2aip,pflags2(a3)
 	addi.w	#$64,Xvel(a3)
 	movem.l	(sp)+,d0-d7/a0-a6
 .0
 	rts
 
-PadOnTeam	;d0 = 1 when pad inputjoy is on the team of player a3 (its cont1team ... cont4team
-	;entry: 1 home, 2 visitors), else 0
+PadOnTeam							;d0 = 1 when pad inputjoy is on the team of player a3 (its cont1team ...
+									;cont4team entry: 1 home, 2 visitors), else 0
 	movem.l	d0-d1/a0,-(sp)
 	movea.l	#cont1team,a0
 	move.w	(inputjoy).w,d0
 	move.w	(a0,d0.w),d0
 	bmi.w	.1
 	move.w	#1,d1
-	btst	#6,pflags(a3)
+	btst	#pfteam,pflags(a3)
 	beq.w	.0
 	move.w	#2,d1
 .0

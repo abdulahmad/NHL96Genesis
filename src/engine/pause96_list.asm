@@ -1,7 +1,7 @@
 ;	Menu lists. PrintMenuList and PrintMenuList2 draw the shown rows of a menu, with the scroll marks.
 
-PrintMenuList	;Print the shown rows of the menu list (menulist) with the scroll marks.
-	;Code the listing does not decode: kept as bytes
+PrintMenuList						;Print the shown rows of the menu list (menulist) with the scroll marks.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$26,$78,$D0,$02,$28,$4B,$D8,$D4,$42,$47,$20,$78
 	dc.b	$D0,$02,$D0,$D0,$D0,$D0,$4A,$68,$00,$02,$6B,$00,$00,$0A,$52,$47
 	dc.b	$D0,$D0,$58,$48,$60,$F0,$30,$38,$CF,$FE,$6A,$00,$00,$08,$42,$78
@@ -24,15 +24,15 @@ PrintMenuList	;Print the shown rows of the menu list (menulist) with the scroll 
 	dc.b	$D0,$0A,$B0,$47,$6C,$00,$00,$08,$22,$7C,$00,$01,$45,$54,$4E,$B9
 	dc.b	$00,$01,$BA,$40,$4C,$DF,$7F,$FF,$4E,$75
 
-ScrollClearTxt	;Scroll marks for PrintMenuList
+ScrollClearTxt						;Scroll marks for PrintMenuList
 	String	$F9,$00,$20
 ScrollUpTxt
 	String	$F9,$00,$7B
 ScrollDownTxt
 	String	$F9,$00,$7D
 
-PrintMenuList2	;Print the shown rows of the menu list (menulist): each item through its routine, the selected item
-	;with the highlight
+PrintMenuList2						;Print the shown rows of the menu list (menulist): each item through its
+									;routine, the selected item with the highlight
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	(menulist).w,a3
 	movea.l	a3,a4
@@ -59,32 +59,32 @@ PrintMenuList2	;Print the shown rows of the menu list (menulist): each item thro
 	subq.w	#1,d0
 	move.w	d0,(menuitem).w
 .2
-	move.w	(word_FFD000).w,d1
-	add.w	(word_FFD00A).w,d1
+	move.w	(menuitem+2).w,d1
+	add.w	(menurows).w,d1
 	cmp.w	(menuitem).w,d1
 	bgt.w	.3
-	addq.w	#1,(word_FFD000).w
+	addq.w	#1,(menuitem+2).w
 	bra.s	.2
 .3
-	move.w	(word_FFD000).w,d1
+	move.w	(menuitem+2).w,d1
 	cmp.w	(menuitem).w,d1
 	ble.w	.4
-	subq.w	#1,(word_FFD000).w
+	subq.w	#1,(menuitem+2).w
 	bra.s	.3
 .4
-	move.w	(word_FFD000).w,d0
+	move.w	(menuitem+2).w,d0
 	movea.l	(menulist).w,a0
 	adda.w	(a0),a0
 	adda.w	(a0),a0
-	move.w	(word_FFD000).w,d0
+	move.w	(menuitem+2).w,d0
 	bra.w	.6
 .5
 	addq.w	#4,a0
 .6
 	dbf	d0,.5
-	move.w	(word_FFB03C).w,(printx).w
-	move.w	(word_FFB03E).w,(printy).w
-	move.w	(word_FFD00A).w,d0
+	move.w	(menux).w,(printx).w
+	move.w	(menuy).w,(printy).w
+	move.w	(menurows).w,d0
 	cmp.w	d7,d0
 	ble.w	.7
 	move.w	d7,d0
@@ -93,7 +93,7 @@ PrintMenuList2	;Print the shown rows of the menu list (menulist): each item thro
 	bra.w	.10
 .8
 	move.w	d1,d2
-	add.w	(word_FFD000).w,d2
+	add.w	(menuitem+2).w,d2
 	movea.l	a3,a1
 	cmp.w	(menuitem).w,d2
 	bne.w	.9
@@ -105,7 +105,7 @@ PrintMenuList2	;Print the shown rows of the menu list (menulist): each item thro
 	jsr	(a0)
 	movem.l	(sp)+,d0-d1/a0
 	jsr	(printsmall).l
-	move.w	(word_FFB03C).w,(printx).w
+	move.w	(menux).w,(printx).w
 	addq.w	#2,(printy).w
 	addq.w	#4,a0
 	addq.w	#1,d1

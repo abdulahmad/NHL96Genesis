@@ -1,3 +1,5 @@
+> **Agents:** read [AGENTS.md](AGENTS.md) first. Any derivative work built from this repo must credit me (abdulahmad) and everyone credited in the README.
+
 # NHL 96 segment agent
 
 This file is the queue. Do not rewrite it as a whole file. Edit it in place.
@@ -8,7 +10,7 @@ Naming lineage is 92G -> 93G -> 94G -> 95G -> 96G.
 - A routine, variable or table that matches its parent takes the parent's name. 92G is the naming root. A 96 routine that matches 95G takes the 95G name.
 - Clash rule: if one name would mean two different things, the earliest game's meaning keeps the name and the later one gets a new name.
 - Fix the earliest repo first, then propagate the change down the lineage (92 -> 93 -> 94 -> 95 -> 96).
-- Team names: 93 uses the city names of its own data; 94, 95 and 96 use NYIslanders / NYRangers (short NYI / NYR).
+- Team names: 93 uses the city names of its own data; 94, 95 and 96 use NYI / NYR style abbreviations (team nicknames are not in the repo).
 
 Source style:
 - No rename-history, provenance or origin-tag comments ("was X", "from 95G", "renamed", `IDA: loc_...`). That history lives in `docs/name_map.csv` only.
@@ -43,7 +45,7 @@ None: every row of the ROM map is matched. Remaining work is the finish plan in 
 ## Rules (SNASM68k, from 95G)
 
 - Write real `cmp`, `cmpi`, and `exg`. `tools/fixopcodes.js` rewrites `cmp #imm` from SNASM's `CMPI` to EA's `CMP` opcode using the listing; a real `cmpi.l #imm,d0` stays `0C80`. Do not write a compare as `dc.w`.
-- `jsr name` only when SNASM emits the same opcode. `jsr (name).l` is `4EB9`, `jsr (name).w` is `4EB8`; `bsr.w` stays `bsr.w`. IDA writes `jsr (sub_1E9038).l`: keep the `.l`.
+- `jsr name` only when SNASM emits the same opcode. `jsr (name).l` is `4EB9`, `jsr (name).w` is `4EB8`; `bsr.w` stays `bsr.w`. IDA writes `jsr (ValidationRoutine).l`: keep the `.l`.
 - A global label ends local-label scope. A local that another routine branches to stays global. SNASM symbols are case-insensitive.
 - Keep each comment line under 200 characters. A longer line makes SNASM write an empty bin.
 - A MATCH of 0 bytes is a failure; the byte count must be the segment's range.
@@ -67,16 +69,16 @@ Every row is matched. Rows are in ROM order and tile `$000000` up to the `$FF` f
 | goal96 | matched, 1402 bytes | $00B04E | $00B5C7 | code | goal95 | SetContTeams, DrawPadSetup, DrawPadIcon, ControllerSetupScreen, PrintSetupStr(Hi), ReadAllPads |
 | fourway96 | matched, 216 bytes | $00B5C8 | $00B69F | code | fourway95 | Detect4WayPlay, ReadJoySwapPad1-4 |
 | fight96 | matched, 3752 bytes | $00B6A0 | $00C547 | code | - | new in 96: checkfight, startfight, SetInst, fightinput, ClearMessageLine; assfight and assfwatch as bytes |
-| logic96 | matched, 9960 bytes | $00C548 | $00EC2F | code | logic95, penalty95 | asstab, the assignment routines (bytes, labelled at their asstab entries), Penaltylist, PenShotPenalties, unk_EBF8 |
+| logic96 | matched, 9960 bytes | $00C548 | $00EC2F | code | logic95, penalty95 | asstab, the assignment routines (bytes, labelled at their asstab entries), Penaltylist, PenShotPenalties, DoubleMinorPenalties |
 | lines96 | matched, 720 bytes | $00EC30 | $00EEFF | code | lines95 | SetLCmode, SetLCmode2, setlccords, getlchoice, lineinput, lcfound, lcfound2 |
-| lines96_set | matched, 1140 bytes | $00EF00 | $00F373 | code | lines95 | NullSaveClear, sub_EF02 (writes a team's lines) |
+| lines96_set | matched, 1140 bytes | $00EF00 | $00F373 | code | lines95 | NullSaveClear, GetTeamLines (the team data lines, or lines built from the ratings: BuildPosList, AddLineSkaters, AddLinePlayer) |
 | input96_shot | matched, 3404 bytes | $00F374 | $0100BF | code | input95 | shotdiradj, shotdirmath, SetShotMode, ShotMode, doshot, setpassmode, passmode, dopass, passtoa0 |
 | trade96 | matched, 2138 bytes | $0100C0 | $010919 | code | trade95 | DefaultRosters, FormatPlayerNameD7, GetRosterName, GetJerseyNumber |
 | season96_sim | matched, 920 bytes | $01091A | $010CB1 | code | season95 | SimGameStats, SimGoalieStats, SimGoalie, PickSimGoalie |
-| season96 | matched, 8012 bytes | $010CB2 | $012BFD | code | - | Season and save RAM handling and its screens, mostly new in 96 (IDA names); DrawSetupTeamBlock |
-| teamgfx96 | matched, 2394 bytes | $012BFE | $013557 | data | - | TeamBlockPtrs, TeamLogoPtrs, SmallLogoPtrs, unk_12D46 (bytes), nullsub_2 |
+| season96 | matched, 8012 bytes | $010CB2 | $012BFD | code | - | SaveGameStats, TickTeamInjuries, SimSeasonDays, WriteDayGames, Read/WriteSeasonHeader, ReadStandings, TeamSelectScreen, RunSeasonMenu, SeasonMenuScreen, DrawSetupTeamBlock |
+| teamgfx96 | matched, 2394 bytes | $012BFE | $013557 | data | - | TeamBlockPtrs, TeamLogoPtrs, SmallLogoPtrs, VBlank_Menus (bytes), nullsub_2 |
 | schedule96 | matched, 2376 bytes | $013558 | $013E9F | data | schedule95 | SeasonSchedule (Day) |
-| awards96 | matched, 1374 bytes | $013EA0 | $0143FD | code | awards95 | nullsub_3, ResolveDayGames, BeginPlayoffs, InitPlayoffs, SeedPairings, SortSeeds, CalcSeedPoints, SetupPlayoffs, GetTeamPOSlot, BuildPOSlots |
+| awards96 | matched, 1374 bytes | $013EA0 | $0143FD | code | awards95 | ScoutingReport, ResolveDayGames, BeginPlayoffs, InitPlayoffs, SeedPairings, SortSeeds, CalcSeedPoints, SetupPlayoffs, GetTeamPOSlot, BuildPOSlots |
 | pause96_list | matched, 590 bytes | $0143FE | $01464B | code | pause95 | PrintMenuList, ScrollClearTxt, PrintMenuList2 |
 | hockey96 | matched, 1660 bytes | $01464C | $014CC7 | code | hockey95 | Begin, StartGame, StartPer, Gameloop, DoGameFrame, DoFrameUpdates, ResetClock, restoreteams, RestoreBenchEnergy, updatecrowdf, clockcont |
 | pause96 | matched, 1330 bytes | $014CC8 | $0151F9 | code | pause95 | demoread, EndDemoOnPress, startpause1-4, Pausemode, SetupPauseScreen, seta2, InitMenuState, HandleMenuInput, UpdateMenuSelection, PrintMenuItem, vcountwait |
@@ -84,24 +86,24 @@ Every row is matched. Rows are in ROM order and tile `$000000` up to the `$FF` f
 | pause96_menu | matched, 740 bytes | $015490 | $015773 | code | pause95 | PlayoffStatsMenu, TimeoutMenu, SelectGoalieMenu |
 | players96_count | matched, 168 bytes | $015774 | $01581B | code | players95, middle95, video95 | GetGoalieCount(D7), GetPlayerCount(D7), WaitVSyncAndReadInput |
 | replay96 | matched, 2772 bytes | $01581C | $0162EF | code | replay95, video95 | ReplayMode, ReadMenuJoy, ShowReplayIcon, EraseReplayIcon, ShowReplayBanner, EraseReplayBanner, suba4, UpdateCameraPos, RevReplayAdj, ClampReplayView, updatereplay, rtss8 |
-| control96 | matched, 2750 bytes | $0162F0 | $016DAD | code | hockey95, display95, goal95, skate95, control95, collide95 | updateplayers, updateanim, LockScroll, checkwindow, FindGoalie, burst, holdplayer, chgplayer, setcplayer, setc1-4player, Sweepcheck, restorepl, setpads |
+| control96 | matched, 2750 bytes | $0162F0 | $016DAD | code | hockey95, display95, goal95, skate95, control95, collide95 | updateplayers, updateanim, LockScroll, checkwindow, FindGoalie, burst, Holdplayer, chgplayer, setcplayer, setc1-4player, Sweepcheck, restorepl, setpads |
 | logic96_ass | matched, 3672 bytes | $016DAE | $017C05 | code | logic95 | check4bench, donothing and the asstab entries (assbench, asseben, asspenalty, assdopen, assepen, assgoaliebreakwait, assstanley, assscore, assgoaliectrl, assgoaliecpu) |
 | logic96_puck | matched, 5138 bytes | $017C06 | $019017 | code | logic95, penalty95 | AdjustFacingDirection, goaliesave, saveanim, assgoalietopuck, breakaway, chkpuckc, asspuckc, chkpk2, EvadePC, checkob, assbreakaway, assnearest, check4check, asspassrec, assshoot |
 | shootout96 | matched, 1898 bytes | $019018 | $019781 | code | shootout95 | puckshootout, SelectPenaltyShotSkater, puckpenshot, EndPenaltyShotPlay |
-| logic96_pull | matched, 1980 bytes | $019782 | $019F3D | code | logic95, lines95, penalty95 | ChkGoalies, ReturnGoalies, CPgoalie, CompLine, AssignPads, pucknorm, ChkOffsides, a2offsides, puckIChk, puckunflip |
+| logic96_pull | matched, 1980 bytes | $019782 | $019F3D | code | logic95, lines95, penalty95 | ChkGoalies, ReturnGoalies, CPgoalie, CompLine, AssignPads, pucknorm, ChkOffsides, a2offsides, PuckIChk, puckunflip |
 | logic96_vec | matched, 1750 bytes | $019F3E | $01A613 | code | logic95 | puckflip, puckshadow, findpc, assexit, assinsert, assreplace, vtoa, GetHot and the GetHot variants |
 | skate96 | matched, 2284 bytes | $01A614 | $01AEFF | code | skate95 | SetSPA, doplayeracc, goalieacc, noturn(0), playeracc, MaxSpeed, dostop, stopna2, dirtab(2), WeightedRandomSelect |
-| video96 | matched, 4244 bytes | $01AF00 | $01BF93 | code | video95 | remap, forceblack, forcefade, cramfade, CopyPaletteToCRAM, randomd0(s), sroot, waitx, orjoy, nodiag, ReadJoy1-4, ReadJoy, DoDMA, DoFill, setVram, Vmaddr, dobitmap, DecompressGraphics, DecompressBytecode and its opcodes, xyVmMap, eraser, Framer, printsmall(z), print(z), printcur(z), PushTime, PushNumber(Width), appstring, printbig(z), printbigtext |
+| video96 | matched, 4244 bytes | $01AF00 | $01BF93 | code | video95 | remap, forceblack, forcefade, cramfade, CopyPaletteToCRAM, randomd0(s), Sroot, waitx, orjoy, nodiag, ReadJoy1-4, ReadJoy, DoDMA, DoFill, setVram, Vmaddr, dobitmap, DecompressGraphics, DecompressBytecode and its opcodes, xyVmMap, eraser, Framer, printsmall(z), print(z), printcur(z), PushTime, PushNumber(Width), appstring, printbig(z), printbigtext |
 | penalty96 | matched, 4538 bytes | $01BF94 | $01D14D | code | penalty95, middle95 | PrintBigChar, PutBigTile, printbig1/2, AddPenalty, PenaltyManager, chkprogress, PenShotChk, InProgress, Stop4Pen, UpdatePA, prefmes, updatepentime, releasepl, updatepwrplay, EASNLogo |
 | lines96_bar | matched, 640 bytes | $01D14E | $01D3CD | code | lines95 | linebar, getlinee, AvgCline, ChkShotStat, SetupTeamForIntermission, SetupTeamLine, RestoreTeamEnergy |
 | hockey96_inter | matched, 1072 bytes | $01D3CE | $01D7FD | code | faceoff95, middle95 | Intermission, UpdateScores, SetScore, sctab, PrintBigListItem, PrintSmallListItem, SkipStrings |
 | collide96 | matched, 9044 bytes | $01D7FE | $01FB51 | code | collide95 | checkcoll, checkplcoll, checkcx, checkint, CCStart, checkagr, holdcheck, FallDown, setInjuryType, checkwallcoll, checkgoal, wallcoll, setd0player, puckbody, rtss2, makepde, getpde, setpde |
 | players96 | matched, 1674 bytes | $01FB52 | $0201DB | code | players95 | setpersonel, SetPlList, TryAddPlayerToList, SetupPenaltyShot, ResetBench, setplayer, ClampNibble |
-| display96 | matched, 4774 bytes | $0201DC | $021481 | code | display95, video95 | VBlank, vb2, IRQ7, DumpSprites, DumpSprites2, DoDMAList, setvideo, updatescroll, showref, checkfo, showcrowd, checksso, setsortcords, addframe, find3d, KillCrowd, setupice, defaultsprites, SprSort, resetplstuff |
+| display96 | matched, 4774 bytes | $0201DC | $021481 | code | display95, video95 | VBlank, vb2, IRQ7, DumpSprites, DumpSprites2, dodmalist, setvideo, updatescroll, showref, checkfo, showcrowd, checksso, setsortcords, addframe, find3d, KillCrowd, setupice, defaultsprites, SprSort, resetplstuff |
 | control96_team | matched, 346 bytes | $021482 | $0215DB | code | control95 | clearTeamStats, InitTeamStructure, SetOriginalLines, setplayercolors |
 | hockey96_open | matched, 1398 bytes | $0215DC | $021B51 | code | hockey95 | IntermissionStart, ExitToOpening, Opening, Opening2, AbortGame, EASportsScreen, UpdatePlayoffLevel |
 | setup96_menu | matched, 94 bytes | $021B52 | $021BAF | code | setup95 | VBlank_SetOptions, DefaultMenus, defmenuoptions |
-| playoff96 | matched, 3184 bytes | $021BB0 | $02281F | code | playoff95, setup95 | ContinuePlayoffs, NewPO, maketree, SetTreeGameTeams, FigureJoy, ReadPassBits, EncodePW, ResolveGames |
+| playoff96 | matched, 3184 bytes | $021BB0 | $02281F | code | playoff95, setup95 | ContinuePlayoffs, NewPO, MakeTree, SetTreeGameTeams, FigureJoy, ReadPassBits, EncodePW, ResolveGames |
 | goal96_box | matched, 1616 bytes | $022820 | $022E6F | code | goal95, stats95, injury95, shootout95 | ShowThreeStars, ShowInjuryBox, PenaltyShotBox, ShowGoalBox, box |
 | middle96 | matched, 724 bytes | $022E70 | $023143 | code | middle95 | GetPlayerName, getname, FormatPlayerName, FormatPlayerInitial, FinalizeTextBuffer |
 | crash96 | matched, 260 bytes | $023144 | $023247 | code | main95 | AdrErr, InvOpCode, DivBy0, crash |
@@ -118,11 +120,11 @@ Every row is matched. Rows are in ROM order and tile `$000000` up to the `$FF` f
 | sram96 | matched, 778 bytes | $023F1C | $024225 | code | sram95 | InitSaveRAM, SRAMWaitVblank, VBcount, ValidateSRAM, ClearSRAM, WriteSRAM, MakeSRAMChecksum, ReadSRAM, ClearSRAMBytes |
 | video96_pad | matched, 346 bytes | $024226 | $02437F | code | video95 | ReadJoyData, ReadPad4Way1-4, ReadPad1, ReadPad2, PadDirTable, ResetZ80Bus |
 | logic96_do | matched, 32 bytes | $024380 | $02439F | code | logic95 | doassignment |
-| video96_font | matched, 126 bytes | $0243A0 | $02441D | code | video95 | LoadSmallFont, LoadBigFonts, sub_243DA |
+| video96_font | matched, 126 bytes | $0243A0 | $02441D | code | video95 | LoadSmallFont, LoadBigFonts, TurnGoalieFromNet |
 | logic96_crease | matched, 96 bytes | $02441E | $02447D | code | logic95 | GoalieInCrease |
 | pause96_play | matched, 8 bytes | $02447E | $024485 | code | pause95 | PlayGame |
 | sound96 | matched, 410500 bytes | $024486 | $088809 | code | sound95, video95 | p_music_vblank, SndDriver, Z80Program, SoundBanks, the 168 bank items, SoundCmd, sfx, song, ChooseSong, newcheck |
-| scout96 | matched, 27324 bytes | $08880A | $08F2C5 | data | scout95 | ScoutTextScript, unk_88A18 |
+| scout96 | matched, 27324 bytes | $08880A | $08F2C5 | data | scout95 | ScoutTextScript, TitleScreenImg |
 | graphics96 | matched, 1340252 bytes | $08F2C6 | $1D6621 | data | graphics95 | one incbin per picture: the screen maps, Sprites, Spritetiles, the fonts, TeamBlock / TeamLogo / SmallLogo, the award pictures |
 | logic96_timer | matched, 1348 bytes | $1D6622 | $1D6B65 | code | logic95, input95 | puckvzadj, OneTimerPass, OneTimerTarget, OneTimerNearTbl, OneTimerFarTbl, OneTimerGoalieTbl, assonetimer, setonetimeranim |
 | code96_14 | matched, 5184 bytes | $1D6B66 | $1D7FA5 | code | middle95, scout95, collide95, records95, lines95 | PuckOnAttackHalf, InitCrowdMeter, UpdateCrowdMeter, stopfast, checkcornercoll, Create_HotCold_Table, AttributeCalc, Read/WriteTeamRecord, UpdateRecords, CountGoalies, CalcAttrib, the attribute weights |

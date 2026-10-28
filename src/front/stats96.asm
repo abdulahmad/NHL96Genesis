@@ -1,7 +1,7 @@
 ;	The line editor.
 
-LineEditor	;The line editor screen for team a2
-	;Code the listing does not decode: kept as bytes
+LineEditor							;The line editor screen for team a2
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$EA,$00,$00,$00,$30,$61,$00,$09,$0C,$31,$FC,$00,$18,$BD,$3C
 	dc.b	$08,$B8,$00,$02,$BF,$B2,$42,$78,$D0,$30,$42,$78,$D0,$34,$31,$FC
 	dc.b	$00,$01,$D0,$3C,$4E,$B9,$00,$01,$BA,$2E,$00,$0A,$FE,$04,$FF,$01
@@ -42,8 +42,9 @@ LineEditor	;The line editor screen for team a2
 	dc.b	$60,$00,$00,$1C,$4E,$75,$36,$7C,$D1,$30,$D6,$F8,$D0,$32,$10,$13
 	dc.b	$52,$00,$34,$38,$D0,$3C,$61,$00,$05,$60,$60,$00,$FD,$DA
 
-PrintAttribHeader	;Player list column header (PAttribColumns page DispAttribCtr), then 6 rows of names, selected row highlighted
-	;Code the listing does not decode: kept as bytes
+PrintAttribHeader					;Player list column header (PAttribColumns page DispAttribCtr), then 6
+									;rows of names, selected row highlighted
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$17,$02,$00,$22,$7C,$00,$02
 	dc.b	$34,$2E,$30,$38,$D0,$30,$60,$00,$00,$06,$D2,$D1,$58,$49,$4A,$51
 	dc.b	$5B,$C8,$FF,$F8,$6A,$00,$00,$08,$53,$78,$D0,$30,$60,$DE,$4E,$B9
@@ -56,8 +57,8 @@ PrintAttribHeader	;Player list column header (PAttribColumns page DispAttribCtr)
 	dc.b	$42,$40,$10,$33,$20,$00,$4E,$B9,$00,$01,$51,$FA,$52,$42,$51,$C9
 	dc.b	$FF,$B4,$4E,$75
 
-DrawLineIcons	;Draw the line icons for the cursor's line, then the selected player box
-	;Code the listing does not decode: kept as bytes
+DrawLineIcons						;Draw the line icons for the cursor's line, then the selected player box
+									;Code the listing does not decode: kept as bytes
 	dc.b	$7A,$06,$41,$FA,$00,$79,$30,$38,$D0,$3C,$E6,$48,$D0,$C0,$4A,$78
 	dc.b	$D2,$64,$67,$00,$00,$04,$53,$48,$10,$10,$B0,$38,$C0,$60,$67,$00
 	dc.b	$00,$0A,$11,$C0,$C0,$60,$61,$00,$01,$2C,$0B,$38,$C0,$60,$67,$00
@@ -105,21 +106,21 @@ DrawLineIcons	;Draw the line icons for the cursor's line, then the selected play
 	dc.b	$2D,$73,$65,$6C,$65,$63,$74,$20,$6C,$69,$6E,$65,$24,$5F,$4C,$DF
 	dc.b	$07,$3F,$4E,$75
 
-ClearLineEditorTop	;Erase the top of map 2
-	;Code the listing does not decode: kept as bytes
+ClearLineEditorTop					;Erase the top of map 2
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$00,$00,$00,$70,$28,$72,$0E
 	dc.b	$34,$3C,$07,$FF,$4E,$F9,$00,$01,$B9,$76
 
-ClearMenuFlags	;Clear palfadenew+$5A and palfadenew+$7A
-	;Code the listing does not decode: kept as bytes
+ClearMenuFlags						;Clear palfadenew+$5A and palfadenew+$7A
+									;Code the listing does not decode: kept as bytes
 	dc.b	$42,$78,$BD,$98,$42,$78,$BD,$B8,$4E,$75,$00,$10,$00,$12,$00,$04
 
-LineIconPosTable	;Line icons x, y, slot count - 1
+LineIconPosTable					;Line icons x, y, slot count - 1
 	dc.b	$00,$05,$00,$12,$00,$04,$00,$10,$00,$12,$00,$04,$00,$1B,$00,$12
 	dc.b	$00,$04,$00,$05,$00,$12,$00,$04,$00,$10,$00,$12,$00,$04,$00,$05
 	dc.b	$00,$12,$00,$03,$00,$10,$00,$12,$00,$03,$FF,$FF
 
-LineCursorTable	;The slot after a cursor move, indexed by slot + 8
+LineCursorTable						;The slot after a cursor move, indexed by slot + 8
 	dc.b	$01,$01,$02,$03,$04,$05,$19,$01,$01,$01,$02,$03,$04,$05,$19,$01
 	dc.b	$09,$09,$0A,$0B,$0C,$0D,$21,$01,$11,$11,$12,$13,$14,$15,$21,$01
 	dc.b	$05,$19,$1A,$1B,$1C,$1D,$29,$01,$0D,$21,$22,$23,$24,$25,$31,$01
@@ -146,14 +147,14 @@ LineCursorTable	;The slot after a cursor move, indexed by slot + 8
 	dc.b	$00,$0A,$61,$00,$00,$48,$60,$00,$F8,$70,$08,$01,$00,$05,$67,$BC
 	dc.b	$4E,$B9,$00,$1E,$23,$9E,$4E,$F9,$00,$01,$54,$D4
 
-SetLineSlot	;Put player d0 in line slot d2 of team a2 (swap if already in that line)
-	;Code the listing does not decode: kept as bytes
+SetLineSlot							;Put player d0 in line slot d2 of team a2 (swap if already in that line)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$E0,$C0,$41,$EA,$01,$84,$32,$02,$02,$41,$FF,$F8,$43,$F0
 	dc.b	$10,$00,$72,$05,$B0,$31,$10,$01,$57,$C9,$FF,$FA,$66,$00,$00,$08
 	dc.b	$13,$B0,$20,$00,$10,$01,$11,$80,$20,$00,$4C,$DF,$03,$07,$4E,$75
 
-LoadTeamLine	;Line editor menu item Load Team Line
-	;Code the listing does not decode: kept as bytes
+LoadTeamLine						;Line editor menu item Load Team Line
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$4A,$78,$D2,$64,$67,$00,$00,$54,$20,$7C,$00,$20
 	dc.b	$00,$00,$54,$48,$43,$EA,$01,$84,$12,$E8,$00,$01,$12,$E8,$00,$03
 	dc.b	$12,$E8,$00,$05,$12,$E8,$00,$07,$12,$E8,$00,$09,$12,$E8,$00,$0B
@@ -164,8 +165,8 @@ LoadTeamLine	;Line editor menu item Load Team Line
 	dc.b	$01,$84,$12,$E8,$00,$01,$12,$E8,$00,$03,$12,$E8,$00,$05,$12,$E8
 	dc.b	$00,$07,$50,$48,$51,$C8,$FF,$EC,$4C,$DF,$7F,$FF,$4E,$75
 
-SaveTeamLine	;Line editor menu item Save Team Line
-	;Code the listing does not decode: kept as bytes
+SaveTeamLine						;Line editor menu item Save Team Line
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$20,$7C,$00,$20,$00,$00,$3E,$2A,$00,$28,$52,$47
 	dc.b	$30,$C7,$43,$EA,$01,$84,$11,$59,$00,$01,$11,$59,$00,$03,$11,$59
 	dc.b	$00,$05,$11,$59,$00,$07,$11,$59,$00,$09,$11,$59,$00,$0B,$11,$59
@@ -210,8 +211,9 @@ SaveTeamLine	;Line editor menu item Save Team Line
 	dc.b	$22,$7C,$FF,$FF,$BD,$7E,$30,$3C,$00,$07,$22,$D8,$51,$C8,$FF,$FC
 	dc.b	$4C,$DF,$03,$00,$4E,$75
 
-sub_1E2644	;Called from the line editor
-	;Code the listing does not decode: kept as bytes
+FormatLineName						;a1 = mesarea " Last" for player d0 of team a2, space padded, for the line
+									;editor slots
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$F0,$A0,$4E,$B9,$00,$01,$01,$C6,$32,$7C,$BF,$F4,$12,$FC
 	dc.b	$00,$20,$30,$18,$45,$F0,$00,$FE,$0C,$18,$00,$20,$66,$FA,$12,$D8
 	dc.b	$B5,$C8,$67,$00,$00,$0E,$4A,$10,$66,$F4,$60,$00,$00,$06,$12,$FC

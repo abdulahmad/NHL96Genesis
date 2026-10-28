@@ -2,20 +2,21 @@
 ;	goaliesave picks the save. The entries cover the carrier, a breakaway, the nearest
 ;	skater, a pass and a shot.
 
-AdjustFacingDirection	;Turn facedir one step toward direction d0 (not past the directions the masks allow)
-	move.w	facedir(a3),d1	;facedir
+AdjustFacingDirection				;Turn facedir one step toward direction d0 (not past the directions the
+									;masks allow)
+	move.w	facedir(a3),d1			;facedir
 	sub.w	d1,d0
 	beq.w	rtss2
 	neg.w	d0
 	andi.w	#4,d0
 	lsr.w	#1,d0
-	subq.w	#1,d0	;d0 = +1/-1
-	btst	#3,pflags(a3)	;pfjoycon
+	subq.w	#1,d0					;d0 = +1/-1
+	btst	#pfjoycon,pflags(a3)	;pfjoycon
 	bne.w	.add
 	btst	d1,#$42
 	beq.w	.add
 	add.w	d0,d1
-	btst	#7,pflags(a3)	;pfgoal
+	btst	#pfgoal,pflags(a3)		;pfgoal
 	bne.w	.dn
 	btst	d1,#$83
 	bra.w	.0
@@ -29,27 +30,28 @@ AdjustFacingDirection	;Turn facedir one step toward direction d0 (not past the d
 	add.w	d0,d1
 .1
 	andi.w	#7,d1
-	move.w	d1,facedir(a3)	;facedir
+	move.w	d1,facedir(a3)			;facedir
 	rts
 
-goaliesave	;The goalie a3 makes a save of the puck crossing at a0: the save SPA from saveanim by the side, height and
-	;his hand, the crowd up, his speed cut
+goaliesave							;The goalie a3 makes a save of the puck crossing at a0: the save SPA from
+									;saveanim by the side, height and
+									;his hand, the crowd up, his speed cut
 	addq.w	#1,(ChkCnt).w
 	move.w	(a0),d0
-	sub.w	(a3),d0	;sub goalie Xpos from d0
+	sub.w	(a3),d0					;sub goalie Xpos from d0
 	move.w	d3,d1
-	sub.w	Ypos(a3),d1	;sub goalie Ypos from d1
+	sub.w	Ypos(a3),d1				;sub goalie Ypos from d1
 	bsr.w	vtoa
 	sub.w	facedir(a3),d0
 	andi.w	#7,d0
 	move.w	d0,d3
-	lsr.w	#2,d0	;divide d0 by 4
+	lsr.w	#2,d0					;divide d0 by 4
 	btst	#3,attribute(a3)
 	beq.w	.1
 	eori.w	#1,d0
 .1
 	move.w	d0,(jerseynum).w
-	cmpi.w	#8,(puckz).w	;high shot: shoulder saves
+	cmpi.w	#8,(puckz).w			;high shot: shoulder saves
 	bgt.w	.6
 	cmpi.w	#$800,(puckvz).w
 	bgt.w	.6
@@ -70,7 +72,7 @@ goaliesave	;The goalie a3 makes a save of the puck crossing at a0: the save SPA 
 	bra.w	.done
 .low
 	addq.w	#4,d0
-	cmpi.w	#8,2(a0)	;puckcross frames
+	cmpi.w	#8,2(a0)				;puckcross frames
 	bls.w	.15
 	cmpi.w	#2,facedir(a3)
 	beq.w	.done
@@ -83,7 +85,7 @@ goaliesave	;The goalie a3 makes a save of the puck crossing at a0: the save SPA 
 	move.w	#$1000,d1
 	move.w	d1,Xvel(a3)
 	ori.w	#1,d0
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.10
 	eori.w	#1,d0
 .10
@@ -102,7 +104,7 @@ goaliesave	;The goalie a3 makes a save of the puck crossing at a0: the save SPA 
 	eori.w	#1,d0
 .13
 	add.w	d1,(a3)
-	btst	#0,$77(a3)	;check hand of goalie
+	btst	#0,$77(a3)				;check hand of goalie
 	beq.w	.14
 	eori.w	#1,d0
 .14
@@ -125,7 +127,7 @@ goaliesave	;The goalie a3 makes a save of the puck crossing at a0: the save SPA 
 .done
 	add.w	d0,d0
 	lea	saveanim(pc),a1
-	move.w	(a1,d0.w),d1	;SPA of the save
+	move.w	(a1,d0.w),d1			;SPA of the save
 	move.w	(a3),d0
 	sub.w	(a0),d0
 	bpl.w	.0
@@ -166,13 +168,13 @@ goaliesave	;The goalie a3 makes a save of the puck crossing at a0: the save SPA 
 	move.w	#SPA02C0,d1
 .8
 	bsr.w	SetSPA
-	addi.w	#$96,(crowdlevel).w
+	addi.w	#$96,(Crowdlevel).w
 	addi.w	#$A,(CwdExciteLvl).w
 	asr	Xvel(a3)
 	asr	Xvel(a3)
 	asr	Yvel(a3)
 	asr	Yvel(a3)
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	beq.w	.19
 	cmpi.w	#3,facedir(a3)
 	beq.w	.9
@@ -193,12 +195,12 @@ goaliesave	;The goalie a3 makes a save of the puck crossing at a0: the save SPA 
 .20
 	rts
 
-saveanim	;SPA per save type
+saveanim							;SPA per save type
 	dc.w	SPAgglover,SPAgglovel,SPAgstackr,SPAgstackl,SPAgstickr,SPAgstickl
 	dc.w	SPAgglover,SPAgglovel,SPAgstickr,SPAgstickl,SPA0074,SPA02C0
 
-assgoalietopuck	;asstab entry: the goalie skates to the loose puck.
-	;Code the listing does not decode: kept as bytes
+assgoalietopuck						;asstab entry: the goalie skates to the loose puck.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$03,$00,$62,$66,$00,$25,$38,$08,$38,$00,$00,$C3,$38
 	dc.b	$66,$00,$25,$2E,$61,$00,$EF,$1A,$08,$AB,$00,$01,$00,$62,$67,$00
 	dc.b	$00,$06,$42,$6B,$00,$40,$9F,$2B,$00,$40,$6A,$00,$00,$66,$10,$2B
@@ -210,8 +212,8 @@ assgoalietopuck	;asstab entry: the goalie skates to the loose puck.
 	dc.b	$00,$2A,$6D,$00,$24,$BC,$0C,$AA,$00,$00,$06,$40,$00,$2A,$6D,$00
 	dc.b	$24,$B0,$60,$00,$23,$38
 
-breakaway	;Breakaway for the carrier.
-	;Code the listing does not decode: kept as bytes
+breakaway							;Breakaway for the carrier.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$F8,$00,$02,$C3,$44,$08,$AB,$00,$01,$00,$62,$67,$00,$00,$3A
 	dc.b	$3F,$3C,$00,$01,$4E,$B9,$00,$08,$84,$70,$48,$E7,$00,$20,$24,$7C
 	dc.b	$FF,$FF,$C7,$26,$08,$2B,$00,$06,$00,$62,$67,$00,$00,$08,$24,$7C
@@ -220,8 +222,8 @@ breakaway	;Breakaway for the carrier.
 	dc.b	$32,$2B,$00,$2A,$67,$00,$00,$0A,$B3,$40,$4C,$9F,$00,$02,$4E,$75
 	dc.b	$32,$3C,$FF,$FF,$60,$F4
 
-BreakawayOffsidesFlagSet	;The breakaway / offsides flags of a3.
-	;Code the listing does not decode: kept as bytes
+BreakawayOffsidesFlagSet			;The breakaway / offsides flags of a3.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$01,$00,$62,$67,$00,$00,$0E,$08,$AB,$00,$00,$00,$64
 	dc.b	$08,$AB,$00,$01,$00,$64,$48,$A7,$C0,$80,$30,$3C,$01,$1E,$32,$2B
 	dc.b	$00,$14,$6A,$00,$00,$04,$44,$41,$B2,$40,$6C,$00,$00,$A0,$30,$3C
@@ -238,14 +240,14 @@ BreakawayOffsidesFlagSet	;The breakaway / offsides flags of a3.
 	dc.b	$60,$F4,$B2,$68,$00,$14,$6F,$00,$00,$0C,$4A,$68,$00,$34,$67,$00
 	dc.b	$00,$04,$60,$E8,$90,$FC,$00,$80,$51,$C8,$FF,$E8,$60,$CE
 
-chkpuckc	;asstab entry: breakaway carrier check, then asspuckc.
-	;Code the listing does not decode: kept as bytes
+chkpuckc							;asstab entry: breakaway carrier check, then asspuckc.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$00,$C3,$48,$66,$00,$00,$14,$08,$38,$00,$02,$C3,$40
 	dc.b	$66,$00,$00,$0A,$61,$00,$FE,$96,$6A,$00,$00,$10,$08,$AB,$00,$01
 	dc.b	$00,$64,$30,$3C,$00,$10,$61,$00,$23,$4A
 
-asspuckc	;asstab entry: the puck carrier.
-	;Code the listing does not decode: kept as bytes
+asspuckc							;asstab entry: the puck carrier.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$B8,$00,$02,$C3,$44,$66,$00,$00,$08,$08,$AB,$00,$01,$00,$64
 	dc.b	$30,$38,$B7,$BE,$B0,$6B,$00,$52,$66,$00,$23,$12,$08,$38,$00,$02
 	dc.b	$C3,$40,$67,$00,$00,$0C,$0C,$78,$00,$01,$C3,$7E,$6E,$00,$02,$A4
@@ -302,17 +304,17 @@ asspuckc	;asstab entry: the puck carrier.
 	dc.b	$61,$00,$4D,$FA,$B0,$7C,$0C,$00,$62,$00,$74,$5E,$61,$00,$14,$78
 	dc.b	$61,$00,$77,$5E,$61,$00,$4C,$6A,$4E,$F9,$00,$00,$F4,$66
 
-chkpk	;With a power play (sflags2 bit 5) chkpk2, else Z set
-	btst	#5,(sflags2).w
+chkpk								;With a power play (sflags2 bit 5) chkpk2, else Z set
+	btst	#sf2pwrplay,(sflags2).w
 	bne.w	chkpk2
-	eori	#4,ccr	;Z flag
+	eori	#4,ccr					;Z flag
 	rts
 
-chkpk2	;Z set when a3's team is on the power play (sflags2 bit 6 against pfteam)
+chkpk2								;Z set when a3's team is on the power play (sflags2 bit 6 against pfteam)
 	movem.l	d0-d1,-(sp)
-	btst	#6,(sflags2).w	;#sf2pwrtm - 0 for team 1, 1 for team 2
+	btst	#sf2pwrtm,(sflags2).w	;#sf2pwrtm - 0 for team 1, 1 for team 2
 	move	sr,d0
-	btst	#6,pflags(a3)
+	btst	#pfteam,pflags(a3)
 	move	sr,d1
 	eor.w	d1,d0
 	move	d0,ccr
@@ -370,8 +372,9 @@ chkpk2	;Z set when a3's team is on the power play (sflags2 bit 6 against pfteam)
 	dc.b	$D2,$FC,$00,$80,$51,$CB,$FF,$CC,$4E,$B9,$00,$00,$F8,$F6,$4A,$6B
 	dc.b	$00,$34,$67,$00,$71,$18,$58,$4F,$60,$00,$1C,$86
 
-EvadePC	;skateto extra routine: steer around the puck carrier (its address is passed in a0).
-	;Code the listing does not decode: kept as bytes
+EvadePC								;skateto extra routine: steer around the puck carrier (its address is
+									;passed in a0).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4A,$78,$B7,$BE,$6B,$00,$71,$0A,$14,$2B,$00,$28,$94,$38,$B7,$86
 	dc.b	$48,$82,$D4,$53,$94,$78,$B7,$5E,$B4,$7C,$00,$28,$6E,$00,$70,$F2
 	dc.b	$B4,$7C,$FF,$D8,$6D,$00,$70,$EA,$12,$2B,$00,$2A,$92,$38,$B7,$88
@@ -383,9 +386,10 @@ EvadePC	;skateto extra routine: steer around the puck carrier (its address is pa
 	dc.b	$00,$18,$B2,$7C,$FF,$CE,$6D,$00,$00,$10,$70,$02,$32,$13,$B2,$78
 	dc.b	$B7,$5E,$6E,$00,$00,$04,$70,$06,$4E,$75
 
-checkob	;Offside watch (gmode bit 5): with a player of the attacking side past the blue line ahead of the puck
-	;set sflags2 bit 7 (and the referee, PushRef), clear it when they are all back
-	btst	#5,(gmode).w
+checkob								;Offside watch (gmode bit 5): with a player of the attacking side past the
+									;blue line ahead of the puck set sflags2 bit 7 (and the referee, PushRef),
+									;clear it when they are all back
+	btst	#gmoffs,(gmode).w
 	beq.w	rtss2
 	btst	#2,(BA_PS_flags).w
 	bne.w	rtss2
@@ -397,7 +401,7 @@ checkob	;Offside watch (gmode bit 5): with a player of the attacking side past t
 	adda.w	#$300,a0
 .0
 	moveq	#$7A,d1
-	btst	#7,pflags(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.top
 	neg.w	d1
 	cmp.w	(pucky).w,d1
@@ -412,14 +416,14 @@ checkob	;Offside watch (gmode bit 5): with a player of the attacking side past t
 	dbf	d0,.1
 .3
 	moveq	#$40,d0
-	bclr	#7,(sflags2).w
+	bclr	#sf2offsig,(sflags2).w
 	bne.w	.dref
 .ex
 	movem.l	(sp)+,d0-d1/a0
 	rts
 .5
 	moveq	#6,d0
-	bset	#7,(sflags2).w
+	bset	#sf2offsig,(sflags2).w
 	bne.s	.ex
 .dref
 	tst.w	(RefCnt).w
@@ -439,14 +443,14 @@ checkob	;Offside watch (gmode bit 5): with a player of the attacking side past t
 	dbf	d0,.8
 	bra.s	.3
 
-assbreakaway	;asstab entry: breakaway; falls into assnearest.
-	;Code the listing does not decode: kept as bytes
+assbreakaway						;asstab entry: breakaway; falls into assnearest.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$30,$2B,$00,$52,$B0,$78,$B7,$BE,$67,$00,$00,$14,$08,$AB,$00,$01
 	dc.b	$00,$64,$30,$3C,$00,$11,$61,$00,$1B,$4E,$60,$00,$00,$0A,$4E,$B9
 	dc.b	$00,$01,$7F,$14,$6B,$E6
 
-assnearest	;asstab entry: the player nearest the puck without it.
-	;Code the listing does not decode: kept as bytes
+assnearest							;asstab entry: the player nearest the puck without it.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$B8,$00,$02,$C3,$44,$66,$00,$00,$08,$08,$AB,$00,$01,$00,$64
 	dc.b	$30,$2B,$00,$52,$B0,$78,$B7,$BE,$66,$00,$00,$2C,$08,$2B,$00,$01
 	dc.b	$00,$64,$66,$00,$00,$22,$08,$38,$00,$02,$C3,$40,$66,$00,$00,$18
@@ -522,8 +526,8 @@ assnearest	;asstab entry: the player nearest the puck without it.
 	dc.b	$00,$1E,$17,$40,$00,$76,$61,$00,$00,$10,$4C,$DF,$08,$01,$17,$40
 	dc.b	$00,$76,$4E,$75,$61,$00,$15,$1A
 
-check4check	;Check an opponent in front of a3.
-	;Code the listing does not decode: kept as bytes
+check4check							;Check an opponent in front of a3.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$4A,$6B,$00,$34,$66,$00,$00,$04,$4E,$75,$08,$2B,$00,$03,$00,$62
 	dc.b	$66,$00,$00,$24,$4E,$B9,$00,$1D,$98,$EE,$67,$00,$00,$1A,$32,$3C
 	dc.b	$09,$9A,$08,$F8,$00,$03,$C3,$52,$4E,$B9,$00,$01,$A6,$14,$08,$EB
@@ -551,8 +555,8 @@ check4check	;Check an opponent in front of a3.
 	dc.b	$00,$08,$02,$40,$00,$03,$66,$00,$DA,$7A,$60,$00,$DA,$E8,$D0,$FC
 	dc.b	$00,$80,$51,$CA,$FF,$6C,$4E,$75
 
-asspassrec	;asstab entry: catch a pass.
-	;Code the listing does not decode: kept as bytes
+asspassrec							;asstab entry: catch a pass.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$69,$78,$08,$38,$00,$00,$C3,$38
 	dc.b	$66,$00,$E4,$42,$08,$2B,$00,$03,$00,$62,$66,$00,$14,$D8,$08,$AB
 	dc.b	$00,$01,$00,$62,$67,$00,$00,$18,$08,$EB,$00,$00,$00,$62,$17,$7C
@@ -572,8 +576,8 @@ asspassrec	;asstab entry: catch a pass.
 	dc.b	$00,$62,$60,$00,$13,$F0,$30,$2B,$00,$44,$32,$2B,$00,$46,$41,$FA
 	dc.b	$68,$70,$60,$00,$10,$72
 
-assshoot	;asstab entry: computer shooting.
-	;Code the listing does not decode: kept as bytes
+assshoot							;asstab entry: computer shooting.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$68,$62,$08,$AB,$00,$01,$00,$62
 	dc.b	$67,$00,$00,$08,$4E,$F9,$00,$00,$F4,$96,$08,$38,$00,$03,$C3,$3A
 	dc.b	$67,$00,$13,$BC,$42,$42,$9F,$6B,$00,$42,$6A,$00,$00,$06,$08,$C2

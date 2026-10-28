@@ -1,7 +1,9 @@
-;	Season and save RAM handling and its screens: mostly new in 96, so most routines keep their IDA names
-;	until the code around them is known. DrawSetupTeamBlock draws the team logos of the controller setup screen.
+;	The season: the save RAM stats, injuries, standings and game log (96 keeps them as bit fields,
+;	ReadSRAMBits / WriteSRAMBits), the day's games and the simulated days, the team select
+;	screen and the season menu.
 
-SortBytesByWords	;Sort a5 words descending and swap the parallel a4 bytes. Stops at a negative byte
+SortBytesByWords					;Sort a5 words descending and swap the parallel a4 bytes. Stops at a
+									;negative byte
 	movem.l	a4-a5,-(sp)
 .0
 	clr.w	d2
@@ -29,28 +31,31 @@ SortBytesByWords	;Sort a5 words descending and swap the parallel a4 bytes. Stops
 	movem.l	(sp)+,a4-a5
 	rts
 
-sub_10CF2
+SaveGameStats						;Season game over: add both teams' game stats to the save RAM totals
+									;(AddTeamGameStats), then TickTeamInjuries
 	movem.l	d0-d7/a0-a6,-(sp)
 	bset	#6,(GameFlags).w
 	movea.l	#tmstruct,a1
-	bsr.w	sub_10D2A
+	bsr.w	AddTeamGameStats
 	movea.l	#AwShots,a1
-	bsr.w	sub_10D2A
+	bsr.w	AddTeamGameStats
 	move.w	(tmstruct+$28).w,d0
 	move.w	(AwShots+$28).w,d1
-	jsr	(sub_10F44).l
+	jsr	(TickTeamInjuries).l
 	bclr	#6,(GameFlags).w
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_10D2A
+AddTeamGameStats					;Add the game stats of team struct a1 (player arrays, ice time) to its
+									;season or playoff totals in save RAM
+									;(AddSavedStats)
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	$28(a1),d7
 	moveq	#$C,d2
 	move.w	#$18,d3
 	move.l	#$120,d4
 	move.l	#$268,d1
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.0
 	moveq	#$A,d2
 	move.w	#$18,d3
@@ -61,25 +66,25 @@ sub_10D2A
 	adda.w	#$C0,a0
 	jsr	(GetGoalieCountD7).l
 	adda.w	d0,a0
-	bsr.w	sub_10E92
+	bsr.w	AddSavedStats
 	moveq	#$E,d2
 	jsr	(GetGoalieCountD7).l
 	move.w	d0,d3
 	moveq	#$2A,d4
 	move.l	#$598C,d1
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.1
 	moveq	#$2A,d4
 	move.l	#$3268,d1
 .1
 	movea.l	a1,a0
 	adda.w	#$C0,a0
-	bsr.w	sub_10E92
+	bsr.w	AddSavedStats
 	moveq	#$C,d2
 	move.w	#$18,d3
 	move.l	#$120,d4
 	move.l	#$1FA8,d1
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.2
 	moveq	#$A,d2
 	move.w	#$18,d3
@@ -90,25 +95,25 @@ sub_10D2A
 	adda.w	#$DC,a0
 	jsr	(GetGoalieCountD7).l
 	adda.w	d0,a0
-	bsr.w	sub_10E92
+	bsr.w	AddSavedStats
 	moveq	#$E,d2
 	jsr	(GetGoalieCountD7).l
 	move.w	d0,d3
 	move.w	#$2A,d4
 	move.l	#$5548,d1
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.3
 	move.w	#$2A,d4
 	move.l	#$2FC8,d1
 .3
 	movea.l	a1,a0
 	adda.w	#$F8,a0
-	bsr.w	sub_10E92
+	bsr.w	AddSavedStats
 	moveq	#$A,d2
 	move.w	#$18,d3
 	move.w	#$F0,d4
 	move.l	#$3CE8,d1
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.4
 	moveq	#9,d2
 	move.w	#$18,d3
@@ -119,13 +124,13 @@ sub_10D2A
 	adda.w	#$114,a0
 	jsr	(GetGoalieCountD7).l
 	adda.w	d0,a0
-	bsr.w	sub_10E92
+	bsr.w	AddSavedStats
 	moveq	#$D,d2
 	jsr	(GetGoalieCountD7).l
 	move.w	d0,d3
 	move.w	#$27,d4
 	move.l	#$5DD0,d1
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.5
 	move.w	#$27,d4
 	move.l	#$3508,d1
@@ -133,14 +138,16 @@ sub_10D2A
 	movea.l	a1,a0
 	adda.w	#$14C,a0
 	bset	#3,(sflags11).w
-	bsr.w	sub_10E92
+	bsr.w	AddSavedStats
 	bclr	#3,(sflags11).w
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_10E92
+AddSavedStats						;Add d3+1 values from a0 to the d2-bit save RAM fields at bit d1 + team d7
+									;* d4 (sflags11 bit 3: word seconds,
+									;as minutes)
 	movem.l	d0-d1/d4/d7-a0,-(sp)
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.0
 	bsr.w	GetTeamPOSlot
 .0
@@ -161,10 +168,10 @@ sub_10E92
 	beq.w	.4
 	ext.l	d4
 	divu.w	#$3C,d4
-	cmpi.w	#2,(OptPerlen).w
+	cmpi.w	#2,(Optperlen).w
 	beq.w	.4
 	asl.w	#1,d4
-	cmpi.w	#1,(OptPerlen).w
+	cmpi.w	#1,(Optperlen).w
 	beq.w	.4
 	asl.w	#1,d4
 .4
@@ -176,7 +183,7 @@ sub_10E92
 	movem.l	(sp)+,d0-d1/d4/d7-a0
 	rts
 
-sub_10F02
+ReadSRAMBitWords					;Read d3+1 d2-bit save RAM fields from bit d1 + d7 * d4 into words at a0
 	movem.l	d0-d1/d3-d4/a0,-(sp)
 	mulu.w	d7,d4
 	add.l	d4,d1
@@ -190,7 +197,8 @@ sub_10F02
 	movem.l	(sp)+,d0-d1/d3-d4/a0
 	rts
 
-sub_10F22
+WriteSRAMBitWords					;Write d3+1 words from a0 to the d2-bit save RAM fields from bit d1 + d7 *
+									;d4
 	movem.l	d0-d1/d3-d4/a0,-(sp)
 	mulu.w	d7,d4
 	add.l	d4,d1
@@ -205,7 +213,8 @@ sub_10F22
 	movem.l	(sp)+,d0-d1/d3-d4/a0
 	rts
 
-sub_10F44
+TickTeamInjuries					;A game played: one injury game off every injured player of teams d0 and
+									;d1 (save RAM bits), then the checksum
 	movem.l	d0-d4/a0,-(sp)
 	move.l	d1,-(sp)
 	move.w	#$1A,d4
@@ -241,39 +250,43 @@ sub_10F44
 	movem.l	(sp)+,d0-d4/a0
 	rts
 
-sub_10FB4
+StartNewSeason						;New season (sflags10 bit 6): reset the season header (day 0, default
+									;options), write it and clear the season
+									;save data
 	btst	#7,(GameFlags).w
 	beq.w	.0
 	bclr	#6,(sflags10).w
 	beq.w	.0
 	bset	#6,(GameFlags).w
-	clr.w	(dword_FFDD7E).w
+	clr.w	(SeasonDay).w
 	clr.b	(dword_FFDD82+3).w
-	clr.b	(dword_FFDD7E+2).w
+	clr.b	(SeasonFlags).w
 	bclr	#1,(sflags13).w
-	move.b	#0,(dword_FFDD7E+3).w
+	move.b	#0,(SeasonDay+3).w
 	move.b	#1,(dword_FFDD82).w
 	move.b	#0,(dword_FFDD82+1).w
-	move.b	#0,(word_FFDD86).w
-	move.b	#1,(word_FFDD86+1).w
-	move.b	#0,(byte_FFDD88).w
-	move.b	#0,(byte_FFDD89).w
-	jsr	(sub_1147E).l
-	jsr	(sub_11552).l
+	move.b	#0,(SeasonDay+8).w
+	move.b	#1,(SeasonDay+8+1).w
+	move.b	#0,(SeasonDay+$A).w
+	move.b	#0,(SeasonDay+$B).w
+	jsr	(WriteSeasonHeader).l
+	jsr	(ClearSeasonData).l
 	bclr	#6,(GameFlags).w
 	jsr	(MakeSRAMChecksum).l
 .0
 	rts
 
-sub_11024
+SimSeasonDays						;Simulate simdays days: every unplayed game of each day, save the results
+									;(WriteDayGames), step the day or
+									;end the season
 	movem.l	d0-d7/a0-a6,-(sp)
-	move.w	(OptPerlen).w,-(sp)
-	move.w	#2,(OptPerlen).w
+	move.w	(Optperlen).w,-(sp)
+	move.w	#2,(Optperlen).w
 	bset	#6,(GameFlags).w
-	move.w	(word_FFDDB0).w,d7
+	move.w	(simdays).w,d7
 	bra.w	.12
 .0
-	bsr.w	sub_1116A
+	bsr.w	BuildSeasonTeamList
 	movea.l	#$FFFFDCFA,a2
 	clr.w	d6
 	move.b	(byte_FFDCF9).w,d6
@@ -285,7 +298,7 @@ sub_11024
 	cmp.b	1(a2),d0
 	bne.w	.3
 .2
-	bsr.w	sub_113C2
+	bsr.w	UserGamePlayed
 	bne.w	.5
 .3
 	movem.l	d3/a3,-(sp)
@@ -303,18 +316,18 @@ sub_11024
 	movem.l	(sp)+,d3/a3
 	beq.w	.5
 	movea.l	a2,a0
-	bsr.w	sub_1051A
+	bsr.w	SimScore
 	bsr.w	SimGameStats
 .5
 	addq.w	#5,a2
 .6
 	dbf	d6,.1
 	bset	#6,(GameFlags).w
-	bsr.w	sub_11226
-	btst	#2,(dword_FFDD7E+2).w
+	bsr.w	WriteDayGames
+	btst	#2,(SeasonFlags).w
 	beq.w	.9
 	jsr	(ResolveDayGames).l
-	btst	#1,(dword_FFDD7E+2).w
+	btst	#1,(SeasonFlags).w
 	bne.w	.10
 	jsr	(GetShifter).l
 	movea.l	#$FFFFCF44,a0
@@ -333,35 +346,37 @@ sub_11024
 	beq.w	.10
 	cmpi.w	#4,6(a0)
 	beq.w	.10
-	addq.w	#1,(dword_FFDD7E).w
+	addq.w	#1,(SeasonDay).w
 	bra.w	.10
 .9
-	cmpi.w	#$BE,(dword_FFDD7E).l
+	cmpi.w	#$BE,(SeasonDay).l
 	blt.w	.11
-	bset	#0,(dword_FFDD7E+2).w
-	bclr	#1,(dword_FFDD7E+2).w
-	bclr	#2,(dword_FFDD7E+2).w
+	bset	#0,(SeasonFlags).w
+	bclr	#1,(SeasonFlags).w
+	bclr	#2,(SeasonFlags).w
 .10
-	bsr.w	sub_1147E
+	bsr.w	WriteSeasonHeader
 	bra.w	.13
 .11
-	addq.w	#1,(dword_FFDD7E).w
-	bsr.w	sub_1147E
+	addq.w	#1,(SeasonDay).w
+	bsr.w	WriteSeasonHeader
 .12
 	dbf	d7,.0
 .13
-	clr.w	(word_FFDDB0).w
+	clr.w	(simdays).w
 	bclr	#6,(GameFlags).w
 	jsr	(MakeSRAMChecksum).l
-	move.w	(sp)+,(OptPerlen).w
+	move.w	(sp)+,(Optperlen).w
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_1116A
-	move.w	(dword_FFDD7E).w,d1
+BuildSeasonTeamList					;Build the day's game list (day, count, 5 bytes a game) from
+									;SeasonSchedule; in the playoffs the round's series
+									;from gsstruct
+	move.w	(SeasonDay).w,d1
 	clr.w	d2
 	movea.l	#$FFFFDCF8,a2
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.0
 	bra.w	.5
 .0
@@ -423,13 +438,15 @@ sub_1116A
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_11226
+WriteDayGames						;Save the results of the day's games: the user game log (SaveUserGame) and
+									;the standings (RecordGameResult);
+									;playoffs: scores into gsstruct
 	clr.w	d2
 	movea.l	#$FFFFDCF8,a2
 	movem.l	d0-d7/a0-a6,-(sp)
 	clr.w	d1
 	move.b	(a2)+,d1
-	btst	#0,(dword_FFDD7E+2).w
+	btst	#0,(SeasonFlags).w
 	beq.w	.2
 	clr.w	d1
 	clr.w	d0
@@ -475,13 +492,13 @@ sub_11226
 	cmp.b	1(a2),d0
 	bne.w	.8
 .7
-	bsr.w	sub_113C2
+	bsr.w	UserGamePlayed
 	bne.w	.8
 	movem.l	d0-d7/a0-a6,-(sp)
-	bsr.w	sub_112DA
+	bsr.w	SaveUserGame
 	movem.l	(sp)+,d0-d7/a0-a6
 .8
-	bsr.w	sub_11402
+	bsr.w	RecordGameResult
 	addq.w	#5,a2
 .5
 	dbf	d1,.6
@@ -489,7 +506,8 @@ sub_11226
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_112DA
+SaveUserGame						;Game a2 of the user team: add it to the save RAM game log (scores,
+									;opponent), mark the day played, count it
 	movem.l	d0-d2,-(sp)
 	move.b	(dword_FFDD82+2).w,d0
 	cmp.b	(a2),d0
@@ -497,7 +515,7 @@ sub_112DA
 	cmp.b	1(a2),d0
 	bne.w	.5
 .0
-	bsr.w	sub_113E8
+	bsr.w	ReadUserGameCount
 	move.l	d0,d1
 	move.l	d1,-(sp)
 	clr.l	d0
@@ -510,7 +528,7 @@ sub_112DA
 	addi.l	#$2A0,d1
 	move.b	3(a2),d0
 	jsr	(WriteSRAMBits).l
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.3
 	addi.l	#-$2EF8,d1
 	move.w	#8,d2
@@ -535,7 +553,7 @@ sub_112DA
 .4
 	bset	#1,d0
 	jsr	(WriteSRAMBits).l
-	move.w	(dword_FFDD7E).w,d1
+	move.w	(SeasonDay).w,d1
 	mulu.w	#1,d1
 	addi.l	#$6BE0,d1
 	move.w	#1,d2
@@ -548,14 +566,15 @@ sub_112DA
 	move.w	#8,d2
 	jsr	(WriteSRAMBits).l
 	jsr	(MakeSRAMChecksum).l
-	jsr	(sub_1149E).l
+	jsr	(ReadSeasonHeader).l
 .5
 	movem.l	(sp)+,d0-d2
 	rts
 
-sub_113C2
+UserGamePlayed						;ne when the user team's game of SeasonDay is already played (its save RAM
+									;day bit)
 	movem.l	d0-d2,-(sp)
-	move.w	(dword_FFDD7E).w,d1
+	move.w	(SeasonDay).w,d1
 	mulu.w	#1,d1
 	addi.l	#$6BE0,d1
 	move.w	#1,d2
@@ -564,7 +583,8 @@ sub_113C2
 	movem.l	(sp)+,d0-d2
 	rts
 
-sub_113E8
+ReadUserGameCount					;d0 = the number of user team games in the save RAM game log (a season
+									;header byte)
 	movem.l	d1-d2,-(sp)
 	move.l	#$240,d1
 	move.w	#8,d2
@@ -572,25 +592,27 @@ sub_113E8
 	movem.l	(sp)+,d1-d2
 	rts
 
-sub_11402
-	btst	#2,(dword_FFDD7E+2).w
+RecordGameResult					;Not in the playoffs: RecordTeamResult for the home and the away team of
+									;game a2
+	btst	#2,(SeasonFlags).w
 	bne.w	.0
 	movem.l	d0-d3,-(sp)
 	clr.w	d1
 	move.b	(a2),d1
 	move.b	2(a2),d2
 	move.b	3(a2),d3
-	bsr.w	sub_11438
+	bsr.w	RecordTeamResult
 	clr.w	d1
 	move.b	1(a2),d1
 	move.b	3(a2),d2
 	move.b	2(a2),d3
-	bsr.w	sub_11438
+	bsr.w	RecordTeamResult
 	movem.l	(sp)+,d0-d3
 .0
 	rts
 
-sub_11438
+RecordTeamResult					;Add a win, tie or loss (own goals d2, opponent d3) to team d1's standings
+									;count in save RAM
 	cmp.b	d2,d3
 	blt.w	.1
 	beq.w	.2
@@ -612,7 +634,8 @@ sub_11438
 	move.w	#7,d2
 	bra.s	.0
 
-sub_1147E
+WriteSeasonHeader					;Write the season header (SeasonDay ...) to save RAM and update the
+									;checksum
 	movem.l	d0-d1/a0,-(sp)
 	movea.l	#$FFFFDD7E,a0
 	moveq	#$C,d1
@@ -622,7 +645,7 @@ sub_1147E
 	movem.l	(sp)+,d0-d1/a0
 	rts
 
-sub_1149E
+ReadSeasonHeader					;Read the season header (SeasonDay ...) from save RAM
 	movem.l	d0-d1/a0,-(sp)
 	movea.l	#$FFFFDD7E,a0
 	moveq	#$C,d1
@@ -638,7 +661,7 @@ sub_1149E
 	dc.b	$DD,$86,$D2,$67,$11,$F8,$DD,$87,$D2,$69,$11,$F8,$DD,$88,$D2,$5F
 	dc.b	$11,$F8,$DD,$89,$D2,$61,$4E,$75
 
-sub_11510
+FindUserGame						;a2 = the user team's game in today's game list, or 0
 	movem.l	d0-d2/a0,-(sp)
 	movea.l	#0,a2
 	movea.l	#$FFFFDCFA,a0
@@ -662,7 +685,8 @@ sub_11510
 	movem.l	(sp)+,d0-d2/a0
 	rts
 
-sub_11552
+ClearSeasonData						;New season: clear the season stats, standings, game log and injuries in
+									;save RAM
 	movem.l	d0-d1,-(sp)
 	moveq	#$4D,d0
 	move.l	#$D67,d1
@@ -676,10 +700,10 @@ sub_11552
 
 sub_11582
 	movem.l	d0-d1,-(sp)
-	jsr	(sub_1149E).l
+	jsr	(ReadSeasonHeader).l
 	moveq	#$4D,d0
 	move.l	#$BEC,d1
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.0
 	move.l	#$89,d0
 	move.l	#$666,d1
@@ -698,21 +722,24 @@ sub_11582
 	movem.l	(sp)+,d0-d1
 	rts
 
-sub_115EA
-	clr.w	(OptPerlen).w
-	move.b	(dword_FFDD7E+3).w,(OptPerlen+1).w
+LoadSeasonOptions					;Take the game options from the season header (period length, penalties,
+									;line changes); OptPlayMode 1 in the
+									;playoffs
+	clr.w	(Optperlen).w
+	move.b	(SeasonDay+3).w,(Optperlen+1).w
 	clr.w	(OptPen).w
 	move.b	(dword_FFDD82).w,(OptPen+1).w
 	clr.w	(OptLine).w
 	move.b	(dword_FFDD82+1).w,(OptLine+1).w
 	clr.w	(OptPlayMode).w
-	btst	#2,(dword_FFDD7E+2).w
+	btst	#2,(SeasonFlags).w
 	beq.w	.0
 	move.w	#1,(OptPlayMode).w
 .0
 	rts
 
-sub_1161E
+ReadStandings						;Read the wins, ties and losses of every team (3 bytes a team) from save
+									;RAM into a0
 	movem.l	d0-d7/a0,-(sp)
 	move.l	#$63D0,d3
 	move.l	#$653C,d4
@@ -741,8 +768,9 @@ sub_1161E
 	dc.b	$00,$80,$42,$40,$20,$7C,$FF,$FF,$CF,$D2,$1E,$30,$70,$00,$4C,$DF
 	dc.b	$01,$00,$4E,$75
 
-sub_1169C
-	jsr	(sub_115EA).l
+SetupSeasonGame						;Set up the user's season game a2: the season options (LoadSeasonOptions)
+									;and the home and visiting teams
+	jsr	(LoadSeasonOptions).l
 	move.b	(a2),(Opt1team+1).w
 	move.w	(Opt1team).w,(HomeTeam).w
 	move.b	1(a2),(Opt2team+1).w
@@ -772,9 +800,11 @@ sub_1169C
 	dc.b	$6F,$00,$00,$0A,$52,$41,$90,$42,$53,$40,$60,$EE,$4C,$DF,$01,$FC
 	dc.b	$4E,$75,$1E,$1D,$1E,$1E,$1B,$1E,$1D,$FF
 
-sub_11814
+TeamSelectScreen					;Team select: up / down change the team, left / right pick home or
+									;visitors, with the team ranks; in a season
+									;only for a new season (the user team)
 	clr.w	(carddelay).w
-	bsr.w	sub_121C8
+	bsr.w	TeamSelectSide
 	btst	#7,(GameFlags).w
 	beq.w	.0
 	btst	#6,(sflags10).w
@@ -818,33 +848,33 @@ sub_11814
 .8
 	jsr	(NewPO).l
 .10
-	bsr.w	sub_11BF8
-	movea.l	#unk_1808B8,a0
+	bsr.w	TeamSelectGfx
+	movea.l	#SelectTeamSeasonSprites,a0
 	btst	#7,(GameFlags).w
 	bne.w	.11
-	movea.l	#unk_18DE04,a0
+	movea.l	#SelectTeamSprites,a0
 .11
-	bsr.w	sub_1218A
+	bsr.w	DrawScreenSprite
 	move.w	#$18,(palcount).w
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	btst	#7,(GameFlags).w
 	bne.w	.9
-	bsr.w	sub_11E56
-	bsr.w	sub_11EC8
+	bsr.w	PrintHomeRanks
+	bsr.w	PrintVisRanks
 	bra.w	.12
 .9
-	bsr.w	sub_11F3A
+	bsr.w	PrintUserRanks
 .12
 	bset	#0,(byte_FF2710).l
 	bclr	#1,(byte_FF2710).l
 	bclr	#2,(byte_FF2710).l
 	move.w	#1,(word_FF2720).l
 .frame
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
-	jsr	(sub_12640).l
+	jsr	(SetMenuScroll).l
 	tst.w	(demoflag).w
 	bne.w	.13
 	addq.w	#1,(carddelay).w
@@ -858,22 +888,22 @@ sub_11814
 	beq.w	.1
 	btst	#7,(GameFlags).w
 	bne.w	.17
-	bsr.w	sub_1222A
+	bsr.w	RedrawTeamRanks
 	bclr	#1,(byte_FF2710).l
 	bne.w	.15
 	bra.w	.16
 .15
-	bsr.w	sub_1212E
-	bsr.w	sub_11E56
+	bsr.w	DrawHomeLogo
+	bsr.w	PrintHomeRanks
 .16
 	bclr	#2,(byte_FF2710).l
 	beq.w	.1
-	bsr.w	sub_12154
-	bsr.w	sub_11EC8
+	bsr.w	DrawVisLogo
+	bsr.w	PrintVisRanks
 	bra.w	.1
 .17
-	bsr.w	sub_12106
-	bsr.w	sub_11F3A
+	bsr.w	DrawUserLogo
+	bsr.w	PrintUserRanks
 .1
 	jsr	(FindHeldMenuPad).l
 	jsr	(ProcessInputWithRepeat).l
@@ -889,14 +919,14 @@ sub_11814
 	beq.w	.frame
 	btst	#2,d1
 	beq.w	.3
-	opt	osq-	;keep the subi (SNASM would make it subq)
+	opt	osq-						;keep the subi (SNASM would make it subq)
 	subi.w	#1,(word_FF2720).l
 	opt	osq+
 	bpl.w	.19
 	clr.w	(word_FF2720).l
 	bra.w	.frame
 .19
-	jsr	(sub_1222A).l
+	jsr	(RedrawTeamRanks).l
 	move	#$2500,sr
 	bra.w	.frame
 .3
@@ -905,7 +935,7 @@ sub_11814
 	tst.w	(word_FF2720).l
 	bne.w	.frame
 	move.w	#1,(word_FF2720).l
-	jsr	(sub_1222A).l
+	jsr	(RedrawTeamRanks).l
 	move	#$2500,sr
 	bra.w	.frame
 .20
@@ -1017,42 +1047,42 @@ sub_11814
 .exit
 	rts
 
-sub_11BF8
+TeamSelectGfx						;Team select video set up: backgrounds, the logos and the five rank names
 	bset	#5,(sflags12).w
-	move.l	#unk_12D46,(vbint).l
-	bclr	#0,(disflags).w
-	bset	#2,(disflags).w
-	bclr	#1,(disflags).w
+	move.l	#VBlank_Menus,(VBint).l
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
-	move.w	#$B800,(VmMap3).w
+	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
-	move.w	#$C000,(VmMap2).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col1).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col1).w
 	move.w	#0,d0
 	bset	#5,(disflags).w
 	jsr	(setVram).l
 	bclr	#5,(disflags).w
 	jsr	(orjoy).l
-	movea.l	#unk_1808B8,a1
+	movea.l	#SelectTeamSeasonSprites,a1
 	btst	#7,(GameFlags).w
 	bne.w	.0
-	movea.l	#unk_18DE04,a1
+	movea.l	#SelectTeamSprites,a1
 .0
-	bsr.w	sub_1217A
-	move.w	d4,(word_FFB014).w
+	bsr.w	LoadScreenSprite
+	move.w	d4,(printbigchars).w
 	movea.l	#BigFontMap2+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	bclr	#2,(sflags11).w
-	move.w	d4,(BigFontChars).w
+	move.w	d4,(BigFontchars).w
 	movea.l	#BigFontMap2+8,a2
 	jsr	(DecompressGraphicsWithCallback).l
 	dc.b	$01,$2A,$15,$6E,$F9,$AB,$CD,$EF	;remap table
-	move.w	d4,(word_FF2716).l
+	move.w	d4,(homelogochars).l
 	addi.w	#$A0,d4
-	move.w	d4,(word_FF2718).l
+	move.w	d4,(vislogochars).l
 	addi.w	#$A0,d4
 	jsr	(printsmallz).l
 	String	$FF,$01,$FD,$00,$FC,$00
@@ -1062,10 +1092,10 @@ sub_11BF8
 	jsr	(eraser).l
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),$00,$00,$00
-	movea.l	#unk_17ECEA,a0
+	movea.l	#SelectTeamSeasonBgMap,a0
 	btst	#7,(GameFlags).w
 	bne.w	.1
-	movea.l	#unk_18C936,a0
+	movea.l	#SelectTeamBgMap,a0
 .1
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -1079,7 +1109,7 @@ sub_11BF8
 	jsr	(dobitmap).l
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),$0B,$01,$00
-	movea.l	#unk_18C136,a0
+	movea.l	#SelectTeamTitleMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -1105,11 +1135,11 @@ sub_11BF8
 	jsr	(dobitmap).l
 	btst	#7,(GameFlags).w
 	beq.w	.11
-	bsr.w	sub_12106
+	bsr.w	DrawUserLogo
 	bra.w	.2
 .11
-	bsr.w	sub_1212E
-	bsr.w	sub_12154
+	bsr.w	DrawHomeLogo
+	bsr.w	DrawVisLogo
 .2
 	btst	#7,(GameFlags).w
 	bne.w	.3
@@ -1120,21 +1150,22 @@ sub_11BF8
 	jsr	(printbigz).l
 	String	$F8,$04,$01,$12,$06,'EVEN-STRENGTH',$F8,$04,$01,$12,$08,'POWER-PLAY',$F8,$04,$01,$12,$0A,'PENALTY KILLING',$F8,$04,$01,$12,$0C,'GOALTENDING',$F8,$04,$01,$12,$0E,'OVERALL',$00
 .4
-	jsr	(sub_1222A).l
+	jsr	(RedrawTeamRanks).l
 	move	#$2500,sr
 	rts
 
-sub_11E56
+PrintHomeRanks						;Team select: the home team's ranks (TeamRankPtrs) as ordinals,
+									;highlighted when the home side is selected
 	movem.l	d0-d7/a0-a6,-(sp)
-	move.w	(word_FFB014).w,-(sp)
+	move.w	(printbigchars).w,-(sp)
 	cmpi.w	#1,(word_FFDDB6).w
 	bne.w	.0
-	move.w	(BigFontChars).w,(word_FFB014).w
+	move.w	(BigFontchars).w,(printbigchars).w
 .0
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),$1E,$10,$00
 	move.w	(printx).w,-(sp)
-	movea.l	#unk_120F2,a5
+	movea.l	#TeamRankPtrs,a5
 	move.w	#4,d7
 .1
 	move.w	d7,d0
@@ -1152,21 +1183,22 @@ sub_11E56
 	addq.w	#2,(printy).w
 	dbf	d7,.1
 	move.w	(sp)+,(printx).w
-	move.w	(sp)+,(word_FFB014).w
+	move.w	(sp)+,(printbigchars).w
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_11EC8
+PrintVisRanks						;Team select: the visiting team's ranks as ordinals, highlighted when the
+									;visitor side is selected
 	movem.l	d0-d7/a0-a6,-(sp)
-	move.w	(word_FFB014).w,-(sp)
+	move.w	(printbigchars).w,-(sp)
 	cmpi.w	#2,(word_FFDDB6).w
 	bne.w	.0
-	move.w	(BigFontChars).w,(word_FFB014).w
+	move.w	(BigFontchars).w,(printbigchars).w
 .0
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),$06,$10,$00
 	move.w	(printx).w,-(sp)
-	movea.l	#unk_120F2,a5
+	movea.l	#TeamRankPtrs,a5
 	move.w	#4,d7
 .1
 	move.w	d7,d0
@@ -1184,16 +1216,16 @@ sub_11EC8
 	addq.w	#2,(printy).w
 	dbf	d7,.1
 	move.w	(sp)+,(printx).w
-	move.w	(sp)+,(word_FFB014).w
+	move.w	(sp)+,(printbigchars).w
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_11F3A
+PrintUserRanks						;Team select (new season): the ranks of the user team as ordinals
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),$22,$06,$00
 	move.w	(printx).w,-(sp)
-	movea.l	#unk_120F2,a5
+	movea.l	#TeamRankPtrs,a5
 	move.w	#4,d7
 .0
 	move.w	d7,d0
@@ -1214,7 +1246,7 @@ sub_11F3A
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-PrintOrdinal	;printbig the ordinal suffix of d0 (11 through 20 are th)
+PrintOrdinal						;printbig the ordinal suffix of d0 (11 through 20 are th)
 	ext.l	d0
 	cmp.w	#$A,d0
 	blt.w	.0
@@ -1230,20 +1262,16 @@ PrintOrdinal	;printbig the ordinal suffix of d0 (11 through 20 are th)
 	movea.l	(a0,d0.w),a1
 	jmp	printbig
 
-OrdinalSuffixPtr	;Ones digit: th, st, nd, rd, then th
+OrdinalSuffixPtr					;Ones digit: th, st, nd, rd, then th
 	dc.l	OrdinalSuffix,OrdinalSuffix+4,OrdinalSuffix+8,OrdinalSuffix+12
 	dc.l	OrdinalSuffix,OrdinalSuffix,OrdinalSuffix,OrdinalSuffix,OrdinalSuffix,OrdinalSuffix
 
-OrdinalSuffix	;TH, ST, ND, RD
-	dc.w	4
-	dc.b	'TH'
-	dc.w	4
-	dc.b	'ST'
-	dc.w	4
-	dc.b	'ND'
-	dc.w	4
-	dc.b	'RD'
-	;The lookup that follows the four suffixes
+OrdinalSuffix						;TH, ST, ND, RD
+	String	'TH'
+	String	'ST'
+	String	'ND'
+	String	'RD'
+	;The team rank lookups TeamRankPtrs points to: d0 = the rank of team d0 from a byte table
 	dc.b	$2F,$08,$48,$80,$20,$7C,$00,$01,$20,$16,$10,$30,$00,$00,$48,$80
 	dc.b	$20,$5F,$4E,$75,$13,$0A,$11,$07,$08,$0B,$02,$19,$0E,$0C,$16,$12
 	dc.b	$05,$10,$0D,$1A,$06,$04,$03,$17,$01,$14,$15,$09,$0F,$18,$01,$01
@@ -1260,48 +1288,50 @@ OrdinalSuffix	;TH, ST, ND, RD
 	dc.b	$20,$5F,$4E,$75,$18,$06,$0B,$07,$08,$10,$01,$16,$11,$12,$14,$13
 	dc.b	$09,$19,$0E,$1A,$05,$03,$02,$0F,$04,$17,$0C,$0D,$0A,$15,$01,$01
 
-unk_120F2
+TeamRankPtrs						;The team rank lookups, one long each: overall, goaltending, penalty
+									;killing, power play, even strength
 	dc.b	$00,$01,$20,$C2,$00,$01,$20,$92,$00,$01,$20,$62,$00,$01,$20,$32
 	dc.b	$00,$01,$20,$02
 
-sub_12106
+DrawUserLogo						;Team select: draw the user team's logo
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),$01,$08,$00
 	clr.w	d7
 	move.b	(dword_FFDD82+2).w,d7
-	move.w	(word_FF2716).l,d4
+	move.w	(homelogochars).l,d4
 	moveq	#2,d5
-	jsr	(sub_12BB2).l
+	jsr	(DrawTeamLogoD7).l
 	move.w	#$64,(palcount).w
 	rts
 
-sub_1212E
+DrawHomeLogo						;Team select: draw the home team's logo
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),$17,$04,$00
 	move.w	(HomeTeam).w,d7
-	move.w	(word_FF2716).l,d4
+	move.w	(homelogochars).l,d4
 	moveq	#2,d5
-	jsr	(sub_12BB2).l
+	jsr	(DrawTeamLogoD7).l
 	move.w	#$64,(palcount).w
 	rts
 
-sub_12154
+DrawVisLogo							;Team select: draw the visiting team's logo (palette 3)
 	jsr	(printz).l
 	String	-(TXPRI+TXPAL3+TXMAP1),$01,$04,$00
 	move.w	(VisTeam).w,d7
-	move.w	(word_FF2718).l,d4
+	move.w	(vislogochars).l,d4
 	clr.w	d5
-	jsr	(sub_12BB2).l
+	jsr	(DrawTeamLogoD7).l
 	move.w	#$64,(palcount).w
 	rts
 
-sub_1217A
+LoadScreenSprite					;Decompress the chars of sprite file a1 at char 1 (for DrawScreenSprite)
 	move.w	#1,d4
 	lea	8(a1),a2
 	adda.l	(a1),a1
 	jmp	DecompressGraphicsPlain
 
-sub_1218A
+DrawScreenSprite					;Put frame 0 of sprite file a0 at the screen's top left (char 1, palette
+									;3) as the only sprite
 	move.w	#$80,d0
 	move.w	#$80,d1
 	move.w	#0,d2
@@ -1315,10 +1345,11 @@ sub_1218A
 	subi.l	#$FFFFC066,d0
 	lsr.w	#1,d0
 	move.w	d0,(Sattsize).w
-	bset	#0,(disflags).w
+	bset	#dfok,(disflags).w
 	rts
 
-sub_121C8
+TeamSelectSide						;Team select: word_FFDDB6 = the highlighted side (0 season, 1 home, 2
+									;visitors)
 	clr.w	(word_FFDDB6).w
 	btst	#7,(GameFlags).w
 	bne.w	.2
@@ -1347,28 +1378,30 @@ sub_121C8
 .2
 	rts
 
-sub_1222A
-	bsr.s	sub_121C8
+RedrawTeamRanks						;Team select: update the selected side and reprint both teams' ranks with
+									;the highlight
+	bsr.s	TeamSelectSide
 	tst.w	(word_FFDDB6).w
 	beq.w	.0
-	bsr.w	sub_11EC8
-	bsr.w	sub_11E56
+	bsr.w	PrintVisRanks
+	bsr.w	PrintHomeRanks
 .0
 	rts
 
-sub_1223E
+RunSeasonMenu						;Run the season screens: call the routine in NextScreenPtr
+									;(SeasonMenuScreen first) until one sets the end value
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	(menulist).w,-(sp)
 	move.l	(menudraw).w,-(sp)
 	move.w	(menuitem).w,-(sp)
-	move.w	(word_FFD000).w,-(sp)
+	move.w	(menuitem+2).w,-(sp)
 	btst	#1,(byte_FFC35A).w
 	bne.w	.0
 	move.w	#3,-(sp)
 	jsr	(song).l
 .0
-	movea.l	(dword_FFDDAC).w,a0
-	cmpa.l	#$772,a0
+	movea.l	(NextScreenPtr).w,a0
+	cmpa.l	#ZeroLong,a0
 	beq.w	.1
 	move.w	(HomeTeam).w,-(sp)
 	move.w	(VisTeam).w,-(sp)
@@ -1380,13 +1413,15 @@ sub_1223E
 	bclr	#1,(byte_FFC35A).w
 	move.l	(sp)+,(menudraw).w
 	move.w	(sp)+,(menuitem).w
-	move.w	(sp)+,(word_FFD000).w
+	move.w	(sp)+,(menuitem+2).w
 	move.l	(sp)+,(menulist).w
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-unk_122A4
-	;Code the listing does not decode: kept as bytes
+SeasonMenuScreen					;Season menu: Play Game, Simulate Game, Standings ... Exit Season (up /
+									;down); [] changes the day, start runs
+									;the item
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$42,$78,$D3,$12,$61,$00,$02,$54,$42,$40,$10,$38
 	dc.b	$DD,$85,$33,$C0,$FF,$FF,$27,$22,$67,$00,$00,$08,$53,$79,$FF,$FF
 	dc.b	$27,$22,$B0,$79,$FF,$FF,$27,$24,$6D,$00,$00,$12,$33,$F9,$FF,$FF
@@ -1446,7 +1481,8 @@ unk_122A4
 	dc.b	$00,$16,$30,$38,$B0,$00,$4E,$B9,$00,$01,$B6,$78,$30,$BC,$00,$00
 	dc.b	$30,$38,$D3,$1A,$30,$80,$52,$78,$D3,$1A,$4E,$75
 
-sub_12640
+SetMenuScroll						;Write the vertical scroll: plane A 0, plane B the menu background scroll
+									;(homegoalies)
 	move.w	(VSCRLPM).w,d0
 	jsr	(Vmaddr).l
 	move.w	#0,(a0)
@@ -1538,7 +1574,8 @@ sub_12640
 	dc.b	$11,$F0,$60,$00,$B0,$41,$70,$05,$72,$05,$34,$3C,$07,$FF,$00,$42
 	dc.b	$80,$00,$4E,$B9,$00,$01,$B9,$76,$4C,$DF,$7F,$FF,$4E,$75
 
-DrawSetupTeamBlock	;Draw the team logo of team d7 at printx / printy (the controller setup screen)
+DrawSetupTeamBlock					;Draw the team block (TeamBlockPtrs) of team d7 at printx / printy (the
+									;controller setup screen)
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#TeamBlockPtrs,a0
 	asl.w	#2,d7
@@ -1556,7 +1593,8 @@ DrawSetupTeamBlock	;Draw the team logo of team d7 at printx / printy (the contro
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_12BB2
+DrawTeamLogoD7						;Draw the logo of team d7 at printx / printy, char d4; d5 = 0 also copies
+									;its palette to palfadenew+$40
 	movem.l	d0-d3/d5-d7/a0-a6,-(sp)
 	movea.l	#TeamLogoPtrs,a0
 	asl.w	#2,d7

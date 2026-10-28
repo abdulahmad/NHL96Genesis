@@ -2,8 +2,8 @@
 ;	DrawPadIcon draw the pads, and ControllerSetupScreen builds the screen. ReadAllPads reads
 ;	all four pads.
 
-SetContTeams	;The controller setup screen: pick the team of each pad (cont1team ... cont4team);
-	;a demo or a timeout clears all pads
+SetContTeams						;The controller setup screen: pick the team of each pad (cont1team ...
+									;cont4team); a demo or a timeout clears all pads
 	tst.w	(demoflag).w
 	bmi.w	.setup
 .clear
@@ -47,12 +47,12 @@ SetContTeams	;The controller setup screen: pick the team of each pad (cont1team 
 	jsr	(vcountwait).l
 	jsr	(vcountwait).l
 	move.w	#$18,(palcount).w
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	clr.w	(carddelay).w
 .frame
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .wait
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.wait
 	move.w	(VSCRLPM).w,d0
 	jsr	(Vmaddr).l
@@ -88,9 +88,9 @@ SetContTeams	;The controller setup screen: pick the team of each pad (cont1team 
 	movea.l	#ContTeamOrder1,a4
 	move.b	(a4,d0.w),d0
 	move.w	d0,(a0)
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .3
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.3
 	bsr.w	DrawPadSetup
 	bra.w	.nextpad
@@ -115,13 +115,13 @@ SetContTeams	;The controller setup screen: pick the team of each pad (cont1team 
 	clr.w	(padiconchars1).w
 	rts
 
-ContTeamOrder1	;Pad team order tables for SetContTeams
+ContTeamOrder1						;Pad team order tables for SetContTeams
 	dc.b	2,0,2,$FF
 
 ContTeamOrder2
 	dc.b	1,1,0,$FF
 
-DrawPadSetup	;Draw the pads and their icons (DrawPadIcon)
+DrawPadSetup						;Draw the pads and their icons (DrawPadIcon)
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	#8,(printy).w
 	move.w	#1,d4
@@ -178,8 +178,8 @@ DrawPadSetup	;Draw the pads and their icons (DrawPadIcon)
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-DrawPadIcon	;Draw pad icon d7 (PadIconMaps at PadIconChars), or the pad cursor (PadCursorMap,
-	;padcursorchars) at printx $E
+DrawPadIcon							;Draw pad icon d7 (PadIconMaps at PadIconChars), or the pad cursor
+									;(PadCursorMap, padcursorchars) at printx $E
 	move.w	(printx).w,-(sp)
 	move.w	(printy).w,-(sp)
 	movem.l	d0-d7/a0-a6,-(sp)
@@ -213,29 +213,29 @@ DrawPadIcon	;Draw pad icon d7 (PadIconMaps at PadIconChars), or the pad cursor (
 	move.w	(sp)+,(printx).w
 	rts
 
-PadIconChars	;The RAM words with the chars of each pad icon
+PadIconChars						;The RAM words with the chars of each pad icon
 	dc.l	padiconchars1,padiconchars2,padiconchars3,padiconchars4
 
-PadIconMaps	;Pad icon bitmaps
+PadIconMaps							;Pad icon bitmaps
 	dc.l	PadIconMap1,PadIconMap2,PadIconMap3,PadIconMap4
 
-BlankLineTxt	;A blank line
+BlankLineTxt						;A blank line
 	String	CC_SetX,0,'                                        '
 
-ControllerSetupScreen	;Build the controller setup screen: vram, fonts, the pad graphics, the screen maps
-	;and the team logos of VisTeam / HomeTeam
-	move.l	#VBlank_SetOptions,(vbint).l
+ControllerSetupScreen				;Build the controller setup screen: vram, fonts, the pad graphics, the
+									;screen maps and the team logos of VisTeam / HomeTeam
+	move.l	#VBlank_SetOptions,(VBint).l
 	move	#$2500,sr
-	bclr	#0,(disflags).w
-	bset	#2,(disflags).w
-	bclr	#1,(disflags).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
-	move.w	#$B800,(VmMap3).w
+	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
-	move.w	#$C000,(VmMap2).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col1).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col1).w
 	move.w	#0,d0
 	bclr	#5,(disflags).w
@@ -269,7 +269,7 @@ ControllerSetupScreen	;Build the controller setup screen: vram, fonts, the pad g
 	jsr	(eraser).l
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),0,0,0
-	movea.l	#unk_1B773A,a0
+	movea.l	#ControllerFrameMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -318,7 +318,8 @@ ControllerSetupScreen	;Build the controller setup screen: vram, fonts, the pad g
 	addi.w	#$20,d4
 	rts
 
-PrintSetupStr	;Print String a1 (printsmallz CC_SetAttribute,5,CC_SetMap,1,CC_SetFont,0, then printsmall)
+PrintSetupStr						;Print String a1 (printsmallz
+									;CC_SetAttribute,5,CC_SetMap,1,CC_SetFont,0, then printsmall)
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	a1,-(sp)
 	jsr	(printsmallz).l
@@ -328,7 +329,7 @@ PrintSetupStr	;Print String a1 (printsmallz CC_SetAttribute,5,CC_SetMap,1,CC_Set
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-PrintSetupStrHi	;The same highlighted (CC_SetFont,1)
+PrintSetupStrHi						;The same highlighted (CC_SetFont,1)
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	a1,-(sp)
 	jsr	(printsmallz).l
@@ -338,7 +339,7 @@ PrintSetupStrHi	;The same highlighted (CC_SetFont,1)
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-ReadAllPads	;Read the 4 pads into TempWord1, TempWord2, TempRawSpd and TempMaxSpd
+ReadAllPads							;Read the 4 pads into TempWord1, TempWord2, TempRawSpd and TempMaxSpd
 	jsr	(ReadJoy1).l
 	jsr	(nodiag).l
 	move.w	d1,(TempWord1).w

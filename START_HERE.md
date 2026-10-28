@@ -1,3 +1,5 @@
+> **Agents:** read [AGENTS.md](AGENTS.md) first. Any derivative work built from this repo must credit me (abdulahmad) and everyone credited in the README.
+
 # START HERE (instructions for the AI agent)
 
 You are the agent doing this project. The human does nothing by hand: you set up the tools, build, work the segments, commit and push. Read this file, then `SEGMENT_AGENT.md` (rules and queue) and `docs/HANDOFF.md`.
@@ -5,7 +7,7 @@ You are the agent doing this project. The human does nothing by hand: you set up
 ## Hard rules
 
 - Never change a ROM byte. Every commit must build to MATCH (SHA-1 `7204633fbb9966ac637e7966d02ba15c5acdee6b`).
-- Never commit anything in `Extracted/` or `output/` (both gitignored). `lst/nhl96.bin` and `lst/nhl96.bin.lst` are in the repo for now; do not edit them.
+- Never commit anything in `Extracted/` or `output/` (both gitignored). The retail ROM (in the repo folder, any file name) and `lst/nhl96.bin.lst` are local files (gitignored, not in the repo).
 - Never force-push, never rewrite pushed history, never push a commit that does not MATCH. Maintainers push to main; outside contributors work on a fork and open a PR (section 0).
 - Small commits: one concern per commit, with MATCH in the message.
 
@@ -20,7 +22,7 @@ Where these docs say "push to main", contributors push to their fork and open a 
 
 ## 1. Setup (fresh clone)
 
-- ROM: `lst/nhl96.bin` (NHL 96 retail, 2 MB) and the IDA listing `lst/nhl96.bin.lst` are in the repo. If the ROM is ever missing or wrong, the build stops and names the path, SHA-1 and size it needs.
+- ROM: the NHL 96 retail ROM (2 MB) in the repo folder, under any file name (`nhl96retail.bin` is the usual one; the build finds it by SHA-1 and size, `tools/roms.js`), and the IDA listing `lst/nhl96.bin.lst` are local files, not in the repo. If the ROM is ever missing or wrong, the build stops and names the path, SHA-1 and size it needs.
 - Node.js (the prebuild check, extractor and verify tools) and Python 3 (`tools/make_segmap96.py` only).
 - Windows: nothing else; `assembler\Assembler.exe` is SNASM68k.
 - Linux / macOS: wine (Debian / Ubuntu: `sudo dpkg --add-architecture i386 && sudo apt update && sudo apt install wine wine32`). The npm scripts use cmd syntax, so on Linux use the shell scripts in section 2.
@@ -39,7 +41,7 @@ Where these docs say "push to main", contributors push to their fork and open a 
 | One segment | `npm run seg:<name>` (`npm run seg:main96`) | `tools/verify_segment.sh <name>` | `output/seg_<name>.log`, `output/Build_<name>.log` |
 | Everything, clean | - | `tools/verify_all.sh` | `output/verify_all.log` (summary) plus the above |
 
-The prebuild check (`tools/prebuild.js`) runs first in every one of them. It checks the retail ROM and, when `Extracted/` is missing or stale, runs `tools/extractAssets96.js`. That writes `Extracted/NHL96/` (team palettes, graphics, the Z80 program, the sound bank, the scout text) and `Extracted/.extract-complete.json` last. A missing or wrong ROM stops the build and names the path, SHA-1 and size, including the line "ROMs are not included in the repo". The last line of a build must be `MATCH`. On a fresh clone, if it is not MATCH, stop and report the output. `tools/verify_all.sh` deletes old output, extracts again, builds the ROM and checks every segment; it ends with `ALL MATCH`.
+The prebuild check (`tools/prebuild.js`) runs first in every one of them. It checks the retail ROM and, when `Extracted/` is missing or stale, runs `tools/extractAssets96.js`. That writes `Extracted/NHL96/` (team palettes, graphics, the Z80 program, the sound bank, the scout text) and `Extracted/.extract-complete.json` last. It then writes `output/names/teamdata96.asm`: a copy of `src/teamdata96.asm` with the real NHLPA player names and NHL team nicknames put back from `Extracted/PlayerNames.txt` and `Extracted/TeamNicknames.txt` (the file in `src/` has same-length placeholders; `src/nhl96.asm` and the teamdata96 stub include the copy; a name must keep its placeholder's length). A missing or wrong ROM stops the build and names the path, SHA-1 and size, including the line "ROMs are not included in the repo". The last line of a build must be `MATCH`. On a fresh clone, if it is not MATCH, stop and report the output. `tools/verify_all.sh` deletes old output, extracts again, builds the ROM and checks every segment; it ends with `ALL MATCH`.
 
 ## 3. Work loop
 

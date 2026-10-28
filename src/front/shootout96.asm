@@ -1,8 +1,8 @@
 ;	A penalty shot and a shootout. puckshootout starts the attempt. puckpenshot is
 ;	the face-off. EndPenaltyShotPlay ends the play and counts the goals.
 
-puckshootout	;asstab entry: start a penalty shot or shootout attempt.
-	;Code the listing does not decode: kept as bytes
+puckshootout						;asstab entry: start a penalty shot or shootout attempt.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$AB,$00,$01,$00,$62,$67,$00,$01,$00,$08,$B8,$00,$04,$C3,$4E
 	dc.b	$08,$F8,$00,$07,$C3,$4A,$42,$B8,$BE,$AE,$42,$B8,$BE,$B2,$42,$B8
 	dc.b	$BE,$B6,$08,$B8,$00,$07,$C3,$48,$08,$38,$00,$00,$C3,$48,$67,$00
@@ -32,8 +32,8 @@ puckshootout	;asstab entry: start a penalty shot or shootout attempt.
 	dc.b	$00,$02,$00,$63,$66,$C8,$31,$C0,$D2,$D6,$4C,$9F,$00,$06,$34,$7C
 	dc.b	$C7,$26,$30,$3C,$00,$1F,$60,$00,$12,$0A
 
-SelectPenaltyShotSkater	;The best rated free skater of the shooting team.
-	;Code the listing does not decode: kept as bytes
+SelectPenaltyShotSkater				;The best rated free skater of the shooting team.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$C7,$26,$4A,$78,$D2,$D2,$67,$00
 	dc.b	$00,$08,$20,$7C,$FF,$FF,$CA,$C4,$32,$3C,$00,$00,$3C,$3C,$FF,$FF
 	dc.b	$3A,$3C,$FF,$FF,$3E,$28,$00,$28,$4E,$B9,$00,$01,$57,$B2,$53,$40
@@ -57,8 +57,8 @@ SelectPenaltyShotSkater	;The best rated free skater of the shooting team.
 	dc.b	$00,$0A,$30,$3C,$FF,$FF,$60,$00,$00,$06,$30,$3C,$00,$01,$4C,$DF
 	dc.b	$7F,$FF,$4E,$75
 
-puckpenshot	;asstab entry: the penalty shot / shootout face-off.
-	;Code the listing does not decode: kept as bytes
+puckpenshot							;asstab entry: the penalty shot / shootout face-off.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$AB,$00,$01,$00,$62,$67,$00,$03,$18,$48,$E7,$FF,$FE,$61,$00
 	dc.b	$1C,$1C,$08,$38,$00,$00,$BF,$B2,$66,$F8,$0C,$78,$02,$58,$B8,$B2
 	dc.b	$63,$00,$00,$0E,$31,$FC,$02,$58,$B8,$B2,$06,$78,$00,$14,$B8,$B8
@@ -112,12 +112,13 @@ puckpenshot	;asstab entry: the penalty shot / shootout face-off.
 	dc.b	$08,$F8,$00,$02,$C3,$48,$30,$3C,$00,$18,$61,$00,$0D,$88,$42,$6B
 	dc.b	$00,$28,$42,$6B,$00,$2A,$4E,$75
 
-PenShotTable	;Penalty shot data
+PenShotTable						;Penalty shot data
 	dc.b	0,1,2,3,4,5,6,0,0,1,5,3,4,2,0,0
 	dc.b	0,3,5,1,4,0,0,0,0,0
 	dc.w	$FF06,$FFDD,$FFCE,$0023,$FFCE,$FFCE,$FFF6,$0000,$FFF1,$0032,$FFF6,$0000,$FFC4
 
-UpdatePenaltyShotEnd	;The shot ends (BA_PS_flags bit 4) when the goalie has the puck, the loose puck timer or the clock runs out. Runs on into EndPenaltyShotPlay
+UpdatePenaltyShotEnd				;The shot ends (BA_PS_flags bit 4) when the goalie has the puck, the loose
+									;puck timer or the clock runs out. Runs on into EndPenaltyShotPlay
 	dc.b	$48,$A7,$80,$00
 	dc.b	$30,$38,$B7,$BE,$B0,$78,$D2,$D6,$4C,$9F,$00,$01,$67,$00,$00,$3C
 	dc.b	$08,$38,$00,$05,$C3,$40,$67,$00,$00,$38,$08,$38,$00,$05,$C3,$48
@@ -129,14 +130,15 @@ UpdatePenaltyShotEnd	;The shot ends (BA_PS_flags bit 4) when the goalie has the 
 	dc.b	$66,$00,$00,$78,$08,$F8,$00,$06,$C3,$40,$30,$3C,$00,$0A,$4E,$B9
 	dc.b	$00,$01,$C1,$D2
 
-EndPenaltyShotPlay	;LockScroll, end the penalty shot play (the BA flags), the shooter newpnum back, then CountShootoutGoals
+EndPenaltyShotPlay					;LockScroll, end the penalty shot play (the BA flags), the shooter newpnum
+									;back, then CountShootoutGoals
 	jsr	(LockScroll).l
 	btst	#0,(gmode2).w
 	bne.w	.stopplay
 	move.w	#$A,(replaydelay).w
-	bset	#2,(sflags2).w
+	bset	#sf2drec,(sflags2).w
 .stopplay
-	bset	#0,(gmode).w
+	bset	#gmclock,(gmode).w
 	bclr	#2,(gmode2).w
 	bclr	#2,(BA_PS_flags).w
 	bclr	#3,(BA_PS_flags).w

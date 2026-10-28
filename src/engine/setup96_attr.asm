@@ -1,11 +1,12 @@
 ;	Roster attribute columns for the skaters and the goalies.
 
-PAttribColumns	;Skater attribute columns. String header, then a long: high word = mask of rating nibbles to average,
-	;low word = attribjmp offset (0 status, 2 energy, 4 handed, 6 weight, $A rating). A negative word ends the list
+PAttribColumns						;Skater attribute columns. String header, then a long: high word = mask of
+									;rating nibbles to average, low word = attribjmp offset (0 status, 2
+									;energy, 4 handed, 6 weight, $A rating). A negative word ends the list
 	String	'     Status    ]'
 	dc.w	$0000,$0
 
-PAttribOverall	;The Overall entry; PAttribOverallMask is read
+PAttribOverall						;The Overall entry; PAttribOverallMask is read
 	String	'[   Overall    ]'
 
 PAttribOverallMask
@@ -36,17 +37,17 @@ PAttribOverallMask
 	dc.w	$0008,$A
 	String	'[Aggressiveness]'
 
-PAttribAggressMask	;The Aggressiveness entry
+PAttribAggressMask					;The Aggressiveness entry
 	dc.w	$0001,$A
 	String	'[   Checking    '
 	dc.w	$0080,$A
 	dc.w	-1
 
-GAttribColumns	;Goalie attribute columns, same format as PAttribColumns
+GAttribColumns						;Goalie attribute columns, same format as PAttribColumns
 	String	'     Status    ]'
 	dc.w	$0000,$0
 
-GAttribOverall	;The Overall entry; GAttribOverallMask is read
+GAttribOverall						;The Overall entry; GAttribOverallMask is read
 	String	'[   Overall    ]'
 
 GAttribOverallMask

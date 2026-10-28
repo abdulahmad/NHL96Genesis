@@ -1,7 +1,8 @@
 ;	Run the current assignment of one player.
 
-doassignment	;Run the current assignment of player a3 (asslist entry assnum, asstab) with a2 / a1 = its team / the other
-	;team (loadTeamStruct).
+doassignment						;Run the current assignment of player a3 (asslist entry assnum, asstab)
+									;with a2 / a1 = its team / the other
+									;team (loadTeamStruct).
 	move.w	assnum(a3),d0
 	clr.w	d1
 	move.b	asslist(a3,d0.w),d1

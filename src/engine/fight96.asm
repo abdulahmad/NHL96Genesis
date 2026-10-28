@@ -1,11 +1,11 @@
-;	Fighting, new in 96. checkfight starts a fight when two players hit hard enough;
-;	startfight and SetInst set the two of them up, fightinput reads their pads, and
-;	assfight and assfwatch run the fighters and the players around them. The assignment
-;	bytes are what the listing left undecoded.
+;	Fighting, new in 96. checkfight starts a fight when two players hit hard enough, and the
+;	fighters and the players around them are run by assignment routines whose bytes are
+;	what the listing left undecoded.
 
-checkfight	;Look for the start of a fight between players a2 and a3 (impact $A or more on both, no
-	;animation lock, no goalie, no faceoff): SetInst both ways, then startfight for both and the other
-	;players watch (assignment $15)
+checkfight							;Look for the start of a fight between players a2 and a3 (impact $A or
+									;more on both, no animation lock, no goalie, no faceoff): SetInst both
+									;ways, then startfight for both and the other players watch (assignment
+									;$15)
 	tst.w	(OptFighting).w
 	bne.w	.5
 	btst	#5,(GameFlags).w
@@ -16,19 +16,19 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 	blt.w	rtsfight
 	cmpi.w	#$A,impact(a2)
 	blt.w	rtsfight
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	rtsfight
-	btst	#5,pflags(a2)
+	btst	#pfalock,pflags(a2)
 	bne.w	rtsfight
-	btst	#4,pflags2(a3)
+	btst	#pf2pen,pflags2(a3)
 	bne.w	rtsfight
-	btst	#4,pflags2(a2)
+	btst	#pf2pen,pflags2(a2)
 	bne.w	rtsfight
 	tst.w	position(a3)
 	beq.w	rtsfight
 	tst.w	position(a2)
 	beq.w	rtsfight
-	btst	#0,(gmode).w
+	btst	#gmclock,(gmode).w
 	bne.w	rtsfight
 	btst	#0,(puck_pflags2).w
 	bne.w	rtsfight
@@ -48,31 +48,31 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 	exg	a2,a3
 	bsr.w	SetInst
 	exg	a2,a3
-	btst	#0,pflags2(a3)
+	btst	#pf2fight,pflags2(a3)
 	beq.w	.4
 	clr.w	(ChkCnt).w
 	moveq	#$1B,d0
-	movea.w	#(unk_FFC856-M68K_RAM),a0
+	movea.w	#(tmstruct+$130-M68K_RAM),a0
 .0
 	clr.b	$39E(a0)
 	clr.b	(a0)+
 	dbf	d0,.0
-	addi.w	#$3E8,(crowdlevel).w
-	addi.w	#$23,(padcursorchars).w
+	addi.w	#$3E8,(Crowdlevel).w
+	addi.w	#$23,(CwdExciteLvl).w
 	clr.w	(word_FFDCEA).w
 	clr.l	(dword_FFDCE0).w
 	clr.l	(dword_FFDCE4).w
 	bclr	#1,(sflags10).w
 	bclr	#2,(sflags10).w
-	bclr	#2,(sflags).w
-	bclr	#3,(sflags).w
+	bclr	#sfspdir,(sflags).w
+	bclr	#sfssdir,(sflags).w
 	move.w	SCnum(a3),(puckc).w
 	move.w	Ypos(a3),d1
 	add.w	Ypos(a2),d1
 	asr.w	#1,d1
 	move.w	d1,(yc1).w
-	bset	#2,(sflags2).w
-	bset	#6,(sflags).w
+	bset	#sf2drec,(sflags2).w
+	bset	#sfslock,(sflags).w
 	moveq	#2,d1
 	move.w	(a3),d0
 	cmp.w	(a2),d0
@@ -90,11 +90,11 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 	move.l	#$15,d0
 	moveq	#$B,d1
 .2
-	btst	#0,pflags2(a3)
+	btst	#pf2fight,pflags2(a3)
 	bne.w	.3
-	tst.w	position(a3)	;check if goalie
+	tst.w	position(a3)			;check if goalie
 	beq.w	.3
-	btst	#2,pflags2(a3)
+	btst	#pf2unav,pflags2(a3)
 	bne.w	.3
 	movem.w	d0,-(sp)
 	move.w	assnum(a3),d0
@@ -106,7 +106,7 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 	adda.w	#$80,a3
 	dbf	d1,.2
 	movea.w	#(puckx-M68K_RAM),a3
-	bset	#0,pflags2(a3)
+	bset	#pf2fight,pflags2(a3)
 	move.l	#$1A,d0
 	jsr	(assinsert).l
 	st	(collflag).w
@@ -116,12 +116,12 @@ checkfight	;Look for the start of a fight between players a2 and a3 (impact $A o
 .5
 	rts
 
-startfight	;Start the fight for player a3 against a2: AddPenalty2 $2E, setd0player, assignment $14,
-	;push a3 back by facing, the fight SPA and Pencntdwn $140
+startfight							;Start the fight for player a3 against a2: AddPenalty2 $2E, setd0player,
+									;assignment $14, push a3 back by facing, the fight SPA and PenCntDwn $140
 	move.w	SCnum(a2),impactp(a3)
 	move.w	#$2E,d0
 	jsr	(AddPenalty2).l
-	move.w	#$140,(Pencntdwn).w
+	move.w	#$140,(PenCntDwn).w
 	clr.w	(word_FFDCDE).w
 	move.w	SCnum(a3),d0
 	jsr	(setd0player).l
@@ -136,14 +136,15 @@ startfight	;Start the fight for player a3 against a2: AddPenalty2 $2E, setd0play
 .0
 	move.w	d1,Xvel(a3)
 	bset	#2,pflags2(a3)
-	bclr	#1,pflags2(a3)
+	bclr	#pf2aip,pflags2(a3)
 	bset	#5,pflags2(a3)
-	bclr	#5,pflags(a3)
+	bclr	#pfalock,pflags(a3)
 	move.w	#SPAfight,d1
 	jmp	SetSPA
 
-SetInst	;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 bit 0 (fighting) on both;
-	;Z clear when a3 was already fighting
+SetInst								;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 bit 0
+									;(fighting) on both;
+									;Z clear when a3 was already fighting
 	cmpi.b	#1,$75(a3)
 	blt.w	rtsfight
 	cmpi.b	#1,$75(a2)
@@ -151,7 +152,7 @@ SetInst	;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 bit 0 (f
 	clr.w	d1
 	move.b	$67(a2),d1
 	movea.w	#(tmstruct-M68K_RAM),a0
-	btst	#6,pflags(a2)
+	btst	#pfteam,pflags(a2)
 	beq.w	.tm
 	adda.w	#$39E,a0
 .tm
@@ -161,8 +162,8 @@ SetInst	;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 bit 0 (f
 	neg.b	d1
 	addi.b	#$10,d1
 	cmp.b	$75(a2),d1
-	bset	#0,pflags2(a2)
-	bset	#0,pflags2(a3)
+	bset	#pf2fight,pflags2(a2)
+	bset	#pf2fight,pflags2(a3)
 	bne.w	rtsfight
 	rts
 	;Not decoded in the listing and not referenced from it: kept as bytes
@@ -174,11 +175,11 @@ SetInst	;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 bit 0 (f
 	dc.b	$00,$2A,$4E,$B9,$00,$01,$C1,$D2,$26,$4C,$4E,$75,$D6,$FC,$00,$80
 	dc.b	$51,$C8,$FF,$CA,$26,$4C
 
-rtsfight	;The shared rts of the fight routines
+rtsfight							;The shared rts of the fight routines
 	rts
 
-assfight	;Assignment $14: the fighter. Not decoded in the listing: kept as bytes, with the rest of the
-	;fight code it calls
+assfight							;Assignment $14: the fighter. Not decoded in the listing: kept as bytes,
+									;with the rest of the fight code it calls
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$F6,$4A,$78,$C3,$E8,$6A,$00,$00,$08
 	dc.b	$4E,$F9,$00,$01,$73,$1E,$08,$AB,$00,$01,$00,$62,$67,$00,$00,$30
 	dc.b	$08,$B8,$00,$07,$C3,$56,$42,$40,$10,$2B,$00,$75,$D0,$40,$56,$40
@@ -298,16 +299,16 @@ loc_C068
 	jsr	(SetSPA).l
 	cmpi.w	#2,(word_FFDCDE).w
 	beq.w	.0
-	move.w	#$140,(Pencntdwn).w
+	move.w	#$140,(PenCntDwn).w
 	bra.w	.1
 .0
-	bsr.w	sub_C51C
+	bsr.w	SetFightingMajors
 	bset	#5,(GameFlags).w
 .1
 	movem.l	(sp)+,d0-d3
 	rts
 
-ClearMessageLine	;Clear the message line
+ClearMessageLine					;Clear the message line
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),0,1,0
@@ -336,7 +337,8 @@ ClearMessageLine	;Clear the message line
 	dc.b	$32,$4B,$30,$11,$E2,$48,$44,$40,$06,$40,$00,$10,$31,$C0,$B0,$40
 	dc.b	$4E,$75
 
-assfwatch	;Assignment $15: a player watching the fight. Not decoded in the listing: kept as bytes
+assfwatch							;Assignment $15: a player watching the fight. Not decoded in the listing:
+									;kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$F7,$B6,$08,$2B,$00,$03,$00,$62
 	dc.b	$66,$00,$F7,$AC,$08,$AB,$00,$01,$00,$62,$67,$00,$00,$06,$42,$6B
 	dc.b	$00,$40,$9F,$6B,$00,$40,$6A,$00,$00,$64,$06,$6B,$00,$3C,$00,$40
@@ -349,7 +351,7 @@ assfwatch	;Assignment $15: a player watching the fight. Not decoded in the listi
 	dc.b	$32,$2B,$00,$46,$41,$FA,$F7,$28,$4E,$B9,$00,$01,$A0,$50,$4E,$F9
 	dc.b	$00,$01,$8D,$32
 
-fightinput	;Controller processing for fighting
+fightinput							;Controller processing for fighting
 	btst	#2,(sflags10).w
 	beq.w	.1
 	movem.w	d0,-(sp)
@@ -361,7 +363,7 @@ fightinput	;Controller processing for fighting
 .1
 	tst.w	temp3(a3)
 	bmi.w	rtsfight
-	tst.w	(Pencntdwn).w
+	tst.w	(PenCntDwn).w
 	bmi.w	rtsfight
 	cmpi.w	#SPA3128,SPA(a3)
 	beq.w	rtsfight
@@ -377,21 +379,21 @@ fightinput	;Controller processing for fighting
 	move.w	d1,-(sp)
 	cmpi.w	#2,(word_FFDCDE).w
 	beq.w	.5
-	move.w	#$280,(word_FFDDB4).w
+	move.w	#$280,(fightidletimer).w
 	bne.w	.8
 .5
 	tst.w	d1
 	bne.w	.7
-	tst.w	(word_FFDDB4).w
+	tst.w	(fightidletimer).w
 	beq.w	.6
-	subq.w	#1,(word_FFDDB4).w
+	subq.w	#1,(fightidletimer).w
 	bra.w	.8
 .6
 	bset	#7,(sflags12).w
 	bne.w	.8
-	move.w	#8,(Pencntdwn).w
+	move.w	#8,(PenCntDwn).w
 .7
-	move.w	#$280,(word_FFDDB4).w
+	move.w	#$280,(fightidletimer).w
 .8
 	btst	#3,d2
 	bne.w	.19
@@ -426,7 +428,7 @@ fightinput	;Controller processing for fighting
 .14
 	move.w	#5,d0
 .15
-	btst	#0,pflags2(a0)
+	btst	#pf2fight,pflags2(a0)
 	bne.w	.16
 	adda.w	#$80,a0
 	dbf	d0,.15
@@ -467,7 +469,7 @@ fightinput	;Controller processing for fighting
 	sub.w	d0,Xvel(a3)
 .22
 	move.w	(sp)+,d1
-	bset	#1,pflags2(a3)
+	bset	#pf2aip,pflags2(a3)
 	bne.w	rtsfight
 	move.w	d1,d2
 	cmpi.w	#SPAfight,SPA(a3)
@@ -493,7 +495,7 @@ fightinput	;Controller processing for fighting
 	btst	#5,d2
 	bne.w	.34
 .25
-	bclr	#1,pflags2(a3)
+	bclr	#pf2aip,pflags2(a3)
 	rts
 .26
 	btst	#2,(sflags10).w
@@ -509,7 +511,7 @@ fightinput	;Controller processing for fighting
 	bne.w	.29
 	bra.s	.25
 .27
-	tst.w	(Pencntdwn).w
+	tst.w	(PenCntDwn).w
 	bmi.s	.25
 	btst	#6,d2
 	bne.w	.28
@@ -534,7 +536,7 @@ fightinput	;Controller processing for fighting
 	movea.l	#SortCords,a0
 	move.w	#$B,d0
 .31
-	btst	#0,pflags2(a0)
+	btst	#pf2fight,pflags2(a0)
 	beq.w	.32
 	cmpa.l	a0,a3
 	bne.w	.33
@@ -544,13 +546,14 @@ fightinput	;Controller processing for fighting
 .33
 	movea.l	a0,a3
 	move.w	#SPA34D0,d1
-	bset	#1,pflags2(a3)
+	bset	#pf2aip,pflags2(a3)
 	jsr	(SetSPA).l
 	movem.l	(sp)+,d1/a0/a3
 .34
 	jmp	SetSPA
 
-sub_C51C	;Change the first two penalties $2E in PenBuf to $26, then Pencntdwn $B40
+SetFightingMajors					;Both fighters' roughing minors in PenBuf become fighting majors;
+									;PenCntDwn $B40
 	movem.l	a1,-(sp)
 	movea.w	#(PenBuf-2-M68K_RAM),a1
 .0
@@ -563,6 +566,6 @@ sub_C51C	;Change the first two penalties $2E in PenBuf to $26, then Pencntdwn $B
 	cmpi.b	#$2E,(a1)
 	bne.s	.1
 	move.b	#$26,(a1)
-	move.w	#$B40,(Pencntdwn).w
+	move.w	#$B40,(PenCntDwn).w
 	movem.l	(sp)+,a1
 	rts

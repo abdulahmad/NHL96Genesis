@@ -1,10 +1,11 @@
 ;	Back to the game from a menu.
 
-ReturnToGame	;Back to the game after a menu: restart the sound driver, RestoreGameScreen, the window registers,
-	;setvideo, team struct $30 bit 0 from bit 1 for both teams, then fade in
+ReturnToGame						;Back to the game after a menu: restart the sound driver,
+									;RestoreGameScreen, the window registers,
+									;setvideo, team struct $30 bit 0 from bit 1 for both teams, then fade in
 	jsr	(forceblack).l
-	jsr	(stop_current_song).l	;stop the song
-	move.w	#9,d0	;restart the sound driver as Begin does
+	jsr	(stop_current_song).l		;stop the song
+	move.w	#9,d0					;restart the sound driver as Begin does
 	jsr	(SoundCmd).l
 	move.w	#0,d0
 	move.w	#$1B24,d1
@@ -19,10 +20,10 @@ ReturnToGame	;Back to the game after a menu: restart the sound driver, RestoreGa
 	jsr	(SoundCmd).l
 	move	#$2700,sr
 	jsr	(RestoreGameScreen).l
-	movea.l	#VDP_DATA,a0
+	movea.l	#Vdata,a0
 	move.w	#$9100,4(a0)
 	move.w	#$9200,4(a0)
-	bclr	#0,(sflags).w
+	bclr	#sfpz,(sflags).w
 	jsr	(setvideo).l
 	movea.l	#tmstruct+$30,a0
 	btst	#1,(a0)
@@ -41,24 +42,25 @@ ReturnToGame	;Back to the game after a menu: restart the sound driver, RestoreGa
 .wait
 	tst.w	(palcount).w
 	bpl.s	.wait
-	move.w	(vcount).w,(oldvcount).w
+	move.w	(Vcount).w,(OldVcount).w
 	rts
 
-RestoreGameScreen	;Rebuild the game screen: the vdp maps, palettes, vram, framer, fonts, energy bar and EASN tiles,
-	;the face off screen (disflags bit 4) or the ref tiles, the home team graphics and the replay icon
+RestoreGameScreen					;Rebuild the game screen: the vdp maps, palettes, vram, framer, fonts,
+									;energy bar and EASN tiles, the face off screen (disflags bit 4) or the
+									;ref tiles, the home team graphics and the replay icon
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	#$FFFFFFFF,(padcont).w
-	move.l	#$FFFFFFFF,(dword_FFBEB2).w
-	move.l	#$FFFFFFFF,(dword_FFBEB6).w
+	move.l	#$FFFFFFFF,(padcont+4).w
+	move.l	#$FFFFFFFF,(padcont+8).w
 	clr.w	(printfontset).w
-	move.l	#VBlank,(vbint).w
-	bset	#1,(disflags).w
-	move.w	#$C000,(VmMap2).w
+	move.l	#VBlank,(VBint).w
+	bset	#df32c,(disflags).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col1).w
 	move.w	#$DC00,(VSPRITES).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col1).w
-	move.w	#$F000,(VmMap3).w
+	move.w	#$F000,(VmMAP3).w
 	move.w	#5,(Map3col1).w
 	move.w	#$FC00,(VSCRLPM).w
 	movea.w	#(palfadenew-M68K_RAM),a0
@@ -71,25 +73,25 @@ RestoreGameScreen	;Rebuild the game screen: the vdp maps, palettes, vram, framer
 	jsr	(setVram_0).l
 	jsr	(ClearOldFrames).l
 	move.w	#$800,d0
-	move.w	(VmMap1).w,d1
+	move.w	(VmMAP1).w,d1
 	move.w	#$7FF,d2
 	jsr	(DoFill).l
 	move.w	(framercset).w,d4
-	jsr	(sub_1C184).l
-	move.w	(word_FFB038).w,d4
+	jsr	(AddFramer).l
+	move.w	(gamefontchars).w,d4
 	jsr	(LoadSmallFont).l
 	jsr	(LoadBigFonts).l
 	move.w	(energybarchars).w,d4
 	movea.l	#EnergyBarMap+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.w	(animchars).w,d4
-	movea.l	#CrowdFrameList+8,a2
+	movea.l	#Crowdframelist+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	jsr	(setupEASNmap).l
 	jsr	(DumpPadSprites).l
 	btst	#4,(disflags).w
 	beq.w	.ref
-	btst	#3,(sflags2).w
+	btst	#sf2replay,(sflags2).w
 	bne.w	.ref
 	move.w	(ExtraChars).w,d4
 	movea.l	#FaceOffMap+8,a2
@@ -101,7 +103,7 @@ RestoreGameScreen	;Rebuild the game screen: the vdp maps, palettes, vram, framer
 	bra.w	.rink
 .ref
 	move.w	(ExtraChars).w,d4
-	btst	#3,(sflags2).w
+	btst	#sf2replay,(sflags2).w
 	beq.w	.2
 	movea.l	#ReplayBannerMap+8,a2
 	bra.w	.load
@@ -114,39 +116,40 @@ RestoreGameScreen	;Rebuild the game screen: the vdp maps, palettes, vram, framer
 	jsr	(DecompressGraphicsPlain).l
 .rink
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	move.w	#$7D0,(Oldrow).w
 	clr.w	d4
-	move.w	d4,(word_FFB022).w
+	move.w	d4,(rinkvrcset).w
 	movea.l	#Rinktilelist+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	jsr	(LoadHomeTeamGfx).l
-	btst	#3,(sflags2).w
+	btst	#sf2replay,(sflags2).w
 	beq.w	.0
 	jsr	(LoadReplayIcon).l
 .0
 	jsr	(setplayercolors).l
 	jsr	(setupIceRinkPal).l
 	move.w	(sp)+,(disflags).w
-	bclr	#0,(disflags).w
-	bclr	#2,(disflags).w
+	bclr	#dfok,(disflags).w
+	bclr	#dfng,(disflags).w
 	move	#$2300,sr
 	jsr	(SprSort).l
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .wait
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.wait
-	bset	#3,(disflags).w
-	jsr	(nullsub_4).l
+	bset	#dfclock,(disflags).w
+	jsr	(printscores1).l
 	bset	#7,(sflags11).w
-	btst	#3,(sflags2).w
+	btst	#sf2replay,(sflags2).w
 	bne.w	.6
 	move.w	#$64,(palcount).w
 .6
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-ClearOldFrames	;Oldframe = -1 for the 16 sort objects, the 4 sso and the 8 pads, so addframe2 sends their tiles again
+ClearOldFrames						;Oldframe = -1 for the 16 sort objects, the 4 sso and the 8 pads, so
+									;addframe2 sends their tiles again
 	movem.l	d0-d1/a0-a3,-(sp)
 	movea.l	#SortCords,a0
 	move.w	#$80,d0
@@ -172,8 +175,9 @@ ClearOldFrames	;Oldframe = -1 for the 16 sort objects, the 4 sso and the 8 pads,
 	movem.l	(sp)+,d0-d1/a0-a3
 	rts
 
-sub_1E2970	;Called from code96_04: a screen with its own vbint (data96_12), the period names and digits
-	;Code the listing does not decode: kept as bytes
+PauseScreenDraw						;Draw the pause screen: its own VBint, the background, period name, clock,
+									;team names, scores, shots and penalties
+									;Code the listing does not decode: kept as bytes
 	dc.b	$2F,$0A,$4E,$B9,$00,$08,$85,$FC,$46,$FC,$27,$00,$23,$FC,$00,$1E
 	dc.b	$2E,$76,$FF,$FF,$D2,$44,$08,$B8,$00,$00,$BF,$B2,$08,$F8,$00,$02
 	dc.b	$BF,$B2,$08,$B8,$00,$01,$BF,$B2,$31,$FC,$00,$00,$B0,$00,$31,$FC
@@ -247,7 +251,7 @@ sub_1E2970	;Called from code96_04: a screen with its own vbint (data96_12), the 
 	dc.b	$30,$02,$4E,$B9,$00,$01,$BD,$84,$4E,$B9,$00,$01,$BC,$84,$31,$DF
 	dc.b	$B0,$40,$52,$78,$B0,$42,$4E,$75
 
-PeriodText	;sub_1E2970: the period names
+PeriodText							;PauseScreenDraw: the period names
 	String	'1st period'
 	String	'2nd period'
 	String	'3rd period'
@@ -256,7 +260,7 @@ PeriodText	;sub_1E2970: the period names
 	String	'          '
 	String	'          '
 
-DigitText	;The digits 0-9
+DigitText							;The digits 0-9
 	String	$30
 	String	$31
 	String	$32
@@ -268,7 +272,7 @@ DigitText	;The digits 0-9
 	String	$38
 	String	$39
 
-PrintDigit	;Print digit d0 (DigitText)
-	;Code the listing does not decode: kept as bytes
+PrintDigit							;Print digit d0 (DigitText)
+									;Code the listing does not decode: kept as bytes
 	dc.b	$22,$7C,$00,$1E,$2E,$3C,$4E,$B9,$00,$01,$D7,$F2,$4E,$F9,$00,$01
 	dc.b	$BE,$E8

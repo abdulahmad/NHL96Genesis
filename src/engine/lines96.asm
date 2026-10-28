@@ -1,23 +1,24 @@
 ;	The line change box. SetLCmode opens it for the team of player a3 when line changes are
 ;	on. SetLCmode2 draws the choices, lineinput reads the pad, and lcfound sets the line.
 
-SetLCmode	;Open the line change box for the team of player a3 (loadTeamStruct): not with line changes
-	;off (OptLine)
+SetLCmode							;Open the line change box for the team of player a3 (loadTeamStruct): not
+									;with line changes off (OptLine)
 	tst.w	(OptLine).w
 	bne.w	rtss7
 	btst	#4,(sflags7).w
 	bne.w	rtss7
 	jsr	(loadTeamStruct).l
-	bset	#1,tmflags(a2)
+	bset	#tmflcm,tmflags(a2)
 	bne.w	rtss7
 	btst	#3,(sflags5).w
 	bne.w	.0
-	bclr	#2,(sflags).w
+	bclr	#sfspdir,(sflags).w
 .0
-	bclr	#3,(sflags).w
-	bset	#3,pflags2(a3)
-SetLCmode2	;Open the line change box: wait for the box, then draw the line choices (setlccords, getlchoice)
-	btst	#0,(gmode).w
+	bclr	#sfssdir,(sflags).w
+	bset	#pf2lcm,pflags2(a3)
+SetLCmode2							;Open the line change box: wait for the box, then draw the line choices
+									;(setlccords, getlchoice)
+	btst	#gmclock,(gmode).w
 	beq.w	.0
 	bsr.w	setlccords
 	cmpi.w	#$F,(printy).w
@@ -27,12 +28,12 @@ SetLCmode2	;Open the line change box: wait for the box, then draw the line choic
 .0
 	bset	#2,(sflags12).w
 	bne.w	.2
-	jsr	(sub_1CFE4).l
+	jsr	(ErasePowerPlayBox).l
 .2
 	bsr.w	setlccords
 	cmpi.w	#$F,(printy).w
 	blt.w	.box
-	bset	#0,(sflags3).w
+	bset	#sf3llcs,(sflags3).w
 	bra.w	.1
 .box
 	jsr	(box).l
@@ -54,7 +55,7 @@ SetLCmode2	;Open the line change box: wait for the box, then draw the line choic
 	move.w	$16(a2),d0
 .pr
 	movea.w	#(mesarea-M68K_RAM),a1
-	move.l	#$44120,(a1)	;String length 4, 'A '
+	move.l	#$44120,(a1)			;String length 4, 'A '
 	add.b	d4,2(a1)
 	jsr	(print).l
 	move.w	d0,-(sp)
@@ -74,13 +75,13 @@ SetLCmode2	;Open the line change box: wait for the box, then draw the line choic
 	addq.w	#2,(printx).w
 	jmp	print
 
-setlccords	;printx / printy of the line change box for team a2
+setlccords							;printx / printy of the line change box for team a2
 	clr.w	d0
 	cmpa.w	#$C726,a2
 	bne.w	.0
 	eori.w	#$16,d0
 .0
-	btst	#1,(gmode).w
+	btst	#gmdir,(gmode).w
 	beq.w	.1
 	eori.w	#$16,d0
 .1
@@ -98,7 +99,7 @@ setlccords	;printx / printy of the line change box for team a2
 	moveq	#9,d0
 	rts
 
-getlchoice	;Line choice d0 from the line change box
+getlchoice							;Line choice d0 from the line change box
 	movem.l	d1-d2,-(sp)
 	move.w	$3C2(a2),d2
 	cmpa.w	#$C726,a2
@@ -117,22 +118,22 @@ getlchoice2
 	add.w	d1,d0
 	add.w	d1,d0
 	add.w	d1,d0
-	lea	unk_EDCE(pc),a0
+	lea	.tab(pc),a0
 	move.b	(a0,d0.w),d0
 	ext.w	d0
 	movem.l	(sp)+,d1-d2
 	rts
 
-unk_EDCE
+.tab
 	dc.b	$00,$01,$02,$01,$02,$00,$02,$00,$01,$00,$01,$02,$00,$01,$02,$00
 	dc.b	$01,$02,$00,$01,$02,$03,$04,$FF,$03,$04,$FF,$03,$04,$FF,$03,$04
 	dc.b	$FF,$04,$03,$FF,$03,$04,$FF,$03,$04,$FF,$05,$06,$FF,$05,$06,$FF
 	dc.b	$05,$06,$FF,$05,$06,$FF,$05,$06,$FF,$05,$06,$FF,$06,$05,$FF,$FF
 
-lineinput	;Pad input while the line change box is open (pflags2 bit 3)
+lineinput							;Pad input while the line change box is open (pflags2 bit 3)
 	movem.w	d1/d4,-(sp)
 	movea.w	#(tmstruct-M68K_RAM),a2
-	btst	#6,pflags(a3)
+	btst	#pfteam,pflags(a3)
 	beq.w	.1
 	adda.w	#$39E,a2
 .1
@@ -151,11 +152,11 @@ lineinput	;Pad input while the line change box is open (pflags2 bit 3)
 	addq.w	#1,d2
 	btst	#5,d1
 	bne.w	lcfound
-	btst	#3,pflags(a3)
+	btst	#pfjoycon,pflags(a3)
 	beq.w	.x
-	btst	#5,pflags(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	.x
-	btst	#0,pflags2(a3)
+	btst	#pf2fight,pflags2(a3)
 	beq.w	.5
 .x
 	rts
@@ -167,14 +168,14 @@ lineinput	;Pad input while the line change box is open (pflags2 bit 3)
 	move.w	#$3E8,(a0,d4.w)
 	movem.l	(sp)+,a0
 
-lcfound	;Line choice d2 made: set the line, close the box
+lcfound								;Line choice d2 made: set the line, close the box
 	move.w	d2,d0
 	move.w	d2,impactp(a2)
-	bsr.w	getlchoice	;translate choice 0-2 into line number 0-6
+	bsr.w	getlchoice				;translate choice 0-2 into line number 0-6
 	tst.w	d0
 	bmi.w	rtss
-	bclr	#3,pflags2(a3)
-	bset	#3,pflags(a3)
+	bclr	#pf2lcm,pflags2(a3)
+	bset	#pfjoycon,pflags(a3)
 	jsr	(loadTeamStruct).l
 	bclr	#1,limpact(a2)
 	move.w	d0,$16(a2)
@@ -186,12 +187,12 @@ lcfound2
 	bsr.w	setlccords
 	cmpi.w	#$F,(printy).w
 	blt.w	.nollcm
-	bclr	#0,(sflags3).w
+	bclr	#sf3llcs,(sflags3).w
 .nollcm
 	addq.w	#1,d1
 	move.w	#$7FF,d2
 	jsr	(eraser).l
 	bclr	#2,(sflags12).w
 	bset	#3,(sflags12).w
-	jmp	nullsub_4
+	jmp	printscores1
 

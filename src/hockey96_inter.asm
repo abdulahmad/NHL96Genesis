@@ -1,7 +1,8 @@
 ;	The intermission. Intermission runs the between-period screens, and SetScore
 ;	updates the other games on the ticker.
 
-Intermission	;Before the period: at game over (gsp 4) the records (UpdateRecords), then the intermission screens
+Intermission						;Before the period: at game over (gsp 4) the records (UpdateRecords), then
+									;the intermission screens
 	cmpi.w	#4,(gsp).w
 	bne.w	.1
 	move.w	#0,(gameclock).w
@@ -9,13 +10,13 @@ Intermission	;Before the period: at game over (gsp 4) the records (UpdateRecords
 	btst	#7,(GameFlags).w
 	beq.w	.1
 	movem.l	a2,-(sp)
-	jsr	(sub_11510).l
+	jsr	(FindUserGame).l
 	cmpa.l	#0,a2
 	beq.w	.0
-	move.b	(byte_FFC733).w,2(a2)
-	move.b	(byte_FFCAD1).w,3(a2)
-	jsr	(sub_112DA).l
-	jsr	(sub_10CF2).l
+	move.b	(HmGoals+1).w,2(a2)
+	move.b	(AwGoals+1).w,3(a2)
+	jsr	(SaveUserGame).l
+	jsr	(SaveGameStats).l
 .0
 	movem.l	(sp)+,a2
 .1
@@ -38,14 +39,14 @@ Intermission	;Before the period: at game over (gsp 4) the records (UpdateRecords
 	beq.w	.3
 	movea.l	#ShootoutIntermissionMenu,a0
 .3
-	bset	#0,(sflags).w
+	bset	#sfpz,(sflags).w
 	movea.l	#SetupPauseScreen,a1
 	jsr	(InitMenuState).l
-	move.w	#$A8C,(word_FFDDC4).w
+	move.w	#$A8C,(IntermissionTimer).w
 .4
 	tst.w	(demoflag).w
 	bne.w	.periodic
-	subq.w	#1,(word_FFDDC4).w
+	subq.w	#1,(IntermissionTimer).w
 	bmi.w	.5
 .periodic
 	jsr	(vcountwait).l
@@ -58,11 +59,12 @@ Intermission	;Before the period: at game over (gsp 4) the records (UpdateRecords
 	rts
 	dc.b	$4E,$75
 
-IntermissionMenus	;The intermission menu by gsp, then the same with OptPlayMode (gsp + 5)
+IntermissionMenus					;The intermission menu by gsp, then the same with OptPlayMode (gsp + 5)
 	dc.l	PregameMenu,IntermissionMenu,IntermissionMenu,IntermissionMenu,GameOverMenu
 	dc.l	PlayoffPregameMenu,IntermissionMenu,IntermissionMenu,IntermissionMenu,PlayoffGameOverMenu
 
-sub_1D4CE	;Early in the playoffs (gamelevel 0-1): random goals for the other games of the day (SetScore)
+InitScores							;Early in the playoffs (gamelevel 0-1): 0-3 random SetScore goals for the
+									;other games of the day
 	cmpi.w	#1,(gamelevel).w
 	bgt.w	rtss2
 	bsr.w	GetShifter
@@ -88,7 +90,8 @@ sub_1D4CE	;Early in the playoffs (gamelevel 0-1): random goals for the other gam
 	dbf	d1,.top
 	rts
 
-UpdateScores	;Update the ticker score values of the other games (SetScore). Called from PeriodOver
+UpdateScores						;Update the ticker score values of the other games (SetScore). Called from
+									;PeriodOver
 	bsr.w	GetShifter
 	move.w	d1,(TickerNum).w
 	movea.w	#(gsstruct-M68K_RAM),a0
@@ -107,8 +110,9 @@ UpdateScores	;Update the ticker score values of the other games (SetScore). Call
 	dbf	d1,.top
 	rts
 
-SetScore	;Add to the score of the game in a0. After period 3 a game within one goal goes to OT (gsper 3) and asks for a
-	;highlight
+SetScore							;Add to the score of the game in a0. After period 3 a game within one goal
+									;goes to OT (gsper 3) and asks for a
+									;highlight
 	cmpi.w	#4,8(a0)
 	bge.w	rtss2
 	movem.l	d0-d1/a0-a1,-(sp)
@@ -128,17 +132,18 @@ SetScore	;Add to the score of the game in a0. After period 3 a game within one g
 	addq.w	#1,8(a0)
 	move.w	(a0),d0
 	move.w	2(a0),d1
-	bsr.w	sub_1D5BC
+	bsr.w	.3
 	add.w	d0,$A(a0)
 	move.w	2(a0),d0
 	move.w	(a0),d1
-	bsr.w	sub_1D5BC
+	bsr.w	.3
 	add.w	d0,$C(a0)
 .ex
 	movem.l	(sp)+,d0-d1/a0-a1
 	rts
 
-sub_1D5BC	;SetScore: the goal weights of the teams of the game (sctab rows by team rating)
+.3									;SetScore: the goal weights of the teams of the game (sctab rows by team
+									;rating)
 	asl.w	#2,d0
 	movea.w	#TeamList,a1
 	movea.l	(a1,d0.w),a1
@@ -164,7 +169,7 @@ sub_1D5BC	;SetScore: the goal weights of the teams of the game (sctab rows by te
 	moveq	#4,d0
 	bra.w	WeightedRandomSelect
 
-sctab	;Weights for 0, 1, 2, 3 goals, 8 rows
+sctab								;Weights for 0, 1, 2, 3 goals, 8 rows
 	dc.w	$2B,$1E,$17,$4
 	dc.w	$27,$20,$18,$5
 	dc.w	$23,$21,$1A,$6
@@ -201,15 +206,15 @@ sctab	;Weights for 0, 1, 2, 3 goals, 8 rows
 	dc.b	$00,$06,$BD,$03,$17,$00,$08,$38,$00,$00,$C3,$3A,$66,$00,$00,$0C
 	dc.b	$61,$00,$E3,$BA,$00,$06,$BF,$03,$17,$00,$70,$1A,$72,$05,$4E,$75
 
-PrintBigListItem	;printbig String d0 of the String list a1 (SkipStrings).
-	;Code the listing does not decode: kept as bytes
+PrintBigListItem					;printbig String d0 of the String list a1 (SkipStrings).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$00,$0E,$60,$00,$E7,$04
 
-PrintSmallListItem	;printsmall String d0 of the String list a1 (SkipStrings).
-	;Code the listing does not decode: kept as bytes
+PrintSmallListItem					;printsmall String d0 of the String list a1 (SkipStrings).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$61,$00,$00,$06,$60,$00,$E2,$50
 
-SkipStrings	;a1 = String d0 of the String list a1
+SkipStrings							;a1 = String d0 of the String list a1
 	bra.w	.1
 .0
 	adda.w	(a1),a1

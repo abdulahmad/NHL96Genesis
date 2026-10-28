@@ -1,19 +1,20 @@
 ;	The opening screens. New in 96.
 
-sub_1E889C	;Called from Opening: a screen
+TitleScreen							;Title screen: the picture TitleScreenImg and song 0, until start or the
+									;time runs out
 	move	#$2700,sr
-	move.w	(VDP_CNTR).l,(seed).w
-	move.w	(VDP_CNTR).l,(seed+2).w
+	move.w	(HVcount).l,(seed).w
+	move.w	(HVcount).l,(seed+2).w
 	bset	#5,(sflags12).w
-	move.l	#unk_12D46,(vbint).w
-	bclr	#0,(disflags).w
-	bclr	#1,(disflags).w
+	move.l	#VBlank_Menus,(VBint).w
+	bclr	#dfok,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#5,(Map3col1).w
-	move.w	#$A000,(VmMap2).w
+	move.w	#$A000,(VmMAP2).w
 	move.w	#7,(Map2col1).w
-	move.w	#$C000,(VmMap1).w
+	move.w	#$C000,(VmMAP1).w
 	move.w	#7,(Map1col1).w
-	move.w	#$F000,(VmMap3).w
+	move.w	#$F000,(VmMAP3).w
 	move.w	#$F800,(VSPRITES).w
 	move.w	#$FC00,(VSCRLPM).w
 	move.w	#0,d0
@@ -33,7 +34,7 @@ sub_1E889C	;Called from Opening: a screen
 	move.w	#1,d4
 	jsr	(printz).l
 	String	$FE,$00,$00
-	movea.l	#unk_88A18,a0
+	movea.l	#TitleScreenImg,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -45,13 +46,13 @@ sub_1E889C	;Called from Opening: a screen
 	move.w	#$F,d5
 	jsr	(dobitmap).l
 	move	#$2500,sr
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	move.w	#0,-(sp)
 	jsr	(song).l
 	move.w	#$18,(palcount).w
 	move.w	#$384,(carddelay).w
 .0
-	bsr.w	sub_1E89F0
+	bsr.w	TitleWaitFrame
 	subq.w	#1,(carddelay).w
 	bmi.w	.1
 	jsr	(FindHeldMenuPad).l
@@ -60,35 +61,37 @@ sub_1E889C	;Called from Opening: a screen
 .1
 	rts
 
-sub_1E89A8	;A vblank handler
-	;Code the listing does not decode: kept as bytes
+VBlank_LineScroll					;A vblank handler nothing sets: the line scroll table (SortCords),
+									;Vscroll, cramfade, Vcount, the music
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$2C,$30,$7C
 	dc.b	$B0,$5E,$32,$38,$B0,$00,$30,$3C,$01,$C0,$4E,$B9,$00,$01,$B3,$EC
 	dc.b	$20,$7C,$00,$C0,$00,$00,$21,$7C,$40,$00,$00,$10,$00,$04,$30,$B8
 	dc.b	$BD,$36,$4E,$B9,$00,$01,$AF,$D6,$52,$78,$B0,$52,$4E,$B9,$00,$02
 	dc.b	$44,$86,$4C,$DF,$7F,$FF,$4E,$73
 
-sub_1E89F0	;Wait for the next frame (vcount)
-	move.w	(vcount).w,d0
+TitleWaitFrame						;TitleScreen: wait for the next frame (Vcount)
+	move.w	(Vcount).w,d0
 .loop
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop
 	rts
 
-sub_1E89FC	;Called from Opening: a screen with text pages (sub_1E8BB8)
+CreditsScreen						;The legal and credits pages (CreditsList) over three pictures; start
+									;skips after the first page
 	move	#$2700,sr
-	move.w	(VDP_CNTR).l,(seed).w
-	move.w	(VDP_CNTR).l,(seed+2).w
+	move.w	(HVcount).l,(seed).w
+	move.w	(HVcount).l,(seed+2).w
 	bset	#5,(sflags12).w
-	move.l	#unk_12D46,(vbint).w
-	bclr	#0,(disflags).w
-	bclr	#1,(disflags).w
+	move.l	#VBlank_Menus,(VBint).w
+	bclr	#dfok,(disflags).w
+	bclr	#df32c,(disflags).w
 	move.w	#5,(Map3col1).w
-	move.w	#$A000,(VmMap2).w
+	move.w	#$A000,(VmMAP2).w
 	move.w	#7,(Map2col1).w
-	move.w	#$C000,(VmMap1).w
+	move.w	#$C000,(VmMAP1).w
 	move.w	#7,(Map1col1).w
-	move.w	#$F000,(VmMap3).w
+	move.w	#$F000,(VmMAP3).w
 	move.w	#$F800,(VSPRITES).w
 	move.w	#$FC00,(VSCRLPM).w
 	move.w	#0,d0
@@ -112,7 +115,7 @@ sub_1E89FC	;Called from Opening: a screen with text pages (sub_1E8BB8)
 	move.l	#RosterFont,(smallfontptr).w
 	jsr	(printz).l
 	String	$FE,$00,$00
-	movea.l	#unk_911B8,a0
+	movea.l	#CreditsBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -125,7 +128,7 @@ sub_1E89FC	;Called from Opening: a screen with text pages (sub_1E8BB8)
 	jsr	(dobitmap).l
 	jsr	(printz).l
 	String	$FF,$01,$0E
-	movea.l	#unk_8F2C6,a0
+	movea.l	#NHLShieldMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -138,7 +141,7 @@ sub_1E89FC	;Called from Opening: a screen with text pages (sub_1E8BB8)
 	jsr	(dobitmap).l
 	jsr	(printz).l
 	String	$FF,$02,$00
-	movea.l	#unk_90686,a0
+	movea.l	#NHLPALogoMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -150,41 +153,42 @@ sub_1E89FC	;Called from Opening: a screen with text pages (sub_1E8BB8)
 	moveq	#0,d5
 	jsr	(dobitmap).l
 	move	#$2500,sr
-	bclr	#2,(disflags).w
+	bclr	#dfng,(disflags).w
 	move.w	#$18,(palcount).w
-	clr.w	(word_FFD030).w
-	clr.w	(word_FFD032).w
+	clr.w	(DispAttribCtr).w
+	clr.w	(VertLineScrolling).w
 	move.l	#$5732,(setupvalues).w
-	bsr.w	sub_1E8BB8
+	bsr.w	PrintCreditsPage
 .0
-	bsr.w	sub_1E8C52
+	bsr.w	CreditsWaitFrame
 	jsr	(FindHeldMenuPad).l
-	tst.w	(word_FFD030).w
+	tst.w	(DispAttribCtr).w
 	beq.w	.1
 	btst	#7,d1
 	bne.w	.5
 .1
-	addq.w	#1,(word_FFD032).w
-	tst.w	(word_FFD030).w
+	addq.w	#1,(VertLineScrolling).w
+	tst.w	(DispAttribCtr).w
 	bne.w	.2
-	cmpi.w	#$B4,(word_FFD032).w
+	cmpi.w	#$B4,(VertLineScrolling).w
 	blt.w	.4
 	bra.w	.3
 .2
-	cmpi.w	#$258,(word_FFD032).w
+	cmpi.w	#$258,(VertLineScrolling).w
 	blt.w	.4
 .3
-	clr.w	(word_FFD032).w
-	addq.w	#1,(word_FFD030).w
-	cmpi.w	#5,(word_FFD030).w
+	clr.w	(VertLineScrolling).w
+	addq.w	#1,(DispAttribCtr).w
+	cmpi.w	#5,(DispAttribCtr).w
 	beq.w	.5
-	bsr.w	sub_1E8BB8
+	bsr.w	PrintCreditsPage
 .4
 	bra.s	.0
 .5
 	rts
 
-sub_1E8BB8	;sub_1E89FC: print the text page at setupvalues
+PrintCreditsPage					;Print the CreditsList page at setupvalues, one String a row up to the
+									;empty String, then step setupvalues
 	jsr	(printz).l
 	String	$AF,$10,$01
 	moveq	#$18,d0
@@ -206,27 +210,28 @@ sub_1E8BB8	;sub_1E89FC: print the text page at setupvalues
 	move.l	a1,(setupvalues).w
 	rts
 
-sub_1E8C0A	;A vblank handler
-	;Code the listing does not decode: kept as bytes
+VBlank_LineScroll2					;A copy of VBlank_LineScroll; nothing sets it
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$2C,$30,$7C
 	dc.b	$B0,$5E,$32,$38,$B0,$00,$30,$3C,$01,$C0,$4E,$B9,$00,$01,$B3,$EC
 	dc.b	$20,$7C,$00,$C0,$00,$00,$21,$7C,$40,$00,$00,$10,$00,$04,$30,$B8
 	dc.b	$BD,$36,$4E,$B9,$00,$01,$AF,$D6,$52,$78,$B0,$52,$4E,$B9,$00,$02
 	dc.b	$44,$86,$4C,$DF,$7F,$FF,$4E,$73
 
-sub_1E8C52	;Wait for the next frame (vcount)
-	move.w	(vcount).w,d0
+CreditsWaitFrame					;CreditsScreen: wait for the next frame (Vcount)
+	move.w	(Vcount).w,d0
 .loop
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop
 	rts
 
-sub_1E8C5E	;Called from Opening2: restart the sound driver, then a screen with sprites (sub_1E8F52)
+CupCelebration						;The user's team won the Cup: the rink scene with the team's sprites and
+									;random crowd cheers until start
 	movem.l	d0-d7/a0-a6,-(sp)
-	jsr	(SoundOff).l	;stop the song
-	move.w	#9,d0	;restart the sound driver as Begin does
+	jsr	(SoundOff).l				;stop the song
+	move.w	#9,d0					;restart the sound driver as Begin does
 	jsr	(SoundCmd).l
-	move.w	#0,d0	;command 0: load the Z80 program
+	move.w	#0,d0					;command 0: load the Z80 program
 	move.w	#$1B24,d1
 	movea.l	#Z80Program,a0
 	jsr	(SoundCmd).l
@@ -237,37 +242,37 @@ sub_1E8C5E	;Called from Opening2: restart the sound driver, then a screen with s
 	move.w	#7,d0
 	move.w	#1,d1
 	jsr	(SoundCmd).l
-	bsr.w	sub_1E8DE4
+	bsr.w	CupCelebrationSetup
 	move.w	#$B,-(sp)
 	jsr	(sfx).l
 	move.w	#1,(padiconchars1).w
-	clr.w	(word_FFD030).w
-	move.w	(vcount).w,d0
+	clr.w	(DispAttribCtr).w
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	jsr	(FindHeldMenuPad).l
 	btst	#7,d1
 	bne.w	.3
 .0
-	btst	#0,(disflags).w
+	btst	#dfok,(disflags).w
 	bne.s	.0
-	addq.w	#1,(word_FFD030).w
-	cmpi.w	#$A,(word_FFD030).w
+	addq.w	#1,(DispAttribCtr).w
+	cmpi.w	#$A,(DispAttribCtr).w
 	blt.w	.1
-	clr.w	(word_FFD030).w
+	clr.w	(DispAttribCtr).w
 	addq.w	#1,(padiconchars1).w
 	cmpi.w	#$22,(padiconchars1).w
 	blt.w	.1
 	move.w	#$11,(padiconchars1).w
 .1
-	subq.w	#1,(word_FFD032).w
+	subq.w	#1,(VertLineScrolling).w
 	bpl.w	.2
 	move.w	#$A,d0
 	jsr	(randomd0).l
-	movea.l	#unk_1E8DD0,a0
+	movea.l	#CupCheerDelays,a0
 	add.w	d0,d0
-	move.w	(a0,d0.w),(word_FFD032).w
+	move.w	(a0,d0.w),(VertLineScrolling).w
 	move.w	#$B,-(sp)
 	jsr	(sfx).l
 .2
@@ -275,29 +280,29 @@ sub_1E8C5E	;Called from Opening2: restart the sound driver, then a screen with s
 	movea.w	#(DMAList-M68K_RAM),a5
 	jsr	(updatescroll).l
 	jsr	(updatesound).l
-	movea.w	#(Satt-M68K_RAM),a6	;sprite attribute table area
-	moveq	#1,d6	;link counter
-	jsr	(sub_1E8F52).l
-	cmpa.w	#$C066,a6	;no sprites: one blank sprite
+	movea.w	#(Satt-M68K_RAM),a6		;sprite attribute table area
+	moveq	#1,d6					;link counter
+	jsr	(CupCelebrationSprites).l
+	cmpa.w	#$C066,a6				;no sprites: one blank sprite
 	bne.w	.n
 	clr.l	(a6)+
 	clr.l	(a6)+
 .n
-	clr.b	-5(a6)	;end sprite list
+	clr.b	-5(a6)					;end sprite list
 	move.l	a6,d0
 	subi.l	#$FFFFC066,d0
-	lsr.w	#1,d0	;words
+	lsr.w	#1,d0					;words
 	move.w	d0,(Sattsize).w
 	move.l	a5,(DMAlistend).w
-	bset	#0,(disflags).w	;dfok
+	bset	#dfok,(disflags).w		;dfok
 	bra.w	.loop2
 .3
 	jsr	(forceblack).l
 	jsr	(KillCrowd).l
-	jsr	(SoundOff).l	;stop the song
-	move.w	#9,d0	;restart the sound driver as Begin does
+	jsr	(SoundOff).l				;stop the song
+	move.w	#9,d0					;restart the sound driver as Begin does
 	jsr	(SoundCmd).l
-	move.w	#0,d0	;command 0: load the Z80 program
+	move.w	#0,d0					;command 0: load the Z80 program
 	move.w	#$1B24,d1
 	movea.l	#Z80Program,a0
 	jsr	(SoundCmd).l
@@ -311,26 +316,27 @@ sub_1E8C5E	;Called from Opening2: restart the sound driver, then a screen with s
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-unk_1E8DD0	;Used from sub_1E8C5E
+CupCheerDelays						;CupCelebration: frames to the next crowd cheer, one picked at random
 	dc.w	$E6,$E1,$EB,$D7,$DC,$F0,$FA,$D2,$F0,$F0
 
-sub_1E8DE4	;sub_1E8C5E: vram, palettes and the screen
+CupCelebrationSetup					;CupCelebration: vram, the team and rink palettes, the rink and sprite
+									;tiles, the picture
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.l	#$FFFFFFFF,(padcont).w
-	move.l	#$FFFFFFFF,(dword_FFBEB2).w
-	move.l	#$FFFFFFFF,(dword_FFBEB6).w
+	move.l	#$FFFFFFFF,(padcont+4).w
+	move.l	#$FFFFFFFF,(padcont+8).w
 	jsr	(forceblack).l
 	clr.w	(Vpos).w
 	move.w	#$38,(Hpos).w
 	clr.w	(printfontset).w
-	move.l	#VBlank,(vbint).w
-	bset	#1,(disflags).w
-	move.w	#$C000,(VmMap2).w
+	move.l	#VBlank,(VBint).w
+	bset	#df32c,(disflags).w
+	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col1).w
 	move.w	#$DC00,(VSPRITES).w
-	move.w	#$E000,(VmMap1).w
+	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col1).w
-	move.w	#$F000,(VmMap3).w
+	move.w	#$F000,(VmMAP3).w
 	move.w	#5,(Map3col1).w
 	move.w	#$FC00,(VSCRLPM).w
 	movea.w	#(palfadenew-M68K_RAM),a0
@@ -341,12 +347,12 @@ sub_1E8DE4	;sub_1E8C5E: vram, palettes and the screen
 	clr.w	d1
 	move.b	(dword_FFDD82+2).w,d1
 	asl.w	#2,d1
-	movea.l	#$77E,a2
+	movea.l	#TeamList,a2
 	movea.l	(a2,d1.w),a2
 	clr.w	d1
-	adda.w	2(a2),a2	;Palettedata
+	adda.w	2(a2),a2				;Palettedata
 	adda.w	d1,a2
-	movea.w	#(unk_FFBD7E-M68K_RAM),a1
+	movea.w	#(palfadenew+$40-M68K_RAM),a1
 	adda.w	d1,a1
 	moveq	#7,d0
 .loop
@@ -355,11 +361,11 @@ sub_1E8DE4	;sub_1E8C5E: vram, palettes and the screen
 	jsr	(setupIceRinkPal).l
 	jsr	(setVram_0).l
 	move.w	#$800,d0
-	move.w	(VmMap1).w,d1
+	move.w	(VmMAP1).w,d1
 	move.w	#$7FF,d2
 	jsr	(DoFill).l
 	clr.w	d4
-	move.w	d4,(word_FFB022).w
+	move.w	d4,(rinkvrcset).w
 	movea.l	#Rinktilelist+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.w	d4,(animchars).w
@@ -371,15 +377,15 @@ sub_1E8DE4	;sub_1E8C5E: vram, palettes and the screen
 	movea.l	#unk_1D5420+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.w	(disflags).w,-(sp)
-	bset	#2,(disflags).w
+	bset	#dfng,(disflags).w
 	move.w	#$7D0,(Oldrow).w
 	move.w	(sp)+,(disflags).w
-	bclr	#0,(disflags).w
-	bclr	#2,(disflags).w
+	bclr	#dfok,(disflags).w
+	bclr	#dfng,(disflags).w
 	move	#$2300,sr
-	move.w	(vcount).w,d0
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	jsr	(printz).l
 	String	$FF,$06,$0C
@@ -401,7 +407,7 @@ sub_1E8DE4	;sub_1E8C5E: vram, palettes and the screen
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-sub_1E8F52	;sub_1E8C5E: the sprites
+CupCelebrationSprites				;CupCelebration: the sprites of the current frame that are in view
 	movea.l	#unk_1CCEE8,a1
 	adda.l	4(a1),a1
 	move.w	(Hpos).w,d4

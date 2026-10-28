@@ -1,6 +1,6 @@
 ;	The standings. Points, the groups, and the sort.
 
-StandingsPoints	;Points and games of the 26 teams from StandingsBuf
+StandingsPoints						;Points and games of the 26 teams from StandingsBuf
 	move.w	#$1A,d0
 	movea.l	#StandingsBuf,a1
 	movea.l	#CalMonth,a2
@@ -27,7 +27,7 @@ StandingsPoints	;Points and games of the 26 teams from StandingsBuf
 	move.w	(sp)+,d1
 	rts
 
-StandingsGroups	;StandingsList = the teams of group StandingsMode
+StandingsGroups						;StandingsList = the teams of group StandingsMode
 	movea.l	#StandingsGroupTbl,a5
 	move.w	(StandingsMode).w,d0
 	asl.w	#2,d0
@@ -43,26 +43,26 @@ StandingsGroups	;StandingsList = the teams of group StandingsMode
 	dbf	d0,.loop
 	rts
 
-StandingsGroupTbl	;StandingsGroups: the team list of each group (a count, then the teams)
+StandingsGroupTbl					;StandingsGroups: the team list of each group (a count, then the teams)
 	dc.l	StandingsGroup0,StandingsGroup1,StandingsGroup2,StandingsGroup3,StandingsGroup4,StandingsGroup4+$D
 
-StandingsGroup0	;A team list (count, then the teams)
+StandingsGroup0						;A team list (count, then the teams)
 	dc.b	6,0,3,7,$A,$13,$17
 
-StandingsGroup1	;A team list (count, then the teams)
+StandingsGroup1						;A team list (count, then the teams)
 	dc.b	6,4,5,6,$14,$16,$19
 
-StandingsGroup2	;A team list (count, then the teams)
+StandingsGroup2						;A team list (count, then the teams)
 	dc.b	7,1,2,9,$B,$F,$11,$12
 
-StandingsGroup3	;A team list (count, then the teams)
+StandingsGroup3						;A team list (count, then the teams)
 	dc.b	7,8,$C,$D,$E,$10,$15,$18
 
-StandingsGroup4	;The team lists of the bigger groups (count, then the teams)
+StandingsGroup4						;The team lists of the bigger groups (count, then the teams)
 	dc.b	$0C,$00,$03,$07,$0A,$13,$17,$04,$05,$06,$14,$16,$19,$0E,$01,$02
 	dc.b	$09,$0B,$0F,$11,$12,$08,$0C,$0D,$0E,$10,$15,$18
 
-SortStandings	;Sort StandingsList by points, then by fewer games played
+SortStandings						;Sort StandingsList by points, then by fewer games played
 	movea.l	#StandingsList,a0
 	movea.l	#CalMonth,a1
 	movea.l	#StandingsOrder,a2

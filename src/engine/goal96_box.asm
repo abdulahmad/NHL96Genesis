@@ -1,19 +1,20 @@
 ;	The boxes at a whistle. The three stars, an injury and a penalty shot share
 ;	this file with the goal box.
 
-ShowThreeStars	;End of game Stars of the Game box. Waits for RefCnt <= $40 and runs once (gmode bit 7); then disflags
-	;bit 3 and a vblank. Frames the box, then the three best star scores (TakeTopStarScore)
+ShowThreeStars						;End of game Stars of the Game box. Waits for RefCnt <= $40 and runs once
+									;(gmode bit 7); then disflags bit 3 and a vblank. Frames the box, then the
+									;three best star scores (TakeTopStarScore)
 	cmpi.w	#$40,(RefCnt).w
 	bgt.w	rtss2
-	bset	#7,(gmode).w
+	bset	#gmstars,(gmode).w
 	bne.w	rtss2
 	jsr	(ClearBigScore).l
-	jsr	(sub_1CFE4).l
+	jsr	(ErasePowerPlayBox).l
 	movem.l	d0/a1,-(sp)
-	bset	#3,(disflags).w
-	move.w	(vcount).w,d0
+	bset	#dfclock,(disflags).w
+	move.w	(Vcount).w,d0
 .loop2
-	cmp.w	(vcount).w,d0
+	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	movem.l	(sp)+,d0/a1
 	movem.l	d0-d5/a0-a4,-(sp)
@@ -49,8 +50,8 @@ ShowThreeStars	;End of game Stars of the Game box. Waits for RefCnt <= $40 and r
 	movem.l	(sp)+,d0-d5/a0-a4
 	rts
 
-TakeTopStarScore	;Take the highest star score at ThreeStars (home team first) and clear it. Returns d0 = player slot, a2 =
-	;its team struct
+TakeTopStarScore					;Take the highest star score at ThreeStars (home team first) and clear it.
+									;Returns d0 = player slot, a2 = its team struct
 	movem.l	d1-d2/a1/a4,-(sp)
 .0
 	movea.w	#(ThreeStars-M68K_RAM),a4
@@ -76,8 +77,9 @@ TakeTopStarScore	;Take the highest star score at ThreeStars (home team first) an
 	movem.l	(sp)+,d1-d2/a1/a4
 	rts
 
-CalcStarScores	;Star score for every roster slot of both teams to ThreeStars (home team first).
-	;Code the listing does not decode: kept as bytes
+CalcStarScores						;Star score for every roster slot of both teams to ThreeStars (home team
+									;first).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$38,$7C,$D1,$30,$4E,$B9,$00,$01,$48,$A2,$3A,$00,$DA,$42,$34,$7C
 	dc.b	$C7,$26,$47,$EA,$03,$9E,$61,$00,$00,$48,$34,$4B,$47,$EA,$FC,$62
 	dc.b	$61,$00,$00,$3E,$0C,$78,$00,$03,$C4,$BC,$66,$00,$00,$32,$4A,$43
@@ -85,8 +87,9 @@ CalcStarScores	;Star score for every roster slot of both teams to ThreeStars (ho
 	dc.b	$00,$07,$00,$02,$67,$00,$00,$06,$06,$40,$00,$1C,$D0,$28,$00,$03
 	dc.b	$E5,$40,$30,$7C,$D1,$30,$21,$BC,$7F,$FF,$FF,$FF,$00,$00,$4E,$75
 
-CalcTeamStarScores	;Star scores of team a2 (a3 = other team) to (a4)+, one long per roster slot.
-	;Code the listing does not decode: kept as bytes
+CalcTeamStarScores					;Star scores of team a2 (a3 = other team) to (a4)+, one long per roster
+									;slot.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$32,$4A,$36,$2A,$00,$0C,$96,$6B,$00,$0C,$48,$C3,$78,$1B,$4E,$B9
 	dc.b	$00,$01,$57,$A2,$44,$40,$D0,$44,$28,$83,$B8,$40,$62,$00,$00,$3C
 	dc.b	$42,$41,$12,$2A,$00,$C0,$C2,$FC,$2A,$F8,$D3,$94,$42,$41,$12,$2A
@@ -98,8 +101,9 @@ CalcTeamStarScores	;Star scores of team a2 (a3 = other team) to (a4)+, one long 
 	dc.b	$06,$94,$00,$00,$7D,$00,$4A,$41,$66,$00,$00,$08,$06,$94,$00,$01
 	dc.b	$24,$F8,$54,$49,$52,$4A,$58,$4C,$51,$CC,$FF,$7E,$4E,$75
 
-ShowInjuryBox	;The injury message (CheckInjury): "Injured player", "Out for period", "game" or n "games", then the player
-	;(GetPlayerNumInitial)
+ShowInjuryBox						;The injury message (CheckInjury): "Injured player", "Out for period",
+									;"game" or n "games", then the player
+									;(GetPlayerNumInitial)
 	movem.l	d0-d2/a0-a4,-(sp)
 	bsr.w	printz
 	String	$BF,$0B,$02
@@ -152,8 +156,9 @@ ShowInjuryBox	;The injury message (CheckInjury): "Injured player", "Out for peri
 	movem.l	(sp)+,d0-d2/a0-a4
 	rts
 
-PenaltyShotBox	;In a shootout ShootoutModeBox; else the "PENALTY SHOT!" box: the shooter, the penalty (Penaltylist) and " by"
-	;the checker
+PenaltyShotBox						;In a shootout ShootoutModeBox; else the "PENALTY SHOT!" box: the shooter,
+									;the penalty (Penaltylist) and " by"
+									;the checker
 	bset	#7,(gmode2).w
 	btst	#0,(gmode2).w
 	beq.w	.box
@@ -208,15 +213,16 @@ PenaltyShotBox	;In a shootout ShootoutModeBox; else the "PENALTY SHOT!" box: the
 	movem.l	(sp)+,d0-d2/a0-a4
 	rts
 
-PenShotBigTxt	;PenaltyShotBox big text
+PenShotBigTxt						;PenaltyShotBox big text
 	String	$F8,$04,$01,$07,$03,'   PENALTY SHOT    ',$F8,$04,$01,$07,$05
 
-ShowGoalBox	;Goal box: close both line change boxes (lcfound2), then the scorer and the assists from ScoreSum
-	;(PrintPlayerGoals / PrintPlayerAssists), the goalie counts (CountGoalies)
+ShowGoalBox							;Goal box: close both line change boxes (lcfound2), then the scorer and
+									;the assists from ScoreSum (PrintPlayerGoals / PrintPlayerAssists), the
+									;goalie counts (CountGoalies)
 	movem.l	d0-d2/a0-a4,-(sp)
 	btst	#2,(BA_PS_flags).w
 	beq.w	.0
-	bset	#2,(sflags2).w
+	bset	#sf2drec,(sflags2).w
 .0
 	movea.w	#(tmstruct-M68K_RAM),a2
 	jsr	(lcfound2).l
@@ -267,7 +273,7 @@ ShowGoalBox	;Goal box: close both line change boxes (lcfound2), then the scorer 
 	cmp.w	(HomeTeam).w,d0
 	bne.w	.3
 	move.w	#0,d0
-	jsr	(nullsub_7).l
+	jsr	(StartArenaAnim).l
 .3
 	move.w	(sp)+,d0
 .print
@@ -314,15 +320,16 @@ ShowGoalBox	;Goal box: close both line change boxes (lcfound2), then the scorer 
 	movem.l	(sp)+,d0-d2/a0-a4
 	rts
 
-GoalBigTxt	;printbig Strings for ShowGoalBox: GOAL!, then HAT TRICK!
+GoalBigTxt							;printbig Strings for ShowGoalBox: GOAL!, then HAT TRICK!
 	String	$F8,$04,$01,$0C,$03,'      GOAL!      ',$F8,$04,$01,$0C,$05
 	String	$F8,$04,$01,$0C,$03,'   HAT TRICK!    ',$F8,$04,$01,$0C,$05
 
-PPGoalBigTxt	;The same after a power play: PP GOAL!, then HAT TRICK!
+PPGoalBigTxt						;The same after a power play: PP GOAL!, then HAT TRICK!
 	String	$F8,$04,$01,$0C,$03,'    PP GOAL!     ',$F8,$04,$01,$0C,$05
 	String	$F8,$04,$01,$0C,$03,'   HAT TRICK!    ',$F8,$04,$01,$0C,$05
 
-box	;Fill a $14 x $C rectangle at printz position $FF,$B,2 with char $7FF (eraser)
+box									;Fill a $14 x $C rectangle at printz position
+									;$FF,$B,2 with char $7FF (eraser)
 	bsr.w	printz
 	String	$FF,$0B,$02
 	moveq	#$14,d0

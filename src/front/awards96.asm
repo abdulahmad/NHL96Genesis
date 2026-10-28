@@ -1,13 +1,14 @@
-;	The playoff seeding. nullsub_3 is an rts. ResolveDayGames scores the day's series.
+;	The playoff seeding. ScoutingReport is an rts. ResolveDayGames scores the day's series.
 ;	BeginPlayoffs and InitPlayoffs seed the conferences, and SetupPlayoffs writes the bracket
 ;	into the save RAM.
 
-nullsub_3
+ScoutingReport						;The pre-game scouting report: an empty rts in 96
 	rts
 
-ResolveDayGames	;Compute winners and losers for the playoff matchups of the day: the series wins (gsstruct),
-	;WinBits and gamelevel when the round is over; at gamelevel 4 the final flags in dword_FFDD7E, else
-	;maketree; then the save RAM write
+ResolveDayGames						;Compute winners and losers for the playoff matchups of the day:
+									;the series wins (gsstruct),
+									;WinBits and gamelevel when the round is over; at gamelevel 4 the final
+									;flags in SeasonDay, else MakeTree; then the save RAM write
 	movem.l	d0-d7/a0-a6,-(sp)
 	clr.w	(rosterscroll).w
 	jsr	(GetShifter).l
@@ -69,7 +70,7 @@ ResolveDayGames	;Compute winners and losers for the playoff matchups of the day:
 	addq.w	#1,(gamelevel).w
 	bra.w	.4
 .notbos
-	clr.w	d3	;solve for no best of 7 playoffs (much simpler)
+	clr.w	d3						;solve for no best of 7 playoffs (much simpler)
 .loop3
 	move.w	$A(a0),d0
 	cmp.w	$C(a0),d0
@@ -92,7 +93,7 @@ ResolveDayGames	;Compute winners and losers for the playoff matchups of the day:
 .4
 	cmpi.w	#4,(gamelevel).w
 	bne.w	.7
-	bset	#1,(dword_FFDD7E+2).w
+	bset	#1,(SeasonFlags).w
 	movem.l	d0/a0-a1,-(sp)
 	movea.l	#$FFFFDCF8,a0
 	lea	2(a0),a1
@@ -102,28 +103,29 @@ ResolveDayGames	;Compute winners and losers for the playoff matchups of the day:
 	addq.w	#1,a1
 .5
 	move.b	(a1),d0
-	bclr	#3,(dword_FFDD7E+2).w
+	bclr	#3,(SeasonFlags).w
 	cmp.b	(dword_FFDD82+2).w,d0
 	bne.w	.6
-	bset	#3,(dword_FFDD7E+2).w
+	bset	#3,(SeasonFlags).w
 .6
 	movem.l	(sp)+,d0/a0-a1
 	bra.w	.8
 .7
-	jsr	(maketree).l
+	jsr	(MakeTree).l
 .8
 	movea.w	#(pwddatabuffer-M68K_RAM),a3
 	jsr	(WritePassBits).l
 	jsr	(WritePassData).l
-	bclr	#4,(sflags).w
+	bclr	#sfwrap,(sflags).w
 	move.w	#$FFFF,(lastsfx).w
 	move.l	#M68K_RAM,(recbpr).w
-	jsr	(sub_11226).l
+	jsr	(WriteDayGames).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-BeginPlayoffs	;Seed the playoffs with sflags11 bit 0 (the pairings to POPairingsTmp), SetupPlayoffs, then seed them to save RAM
-	;(InitPlayoffs again); GameFlags bit 6 holds the checksum until the end
+BeginPlayoffs						;Seed the playoffs with sflags11 bit 0 (the pairings to POPairingsTmp),
+									;SetupPlayoffs, then seed them to save RAM
+									;(InitPlayoffs again); GameFlags bit 6 holds the checksum until the end
 	bset	#6,(GameFlags).w
 	bset	#0,(sflags11).w
 	bsr.w	InitPlayoffs
@@ -131,14 +133,16 @@ BeginPlayoffs	;Seed the playoffs with sflags11 bit 0 (the pairings to POPairings
 	btst	#1,(sflags11).w
 	bsr.w	SetupPlayoffs
 	bsr.w	InitPlayoffs
-	jsr	(maketree).l
+	jsr	(MakeTree).l
 	bclr	#6,(GameFlags).w
 	jsr	(MakeSRAMChecksum).l
 	rts
 
-InitPlayoffs	;Seed the playoffs: the two conferences (ConferenceTeams1 / 2) sorted by points (SortSeeds), the pairings
-	;to save RAM SRPOPairings and SRPOSlots (BuildPOSlots). With sflags11 bit 0 the pairings go to POPairingsTmp
-	;instead, and sflags11 bit 1 is set when the team in dword_FFDD82+2 is not in them
+InitPlayoffs						;Seed the playoffs: the two conferences (ConferenceTeams1 / 2) sorted by
+									;points (SortSeeds), the pairings
+									;to save RAM SRPOPairings and SRPOSlots (BuildPOSlots). With sflags11 bit
+									;0 the pairings go to POPairingsTmp instead, and sflags11 bit 1 is set
+									;when the team in dword_FFDD82+2 is not in them
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	#$B,d0
 	movea.l	#AwardIds,a0
@@ -149,7 +153,7 @@ InitPlayoffs	;Seed the playoffs: the two conferences (ConferenceTeams1 / 2) sort
 	movea.l	#ConferenceTeams2,a1
 	bsr.w	CopyBytes
 	movea.l	#SeedStandings,a0
-	jsr	(sub_1161E).l
+	jsr	(ReadStandings).l
 	bsr.w	CalcSeedPoints
 	move.w	#$C,(SeedCount).l
 	movea.l	#AwardIds,a0
@@ -188,8 +192,8 @@ InitPlayoffs	;Seed the playoffs: the two conferences (ConferenceTeams1 / 2) sort
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-SeedPairings	;Write the pairings of the sorted conference a1 to a0: the top team, the first team of another division
-	;(TeamDivisions), then the rest in order
+SeedPairings						;Write the pairings of the sorted conference a1 to a0: the top team, the
+									;first team of another division (TeamDivisions), then the rest in order
 	movea.l	#TeamDivisions,a2
 	clr.w	d0
 	move.b	(a1)+,d0
@@ -237,10 +241,11 @@ SeedPairings	;Write the pairings of the sorted conference a1 to a0: the top team
 	move.b	d0,1(a0)
 	rts
 
-TeamDivisions	;The division of each team (SeedPairings)
+TeamDivisions						;The division of each team (SeedPairings)
 	dc.b	0,2,2,0,1,1,1,0,3,2,0,2,3,3,3,2,3,2,2,0,1,3,1,0,3,1
 
-SortSeeds	;Bubble sort the SeedCount team bytes at a0 by SeedPoints, then SeedGames, highest first
+SortSeeds							;Bubble sort the SeedCount team bytes at a0 by SeedPoints, then SeedGames,
+									;highest first
 	movea.l	#SeedPoints,a1
 	movea.l	#SeedGames,a2
 	move.w	d1,-(sp)
@@ -281,7 +286,8 @@ SortSeeds	;Bubble sort the SeedCount team bytes at a0 by SeedPoints, then SeedGa
 	move.w	(sp)+,d1
 	rts
 
-CalcSeedPoints	;SeedPoints = 2 * wins + ties and SeedGames = wins of the teams (SeedStandings)
+CalcSeedPoints						;SeedPoints = 2 * wins + ties and SeedGames = wins of the teams
+									;(SeedStandings)
 	move.w	#$1A,d0
 	movea.l	#SeedStandings,a1
 	movea.l	#SeedPoints,a2
@@ -308,22 +314,23 @@ CalcSeedPoints	;SeedPoints = 2 * wins + ties and SeedGames = wins of the teams (
 	move.w	(sp)+,d1
 	rts
 
-CopyBytes	;Copy d0 + 1 bytes from a1 to a0
+CopyBytes							;Copy d0 + 1 bytes from a1 to a0
 	move.b	(a1)+,(a0)+
 	dbf	d0,CopyBytes
 	rts
 
-ConferenceTeams1	;The teams of the first conference
+ConferenceTeams1					;The teams of the first conference
 	dc.b	ANH,CGY,EDM,LA,SJ,VAN,CHI,DAL,DET,STL,TOR,WPG
 
-ConferenceTeams2	;The teams of the second conference
+ConferenceTeams2					;The teams of the second conference
 	dc.b	BOS,BUF,HFD,MTL,OTW,PIT,QUE,FLA,NJ,NYI,NYR,PHI,TB,WSH
 
-SetupPlayoffs	;Start the playoffs: save the season header (SRSeasonHeaderSave) and clear it, clear save RAM blocks (ClearSRAMBytes),
-	;OptPlayMode 1
+SetupPlayoffs						;Start the playoffs: save the season header (SRSeasonHeaderSave) and clear
+									;it, clear save RAM blocks (ClearSRAMBytes),
+									;OptPlayMode 1
 	movem.l	d0-d7/a0-a6,-(sp)
 	bset	#6,(GameFlags).w
-	move.b	(dword_FFDD7E+3).w,-(sp)
+	move.b	(SeasonDay+3).w,-(sp)
 	move.b	(dword_FFDD82).w,-(sp)
 	move.b	(dword_FFDD82+1).w,-(sp)
 	move.b	(dword_FFDD82+2).w,-(sp)
@@ -336,14 +343,14 @@ SetupPlayoffs	;Start the playoffs: save the season header (SRSeasonHeaderSave) a
 	dbf	d0,.save
 	movea.l	#SaveRAM+SRSeasonHeader,a0
 	clr.l	(a0)
-	jsr	(sub_1149E).l
-	bset	#2,(dword_FFDD7E+2).w
+	jsr	(ReadSeasonHeader).l
+	bset	#2,(SeasonFlags).w
 	move.b	(sp)+,(dword_FFDD82+2).w
 	move.b	(sp)+,(dword_FFDD82+1).w
 	move.b	(sp)+,(dword_FFDD82).w
-	move.b	(sp)+,(dword_FFDD7E+3).w
+	move.b	(sp)+,(SeasonDay+3).w
 	clr.b	(dword_FFDD82+3).w
-	jsr	(sub_1147E).l
+	jsr	(WriteSeasonHeader).l
 	move.l	#$CBF,d0
 	move.w	#$54,d1
 	jsr	(ClearSRAMBytes).l
@@ -359,7 +366,7 @@ SetupPlayoffs	;Start the playoffs: save the season header (SRSeasonHeaderSave) a
 	move.l	#$89,d0
 	move.l	#$6C0,d1
 	jsr	(ClearSRAMBytes).l
-	jsr	(sub_1DFA1C).l
+	jsr	(ClearFreeAgentStats).l
 	moveq	#$4D,d0
 	moveq	#$A,d1
 	jsr	(ClearSRAMBytes).l
@@ -369,13 +376,13 @@ SetupPlayoffs	;Start the playoffs: save the season header (SRSeasonHeaderSave) a
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-RestoreSeasonHeader	;Put back the season header saved by SetupPlayoffs. Nothing calls it.
-	;Code the listing does not decode: kept as bytes
+RestoreSeasonHeader					;Put back the season header saved by SetupPlayoffs. Nothing calls it.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$20,$7C,$00,$20,$00,$82,$22,$7C,$00,$20,$00,$CE
 	dc.b	$30,$3C,$00,$0C,$53,$40,$30,$D9,$51,$C8,$FF,$FC,$4E,$B9,$00,$01
 	dc.b	$14,$9E,$4E,$B9,$00,$02,$41,$AA,$4C,$DF,$7F,$FF,$4E,$75
 
-GetTeamPOSlot	;d7 = the seed slot of team d7 (save RAM SRPOSlots)
+GetTeamPOSlot						;d7 = the seed slot of team d7 (save RAM SRPOSlots)
 	move.l	a0,-(sp)
 	movea.l	#SaveRAM+SRPOSlots,a0
 	add.w	d7,d7
@@ -384,7 +391,7 @@ GetTeamPOSlot	;d7 = the seed slot of team d7 (save RAM SRPOSlots)
 	movea.l	(sp)+,a0
 	rts
 
-GetPOSlotTeam	;d7 = the team in seed slot d7 (save RAM SRPOPairings)
+GetPOSlotTeam						;d7 = the team in seed slot d7 (save RAM SRPOPairings)
 	move.l	a0,-(sp)
 	movea.l	#SaveRAM+SRPOPairings,a0
 	add.w	d7,d7
@@ -393,7 +400,7 @@ GetPOSlotTeam	;d7 = the team in seed slot d7 (save RAM SRPOPairings)
 	movea.l	(sp)+,a0
 	rts
 
-BuildPOSlots	;Save RAM SRPOSlots from SRPOPairings: the seed slot of each team
+BuildPOSlots						;Save RAM SRPOSlots from SRPOPairings: the seed slot of each team
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#SaveRAM+SRPOPairings,a0
 	movea.l	#SaveRAM+SRPOSlots,a1

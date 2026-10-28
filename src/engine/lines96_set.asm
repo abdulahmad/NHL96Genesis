@@ -1,12 +1,15 @@
-;	The team's lines. NullSaveClear is the rts ClearSRAM calls. sub_EF02 writes the lines
-;	of a team.
+;	The team's lines. GetTeamLines returns the line sets of a team: the team data lines while its
+;	saved roster is still the default one, else lines built in RAM from the players' overall ratings.
+;
+;	Each position gets a list of its players, best first; a line takes the player of the asked rank
+;	and marks him used, or the next free player from the fallback lists.
 
-NullSaveClear	;An rts. Called from ClearSRAM
+NullSaveClear						;An rts. Called from ClearSRAM
 	rts
 
-sub_EF02
+GetTeamLines						;a0 = the line sets of team d7
 	movem.l	d0-d7/a1-a6,-(sp)
-	bsr.w	sub_F300
+	bsr.w	CheckDefaultRoster
 	bne.w	.0
 	movea.l	#TeamList,a0
 	asl.w	#2,d7
@@ -16,130 +19,131 @@ sub_EF02
 .0
 	movea.l	#$FFFFD171,a3
 	move.w	#0,d5
-	bsr.w	sub_F1F0
+	bsr.w	BuildPosList
 	movea.l	#$FFFFD177,a3
 	move.w	#1,d5
-	bsr.w	sub_F1F0
+	bsr.w	BuildPosList
 	movea.l	#$FFFFD195,a3
 	move.w	#2,d5
-	bsr.w	sub_F1F0
+	bsr.w	BuildPosList
 	movea.l	#$FFFFD1B3,a3
 	move.w	#3,d5
-	bsr.w	sub_F1F0
+	bsr.w	BuildPosList
 	movea.l	#$FFFFD1D1,a3
 	move.w	#4,d5
-	bsr.w	sub_F1F0
+	bsr.w	BuildPosList
 	movea.l	#$FFFFD1EF,a3
 	move.w	#5,d5
-	bsr.w	sub_F1F0
+	bsr.w	BuildPosList
 	movea.l	#$FFFFD130,a0
-	bsr.w	sub_F1E6
+	bsr.w	AddBestGoalie
 	move.w	#2,d1
-	bsr.w	sub_F09A
-	move.l	(ThreeStars).w,(dword_FFD138).w
-	move.l	(dword_FFD134).w,(dword_FFD13C).w
-	bsr.w	sub_F102
+	bsr.w	AddLineSkaters
+	move.l	(LineSetsBuf).w,(LineSetsBuf+8).w
+	move.l	(LineSetsBuf+4).w,(LineSetsBuf+$C).w
+	bsr.w	ClearUsedPlayers
 	movea.l	#$FFFFD140,a0
-	bsr.w	sub_F1E6
+	bsr.w	AddBestGoalie
 	move.w	#3,d1
-	bsr.w	sub_F09A
-	bsr.w	sub_F102
+	bsr.w	AddLineSkaters
+	bsr.w	ClearUsedPlayers
 	movea.l	#$FFFFD148,a0
-	bsr.w	sub_F1E6
+	bsr.w	AddBestGoalie
 	move.w	#4,d1
-	bsr.w	sub_F09A
-	move.l	(ThreeStars).w,(dword_FFD150).w
-	move.l	(dword_FFD134).w,(dword_FFD154).w
-	move.l	(dword_FFD140).w,(dword_FFD158).w
-	move.l	(dword_FFD144).w,(dword_FFD15C).w
-	bsr.w	sub_F102
+	bsr.w	AddLineSkaters
+	move.l	(LineSetsBuf).w,(LineSetsBuf+$20).w
+	move.l	(LineSetsBuf+4).w,(LineSetsBuf+$24).w
+	move.l	(LineSetsBuf+$10).w,(LineSetsBuf+$28).w
+	move.l	(LineSetsBuf+$14).w,(LineSetsBuf+$2C).w
+	bsr.w	ClearUsedPlayers
 	movea.l	#$FFFFD1B3,a3
 	move.w	#$FFFF,d5
-	bsr.w	sub_F1F0
+	bsr.w	BuildPosList
 	movea.l	#$FFFFD160,a0
-	bsr.w	sub_F1E6
+	bsr.w	AddBestGoalie
 	move.w	#2,d1
-	bsr.w	sub_F030
+	bsr.w	AddDefensePair
 	move.w	#2,d1
-	bsr.w	sub_F050
-	bsr.w	sub_F102
-	move.b	(byte_FFD160).w,(StandingsBuf).w
+	bsr.w	AddFourForwards
+	bsr.w	ClearUsedPlayers
+	move.b	(LineSetsBuf+$30).w,(StandingsBuf).w
 	movea.l	#$FFFFD169,a0
 	move.w	#3,d1
-	bsr.w	sub_F030
+	bsr.w	AddDefensePair
 	move.w	#4,d1
-	bsr.w	sub_F050
+	bsr.w	AddFourForwards
 	movea.l	#$FFFFD130,a0
 .1
 	movem.l	(sp)+,d0-d7/a1-a6
 	rts
 
-sub_F030
+AddDefensePair						;Write the LD and RD of rank d1 to a0
 	movea.l	#$FFFFD177,a1
-	movea.l	#unk_F1D2,a2
-	bsr.w	sub_F154
+	movea.l	#MergedFallbackLists,a2
+	bsr.w	AddLinePlayer
 	movea.l	#$FFFFD195,a1
-	movea.l	#unk_F1D2,a2
-	bra.w	sub_F154
+	movea.l	#MergedFallbackLists,a2
+	bra.w	AddLinePlayer
 
-sub_F050
+AddFourForwards						;Write four forwards of rank d1 up from the forward list to a0, then 0
 	movea.l	#$FFFFD1B3,a1
-	movea.l	#unk_F1D2,a2
-	bsr.w	sub_F154
+	movea.l	#MergedFallbackLists,a2
+	bsr.w	AddLinePlayer
 	addq.w	#1,d1
 	movea.l	#$FFFFD1B3,a1
-	movea.l	#unk_F1D2,a2
-	bsr.w	sub_F154
+	movea.l	#MergedFallbackLists,a2
+	bsr.w	AddLinePlayer
 	addq.w	#1,d1
 	movea.l	#$FFFFD1B3,a1
-	movea.l	#unk_F1D2,a2
-	bsr.w	sub_F154
+	movea.l	#MergedFallbackLists,a2
+	bsr.w	AddLinePlayer
 	addq.w	#1,d1
 	movea.l	#$FFFFD1B3,a1
-	movea.l	#unk_F1D2,a2
-	bsr.w	sub_F154
+	movea.l	#MergedFallbackLists,a2
+	bsr.w	AddLinePlayer
 	clr.b	(a0)+
 	rts
 
-sub_F09A
+AddLineSkaters						;Write the skaters of rank d1 to a0: LD, RD, LW, C, RW, then the rank 3
+									;center, then 0
 	movea.l	#$FFFFD177,a1
-	movea.l	#unk_F1BE,a2
-	bsr.w	sub_F154
+	movea.l	#DefenseFallbackLists,a2
+	bsr.w	AddLinePlayer
 	movea.l	#$FFFFD195,a1
-	movea.l	#unk_F1BE,a2
-	bsr.w	sub_F154
+	movea.l	#DefenseFallbackLists,a2
+	bsr.w	AddLinePlayer
 	movea.l	#$FFFFD1B3,a1
-	movea.l	#unk_F1AA,a2
-	bsr.w	sub_F154
+	movea.l	#ForwardFallbackLists,a2
+	bsr.w	AddLinePlayer
 	movea.l	#$FFFFD1D1,a1
-	movea.l	#unk_F1AA,a2
-	bsr.w	sub_F154
+	movea.l	#ForwardFallbackLists,a2
+	bsr.w	AddLinePlayer
 	movea.l	#$FFFFD1EF,a1
-	movea.l	#unk_F1AA,a2
-	bsr.w	sub_F154
+	movea.l	#ForwardFallbackLists,a2
+	bsr.w	AddLinePlayer
 	move.w	#3,d1
 	movea.l	#$FFFFD1D1,a1
-	movea.l	#unk_F1AA,a2
-	bsr.w	sub_F154
+	movea.l	#ForwardFallbackLists,a2
+	bsr.w	AddLinePlayer
 	clr.b	(a0)+
 	rts
 
-sub_F102
+ClearUsedPlayers					;Clear the used marks of the five skater lists
 	movem.l	d0-d3/a0,-(sp)
 	movea.l	#$FFFFD1D1,a0
-	bsr.w	sub_F13E
+	bsr.w	ClearPosListUsed
 	movea.l	#$FFFFD1B3,a0
-	bsr.w	sub_F13E
+	bsr.w	ClearPosListUsed
 	movea.l	#$FFFFD1EF,a0
-	bsr.w	sub_F13E
+	bsr.w	ClearPosListUsed
 	movea.l	#$FFFFD177,a0
-	bsr.w	sub_F13E
+	bsr.w	ClearPosListUsed
 	movea.l	#$FFFFD195,a0
-	bsr.w	sub_F13E
+	bsr.w	ClearPosListUsed
 	movem.l	(sp)+,d0-d3/a0
 	rts
 
-sub_F13E
+ClearPosListUsed					;Clear bit 7 (used) of every player in the list at a0
 	move.b	(a0),d1
 	ext.w	d1
 	addq.w	#2,a0
@@ -151,14 +155,16 @@ sub_F13E
 .1
 	rts
 
-sub_F154
-	bsr.w	sub_F162
+AddLinePlayer						;Write the player of rank d1 in list a1 to a0, or a free one from the
+									;fallback lists at a2
+	bsr.w	TakePosListPlayer
 	bne.w	.0
-	bsr.w	sub_F18C
+	bsr.w	TakeFallbackPlayer
 .0
 	rts
 
-sub_F162
+TakePosListPlayer					;ne: the player of rank d1 in list a1 is free; write his number + 1 to a0
+									;and mark him used
 	movem.w	d1,-(sp)
 	subq.w	#1,d1
 	cmp.b	(a1),d1
@@ -174,14 +180,15 @@ sub_F162
 	move.w	#0,d0
 	rts
 
-sub_F18C
+TakeFallbackPlayer					;The first free player in the five lists at a2, trying the next rank in
+									;each, then the rank after
 	move.w	d1,-(sp)
 .0
 	clr.w	d4
 	addq.w	#1,d1
 .1
 	movea.l	(a2,d4.w),a1
-	bsr.s	sub_F162
+	bsr.s	TakePosListPlayer
 	bne.w	.2
 	addq.w	#4,d4
 	cmp.w	#$14,d4
@@ -191,22 +198,24 @@ sub_F18C
 	move.w	(sp)+,d1
 	rts
 
-unk_F1AA
+ForwardFallbackLists				;Lists AddLinePlayer tries for a forward
 	dc.l	$FFFFD1D1,$FFFFD1EF,$FFFFD1B3,$FFFFD195,$FFFFD177
 
-unk_F1BE
+DefenseFallbackLists				;Lists AddLinePlayer tries for a defenseman
 	dc.l	$FFFFD177,$FFFFD195,$FFFFD1D1,$FFFFD1EF,$FFFFD1B3
 
-unk_F1D2
+MergedFallbackLists					;Lists AddLinePlayer tries once the forward list holds all the forwards
 	dc.l	$FFFFD177,$FFFFD195,$FFFFD1B3,$FFFFD1B3,$FFFFD1B3
 
-sub_F1E6
-	move.b	(byte_FFD173).w,d0
+AddBestGoalie						;Write the first goalie of the goalie list (player number + 1) to a0
+	move.b	(LineSetsBuf+$43).w,d0
 	addq.b	#1,d0
 	move.b	d0,(a0)+
 	rts
 
-sub_F1F0
+BuildPosList						;List at a3 (count, 0, player numbers) of the players of position slot d5
+									;(-1: the forwards, any other negative: the defense), sorted by overall
+									;rating, best first
 	clr.b	(a3)
 	clr.b	1(a3)
 	movea.l	a3,a2
@@ -219,7 +228,7 @@ sub_F1F0
 .0
 	movem.l	d2-d3,-(sp)
 	move.w	d2,d0
-	jsr	(sub_103AA).l
+	jsr	(GetPositionSlot).l
 	tst.w	d5
 	bpl.w	.1
 	cmp.w	#$FFFF,d5
@@ -248,7 +257,7 @@ sub_F1F0
 	adda.w	(a1),a1
 	addq.w	#8,a1
 	movea.l	a1,a0
-	movea.l	#$F300,a4
+	movea.l	#CheckDefaultRoster,a4
 	movea.l	#OvrGoalWgtList2,a6
 	move.l	(GAttribOverallMask).l,d4
 	tst.w	d5
@@ -295,7 +304,8 @@ sub_F1F0
 	dc.b	$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 	dc.b	$00,$00,$00,$00
 
-sub_F300
+CheckDefaultRoster					;eq when the saved roster of team d7 is its default roster: the team data
+									;player count, and every slot holds the team's own player in order
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#TeamList,a0
 	move.w	d7,-(sp)
@@ -313,7 +323,7 @@ sub_F300
 	move.w	d0,d1
 	jsr	(GetPlayerCountD7).l
 	cmp.w	d0,d1
-	bne.w	.playerabovetopgoalline
+	bne.w	.changed
 	subq.w	#1,d1
 	clr.w	d2
 	move.w	d7,d0
@@ -324,14 +334,14 @@ sub_F300
 	move.w	(a0)+,d0
 	andi.w	#$1F,d0
 	cmp.b	d0,d7
-	bne.w	.playerabovetopgoalline
+	bne.w	.changed
 	move.w	(a0)+,d0
 	cmp.b	d0,d2
-	bne.w	.playerabovetopgoalline
+	bne.w	.changed
 	addq.w	#1,d2
 	dbf	d1,.0
 	bra.w	.2
-.playerabovetopgoalline
+.changed
 	move.w	#1,d0
 	bra.w	.8
 .2

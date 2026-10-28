@@ -2,58 +2,69 @@
 ;	strings with their length in front, hex digits, roster entries, pictures, sound bank items
 ;	and schedule days.
 
-VmInc MACRO ;set video auto inc. mode
+; VmInc: set the VDP auto-increment (register 15).
+;   Emits: move.w #$8F00+(\1&255),Vctrl (one instruction, no data).
+;   \1: bytes to step after each VDP data access (2 for word writes).
+;   Example (video96.asm:500): VmInc 2  -> move.w #$8F02,Vctrl
+VmInc MACRO							;set video auto inc. mode
 	move	#$8f00+(\1&255),Vctrl
 	ENDM
 
+; String: a print string with its length in front (print, printz and the string lists read it).
+;   Emits: dc.w length (counts the word itself and any pad), each argument as dc.b in order, then
+;   one 0 pad byte if the data would end on an odd address.
+;   \1..\40: each a quoted text ('abc') or a byte expression (e.g. a control code -$ab,x,y).
+;   SNASM68k accepts at most 31 parameters in one macro call, so 31 is the practical limit.
+;   Example (middle96_per.asm:4): String '1',$12
+;     -> 00 04 31 12
 String  MACRO
         ; Store current position
 @begin1  =   *
         ; Reserve space for length word
         dc.w    0
         ; Output the string bytes
-        dc.b    \1     ; first param
+        dc.b    \1					; first param
     IF NARG>1
-        dc.b    \2     ; second param
+        dc.b    \2					; second param
     ENDIF
     IF NARG>2
-        dc.b    \3     ; third param
+        dc.b    \3					; third param
     ENDIF
     IF NARG>3
-        dc.b    \4     ; fourth param
+        dc.b    \4					; fourth param
     ENDIF
     IF NARG>4
-        dc.b    \5     ; fifth param
+        dc.b    \5					; fifth param
     ENDIF
     IF NARG>5
-        dc.b    \6     ; sixth param
+        dc.b    \6					; sixth param
     ENDIF
     IF NARG>6
-        dc.b    \7     ; seventh param
+        dc.b    \7					; seventh param
     ENDIF
     IF NARG>7
-        dc.b    \8     ; eighth param
+        dc.b    \8					; eighth param
     ENDIF
     IF NARG>8
-        dc.b    \9     ; ninth param
+        dc.b    \9					; ninth param
     ENDIF
     IF NARG>9
-        dc.b    \10    ; tenth param
+        dc.b    \10					; tenth param
     ENDIF
     IF NARG>10
-        dc.b    \11    ; eleventh param
+        dc.b    \11					; eleventh param
     ENDIF
     IF NARG>11
-        dc.b    \12    ; twelfth param
+        dc.b    \12					; twelfth param
     ENDIF
     IF NARG>12
-        dc.b    \13    ; thirteenth param
+        dc.b    \13					; thirteenth param
     ENDIF
     IF NARG>13
-        dc.b    \14    ; fourteenth param
+        dc.b    \14					; fourteenth param
     ENDIF
     IF NARG>14
-        dc.b    \15    ; fifteenth param
+        dc.b    \15					; fifteenth param
     ENDIF
     IF NARG>15
         dc.b    \16
@@ -137,15 +148,17 @@ String  MACRO
 @end1    =   *
         ; Now write the length at the reserved position
         org     @begin1
-        dc.w    @end1-@begin1  ; Total length
+        dc.w    @end1-@begin1		; Total length
         org     @end1
     ENDM
 
-HEX2 MACRO    ; macro for hex data
-    dc.w    $\1,$\2,$\3,$\4     ; handle 4 words at a time, add $ prefix
-    ENDM
-
-; Player record: String-style name (dc.b 0, length; name; 0 pad to even), then 4 rating words
+; PLAYER (used as Player): one roster record.
+;   Emits: dc.b 0, length (counts these 2 bytes, the name and the pad), the name, a 0 pad to even,
+;   then 4 rating words dc.w $\2,$\3,$\4,$\5.
+;   \1: the quoted name (the build puts the real names in place of the P001_ placeholders).
+;   \2..\5: the ratings, 4 hex digits each, written without $.
+;   Example (teamdata96.asm:136): Player 'P001______',3164,3232,0000,3233
+;     -> 00 0C 50 30 30 31 5F 5F 5F 5F 5F 5F 31 64 32 32 00 00 32 33
 PLAYER MACRO
 @begin = *
     dc.b $00, $00
@@ -160,7 +173,12 @@ PLAYER MACRO
     dc.w $\2,$\3,$\4,$\5
     ENDM
 
-; PIX macro for
+; PIX: goalie save odds bytes, looked up for the values the data uses.
+;   Emits: one dc.b per argument: \1 1111=$55, 2131=$9D, 3111=$D5; \2 1111=$55, 2131=$9D, 3300=$F0,
+;   1311=$75; \3 1213=$67. Any other value emits nothing.
+;   \1..\3: four digit numbers, one digit (0-3) per puck region, as 93G/94G PIX1.
+;   Example (92G hockey.asm:2516; unused here): pix 1111,2131,1213
+;     -> 55 9D 67
 PIX     MACRO
         ; First parameter
         IF      \1=1111
@@ -191,13 +209,22 @@ PIX     MACRO
             ENDIF
         ENDIF
     ENDM
-; SoundBanks item: type (SB_PATCH / SB_SAMPLE / SB_SONG / SB_LIST), id, size word
+; SndItem: one sound bank item.
+;   Emits: dc.b \1,\2 then dc.w \3 (4 bytes).
+;   \1: the type, SB_PATCH / SB_SAMPLE / SB_SONG / SB_LIST. \2: the id. \3: the size word.
+;   Example (sound96.asm:448): SndItem SB_SAMPLE,$00,$2143
+;     -> 01 00 21 43
 SndItem MACRO
 	dc.b	\1,\2
 	dc.w	\3
 	ENDM
 
-;	Day: one schedule record. Args are team abbreviations in pairs (up to 12 games). Emits the game count, then the teams.
+; Day: one schedule day.
+;   Emits: dc.b the game count (NARG/2), then dc.b each team, two per game. An odd number of
+;   arguments stops the build.
+;   \1..\24: team abbreviations (team numbers), in pairs, up to 12 games.
+;   Example (schedule96.asm:8): Day CHI,PIT, WPG,OTW, ... LA,SJ (12 games)
+;     -> 0C, then the 24 team numbers
 Day	MACRO
 	IF NARG&1
 	FAIL	Day needs an even number of teams

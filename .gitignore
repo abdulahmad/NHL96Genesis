@@ -3,3 +3,12 @@ output/
 node_modules/
 __pycache__/
 *.log
+# The reference ROM and its IDA listing are local files: they are derived from the game and are not committed.
+lst/*.bin
+lst/*.lst
+
+# The retail ROM is a local file in the repo folder (any file name; found by SHA-1)
+/*.bin
+/*.gen
+nhl96retail.bin
+package-lock.json

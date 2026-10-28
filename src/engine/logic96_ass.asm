@@ -1,8 +1,9 @@
 ;	Assignment entries. check4bench sends a player to the bench. The other entries
 ;	cover the bench, the penalty box, a goal celebration and the goalies.
 
-check4bench	;Check if player a3 should go to the bench (called from the assignment code).
-	;Code the listing does not decode: kept as bytes
+check4bench							;Check if player a3 should go to the bench (called from the assignment
+									;code).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$38,$00,$02,$C3,$40,$66,$F6,$08,$2B,$00,$03,$00,$62,$66,$EE
 	dc.b	$08,$2B,$00,$04,$00,$63,$66,$E6,$4A,$2B,$00,$60,$6A,$00,$00,$08
 	dc.b	$4A,$2B,$00,$61,$6B,$D8,$10,$2B,$00,$61,$B0,$2B,$00,$67,$67,$00
@@ -14,8 +15,8 @@ check4bench	;Check if player a3 should go to the bench (called from the assignme
 	dc.b	$FE,$58,$10,$2B,$00,$60,$48,$80,$37,$40,$00,$34,$4E,$F9,$00,$01
 	dc.b	$FE,$58
 
-assbench	;asstab entry: player a3 should go to the bench.
-	;Code the listing does not decode: kept as bytes
+assbench							;asstab entry: player a3 should go to the bench.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$FF,$64,$0C,$6B,$00,$64,$00,$40
 	dc.b	$67,$00,$01,$0E,$61,$00,$FF,$58,$08,$2B,$00,$04,$00,$63,$66,$00
 	dc.b	$35,$5E,$08,$AB,$00,$01,$00,$62,$67,$00,$00,$2C,$37,$7C,$00,$08
@@ -42,8 +43,8 @@ assbench	;asstab entry: player a3 should go to the bench.
 	dc.b	$00,$02,$00,$63,$10,$2B,$00,$60,$48,$80,$37,$40,$00,$34,$4E,$B9
 	dc.b	$00,$01,$FE,$58,$50,$EB,$00,$61,$50,$EB,$00,$60,$4E,$75
 
-asseben	;asstab entry: player a3 should exit the bench area.
-	;Code the listing does not decode: kept as bytes
+asseben								;asstab entry: player a3 should exit the bench area.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$F6,$08,$AB,$00,$01,$00,$62,$67,$00
 	dc.b	$00,$54,$42,$6B,$00,$28,$42,$6B,$00,$2A,$30,$2B,$00,$52,$5D,$40
 	dc.b	$6B,$00,$00,$04,$52,$40,$C1,$FC,$00,$0E,$37,$40,$00,$14,$36,$BC
@@ -54,8 +55,8 @@ asseben	;asstab entry: player a3 should exit the bench area.
 	dc.b	$08,$AB,$00,$05,$00,$63,$08,$AB,$00,$02,$00,$63,$42,$6B,$00,$58
 	dc.b	$37,$7C,$10,$00,$00,$28,$60,$00,$33,$68
 
-asspenalty	;asstab entry: player a3 goes to the penalty box.
-	;Code the listing does not decode: kept as bytes
+asspenalty							;asstab entry: player a3 goes to the penalty box.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$FF,$6C,$08,$AB,$00,$01,$00,$62
 	dc.b	$67,$00,$00,$70,$08,$EB,$00,$02,$00,$63,$61,$00,$01,$36,$78,$FE
 	dc.b	$61,$00,$FC,$F0,$37,$7C,$00,$08,$00,$42,$70,$0B,$12,$38,$C3,$EC
@@ -82,14 +83,14 @@ asspenalty	;asstab entry: player a3 goes to the penalty box.
 	dc.b	$67,$00,$F8,$7C,$38,$3C,$00,$04,$B0,$78,$C3,$88,$67,$00,$F8,$70
 	dc.b	$38,$3C,$00,$06,$60,$00,$F8,$68
 
-assdopen	;asstab entry: player a3 serves his penalty.
-	;Code the listing does not decode: kept as bytes
+assdopen							;asstab entry: player a3 serves his penalty.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$00,$26,$08,$AB,$00,$01,$00,$62
 	dc.b	$67,$00,$00,$1C,$70,$10,$08,$2B,$00,$06,$00,$62,$67,$00,$00,$04
 	dc.b	$70,$01,$D1,$38,$C3,$EC,$50,$EB,$00,$34,$42,$6B,$00,$06,$4E,$75
 
-assepen	;asstab entry: player a3 leaves the penalty box.
-	;Code the listing does not decode: kept as bytes
+assepen								;asstab entry: player a3 leaves the penalty box.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$FD,$B4,$08,$AB,$00,$01,$00,$62
 	dc.b	$67,$00,$00,$68,$08,$EB,$00,$02,$00,$62,$08,$EB,$00,$02,$00,$63
 	dc.b	$70,$10,$72,$C4,$08,$2B,$00,$06,$00,$62,$67,$00,$00,$06,$70,$01
@@ -103,8 +104,9 @@ assepen	;asstab entry: player a3 leaves the penalty box.
 	dc.b	$00,$63,$08,$AB,$00,$02,$00,$63,$37,$7C,$F0,$00,$00,$28,$60,$00
 	dc.b	$30,$FE
 
-assgoaliebreakwait	;asstab entry: in a shootout or penalty shot park the idle goalie off the ice.
-	;Code the listing does not decode: kept as bytes
+assgoaliebreakwait					;asstab entry: in a shootout or penalty shot park the idle goalie off the
+									;ice.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$00,$50,$08,$38,$00,$02,$C3,$40
 	dc.b	$66,$00,$00,$12,$08,$38,$00,$00,$C3,$48,$66,$00,$00,$08,$4E,$71
 	dc.b	$60,$00,$30,$DA,$42,$6B,$00,$28,$42,$6B,$00,$2A,$48,$E7,$80,$80
@@ -112,13 +114,14 @@ assgoaliebreakwait	;asstab entry: in a shootout or penalty shot park the idle go
 	dc.b	$01,$91,$00,$14,$08,$28,$00,$07,$00,$62,$66,$00,$00,$08,$37,$7C
 	dc.b	$FE,$6F,$00,$14,$4C,$DF,$01,$01,$4E,$75,$4E,$75
 
-donothing	;Unless locked or pad controlled, player a3 just skates (jumped to from the fight and assignment code).
-	;Code the listing does not decode: kept as bytes
+donothing							;Unless locked or pad controlled, player a3 just skates (jumped to from
+									;the fight and assignment code).
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$F6,$08,$2B,$00,$03,$00,$62,$66,$EE
 	dc.b	$70,$08,$60,$00,$32,$F8
 
-assstanley	;asstab entry: player a3 skates with the Stanley Cup overhead.
-	;Code the listing does not decode: kept as bytes
+assstanley							;asstab entry: player a3 skates with the Stanley Cup overhead.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$E0,$08,$AB,$00,$01,$00,$62,$67,$00
 	dc.b	$00,$22,$37,$7C,$00,$5A,$00,$44,$4A,$78,$BD,$32,$6A,$00,$00,$06
 	dc.b	$44,$6B,$00,$44,$37,$78,$BD,$2E,$00,$46,$32,$3C,$0C,$A0,$61,$00
@@ -126,8 +129,8 @@ assstanley	;asstab entry: player a3 skates with the Stanley Cup overhead.
 	dc.b	$61,$00,$30,$78,$B0,$7C,$00,$07,$6E,$9E,$34,$00,$37,$42,$00,$54
 	dc.b	$60,$00,$37,$D0
 
-assscore	;asstab entry: player a3 celebrates a goal.
-	;Code the listing does not decode: kept as bytes
+assscore							;asstab entry: player a3 celebrates a goal.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$8C,$08,$AB,$00,$01,$00,$62,$67,$00
 	dc.b	$00,$24,$61,$00,$00,$A2,$37,$7C,$00,$08,$00,$42,$37,$7C,$00,$5A
 	dc.b	$00,$44,$4A,$78,$BD,$32,$6A,$00,$00,$06,$44,$6B,$00,$44,$37,$78
@@ -143,8 +146,8 @@ assscore	;asstab entry: player a3 celebrates a goal.
 	dc.b	$4E,$75,$08,$2B,$00,$03,$00,$62,$67,$00,$2B,$FE,$4E,$75,$4E,$75
 	dc.b	$4E,$75
 
-assgoaliectrl	;asstab entry: the goalie of a pad.
-	;Code the listing does not decode: kept as bytes
+assgoaliectrl						;asstab entry: the goalie of a pad.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$03,$00,$62,$66,$00,$00,$06,$60,$00,$2F,$58,$08,$2B
 	dc.b	$00,$01,$00,$62,$66,$00,$00,$94,$48,$A7,$C0,$00,$30,$13,$32,$2B
 	dc.b	$00,$14,$B2,$7C,$00,$AA,$6E,$00,$00,$22,$B2,$7C,$FF,$56,$6D,$00
@@ -169,8 +172,8 @@ assgoaliectrl	;asstab entry: the goalie of a pad.
 	dc.b	$E4,$08,$17,$40,$00,$40,$30,$2B,$00,$52,$B0,$78,$B7,$BE,$67,$00
 	dc.b	$00,$02,$4E,$75
 
-assgoaliecpu	;asstab entry: the computer goalie.
-	;Code the listing does not decode: kept as bytes
+assgoaliecpu						;asstab entry: the computer goalie.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$08,$2B,$00,$03,$00,$62,$66,$00,$FE,$94,$31,$F8,$B7,$5E,$DC,$AA
 	dc.b	$08,$38,$00,$00,$C3,$42,$67,$00,$00,$60,$08,$2B,$00,$01,$00,$63
 	dc.b	$66,$00,$00,$56,$08,$38,$00,$01,$C3,$42,$67,$00,$00,$34,$08,$38
