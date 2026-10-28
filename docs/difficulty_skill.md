@@ -62,7 +62,7 @@ What **does** change:
 | Options UI | `src/front/options96.asm` — `OptionsScreen`, `OptionsMenuList`, row label in the header `String` (`'skill level:'`) |
 | Menu variable | `OptionVars` last entry → `OptSkill` |
 | Display strings | `SkillText` — three choices, in index order |
-| Row handler | `SkillItem` (still `dc.b`; clamps `OptSkill` and returns the active `SkillText` line in `a1`, same pattern as `FightingItem` / `PenaltyItem`) |
+| Row handler | `SkillItem` (still `dc.b`; wraps `OptSkill` within 0–2 (shows `NotApplicableText` for `OptPlayMode` 4, 5, and 7+, but not 6) and returns the active `SkillText` line in `a1`, same pattern as `FightingItem` / `PenaltyItem`) |
 | RAM | `OptSkill equ $FFFFD268` in `src/ram96.asm` |
 | Apply at game start | `SetSkillLevel` in `options96.asm` (called from `SetPlayMode` on most play modes) |
 | Runtime gravity words | `word_FFD284` (NTSC), `word_FFD286` (PAL via `PalMode`) in `src/ram96.asm` |
@@ -82,7 +82,7 @@ Left/right on the highlighted row increments or decrements the word pointed to b
 ### Defaults and save data
 
 - **SRAM init** (`ClearSRAM` in `src/sram96.asm`): `OptSkill` = **1** (all-star).
-- **Options idle timeout** (`OptionsScreen` `.16`, ~30 s on the menu): resets options to defaults, including `OptSkill` = **1**.
+- **Options idle timeout** (`OptionsScreen` `.16`, `cmpi.w #$2A30,(carddelay)` at `options96.asm` ~line 68 = 10,800 frames, ~3 minutes NTSC): resets options to defaults, including `OptSkill` = **1**.
 - **Persistence**: `ReadOptions` / `WriteOptions` read or write **`$18` bytes** from save RAM offset **`$1EC6`** starting at `OptPlayMode`. `OptSkill` lies in that block (after `OptFighting`; before `OptRosters`). The gravity words `word_FFD284` / `word_FFD286` are **not** stored in SRAM; they are filled when a game mode is applied.
 
 On entering `OptionsScreen`, the code sets `word_FFD284` = `$15` and `word_FFD286` = `$1D` before `ReadOptions`. Those are the same numbers **pro** and **all-star** use in the tables below; they stay in RAM until `SetSkillLevel` runs or the screen is entered again.
@@ -92,7 +92,11 @@ On entering `OptionsScreen`, the code sets `word_FFD284` = `$15` and `word_FFD28
 `SetPlayMode` (`options96.asm`) configures season, playoff, shootout, and normal game paths.
 
 - **Shootout** (`OptPlayMode` = 6): branches to `ShootoutInit` **without** calling `SetSkillLevel`. Gravity stays at the values left from `OptionsScreen` entry (defaults above), regardless of `OptSkill`.
-- **Other modes** that start a game (path `.4` → `.5`): after `SetLineOption` and `SetPenOption`, calls **`SetSkillLevel`**.
+- **Season modes** (`OptPlayMode` = 4 continue, 5 new): clear `OptPlayMode`, set season flags, and `bra.w .5`, **skipping** `SetSkillLevel` (`options96.asm` ~527–537).
+- **Playoffs** (`OptPlayMode` = 7): `OptionsScreen` goes to `PlayoffMenuScreen` before `SetPlayMode`.
+- **Other modes** (regular game, path `.4` → `.5`): after `SetLineOption` and `SetPenOption`, calls **`SetSkillLevel`**.
+
+Note: `SkillItem` shows `NotApplicableText` for modes 4, 5, and 7+, but **not** for shootout (6), so shootout displays a skill level that has no effect.
 
 `SetSkillLevel` indexes by `OptSkill` (word index × 2) into two parallel tables:
 
@@ -125,7 +129,7 @@ The skill tables do **not** rename AI scripts or roster ratings. They only feed 
 
 1. Load the same gravity word into `d4` (PAL swap as above).
 2. Skip this block for some `SPA` ranges (`SPA17E4`–`SPA1F76`, and `SPA2B88`).
-3. On ice (`Zpos` = 0), apply extra damping to `Xvel` / `Yvel` (shift 6 or 9 depending on `pflags` bit 0, home vs away).
+3. On ice (`Zpos` = 0), apply extra damping to `Xvel` / `Yvel` (shift 6 normally, 9 when `pflags` bit 0 `pfdoff`, deceleration off, is set; `equals.inc`. Home/away is `pfteam`, bit 6).
 4. Multiply velocities by `d4` and integrate into `Xpos` / `Ypos`; apply extra Z terms when airborne or on the ice surface.
 
 **Rookie-only tweak** (human-controlled skaters):
@@ -163,3 +167,6 @@ Finish plan step 7 in `docs/align95_plan.md` may rename `word_FFD284` / `word_FF
 | User-facing | Options → “skill level” | Season / playoff progression |
 | 95G | New in 96 | Present in 95G |
 | Effect | Gravity / movement tuning | Bracket and season logic |
+
+
+`gamelevel` also scales crowd excitement: `StartPer` sets `CwdExciteLvl` = `gamelevel` × 16 (`ram96.asm`, `CwdExciteLvl`).
