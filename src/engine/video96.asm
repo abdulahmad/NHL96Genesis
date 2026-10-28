@@ -497,7 +497,7 @@ setVram_0							;Second half of setVram without the fade: clear vram and set the
 									;registers from disflags
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
-	move.w	#$8F02,(Vctrl).l
+	VmInc	2
 	clr.w	d0
 	bsr.w	Vmaddr
 	move.w	#$3FFF,d0
