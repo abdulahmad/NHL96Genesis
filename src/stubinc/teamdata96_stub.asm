@@ -14,4 +14,4 @@
 ; External addresses outside: none.
 
 ; Main segment code
-	include	..\output\names\teamdata96.asm
+	include	..\output\obj\names\teamdata96.asm

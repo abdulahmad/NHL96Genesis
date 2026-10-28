@@ -37,11 +37,11 @@ Where these docs say "push to main", contributors push to their fork and open a 
 
 | What | Windows | Linux / macOS (wine) | Logs |
 | --- | --- | --- | --- |
-| Full ROM | `npm run build:retail` | `tools/build_rom.sh` | `output/build_rom.log`, `output/Build96.log` |
+| Full ROM | `npm run build:retail` | `tools/build_rom.sh` | `output/build_rom.log`, `output/obj/Build96.log` |
 | One segment | `npm run seg:<name>` (`npm run seg:main96`) | `tools/verify_segment.sh <name>` | `output/seg_<name>.log`, `output/Build_<name>.log` |
 | Everything, clean | - | `tools/verify_all.sh` | `output/verify_all.log` (summary) plus the above |
 
-The prebuild check (`tools/prebuild.js`) runs first in every one of them. It checks the retail ROM and, when `Extracted/` is missing or stale, runs `tools/extractAssets96.js`. That writes `Extracted/NHL96/` (team palettes, graphics, the Z80 program, the sound bank, the scout text) and `Extracted/.extract-complete.json` last. It then writes `output/names/teamdata96.asm`: a copy of `src/teamdata96.asm` with the real NHLPA player names and NHL team nicknames put back from `Extracted/PlayerNames.txt` and `Extracted/TeamNicknames.txt` (the file in `src/` has same-length placeholders; `src/nhl96.asm` and the teamdata96 stub include the copy; a name must keep its placeholder's length). A missing or wrong ROM stops the build and names the path, SHA-1 and size, including the line "ROMs are not included in the repo". The last line of a build must be `MATCH`. On a fresh clone, if it is not MATCH, stop and report the output. `tools/verify_all.sh` deletes old output, extracts again, builds the ROM and checks every segment; it ends with `ALL MATCH`.
+The prebuild check (`tools/prebuild.js`) runs first in every one of them. It checks the retail ROM and, when `Extracted/` is missing or stale, runs `tools/extractAssets96.js`. That writes `Extracted/NHL96/` (team palettes, graphics, the Z80 program, the sound bank, the scout text) and `Extracted/.extract-complete.json` last. It then writes `output/obj/names/teamdata96.asm`: a copy of `src/teamdata96.asm` with the real NHLPA player names and NHL team nicknames put back from `Extracted/PlayerNames.txt` and `Extracted/TeamNicknames.txt` (the file in `src/` has same-length placeholders; `src/nhl96.asm` and the teamdata96 stub include the copy; a name must keep its placeholder's length). A missing or wrong ROM stops the build and names the path, SHA-1 and size, including the line "ROMs are not included in the repo". The last line of a build must be `MATCH`. On a fresh clone, if it is not MATCH, stop and report the output. `tools/verify_all.sh` deletes old output, extracts again, builds the ROM and checks every segment; it ends with `ALL MATCH`.
 
 ## 3. Work loop
 
