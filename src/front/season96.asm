@@ -1267,14 +1267,10 @@ OrdinalSuffixPtr					;Ones digit: th, st, nd, rd, then th
 	dc.l	OrdinalSuffix,OrdinalSuffix,OrdinalSuffix,OrdinalSuffix,OrdinalSuffix,OrdinalSuffix
 
 OrdinalSuffix						;TH, ST, ND, RD
-	dc.w	4
-	dc.b	'TH'
-	dc.w	4
-	dc.b	'ST'
-	dc.w	4
-	dc.b	'ND'
-	dc.w	4
-	dc.b	'RD'
+	String	'TH'
+	String	'ST'
+	String	'ND'
+	String	'RD'
 	;The team rank lookups TeamRankPtrs points to: d0 = the rank of team d0 from a byte table
 	dc.b	$2F,$08,$48,$80,$20,$7C,$00,$01,$20,$16,$10,$30,$00,$00,$48,$80
 	dc.b	$20,$5F,$4E,$75,$13,$0A,$11,$07,$08,$0B,$02,$19,$0E,$0C,$16,$12
