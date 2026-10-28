@@ -13,7 +13,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how changes are made (names, comments
 - Still very raw.
 - StaticEck is taking it on and cleaning it up.
 
-Bitwise rebuild of NHL 96 for the Sega Genesis, in the style of [NHL95Genesis](https://github.com/abdulahmad/NHL95Genesis). The full build is byte for byte the retail ROM (SHA-1 `7204633fbb9966ac637e7966d02ba15c5acdee6b`); each segment also builds and verifies on its own. Every segment is source. Pictures, the sound bank and the scout text are `incbin`s of `Extracted/NHL96/`, written by `tools/extractAssets96.js` (`SEGMENT_AGENT.md`).
+Reverse engineered source of NHL 96 for the Sega Genesis, in the style of [NHL95Genesis](https://github.com/abdulahmad/NHL95Genesis). The full build is byte for byte the retail ROM (SHA-1 `7204633fbb9966ac637e7966d02ba15c5acdee6b`); each segment also builds and verifies on its own. Every segment is source. Pictures, the sound bank and the scout text are `incbin`s of `Extracted/NHL96/`, written by `tools/extractAssets96.js` (`SEGMENT_AGENT.md`).
 
 Start with `START_HERE.md` (setup, build, contributor workflow), then `SEGMENT_AGENT.md` (rules and the ROM map queue) and `PROMPT.md` (the per-segment prompt).
 
