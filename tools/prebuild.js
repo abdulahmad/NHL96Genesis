@@ -109,7 +109,7 @@ if (!romPath) {
 
 // The licensed names: src/teamdata96.asm holds placeholders instead of the NHLPA player names and the NHL team nicknames. The
 // extractor writes the real ones to Extracted/PlayerNames.txt and Extracted/TeamNicknames.txt (one per line, in source order);
-// this copies the file to output/names/ with each placeholder replaced, and nhl96.asm and the teamdata96 segment stub include
+// this copies the file to output/obj/names/ with each placeholder replaced, and nhl96.asm and the teamdata96 segment stub include
 // the copy. A name must have the length of its placeholder (the Player macro writes the row length). Player rows are replaced
 // in order; a nickname placeholder is 'N' + its two-digit number in TeamNicknames.txt, padded with '_'.
 function writeNames() {
@@ -117,7 +117,7 @@ function writeNames() {
     const players = read('PlayerNames.txt'), nicks = read('TeamNicknames.txt');
     const fail = (msg) => { console.error('names: ' + msg); console.error('*** BUILD STOPPED: the player names could not be put back ***'); process.exit(1); };
     let p = 0;
-    const outDir = path.join(ROOT, 'output', 'names');
+    const outDir = path.join(ROOT, 'output', 'obj', 'names');
     fs.mkdirSync(outDir, { recursive: true });
     const out = fs.readFileSync(path.join(ROOT, 'src', 'teamdata96.asm'), 'latin1')
         .replace(/^([ \t]*Player[ \t]+')((?:[^']|'')*)(')([^\r\n]*)/gm, (m, a, ph, z, rest) => {
@@ -135,7 +135,7 @@ function writeNames() {
         });
     fs.writeFileSync(path.join(outDir, 'teamdata96.asm'), out, 'latin1');
     if (p !== players.length) fail(`PlayerNames.txt has ${players.length} names, src/teamdata96.asm has ${p} Player rows`);
-    console.log(`prebuild: ${p} player names, ${nicks.length} team nicknames -> output/names/`);
+    console.log(`prebuild: ${p} player names, ${nicks.length} team nicknames -> output/obj/names/`);
 }
 
 // 2. Extracted/ assets: extract again if missing or incomplete.

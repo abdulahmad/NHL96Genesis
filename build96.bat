@@ -18,7 +18,7 @@ if not defined NHL_PREBUILD_DONE (
 @REM echo Using checksum=%checksum%
 
 REM Create the output directory
-if not exist "%workspaceFolder%output" mkdir "%workspaceFolder%output"
+if not exist "%workspaceFolder%output\obj" mkdir "%workspaceFolder%output\obj"
 
 REM Change to the workspace src directory
 cd /d "%workspaceFolder%src"
@@ -35,7 +35,7 @@ REM Run the assembler with all flags
   /p /m /g ^
   /o d- /o s- /o r+ /o l+ /o l. /o ow+ /o op- /o os+ /o oz+ /o omq- /o oaq+ /o osq+ ^
   %checksumFlag% ^
-  "%workspaceFolder%src\nhl96.asm,%workspaceFolder%output\nhl96.bin,%workspaceFolder%output\nhl96,%workspaceFolder%output\nhl96" ^
-  > "%workspaceFolder%output\Build96.log"
+  "%workspaceFolder%src\nhl96.asm,%workspaceFolder%output\obj\nhl96.bin,%workspaceFolder%output\obj\nhl96,%workspaceFolder%output\obj\nhl96" ^
+  > "%workspaceFolder%output\obj\Build96.log"
 
 endlocal

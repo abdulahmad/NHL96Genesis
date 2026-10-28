@@ -14,11 +14,12 @@ say() { echo "$*" >>$sum; [ $quiet = 1 ] && [[ "$*" == *": MATCH"* ]] || echo "$
 # tools/prebuild.js runs here with Linux node (fresh extract, ROM check); the .bat files skip it (no node under wine).
 export NHL_PREBUILD_DONE=1
 rm -rf Extracted; node tools/prebuild.js retail >output/prebuild.log 2>&1 || { say "PREBUILD FAIL (output/prebuild.log)"; cat output/prebuild.log; exit 1; }
-rm -f output/nhl96.bin output/modified_nhl96.bin
+rm -f output/obj/nhl96.bin output/obj/modified_nhl96.bin output/modified_nhl96.bin
 wine cmd /c "set checksum=1&& build96.bat" >output/top.log 2>&1
-grep -qP '^[1-9]\d* error' output/Build96.log && { say "TOP ERRORS in output/Build96.log"; fail=1; }
-[ -s output/nhl96.bin ] || { say "TOP NO BIN"; fail=1; }
-node tools/fixopcodes.js "output/nhl96 .lst" output/nhl96.bin >>output/top.log 2>&1
+grep -qP '^[1-9]\d* error' output/obj/Build96.log && { say "TOP ERRORS in output/obj/Build96.log"; fail=1; }
+[ -s output/obj/nhl96.bin ] || { say "TOP NO BIN"; fail=1; }
+node tools/fixopcodes.js "output/obj/nhl96 .lst" output/obj/nhl96.bin >>output/top.log 2>&1
+mv -f output/obj/modified_nhl96.bin output/
 r=$(node tools/verifyRom.js output/modified_nhl96.bin retail 2>&1 | head -1); say "ROM: $r"; [[ $r == MATCH* ]] || fail=1
 for s in $(node -e 'for(const k in require("./package.json").scripts) if(/^seg:/.test(k)) console.log(k.slice(4))'); do
   org=$(node -e "console.log(require('./package.json').scripts['seg:$s'].match(/verifySegment.js \S+ (\S+)/)[1])")
