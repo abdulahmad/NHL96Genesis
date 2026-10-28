@@ -45,7 +45,7 @@ The prebuild check (`tools/prebuild.js`) runs first in every one of them. It che
 
 ## 3. Work loop
 
-Every row of the ROM map is matched. The next work is the finish plan in `docs/align95_plan.md`: names, then symbols and comments, inside the files that already exist (`PROMPT.md`). Do not put a `dc.b` dump back in place of an `incbin`, and do not add a numbered `code96` or `data96` file. After a change: MATCH, commit, push, update `docs/HANDOFF.md`.
+Every row of the ROM map is matched. The next work is the finish plan in `docs/align95_plan.md`: names, then symbols and comments, inside the files that already exist (`PROMPT.md`). Do not put a `dc.b` dump back in place of an `incbin`, and do not add a numbered `code96` or `data96` file. After a change: MATCH, commit, push, update `docs/HANDOFF.md`. Game-mechanics notes: `docs/difficulty_skill.md` (96 options skill level).
 
 ## 4. When stuck
 
