@@ -621,27 +621,27 @@ DrawField							;Draw one create player field: label then value, all registers s
 	dc.b	$4C,$DF,$03,$03,$4E,$75
 
 SkaterSkillLabels					;The skater rating labels
-	String	$FD,$02,$FC,$0D,'Agility',$FD,$13
-	String	$FD,$02,$FC,$0E,'Speed',$FD,$13
-	String	$FD,$02,$FC,$0F,'Off.Awareness',$FD,$13
-	String	$FD,$02,$FC,$10,'Def.Awareness',$FD,$13
-	String	$FD,$02,$FC,$11,'Shot Power',$FD,$13
-	String	$FD,$02,$FC,$12,'Checking Ability',$FD,$13
-	String	$FD,$02,$FC,$13,'Stick Handling',$FD,$13
-	String	$FD,$02,$FC,$14,'Shot Accuracy',$FD,$13
-	String	$FD,$02,$FC,$15,'Endurance',$FD,$13
-	String	$FD,$02,$FC,$16,'Pass Accuracy',$FD,$13
+	String	CC_SetX,$02,CC_SetY,$0D,'Agility',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$0E,'Speed',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$0F,'Off.Awareness',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$10,'Def.Awareness',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$11,'Shot Power',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$12,'Checking Ability',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$13,'Stick Handling',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$14,'Shot Accuracy',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$15,'Endurance',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$16,'Pass Accuracy',CC_SetX,$13
 
 GoalieSkillLabels					;The goalie rating labels
-	String	$FD,$02,$FC,$0D,'Agility',$FD,$13
-	String	$FD,$02,$FC,$0E,'Speed',$FD,$13
-	String	$FD,$02,$FC,$0F,'Off.Awareness',$FD,$13
-	String	$FD,$02,$FC,$10,'Def.Awareness',$FD,$13
-	String	$FD,$02,$FC,$11,'Puck Control',$FD,$13
-	String	$FD,$02,$FC,$12,'Stick Right',$FD,$13
-	String	$FD,$02,$FC,$13,'Stick Left',$FD,$13
-	String	$FD,$02,$FC,$14,'Glove Right',$FD,$13
-	String	$FD,$02,$FC,$15,'Glove Left',$FD,$13
+	String	CC_SetX,$02,CC_SetY,$0D,'Agility',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$0E,'Speed',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$0F,'Off.Awareness',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$10,'Def.Awareness',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$11,'Puck Control',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$12,'Stick Right',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$13,'Stick Left',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$14,'Glove Right',CC_SetX,$13
+	String	CC_SetX,$02,CC_SetY,$15,'Glove Left',CC_SetX,$13
 
 LastFieldRow						;d4 = the last row index for the player type (CreateType) Code the listing
 									;does not decode: kept as bytes
@@ -1147,7 +1147,7 @@ DrawFreeAgents						;Draw visible free agent rows (pos, name, rating) Code the l
 	dc.b	$4E,$B9,$00,$01,$BC,$84,$61,$00,$FF,$52,$60,$D4
 
 FreeAgentMsgText					;SignFreeAgents: the message when there are no free agents
-	String	$8F,$18,$06,'No free agents.',$8F,$17,$07,'Press Any button',$8F,$16,$08,'to exit.'
+	String	CC_Font1Pal3Pri,$18,$06,'No free agents.',CC_Font1Pal3Pri,$17,$07,'Press Any button',CC_Font1Pal3Pri,$16,$08,'to exit.'
 	dc.b	$4E,$75
 
 BuildFreeAgentList					;Copy the free agent list from save RAM to a work table and an index list
@@ -1318,7 +1318,7 @@ DrawReleaseRoster					;Draw the visible roster rows (pos letter, name, rating) w
 	dc.b	$D7,$F2,$4E,$B9,$00,$01,$BC,$84,$61,$00,$FF,$52,$60,$D4
 
 ReleaseMsgText						;ReleasePlayers: the message when the free agent list is full
-	String	$8F,$18,$06,'Free agent list',$8F,$17,$07,'is full.',$8F,$16,$08,'Press any button',$8F,$15,$09,'to exit.'
+	String	CC_Font1Pal3Pri,$18,$06,'Free agent list',CC_Font1Pal3Pri,$17,$07,'is full.',CC_Font1Pal3Pri,$16,$08,'Press any button',CC_Font1Pal3Pri,$15,$09,'to exit.'
 	dc.b	$48,$E7,$FF,$FE,$4E,$B9,$00,$01,$57,$B2,$55,$40,$3A,$00,$20,$7C
 	dc.b	$FF,$FF,$3A,$98,$38,$05,$42,$46,$10,$28,$00,$01,$B0,$28,$00,$05
 	dc.b	$6F,$00,$00,$10,$50,$C6,$20,$10,$24,$28,$00,$04,$21,$40,$00,$04

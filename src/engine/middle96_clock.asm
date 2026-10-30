@@ -7,7 +7,7 @@ showclock							;Put the game clock on screen (m:ss), or else queue it (showcloc
 	bne.w	.2
 	move.l	a1,-(sp)
 	jsr	(printz).l
-	String	$BE,$0D,$05
+	String	CC_Font2Pri,$0D,$05
 	move.w	(gameclock).w,d0
 	ext.l	d0
 	divu.w	#$258,d0
@@ -38,7 +38,7 @@ showclock							;Put the game clock on screen (m:ss), or else queue it (showcloc
 	jsr	(PrintClockDigit).l
 	movea.l	(sp)+,a1
 	jsr	(printz).l
-	String	$BD,$0D,$05
+	String	CC_Font3Pri,$0D,$05
 .2
 	rts
 
@@ -208,7 +208,7 @@ ShowBigScore						;The big score of both teams with the EASN logo; in a shootout
 	jsr	(ErasePowerPlayBox).l
 	jsr	(EASNLogo).l
 	jsr	(printbigz2).l
-	String	$F8,$04,$01,$06,$15,$20,$FB,$0F
+	String	CC_SetMapAndPosition,$04,$01,$06,$15,$20,CC_AddX,$0F
 	move.w	(AwGoals).w,d0
 	move.w	#3,d1
 	jsr	(PushNumberWidth).l
@@ -216,7 +216,7 @@ ShowBigScore						;The big score of both teams with the EASN logo; in a shootout
 	jsr	(printbigz2).l
 	String	$3E
 	jsr	(printbigz2).l
-	String	$F8,$04,$01,$06,$17,$20,$FB,$0F
+	String	CC_SetMapAndPosition,$04,$01,$06,$17,$20,CC_AddX,$0F
 	move.w	(HmGoals).w,d0
 	move.w	#3,d1
 	jsr	(PushNumberWidth).l
@@ -226,7 +226,7 @@ ShowBigScore						;The big score of both teams with the EASN logo; in a shootout
 	btst	#0,(gmode2).w
 	beq.w	.0
 	jsr	(printz).l
-	String	$BF,$08,$19
+	String	CC_Font1Pri,$08,$19
 	jsr	(printbigz2).l
 	String	'    shootout    '
 	jsr	(printbigz2).l
@@ -234,7 +234,7 @@ ShowBigScore						;The big score of both teams with the EASN logo; in a shootout
 	bra.w	.1
 .0
 	jsr	(printz).l
-	String	$BF,$08,$19
+	String	CC_Font1Pri,$08,$19
 	movea.l	#ScorePeriodText,a1
 	move.w	(gsp).w,d0
 	jsr	(SkipStrings).l
@@ -243,7 +243,7 @@ ShowBigScore						;The big score of both teams with the EASN logo; in a shootout
 	String	$3E
 .1
 	jsr	(printbigz1).l
-	String	$F8,$04,$01,$07,$15,'<            >',$FD,$08
+	String	CC_SetMapAndPosition,$04,$01,$07,$15,'<            >',CC_SetX,$08
 	move.w	(AwShots+$28).w,d0
 	movea.w	#TeamList,a1
 	asl.w	#2,d0
@@ -254,7 +254,7 @@ ShowBigScore						;The big score of both teams with the EASN logo; in a shootout
 	adda.w	(a1),a1
 	jsr	(printbig1).l
 	jsr	(printbigz1).l
-	String	$F8,$04,$01,$07,$17,'<            >',$FD,$08
+	String	CC_SetMapAndPosition,$04,$01,$07,$17,'<            >',CC_SetX,$08
 	move.w	(tmstruct+$28).w,d0
 	movea.w	#TeamList,a1
 	asl.w	#2,d0
@@ -277,13 +277,13 @@ ClearBigScore						;Erase the big score
 	movem.l	d0-d7/a0-a6,-(sp)
 	bclr	#0,(byte_FFC35A).w
 	jsr	(printz).l
-	String	$BF,$01,$15
+	String	CC_Font1Pri,$01,$15
 	move.w	#$1B,d0
 	move.w	#4,d1
 	move.w	#$7FF,d2
 	jsr	(eraser).l
 	jsr	(printz).l
-	String	$BF,$08,$19
+	String	CC_Font1Pri,$08,$19
 	move.w	#$14,d0
 	move.w	#2,d1
 	move.w	#$7FF,d2

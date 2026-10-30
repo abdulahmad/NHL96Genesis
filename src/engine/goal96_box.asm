@@ -19,12 +19,12 @@ ShowThreeStars						;End of game Stars of the Game box. Waits for RefCnt <= $40 
 	movem.l	(sp)+,d0/a1
 	movem.l	d0-d5/a0-a4,-(sp)
 	bsr.w	printz
-	String	$BF,$02,$0E
+	String	CC_Font1Pri,$02,$0E
 	moveq	#$1C,d0
 	moveq	#9,d1
 	bsr.w	Framer
 	bsr.w	printbigz2
-	String	$F8,$04,$01,$03,$10,'    Stars of the Game     ',$F8,$04,$01,$03,$0F
+	String	CC_SetMapAndPosition,$04,$01,$03,$10,'    Stars of the Game     ',CC_SetMapAndPosition,$04,$01,$03,$0F
 	bsr.w	CalcStarScores
 	move.w	#$12,(printy).w
 	moveq	#2,d2
@@ -106,7 +106,7 @@ ShowInjuryBox						;The injury message (CheckInjury): "Injured player", "Out for
 									;(GetPlayerNumInitial)
 	movem.l	d0-d2/a0-a4,-(sp)
 	bsr.w	printz
-	String	$BF,$0B,$02
+	String	CC_Font1Pri,$0B,$02
 	moveq	#$12,d0
 	moveq	#6,d1
 	bsr.w	Framer
@@ -115,21 +115,21 @@ ShowInjuryBox						;The injury message (CheckInjury): "Injured player", "Out for
 	btst	#5,(sflags7).w
 	bne.w	.0
 	bsr.w	printbigz2
-	String	$F8,$04,$01,$0C,$03,'Injured player  '
+	String	CC_SetMapAndPosition,$04,$01,$0C,$03,'Injured player  '
 	jsr	(printz).l
-	String	$BF,$0C,$06,'Out for period',$BF,$0C,$05
+	String	CC_Font1Pri,$0C,$06,'Out for period',CC_Font1Pri,$0C,$05
 	bra.w	.4
 .0
 	bsr.w	printbigz2
-	String	$F8,$04,$01,$0C,$03,'Injured player  '
+	String	CC_SetMapAndPosition,$04,$01,$0C,$03,'Injured player  '
 	jsr	(printz).l
-	String	$BF,$0C,$06,'Out for game',$BF,$0C,$05
+	String	CC_Font1Pri,$0C,$06,'Out for game',CC_Font1Pri,$0C,$05
 	bra.w	.4
 .1
 	bsr.w	printbigz2
-	String	$F8,$04,$01,$0C,$03,'Injured player  '
+	String	CC_SetMapAndPosition,$04,$01,$0C,$03,'Injured player  '
 	jsr	(printz).l
-	String	$BF,$0C,$06,'Out for '
+	String	CC_Font1Pri,$0C,$06,'Out for '
 	move.w	(injurygames).w,d0
 	move.w	#1,d1
 	jsr	(PushNumberWidth).l
@@ -144,14 +144,14 @@ ShowInjuryBox						;The injury message (CheckInjury): "Injured player", "Out for
 	String	' games'
 .3
 	jsr	(printz).l
-	String	$BF,$0C,$05
+	String	CC_Font1Pri,$0C,$05
 .4
 	bsr.w	GetPlayerNumInitial
 	bsr.w	print
 	btst	#0,(puck_pflags2).w
 	beq.w	.5
 	bsr.w	printz
-	String	$BF,$14,$06,'the game'
+	String	CC_Font1Pri,$14,$06,'the game'
 .5
 	movem.l	(sp)+,d0-d2/a0-a4
 	rts
@@ -169,7 +169,7 @@ PenaltyShotBox						;In a shootout ShootoutModeBox; else the "PENALTY SHOT!" box
 .0
 	jsr	(prefmes).l
 	bsr.w	printz
-	String	$BF,$06,$02
+	String	CC_Font1Pri,$06,$02
 	moveq	#$15,d0
 	moveq	#8,d1
 .1
@@ -192,7 +192,7 @@ PenaltyShotBox						;In a shootout ShootoutModeBox; else the "PENALTY SHOT!" box
 	bsr.w	FormatPlayerNumInitial
 	bsr.w	print
 	bsr.w	printz
-	String	$BF,$07,$07
+	String	CC_Font1Pri,$07,$07
 	movem.l	a1/a3,-(sp)
 	move.w	(pspenalty).w,d0
 	movea.l	#Penaltylist,a1
@@ -201,7 +201,7 @@ PenaltyShotBox						;In a shootout ShootoutModeBox; else the "PENALTY SHOT!" box
 	bsr.w	print
 	movem.l	(sp)+,a1/a3
 	bsr.w	printz
-	String	' by',$BF,$07,$08
+	String	' by',CC_Font1Pri,$07,$08
 	move.w	(BA_Checker_Offset).w,d0
 	movea.l	#AwShots,a2
 	tst.w	(BA_Team).w
@@ -214,7 +214,7 @@ PenaltyShotBox						;In a shootout ShootoutModeBox; else the "PENALTY SHOT!" box
 	rts
 
 PenShotBigTxt						;PenaltyShotBox big text
-	String	$F8,$04,$01,$07,$03,'   PENALTY SHOT    ',$F8,$04,$01,$07,$05
+	String	CC_SetMapAndPosition,$04,$01,$07,$03,'   PENALTY SHOT    ',CC_SetMapAndPosition,$04,$01,$07,$05
 
 ShowGoalBox							;Goal box: close both line change boxes (lcfound2), then the scorer and
 									;the assists from ScoreSum (PrintPlayerGoals / PrintPlayerAssists), the
@@ -232,7 +232,7 @@ ShowGoalBox							;Goal box: close both line change boxes (lcfound2), then the s
 	movea.w	#(ScoreSum-6-M68K_RAM),a4
 	adda.w	(ScoreSumbytes).w,a4
 	bsr.w	printz
-	String	$BF,$0B,$02
+	String	CC_Font1Pri,$0B,$02
 	moveq	#$13,d0
 	move.w	#5,d1
 	tst.b	4(a4)
@@ -299,7 +299,7 @@ ShowGoalBox							;Goal box: close both line change boxes (lcfound2), then the s
 	bclr	#5,(sflags4).w
 	bne.w	.6
 	bsr.w	printz
-	String	$BF,$0E,$06,'Assist by:',$BF,$0C,$07
+	String	CC_Font1Pri,$0E,$06,'Assist by:',CC_Font1Pri,$0C,$07
 	move.w	d0,-(sp)
 	bsr.w	FormatPlayerName
 	bsr.w	print
@@ -309,7 +309,7 @@ ShowGoalBox							;Goal box: close both line change boxes (lcfound2), then the s
 	move.b	5(a4),d0
 	bmi.w	.6
 	bsr.w	printz
-	String	$BF,$0C,$08
+	String	CC_Font1Pri,$0C,$08
 	move.w	d0,-(sp)
 	bsr.w	FormatPlayerName
 	bsr.w	print
@@ -321,17 +321,17 @@ ShowGoalBox							;Goal box: close both line change boxes (lcfound2), then the s
 	rts
 
 GoalBigTxt							;printbig Strings for ShowGoalBox: GOAL!, then HAT TRICK!
-	String	$F8,$04,$01,$0C,$03,'      GOAL!      ',$F8,$04,$01,$0C,$05
-	String	$F8,$04,$01,$0C,$03,'   HAT TRICK!    ',$F8,$04,$01,$0C,$05
+	String	CC_SetMapAndPosition,$04,$01,$0C,$03,'      GOAL!      ',CC_SetMapAndPosition,$04,$01,$0C,$05
+	String	CC_SetMapAndPosition,$04,$01,$0C,$03,'   HAT TRICK!    ',CC_SetMapAndPosition,$04,$01,$0C,$05
 
 PPGoalBigTxt						;The same after a power play: PP GOAL!, then HAT TRICK!
-	String	$F8,$04,$01,$0C,$03,'    PP GOAL!     ',$F8,$04,$01,$0C,$05
-	String	$F8,$04,$01,$0C,$03,'   HAT TRICK!    ',$F8,$04,$01,$0C,$05
+	String	CC_SetMapAndPosition,$04,$01,$0C,$03,'    PP GOAL!     ',CC_SetMapAndPosition,$04,$01,$0C,$05
+	String	CC_SetMapAndPosition,$04,$01,$0C,$03,'   HAT TRICK!    ',CC_SetMapAndPosition,$04,$01,$0C,$05
 
 box									;Fill a $14 x $C rectangle at printz position
 									;$FF,$B,2 with char $7FF (eraser)
 	bsr.w	printz
-	String	$FF,$0B,$02
+	String	CC_Font1,$0B,$02
 	moveq	#$14,d0
 	moveq	#$C,d1
 	move.l	#$7FF,d2

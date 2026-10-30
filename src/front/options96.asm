@@ -255,13 +255,13 @@ OptionsScreenSetup					;OptionsScreen: vram, fonts, the screen bitmaps and the r
 	movea.l	#PuckAnimMap+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	jsr	(printsmallz).l
-	String	$FF,$01,$FD,$00,$FC
+	String	CC_SetMap,$01,CC_SetX,$00,CC_SetY
 	moveq	#$28,d0
 	moveq	#$1C,d1
 	move.w	#$7FF,d2
 	jsr	(eraser).l
 	jsr	(printz).l
-	String	$BF,$00,$00
+	String	CC_Font1Pri,$00,$00
 	movea.l	#MainMenuBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -274,7 +274,7 @@ OptionsScreenSetup					;OptionsScreen: vram, fonts, the screen bitmaps and the r
 	moveq	#8,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$BF,$0B,$01
+	String	CC_Font1Pri,$0B,$01
 	movea.l	#MainMenuTitleMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -287,7 +287,7 @@ OptionsScreenSetup					;OptionsScreen: vram, fonts, the screen bitmaps and the r
 	moveq	#8,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$FE,$00,$00
+	String	CC_Font2,$00,$00
 	movea.l	#ControllerBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -341,8 +341,8 @@ OptionsMenuInit						;OptionsScreen: menulist = OptionsMenuList, item 0
 
 OptionsMenuList						;The options menu: each item routine keeps its option in range and returns
 									;its text in a1
-	String	$FE,$07,$F9
-	String	$FE,$05,$F9
+	String	CC_SetAttribute,$07,CC_SetFont
+	String	CC_SetAttribute,$05,CC_SetFont
 	dc.l	PlayModeItem,RostersItem,PerLenItem,GoalieItem,UserRecItem
 	dc.l	PenaltyItem,LineItem,FightingItem,SkillItem,-1
 
@@ -427,7 +427,7 @@ PlayModeItem						;Options menu row: play mode
 	dc.b	$D7,$F2,$4E,$75
 
 NotApplicableText					;Options menu: an option the play mode does not use
-	String	$FE,$03,'not applicable    ',$FE,$07
+	String	CC_SetAttribute,$03,'not applicable    ',CC_SetAttribute,$07
 
 RostersText							;Options menu: rosters
 	String	'with trades       '
@@ -611,7 +611,7 @@ OptionsAnimFrame					;OptionsScreen: draw frame optanimframe of the animation (P
 									;7 tiles)
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printz).l
-	String	$BF,$1F,$01
+	String	CC_Font1Pri,$1F,$01
 	move.w	(word_FFB8C4).w,d4
 	movea.l	#PuckAnimMap,a0
 	movea.l	a0,a1

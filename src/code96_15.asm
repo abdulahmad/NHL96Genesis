@@ -184,7 +184,7 @@ HiScoreScreen						;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up t
 	dbf	d1,.loop
 	jsr	(setVram_0).l
 	jsr	(printz).l
-	String	$BE,$0E,$03
+	String	CC_Font2Pri,$0E,$03
 	movea.l	#HiScoreBgMap,a2
 	movea.l	a2,a0
 	movea.l	a2,a1
@@ -198,7 +198,7 @@ HiScoreScreen						;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up t
 	moveq	#$F,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$BE,$10,$10
+	String	CC_Font2Pri,$10,$10
 	movea.l	#HiScoreImg,a2
 	movea.l	a2,a0
 	movea.l	a2,a1

@@ -32,7 +32,7 @@ NameEntryScreen						;Name entry screen for pad slot a5: the name log, then edit
 .loop
 	bsr.w	GetNameLength
 	jsr	(printz).l
-	String	$8F,$04,$14
+	String	CC_Font1Pal3Pri,$04,$14
 	tst.w	(NameEntryMode).w
 	beq.w	.0
 	movea.l	#NameEntryBuf,a1
@@ -139,7 +139,7 @@ NameEntryScreen						;Name entry screen for pad slot a5: the name log, then edit
 	bra.w	.loop
 .4
 	jsr	(printcurz).l
-	String	$8F,$03,$15
+	String	CC_Font1Pal3Pri,$03,$15
 	add.w	d4,(printx).w
 	jsr	(printcurz).l
 	String	'   '
@@ -180,7 +180,7 @@ NameEntryScreen						;Name entry screen for pad slot a5: the name log, then edit
 	bsr.w	PrintCurLetter
 	move.w	(sp)+,(smallfontchars).w
 	jsr	(printsmallz).l
-	String	$FE,$07
+	String	CC_SetAttribute,$07
 	movea.l	#NameEntryBuf,a0
 	movea.l	#CreateLetterGrid,a1
 	move.b	(a1,d5.w),d0
@@ -193,13 +193,13 @@ NameEntryScreen						;Name entry screen for pad slot a5: the name log, then edit
 .6
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printz).l
-	String	$8F,$01,$11
+	String	CC_Font1Pal3Pri,$01,$11
 	move.w	#$15,d0
 	move.w	#7,d1
 	move.w	#$7FF,d2				;blank char
 	jsr	(eraser).l
 	jsr	(printz).l
-	String	$8F,$17,$0D
+	String	CC_Font1Pal3Pri,$17,$0D
 	move.w	#$10,d0
 	move.w	#$B,d1
 	move.w	#$7FF,d2				;blank char
@@ -207,7 +207,7 @@ NameEntryScreen						;Name entry screen for pad slot a5: the name log, then edit
 	bchg	#0,(NameEntryMode+1).w
 	bne.w	.20
 	jsr	(printz).l
-	String	$8F,$1A,$0F
+	String	CC_Font1Pal3Pri,$1A,$0F
 	movea.l	#CreateLetterGrid,a0
 	moveq	#2,d0
 .7
@@ -223,7 +223,7 @@ NameEntryScreen						;Name entry screen for pad slot a5: the name log, then edit
 	subi.w	#$A,(printx).w
 	dbf	d0,.7
 	jsr	(printcurz).l
-	String	$8F,$17,$13,'{}[]=new letter'
+	String	CC_Font1Pal3Pri,$17,$13,'{}[]=new letter'
 	move.w	#$17,(printx).w
 	addq.w	#1,(printy).w
 	move.w	(printx).w,-(sp)
@@ -251,7 +251,7 @@ NameEntryScreen						;Name entry screen for pad slot a5: the name log, then edit
 	bsr.w	GetLogName
 .21
 	jsr	(printz).l
-	String	$8F,$01,$11
+	String	CC_Font1Pal3Pri,$01,$11
 	move.w	#$15,d0
 	move.w	#7,d1
 .22
@@ -259,7 +259,7 @@ NameEntryScreen						;Name entry screen for pad slot a5: the name log, then edit
 	jsr	(eraser).l
 .23
 	jsr	(printz).l
-	String	$8F,$1A,$0F
+	String	CC_Font1Pal3Pri,$1A,$0F
 	move.w	#$A,d0
 	move.w	#3,d1
 .24
@@ -272,11 +272,11 @@ NameEntryScreen						;Name entry screen for pad slot a5: the name log, then edit
 NameEntryHelp						;Name entry: name log key help text
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printcurz).l
-	String	$8F,$03,$13,'{}=select name'
+	String	CC_Font1Pal3Pri,$03,$13,'{}=select name'
 	jsr	(printcurz).l
-	String	$8F,$03,$14,'b=enter/edit name'
+	String	CC_Font1Pal3Pri,$03,$14,'b=enter/edit name'
 	jsr	(printcurz).l
-	String	$8F,$03,$15,'start=use name'
+	String	CC_Font1Pal3Pri,$03,$15,'start=use name'
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
@@ -334,7 +334,7 @@ FindLetter							;d0 = index of letter d0 in the letter grid, $1E when not found
 
 PrintNameCursor						;Name entry: position the name cursor, " < " with NameEntryMode set
 	jsr	(printz).l
-	String	$8F,$03,$15
+	String	CC_Font1Pal3Pri,$03,$15
 	add.w	d4,(printx).w
 	tst.w	(NameEntryMode).w
 	beq.w	rtsNameCursor
@@ -357,7 +357,7 @@ PrintCurLetter						;Name entry: print grid letter d5 when the cursor is on
 
 LetterGridPos						;Name entry: printx / printy of grid letter d5 (10 a row)
 	jsr	(printz).l
-	String	$8F,$1A,$0F
+	String	CC_Font1Pal3Pri,$1A,$0F
 	move.w	d5,d0
 	ext.l	d0
 	divu.w	#$A,d0
@@ -367,10 +367,10 @@ LetterGridPos						;Name entry: printx / printy of grid letter d5 (10 a row)
 	rts
 
 EnterNameTxt						;Name entry prompt for an empty name log slot
-	String	$8F,$01,$12,'  Enter new name: '
+	String	CC_Font1Pal3Pri,$01,$12,'  Enter new name: '
 
 SelectNameTxt						;Name entry prompt for a used name log slot
-	String	$8F,$01,$12,'Select or replace:'
+	String	CC_Font1Pal3Pri,$01,$12,'Select or replace:'
 
 PrintNameLog						;Name entry: print the 7-row name log list
 	movem.l	d0-d7/a0-a6,-(sp)
@@ -378,7 +378,7 @@ PrintNameLog						;Name entry: print the 7-row name log list
 	move.w	(namelogsel).w,-(sp)
 	move.w	(namelogsel).w,d6
 	jsr	(printcurz).l
-	String	$8F,$01,$0A
+	String	CC_Font1Pal3Pri,$01,$0A
 	move.w	#6,d7
 	move.w	#1,(namelogsel).w
 	movea.l	#$FFFFBF54,a1
@@ -393,7 +393,7 @@ PrintNameLog						;Name entry: print the 7-row name log list
 	bsr.w	PrintNameField
 	move.w	(sp)+,(smallfontchars).w
 	jsr	(printsmallz).l
-	String	$FE,$07
+	String	CC_SetAttribute,$07
 	move.w	(sp)+,(printx).w
 	addq.w	#1,(printy).w
 	addq.w	#1,(namelogsel).w
@@ -675,13 +675,13 @@ NameEntryGfx						;Name entry: vram, fonts, the screen bitmaps, the pad icon
 	jsr	(DecompressGraphicsPlain).l
 	bset	#2,(sflags11).w
 	jsr	(printsmallz).l
-	String	$FF,$01,$FD,$00,$FC
+	String	CC_SetMap,$01,CC_SetX,$00,CC_SetY
 	moveq	#$28,d0
 	moveq	#$1C,d1
 	move.w	#$7FF,d2
 	jsr	(eraser).l
 	jsr	(printcurz).l
-	String	$BF,$00,$00
+	String	CC_Font1Pri,$00,$00
 	movea.l	#NameEntryBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -694,7 +694,7 @@ NameEntryGfx						;Name entry: vram, fonts, the screen bitmaps, the pad icon
 	moveq	#8,d5
 	jsr	(dobitmap).l
 	jsr	(printcurz).l
-	String	$BF,$0B,$01
+	String	CC_Font1Pri,$0B,$01
 	movea.l	#NameEntryTitleMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -707,7 +707,7 @@ NameEntryGfx						;Name entry: vram, fonts, the screen bitmaps, the pad icon
 	moveq	#8,d5
 	jsr	(dobitmap).l
 	jsr	(printcurz).l
-	String	$FE,$00,$00
+	String	CC_Font2,$00,$00
 	movea.l	#IceBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -726,7 +726,7 @@ NameEntryGfx						;Name entry: vram, fonts, the screen bitmaps, the pad icon
 	add.w	d0,d0
 	movea.l	(a0,d0.w),a0
 	jsr	(printz).l
-	String	$BF,$1A,$09
+	String	CC_Font1Pri,$1A,$09
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -738,7 +738,7 @@ NameEntryGfx						;Name entry: vram, fonts, the screen bitmaps, the pad icon
 	moveq	#2,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$BF,$17,$05
+	String	CC_Font1Pri,$17,$05
 	move.w	(HomeTeam).w,d7
 	tst.w	(nameentryvis).w
 	beq.w	.0
@@ -746,7 +746,7 @@ NameEntryGfx						;Name entry: vram, fonts, the screen bitmaps, the pad icon
 .0
 	jsr	(DrawSetupTeamBlock).l
 	jsr	(printbigz).l
-	String	$F8,$04,$01,$04,$05,'name',$FD,$0C,'w   l   t'
+	String	CC_SetMapAndPosition,$04,$01,$04,$05,'name',CC_SetX,$0C,'w   l   t'
 	rts
 
 NameEntryPadIcons					;NameEntryGfx: the pad icon map of each pad slot
@@ -757,7 +757,7 @@ PrintNameLogRecords					;Name entry: the record columns of the 7 name log rows (
 	movea.l	#setupvalues,a0
 	move.w	#6,d7
 	jsr	(printz).l
-	String	$8F,$0B,$0A
+	String	CC_Font1Pal3Pri,$0B,$0A
 .0
 	move.w	8(a0),d0
 .1

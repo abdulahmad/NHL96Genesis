@@ -20,20 +20,20 @@ TitleScreen							;Title screen: the picture TitleScreenImg and song 0, until st
 	move.w	#0,d0
 	jsr	(setVram).l
 	jsr	(printz).l
-	String	$FF,$00,$00
+	String	CC_Font1,$00,$00
 	moveq	#$28,d0
 	moveq	#$1C,d1
 	move.l	#$7FF,d2
 	jsr	(eraser).l
 	jsr	(printz).l
-	String	$FE,$00,$00
+	String	CC_Font2,$00,$00
 	moveq	#$28,d0
 	moveq	#$1C,d1
 	move.l	#$7FF,d2
 	jsr	(eraser).l
 	move.w	#1,d4
 	jsr	(printz).l
-	String	$FE,$00,$00
+	String	CC_Font2,$00,$00
 	movea.l	#TitleScreenImg,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -97,13 +97,13 @@ CreditsScreen						;The legal and credits pages (CreditsList) over three picture
 	move.w	#0,d0
 	jsr	(setVram).l
 	jsr	(printz).l
-	String	$FF,$00,$00
+	String	CC_Font1,$00,$00
 	moveq	#$28,d0
 	moveq	#$1C,d1
 	move.l	#$7FF,d2
 	jsr	(eraser).l
 	jsr	(printz).l
-	String	$FE,$00,$00
+	String	CC_Font2,$00,$00
 	moveq	#$28,d0
 	moveq	#$1C,d1
 	move.l	#$7FF,d2
@@ -114,7 +114,7 @@ CreditsScreen						;The legal and credits pages (CreditsList) over three picture
 	jsr	(DecompressGraphicsPlain).l
 	move.l	#RosterFont,(smallfontptr).w
 	jsr	(printz).l
-	String	$FE,$00,$00
+	String	CC_Font2,$00,$00
 	movea.l	#CreditsBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -127,7 +127,7 @@ CreditsScreen						;The legal and credits pages (CreditsList) over three picture
 	moveq	#$F,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$FF,$01,$0E
+	String	CC_Font1,$01,$0E
 	movea.l	#NHLShieldMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -140,7 +140,7 @@ CreditsScreen						;The legal and credits pages (CreditsList) over three picture
 	moveq	#0,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$FF,$02,$00
+	String	CC_Font1,$02,$00
 	movea.l	#NHLPALogoMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -190,20 +190,20 @@ CreditsScreen						;The legal and credits pages (CreditsList) over three picture
 PrintCreditsPage					;Print the CreditsList page at setupvalues, one String a row up to the
 									;empty String, then step setupvalues
 	jsr	(printz).l
-	String	$AF,$10,$01
+	String	CC_Font1Pal1Pri,$10,$01
 	moveq	#$18,d0
 	moveq	#$1B,d1
 	move.l	#$7FF,d2
 	jsr	(eraser).l
 	movea.l	(setupvalues).w,a1
 	jsr	(printsmallz).l
-	String	$F8,$05,$01,$10,$01
+	String	CC_SetMapAndPosition,$05,$01,$10,$01
 .0
 	cmpi.w	#2,(a1)
 	beq.w	.1
 	jsr	(printsmall).l
 	jsr	(printsmallz).l
-	String	$FD,$10,$FA,$01
+	String	CC_SetX,$10,CC_AddY,$01
 	bra.s	.0
 .1
 	addq.l	#2,a1
@@ -388,7 +388,7 @@ CupCelebrationSetup					;CupCelebration: vram, the team and rink palettes, the r
 	cmp.w	(Vcount).w,d0
 	beq.s	.loop2
 	jsr	(printz).l
-	String	$FF,$06,$0C
+	String	CC_Font1,$06,$0C
 	move.w	(ExtraChars).w,d4
 	movea.l	#unk_1D5420,a0
 	movea.l	a0,a1

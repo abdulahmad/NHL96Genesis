@@ -4,7 +4,7 @@
 AdrErr								;Vector 3: "Address Error", the access address and the pc (crash)
 	move	#$2700,sr
 	jsr	(printcurz).l
-	String	$BD,$00,$00,'Address Error'
+	String	CC_Font3Pri,$00,$00,'Address Error'
 	move.l	$A(sp),d0
 	move.l	2(sp),d1
 	bra.w	crash
@@ -12,7 +12,7 @@ AdrErr								;Vector 3: "Address Error", the access address and the pc (crash)
 InvOpCode							;Vector 4: "Illegal Instruction" and the pc (crash)
 	move	#$2700,sr
 	bsr.w	printcurz
-	String	$BD,$00,$00,'Illegal Instruction'
+	String	CC_Font3Pri,$00,$00,'Illegal Instruction'
 	move.l	2(sp),d0
 	move.l	d0,d1
 	bra.w	crash
@@ -20,7 +20,7 @@ InvOpCode							;Vector 4: "Illegal Instruction" and the pc (crash)
 DivBy0								;Vector 5: "Division by zero" and the pc, falls into crash
 	move	#$2700,sr
 	bsr.w	printcurz
-	String	$BD,$00,$00,'Division by zero'
+	String	CC_Font3Pri,$00,$00,'Division by zero'
 	move.l	2(sp),d0
 	move.l	d0,d1
 

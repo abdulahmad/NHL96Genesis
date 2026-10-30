@@ -193,7 +193,7 @@ chkprogress							;Control the progress of the ref and the game through penalty 
 	bclr	#sf2drec,(sflags2).w
 	bclr	#7,(gmode2).w
 	bsr.w	printz
-	String	$FF,$03,$02
+	String	CC_Font1,$03,$02
 	moveq	#$1B,d0
 	moveq	#8,d1
 	btst	#0,(gmode2).w
@@ -644,7 +644,7 @@ UpdatePA							;Animate the ref in the ref window (RefCnt, SetPA2)
 	move.w	#$7FFF,(penmsgtimer).w
 	bsr.w	ErasePenaltyMessage
 	bsr.w	printz
-	String	$BF,$11,$0B
+	String	CC_Font1Pri,$11,$0B
 	bsr.w	GetPlayerName
 	move.w	(a1),d0
 	lsr.w	#1,d0
@@ -765,7 +765,7 @@ prefmes								;Print the penalty message: the player, the penalty and its lengt
 	tst.w	d0
 	bpl.w	.0
 	bsr.w	printz
-	String	$BF,$00,$0A
+	String	CC_Font1Pri,$00,$0A
 	moveq	#$D,d0
 	moveq	#3,d1
 	move.w	#$7FF,d2
@@ -773,7 +773,7 @@ prefmes								;Print the penalty message: the player, the penalty and its lengt
 	bra.w	.8
 .0
 	bsr.w	printz
-	String	$BF,$05,$0A
+	String	CC_Font1Pri,$05,$0A
 	movea.l	#Penaltylist,a1
 	adda.w	(a1,d0.w),a1
 	addq.w	#2,a1
@@ -808,12 +808,12 @@ prefmes								;Print the penalty message: the player, the penalty and its lengt
 .4
 	move.w	d0,-(sp)
 	jsr	(printz).l
-	String	$BF,$0B,$02
+	String	CC_Font1Pri,$0B,$02
 	move.w	#$14,d0
 	move.w	#8,d1
 	jsr	(Framer).l
 	jsr	(printbigz2).l
-	String	$F8,$04,$01,$0C,$03,'                  '
+	String	CC_SetMapAndPosition,$04,$01,$0C,$03,'                  '
 	move.w	#$15,(printx).w
 	move.w	#3,(printy).w
 	move.w	(sp)+,d0
@@ -843,14 +843,14 @@ prefmes								;Print the penalty message: the player, the penalty and its lengt
 	move.b	$67(a1),d0
 	jsr	(GetPlayerNumInitial).l
 	jsr	(printz).l
-	String	$BF,$0C,$06
+	String	CC_Font1Pri,$0C,$06
 	cmpi.b	#$20,2(a1)
 	beq.w	.7
 	addq.w	#1,(printx).w
 .7
 	jsr	(print).l
 	jsr	(printz).l
-	String	$BF,$11,$05,'penalty'
+	String	CC_Font1Pri,$11,$05,'penalty'
 	move.w	#$D,(printx).w
 	movea.l	$1E(a2),a1
 	adda.w	4(a1),a1
@@ -859,7 +859,7 @@ prefmes								;Print the penalty message: the player, the penalty and its lengt
 	jsr	(printz).l
 	String	$2E
 	jsr	(printz).l
-	String	$BF,$0D,$07
+	String	CC_Font1Pri,$0D,$07
 	move.w	(sp)+,d0
 	lsr.w	#8,d0
 	andi.w	#$FF,d0
@@ -884,7 +884,7 @@ PenaltyTimeTxt						;prefmes: the penalty lengths
 
 ErasePenaltyMessage					;Erase the penalty message box prefmes draws
 	jsr	(printz).l
-	String	$BF,$0B,$02
+	String	CC_Font1Pri,$0B,$02
 	move.w	#$14,d0
 	move.w	#8,d1
 	move.w	#$7FF,d2
@@ -1161,7 +1161,7 @@ updatepwrplay						;The power play box: the team and the time left
 	bsr.w	DrawPowerPlayBox
 .6
 	jsr	(printz).l
-	String	$BF,$17,$19
+	String	CC_Font1Pri,$17,$19
 	jsr	(printbigz1).l
 	String	$2B
 	bsr.w	GetLowestPen
@@ -1177,7 +1177,7 @@ updatepwrplay						;The power play box: the team and the time left
 	movea.w	#(mesarea-M68K_RAM),a3
 	move.w	#2,(a3)
 	bsr.w	appendz
-	String	$BF,$14,$19
+	String	CC_Font1Pri,$14,$19
 	adda.w	4(a0),a0
 	adda.w	(a0),a0
 	movea.l	a0,a1
@@ -1185,7 +1185,7 @@ updatepwrplay						;The power play box: the team and the time left
 	movea.w	a3,a1
 	bsr.w	print
 	bsr.w	printz
-	String	$BF,$14,$1A,'PP'
+	String	CC_Font1Pri,$14,$1A,'PP'
 	bset	#dfclock,(disflags).w
 	rts
 
@@ -1199,7 +1199,7 @@ updatepwrplay						;The power play box: the team and the time left
 
 ErasePowerPlayBox					;Erase the power play box
 	jsr	(printz).l
-	String	$BF,$13,$18
+	String	CC_Font1Pri,$13,$18
 	move.w	#$C,d0
 	move.w	#4,d1
 	move.w	#$7FF,d2
@@ -1208,7 +1208,7 @@ ErasePowerPlayBox					;Erase the power play box
 
 DrawPowerPlayBox					;Draw the power play box frame (Framer)
 	jsr	(printz).l
-	String	$BF,$13,$18
+	String	CC_Font1Pri,$13,$18
 	move.w	#$C,d0
 	move.w	#4,d1
 	jmp	Framer
@@ -1227,7 +1227,7 @@ printscores1						;The scoreboard redraw: an empty rts in 96
 
 EASNLogo							;Draw the EASN logo
 	bsr.w	printz
-	String	$BF,$01,$15
+	String	CC_Font1Pri,$01,$15
 	movea.l	#EASNmap,a1
 	adda.l	4(a1),a1
 	movea.w	#ZeroLong,a2

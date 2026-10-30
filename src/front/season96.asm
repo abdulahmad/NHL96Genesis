@@ -1085,7 +1085,7 @@ TeamSelectGfx						;Team select video set up: backgrounds, the logos and the fiv
 	move.w	d4,(vislogochars).l
 	addi.w	#$A0,d4
 	jsr	(printsmallz).l
-	String	$FF,$01,$FD,$00,$FC,$00
+	String	CC_SetMap,$01,CC_SetX,$00,CC_SetY,$00
 	moveq	#$28,d0
 	moveq	#$1C,d1
 	move.w	#$7FF,d2
@@ -1144,11 +1144,11 @@ TeamSelectGfx						;Team select video set up: backgrounds, the logos and the fiv
 	btst	#7,(GameFlags).w
 	bne.w	.3
 	jsr	(printbigz).l
-	String	$F8,$04,$01,$0E,$10,'EVEN-STRENGTH',$F8,$04,$01,$0F,$12,'POWER-PLAY',$F8,$04,$01,$0D,$14,'PENALTY KILLING',$F8,$04,$01,$0F,$16,'GOALTENDING',$F8,$04,$01,$11,$18,'OVERALL',$00
+	String	CC_SetMapAndPosition,$04,$01,$0E,$10,'EVEN-STRENGTH',CC_SetMapAndPosition,$04,$01,$0F,$12,'POWER-PLAY',CC_SetMapAndPosition,$04,$01,$0D,$14,'PENALTY KILLING',CC_SetMapAndPosition,$04,$01,$0F,$16,'GOALTENDING',CC_SetMapAndPosition,$04,$01,$11,$18,'OVERALL',$00
 	bra.w	.4
 .3
 	jsr	(printbigz).l
-	String	$F8,$04,$01,$12,$06,'EVEN-STRENGTH',$F8,$04,$01,$12,$08,'POWER-PLAY',$F8,$04,$01,$12,$0A,'PENALTY KILLING',$F8,$04,$01,$12,$0C,'GOALTENDING',$F8,$04,$01,$12,$0E,'OVERALL',$00
+	String	CC_SetMapAndPosition,$04,$01,$12,$06,'EVEN-STRENGTH',CC_SetMapAndPosition,$04,$01,$12,$08,'POWER-PLAY',CC_SetMapAndPosition,$04,$01,$12,$0A,'PENALTY KILLING',CC_SetMapAndPosition,$04,$01,$12,$0C,'GOALTENDING',CC_SetMapAndPosition,$04,$01,$12,$0E,'OVERALL',$00
 .4
 	jsr	(RedrawTeamRanks).l
 	move	#$2500,sr
