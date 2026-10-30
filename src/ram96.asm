@@ -1,25 +1,12 @@
 ;	RAM map. Each variable takes its 95G name (or a name from
 ;	what it holds) once the code that uses it shows which it is; the rest keep their IDA names. Define each
 ;	name once.
-SaveRAM				equ	$200000		;the cartridge save RAM (header SRAM range)
-SRSeasonHeader		equ	$82			;save RAM offset: the season header (SetupPlayoffs keeps a copy at
-									;SRSeasonHeaderSave)
-SRPOPairings		equ	$AE			;save RAM offset: the playoff pairings, the team of each seed slot, a word
-									;each (InitPlayoffs)
-SRSeasonHeaderSave	equ	$CE			;save RAM offset: SetupPlayoffs keeps SRSeasonHeader here
-SRPOSlots			equ	$DE			;save RAM offset: the seed slot of each team, a word each (BuildPOSlots)
-SRTeamCounts		equ	$3598		;save RAM offset: 4 bytes a team: +1 the player count, +3 the goalie count
-									;in the low 2 bits
-M68K_RAM			equ	$FFFF0000
 AwardIds			equ	$FFFF0000	;InitPlayoffs: the teams of the two conferences (ConferenceTeams1 at +0,
 									;ConferenceTeams2 at +$14), sorted by SortSeeds. Shares M68K_RAM
-SeedStandings		equ	$FFFF0032	;InitPlayoffs: the standings, 3 bytes a team (ReadStandings)
-SeedPoints			equ	$FFFF0080	;InitPlayoffs: 2 * wins + ties of each team (CalcSeedPoints)
-SeedGames			equ	$FFFF009A	;InitPlayoffs: the wins of each team, the SortSeeds tie break
-									;(CalcSeedPoints)
-SeedCount			equ	$FFFF00B4
-POPairingsTmp		equ	$FFFF00B6	;InitPlayoffs with sflags11 bit 0: the pairings, here instead of save RAM
-									;SRPOPairings
+Z80_RAM				equ	$A00000
+Z80_YM2612			equ	$A04000
+Stack				equ	$FFFFFDFA
+M68K_RAM			equ	$FFFF0000
 word_FF1388			equ	$FFFF1388
 pstatscol			equ	$FFFF1EB2	;SeasonPlayoffStats: the stat column being printed
 byte_FF2710			equ	$FFFF2710
@@ -44,6 +31,7 @@ bigfont1chars		equ	$FFFFB016	;Chars of BigFontMap (printbig1, the clock digits)
 BigFontchars		equ	$FFFFB018
 smallfontchars		equ	$FFFFB01C
 smallfont2chars		equ	$FFFFB01E	;Second small font chars (help lines and highlight)
+smallfontptr		equ	$FFFFBF8A
 energybarchars		equ	$FFFFB020
 rinkvrcset			equ	$FFFFB022	;First vram char of the rink tiles
 animchars			equ	$FFFFB024
@@ -52,9 +40,9 @@ framercset			equ	$FFFFB028
 EASNcset			equ	$FFFFB02A
 awardlogochars		equ	$FFFFB02C	;Awards: chars of the winner team logo
 spritechars			equ	$FFFFB02E	;First vram char of the sprites (setupice)
+ExtraChars			equ	$FFFFB03A
 ReplayIconChars		equ	$FFFFB030	;Vram char of the replay icon
 gamefontchars		equ	$FFFFB038	;First char of the game fonts (LoadSmallFont, LoadBigFonts)
-ExtraChars			equ	$FFFFB03A
 menux				equ	$FFFFB03C	;PrintMenuList2: x of the item list
 menuy				equ	$FFFFB03E	;PrintMenuList2: y of the item list
 printx				equ	$FFFFB040
@@ -65,20 +53,20 @@ printfontset		equ	$FFFFB048
 fodropx				equ	$FFFFB04A
 fodropy				equ	$FFFFB04C
 recbpr				equ	$FFFFB04E
+VBint				equ	$FFFFD244	;vertical blank handler address (VBjsr jumps through it)
 Vcount				equ	$FFFFB052
 OldVcount			equ	$FFFFB054
 repeatdelayframes	equ	$FFFFB056
 asv					equ	$FFFFB058
-lldisp				equ	$FFFFB05A
 periodendtime		equ	$FFFFB05C
 SortCords			equ	$FFFFB05E
 unk_FFB65E			equ	$FFFFB65E
 unk_FFB6DE			equ	$FFFFB6DE
 puckx				equ	$FFFFB75E
-pucky				equ	$FFFFB772
-puckz				equ	$FFFFB776
 puckvx				equ	$FFFFB786
+pucky				equ	$FFFFB772
 puckvy				equ	$FFFFB788
+puckz				equ	$FFFFB776
 puckvz				equ	$FFFFB78A
 byte_FFB7BC			equ	$FFFFB7BC
 puckc				equ	$FFFFB7BE
@@ -86,28 +74,20 @@ puck_pflags2		equ	$FFFFB7C1
 Ylist				equ	$FFFFB85E
 OOlistpos			equ	$FFFFB87E
 OOlist				equ	$FFFFB89E
-lastpuckc			equ	$FFFFB8AE
-padiconchars1		equ	$FFFFB8B0	;ControllerSetupScreen: PadIconMap1 ... 4 chars
-									;(PadIconChars), in game RAM
 Crowdframe			equ	$FFFFB8B0	;The crowd frame (updatecrowdf; saved by
 									;updatereplay). Shares padiconchars1
 Crowdlevel			equ	$FFFFB8B2	;crowd noise level; the controller setup screen keeps padiconchars2 here
-padiconchars2		equ	$FFFFB8B2
-padiconchars3		equ	$FFFFB8B4
-crowdtblidx			equ	$FFFFB8B4	;updatecrowdf: the crowd frame step. Shares padiconchars3
-padiconchars4		equ	$FFFFB8B6
 Crowdcnt			equ	$FFFFB8B6	;updatecrowdf: frames to the next crowd frame. Shares padiconchars4
-padcursorchars		equ	$FFFFB8B8	;ControllerSetupScreen: PadCursorMap chars
 CwdExciteLvl		equ	$FFFFB8B8	;Crowd excitement (StartPer: gamelevel * 16). Shares padcursorchars
 MaxCwdExciteLvl		equ	$FFFFB8BA
 NumCwdExciteLvl		equ	$FFFFB8BC
 SumCwdExciteLvl		equ	$FFFFB8BE
+crowdtblidx			equ	$FFFFB8B4	;updatecrowdf: the crowd frame step. Shares padiconchars3
 Zamx				equ	$FFFFB8C2
 word_FFB8C4			equ	$FFFFB8C4
 optanimframe		equ	$FFFFB8C6	;OptionsScreen: animation frame 0-7
 optanimdelay		equ	$FFFFB8C8	;OptionsScreen: frames to the next animation frame
 DMAList				equ	$FFFFB8CA
-DMAlistend			equ	$FFFFBD2A
 Vpos				equ	$FFFFBD2E
 Oldrow				equ	$FFFFBD30
 Hpos				equ	$FFFFBD32
@@ -118,6 +98,7 @@ wcradiusy			equ	$FFFFBD3A
 palcount			equ	$FFFFBD3C
 palfadenew			equ	$FFFFBD3E
 fofdata2			equ	$FFFFBDBE
+ffonum				equ	8			;objects tied to the rink scroll
 pads				equ	$FFFFBDCA
 Joy1Struct			equ	$FFFFBDE6
 Joy3Struct			equ	$FFFFBE1E
@@ -126,6 +107,8 @@ unk_FFBE72			equ	$FFFFBE72
 unk_FFBE8E			equ	$FFFFBE8E
 PadControlBits		equ	$FFFFBEAA
 padcont				equ	$FFFFBEAE
+ssonum				equ	4			;screen objects not tied to the rink scroll
+ssosize				equ	$14			;bytes per sso object
 sso					equ	$FFFFBEBA
 shotplayer			equ	$FFFFBF0A
 lastplayer			equ	$FFFFBF0C
@@ -159,7 +142,6 @@ pstatsrows			equ	$FFFFBF5C	;SeasonPlayoffStats: rows on screen
 pstatslast			equ	$FFFFBF5E	;SeasonPlayoffStats: last row
 recwins				equ	$FFFFBF7C
 word_FFBF88			equ	$FFFFBF88
-smallfontptr		equ	$FFFFBF8A
 onetimerplayer		equ	$FFFFBFA6
 onetimerflags		equ	$FFFFBFB0
 disflags			equ	$FFFFBFB2
@@ -176,6 +158,7 @@ foy					equ	$FFFFBFE4
 fodir1				equ	$FFFFBFE6
 fodir2				equ	$FFFFBFE8
 collflag			equ	$FFFFBFEE
+lldisp				equ	$FFFFB05A
 word_FFBFF0			equ	$FFFFBFF0
 mesarea				equ	$FFFFBFF2
 TextBuffer			equ	$FFFFBFF4
@@ -185,6 +168,7 @@ ltack				equ	$FFFFC062
 lastsfx				equ	$FFFFC064
 Satt				equ	$FFFFC066
 Sattsize			equ	$FFFFC336
+DMAlistend			equ	$FFFFBD2A
 gmode				equ	$FFFFC338
 sflags				equ	$FFFFC33A
 sflags2				equ	$FFFFC33C
@@ -204,7 +188,8 @@ sflags12			equ	$FFFFC356
 sflags13			equ	$FFFFC358
 byte_FFC35A			equ	$FFFFC35A
 LineHoldFlag		equ	$FFFFC35C
-shotpflags			equ	$FFFFC364	;pflags of the last shooter (doshot)
+lastpuckc			equ	$FFFFB8AE
+menupadnum			equ	$FFFFD252
 crowdnoisedelay		equ	$FFFFC368
 CwdChkCntr			equ	$FFFFC36A	;Crowd meter frame counter
 CwdChkCnt			equ	$FFFFC36C	;Crowd meter update count
@@ -252,9 +237,6 @@ PenFighting2	equ	$28
 PenInst			equ	$2A
 PenDelay		equ	$2C
 ; Sprite object counts and sizes (92 names)
-ssosize				equ	$14			;bytes per sso object
-ssonum				equ	4			;screen objects not tied to the rink scroll
-ffonum				equ	8			;objects tied to the rink scroll
 PenCntDwn			equ	$FFFFC3E8
 Penaltytimer		equ	$FFFFC3EA
 PBnum				equ	$FFFFC3EC
@@ -304,33 +286,38 @@ menurows			equ	$FFFFD00A	;PrintMenuList2: items shown
 TickerNum			equ	$FFFFD026
 PPBonus				equ	$FFFFD028
 callbackPtr			equ	$FFFFD02C
-DispAttribCtr		equ	$FFFFD030	;Stats screens: the column shown
-VertLineScrolling	equ	$FFFFD032	;Stats screens: the row scroll
-PlayerScrollCtr		equ	$FFFFD034	;Stats screens: the player row
 word_FFD036			equ	$FFFFD036
 word_FFD038			equ	$FFFFD038
-screentimer			equ	$FFFFD03A	;Stats screens: the row count
-setupvalues			equ	$FFFFD03C
+CalTeam				equ	$FFFFD130	;CalendarScreen team (StandingsScreen: the group size). Shares ThreeStars
+SeedCount			equ	$FFFF00B4
 ThreeStars			equ	$FFFFD130
 LineSetsBuf			equ	$FFFFD130	;GetTeamLines builds the line sets here. Shares ThreeStars
-CalTeam				equ	$FFFFD130	;CalendarScreen team (StandingsScreen: the group size). Shares ThreeStars
 CalMonth			equ	$FFFFD132	;CalendarScreen month (StandingsScreen: the 26 team points table)
+SeedPoints			equ	$FFFF0080	;InitPlayoffs: 2 * wins + ties of each team (CalcSeedPoints)
 StandingsMode		equ	$FFFFD14C
+SeedGames			equ	$FFFF009A	;InitPlayoffs: the wins of each team, the SortSeeds tie break
+									;(CalcSeedPoints)
+SeedStandings		equ	$FFFF0032	;InitPlayoffs: the standings, 3 bytes a team (ReadStandings)
+POPairingsTmp		equ	$FFFF00B6	;InitPlayoffs with sflags11 bit 0: the pairings, here instead of save RAM
+									;SRPOPairings
 StandingsOrder		equ	$FFFFD14E	;StandingsScreen games of the 26 teams
 StandingsBuf		equ	$FFFFD168
 StandingsList		equ	$FFFFD1B6
+DispAttribCtr		equ	$FFFFD030	;Stats screens: the column shown
+VertLineScrolling	equ	$FFFFD032	;Stats screens: the row scroll
+PlayerScrollCtr		equ	$FFFFD034	;Stats screens: the player row
+screentimer			equ	$FFFFD03A	;Stats screens: the row count
 nibblebuffer		equ	$FFFFD230
 dword_FFD234		equ	$FFFFD234
 word_FFD238			equ	$FFFFD238
 word_FFD23A			equ	$FFFFD23A
 word_FFD23C			equ	$FFFFD23C
-VBint				equ	$FFFFD244	;vertical blank handler address (VBjsr jumps through it)
 pad1user			equ	$FFFFD248
 pad2user			equ	$FFFFD24A
 pad3user			equ	$FFFFD24C
 pad4user			equ	$FFFFD24E
 FourWayPlay			equ	$FFFFD250
-menupadnum			equ	$FFFFD252
+varend				equ	$FFFFDDC6	;End of the variables Begin clears from VSCRLPM
 OptPlayMode			equ	$FFFFD254
 OptNOP				equ	$FFFFD256
 Opt1team			equ	$FFFFD258
@@ -353,8 +340,8 @@ skillspeed			equ	$FFFFD284	;Skill level speed (SkillLevelTbl, SetSkillLevel)
 skillspeedpal		equ	$FFFFD286	;Skill level speed for PAL (SkillLevelPalTbl)
 TmpOptLine2			equ	$FFFFD288
 TempOptPlayMode		equ	$FFFFD28A
-tpassbits			equ	$FFFFD28C
 pwddatabuffer		equ	$FFFFD296
+tpassbits			equ	$FFFFD28C
 PlayingSong			equ	$FFFFD2A2
 BA_Team				equ	$FFFFD2D2
 BA_Sktr_SCnum		equ	$FFFFD2D4
@@ -394,6 +381,18 @@ homeshootnum		equ	$FFFFD446	;The shooter index of the shootout
 shootoutteam		equ	$FFFFD454
 byte_FFD474			equ	$FFFFD474
 byte_FFD47E			equ	$FFFFD47E
+SeasonDay			equ	$FFFFDD7E	;The season header in RAM (ReadSeasonHeader / WriteSeasonHeader):
+									;the season day word first
+SeasonFlags			equ	SeasonDay+2	;Season header flags (bit 0 regular season over, bit 1 season done, bit 2
+									;playoffs)
+injurygames			equ	$FFFFDDB8
+padcursorchars		equ	$FFFFB8B8	;ControllerSetupScreen: PadCursorMap chars
+padiconchars1		equ	$FFFFB8B0	;ControllerSetupScreen: PadIconMap1 ... 4 chars
+									;(PadIconChars), in game RAM
+padiconchars2		equ	$FFFFB8B2
+padiconchars3		equ	$FFFFB8B4
+padiconchars4		equ	$FFFFB8B6
+setupvalues			equ	$FFFFD03C
 NameEntryMode		equ	$FFFFD484	;Name entry: 0 log mode, else name edit mode
 userblockx			equ	$FFFFD488	;Playoff tree: x of the user's team block
 SongNum				equ	$FFFFD48A
@@ -422,29 +421,30 @@ byte_FFDCEC			equ	$FFFFDCEC
 replaydelay			equ	$FFFFDCF2
 PALflag				equ	$FFFFDCF6
 byte_FFDCF9			equ	$FFFFDCF9
-SeasonDay			equ	$FFFFDD7E	;The season header in RAM (ReadSeasonHeader / WriteSeasonHeader):
-									;the season day word first
-SeasonFlags			equ	SeasonDay+2	;Season header flags (bit 0 regular season over, bit 1 season done, bit 2
-									;playoffs)
 dword_FFDD82		equ	$FFFFDD82
 jerseynum			equ	$FFFFDDAA
 NextScreenPtr		equ	$FFFFDDAC	;The next season screen routine (RunSeasonMenu, PlayoffMenuScreen)
 simdays				equ	$FFFFDDB0	;Days for SimSeasonDays to simulate
 fightidletimer		equ	$FFFFDDB4	;Fight: frames left with no button before it ends
 word_FFDDB6			equ	$FFFFDDB6
-injurygames			equ	$FFFFDDB8
 SRAMChecksum		equ	$FFFFDDBC
+shotpflags			equ	$FFFFC364	;pflags of the last shooter (doshot)
 word_FFDDBE			equ	$FFFFDDBE
 IntermissionTimer	equ	$FFFFDDC4	;Intermission: frames before it continues by itself
-varend				equ	$FFFFDDC6	;End of the variables Begin clears from VSCRLPM
-Stack				equ	$FFFFFDFA
 SndDrvRAM			equ	$FFFFFDFC	;Sound driver RAM base: word $1234 = driver on, 0 = off
 SndSeqPtr			equ	$FFFFFDFE	;8 song slots: song data (-1 = free)
 SndSeqId			equ	$FFFFFE3E	;8 words: the id SndStartSeq gave the slot
 unk_FFFFF6			equ	$FFFFFFF6
 unk_FFFFFF			equ	$FFFFFFFF
-Z80_RAM				equ	$A00000
-Z80_YM2612			equ	$A04000
+SaveRAM				equ	$200000		;the cartridge save RAM (header SRAM range)
+SRSeasonHeader		equ	$82			;save RAM offset: the season header (SetupPlayoffs keeps a copy at
+									;SRSeasonHeaderSave)
+SRSeasonHeaderSave	equ	$CE			;save RAM offset: SetupPlayoffs keeps SRSeasonHeader here
+SRPOPairings		equ	$AE			;save RAM offset: the playoff pairings, the team of each seed slot, a word
+									;each (InitPlayoffs)
+SRPOSlots			equ	$DE			;save RAM offset: the seed slot of each team, a word each (BuildPOSlots)
+SRTeamCounts		equ	$3598		;save RAM offset: 4 bytes a team: +1 the player count, +3 the goalie count
+									;in the low 2 bits
 ; ----------------------------------
 
 
