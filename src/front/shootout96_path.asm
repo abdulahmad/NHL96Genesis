@@ -7,7 +7,7 @@ ShootoutModeBox						;Shootout round box: "SHOOTOUT MODE" (ShootoutModeBigTxt), 
 	move.w	#$FFFF,d0
 	jsr	(prefmes).l
 	jsr	(printz).l
-	String	$BF,$03,$02
+	String	CC_Font1Pri,$03,$02
 	moveq	#$1B,d0
 	moveq	#$C,d1
 	jsr	(Framer).l
@@ -26,7 +26,7 @@ ShootoutModeBox						;Shootout round box: "SHOOTOUT MODE" (ShootoutModeBigTxt), 
 	addq.w	#1,(printy).w
 	addq.w	#6,(printx).w
 	jsr	(printz).l
-	String	' vs.',$BF,$04,$07
+	String	' vs.',CC_Font1Pri,$04,$07
 	move.w	(BA_Goalie_SCnum).w,d0
 	asl.w	#7,d0
 	movea.l	#SortCords,a2
@@ -41,9 +41,9 @@ ShootoutModeBox						;Shootout round box: "SHOOTOUT MODE" (ShootoutModeBigTxt), 
 	jsr	(FormatPlayerNumInitial).l
 	jsr	(print).l
 	jsr	(printbigz2).l
-	String	$F8,$04,$01,$04,$08,'                         ',$FA,$02,$FD,$04,'                         '
+	String	CC_SetMapAndPosition,$04,$01,$04,$08,'                         ',CC_AddY,$02,CC_SetX,$04,'                         '
 	jsr	(printbigz1).l
-	String	$F8,$04,$01,$05,$08,'<            >',$FD,$06
+	String	CC_SetMapAndPosition,$04,$01,$05,$08,'<            >',CC_SetX,$06
 	movea.l	#tmstruct,a1
 	movea.l	$1E(a1),a1
 	adda.w	4(a1),a1
@@ -54,7 +54,7 @@ ShootoutModeBox						;Shootout round box: "SHOOTOUT MODE" (ShootoutModeBigTxt), 
 	jsr	(PushNumberWidth).l
 	jsr	(printbig2).l
 	jsr	(printbigz1).l
-	String	$F8,$04,$01,$05,$0A,'<            >',$FD,$06
+	String	CC_SetMapAndPosition,$04,$01,$05,$0A,'<            >',CC_SetX,$06
 	movea.l	#AwShots,a1
 	movea.l	$1E(a1),a1
 	adda.w	4(a1),a1
@@ -65,7 +65,7 @@ ShootoutModeBox						;Shootout round box: "SHOOTOUT MODE" (ShootoutModeBigTxt), 
 	jsr	(PushNumberWidth).l
 	jsr	(printbig2).l
 	jsr	(printz).l
-	String	$BF,$04,$0C,'       Round '
+	String	CC_Font1Pri,$04,$0C,'       Round '
 	move.w	(shootoutround).w,d0
 	move.w	#2,d1
 	jsr	(PushNumberWidth).l
@@ -74,7 +74,7 @@ ShootoutModeBox						;Shootout round box: "SHOOTOUT MODE" (ShootoutModeBigTxt), 
 	rts
 
 ShootoutModeBigTxt					;ShootoutModeBox big text
-	String	$F8,$04,$01,$04,$03,'      SHOOTOUT MODE      ',$F8,$04,$01,$04,$05
+	String	CC_SetMapAndPosition,$04,$01,$04,$03,'      SHOOTOUT MODE      ',CC_SetMapAndPosition,$04,$01,$04,$05
 
 ShootoutInit						;Clear the player structs (SortCords) and the shootout state, then the
 									;shooter lists of both teams (InitShooters)
@@ -155,12 +155,12 @@ InitShooters						;The 6 starters of the home (shootoutteam 0) or away team (sav
 ShootoutWonBy						;Shootout: "SHOOTOUT WON BY" and the winning team (printbig1)
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printz).l
-	String	$BF,$01,$0D
+	String	CC_Font1Pri,$01,$0D
 	move.w	#6,d1
 	move.w	#$1E,d0
 	jsr	(Framer).l
 	jsr	(printbigz2).l
-	String	$F8,$04,$01,$02,$0E,'      SHOOTOUT WON BY       '
+	String	CC_SetMapAndPosition,$04,$01,$02,$0E,'      SHOOTOUT WON BY       '
 	addq.w	#2,(printy).w
 	move.w	(HomeTeam).w,d1
 	move.w	(homeshootgoals).w,d0

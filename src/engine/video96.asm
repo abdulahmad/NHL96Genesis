@@ -956,7 +956,7 @@ printz								;print with the String after the call
 
 print								;print String a1 at printx / printy with the font map SmallFontMap: a
 									;negative byte sets printa / printm /
-									;printx / printy from the next bytes, $40 a blank, $5E a new line, lower
+									;printx / printy from the next bytes, $40 a blank, $5E skips one column, lower
 									;case printed as upper case
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w

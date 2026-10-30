@@ -2,8 +2,8 @@
 
 RosterMenuList						;The roster menu (PlayoffMenuScreen): each item
 									;routine returns its text in a1
-	String	$FE,$07,$F9
-	String	$FE,$05,$F9
+	String	CC_SetAttribute,$07,CC_SetFont
+	String	CC_SetAttribute,$05,CC_SetFont
 	dc.l	.trade,.create,.freeagents,.release,.reset,.rosters,.exit,-1
 .trade	movea.l	#.tradetxt,a1
 	rts
@@ -13,23 +13,23 @@ RosterMenuList						;The roster menu (PlayoffMenuScreen): each item
 .createtxt	String	'Create Players'
 .freeagents	movea.l	#.freeagentstxt,a1
 	rts
-.freeagentstxt	String	$FD,$0C,'Sign Free Agents'
+.freeagentstxt	String	CC_SetX,$0C,'Sign Free Agents'
 .release	movea.l	#.releasetxt,a1
 	rts
 .releasetxt	String	'Release Player'
 .reset	movea.l	#.resettxt,a1
 	rts
-.resettxt	String	$FD,$0E,'Reset Rosters'
+.resettxt	String	CC_SetX,$0E,'Reset Rosters'
 .rosters	movea.l	#.rosterstxt,a1
 	rts
-.rosterstxt	String	$FD,$0E,'Team Rosters'
+.rosterstxt	String	CC_SetX,$0E,'Team Rosters'
 .exit	movea.l	#.exittxt,a1
 	rts
-.exittxt	String	$FD,$12,'Exit'
+.exittxt	String	CC_SetX,$12,'Exit'
 
 YesNoMenuList						;A Yes / No menu (PlayoffMenuScreen)
-	String	$FE,$07,$F9
-	String	$FE,$05,$F9
+	String	CC_SetAttribute,$07,CC_SetFont
+	String	CC_SetAttribute,$05,CC_SetFont
 	dc.l	.yes,.no,-1
 .yes	movea.l	#.yestxt,a1
 	rts
@@ -251,10 +251,10 @@ CheckTrade							;Check the trade (players chosen on both teams, at most three a
 	dc.b	$00,$02,$60,$00,$00,$04,$52,$50,$4A,$99,$51,$C8,$FF,$E4,$4E,$75
 
 InvalidTradeText					;CheckTrade: the reasons a trade is refused
-	String	$FD,$08,$FC,$09,'no players selected on',$FD,$08,$FC,$0A,'one or more teams'
-	String	$FD,$08,$FC,$09,'Roster Rules Violated.',$FA,$01,$FD,$08,'each team limited to',$FA,$01,$FD,$08,'2-3 goalies with a',$FA,$01,$FD,$08,'maximum of 27 players.'
-	String	$FD,$08,$FC,$09,'no players selected on',$FD,$08,$FC,$0A,'one or more teams'
-	String	$FD,$08,$FC,$09,'more than 3 players',$FA,$01,$FD,$08,'selected for trade on',$FA,$01,$FD,$08,'one or more teams'
+	String	CC_SetX,$08,CC_SetY,$09,'no players selected on',CC_SetX,$08,CC_SetY,$0A,'one or more teams'
+	String	CC_SetX,$08,CC_SetY,$09,'Roster Rules Violated.',CC_AddY,$01,CC_SetX,$08,'each team limited to',CC_AddY,$01,CC_SetX,$08,'2-3 goalies with a',CC_AddY,$01,CC_SetX,$08,'maximum of 27 players.'
+	String	CC_SetX,$08,CC_SetY,$09,'no players selected on',CC_SetX,$08,CC_SetY,$0A,'one or more teams'
+	String	CC_SetX,$08,CC_SetY,$09,'more than 3 players',CC_AddY,$01,CC_SetX,$08,'selected for trade on',CC_AddY,$01,CC_SetX,$08,'one or more teams'
 
 WaitMenuFrame						;Wait for the next frame (Vcount), then SetMenuScroll; d0 kept Code the
 									;listing does not decode: kept as bytes

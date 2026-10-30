@@ -240,21 +240,21 @@ PListArrows							;PlayerStatsList: the scroll marks { (VertLineScrolling above 
 	tst.w	(VertLineScrolling).w
 	beq.w	.0
 	jsr	(printcurz).l
-	String	$8F,$02,$0B,$7B
+	String	CC_Font1Pal3Pri,$02,$0B,'{'
 	bra.w	.1
 .0
 	jsr	(printcurz).l
-	String	$8F,$02,$0B,$20
+	String	CC_Font1Pal3Pri,$02,$0B,' '
 .1
 	move.w	(PlayerScrollCtr).w,d1
 	cmp.w	(word_FFD038).w,d1
 	bge.w	.2
 	jsr	(printcurz).l
-	String	$8F,$02,$17,$7D
+	String	CC_Font1Pal3Pri,$02,$17,'}'
 	bra.w	.3
 .2
 	jsr	(printcurz).l
-	String	$8F,$02,$17,$20
+	String	CC_Font1Pal3Pri,$02,$17,' '
 .3
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
@@ -296,13 +296,13 @@ PListSetup							;PlayerStatsList: vram, fonts and the screen bitmaps
 	move.w	d4,(setupvalues).w
 	addi.w	#$20,d4
 	jsr	(printsmallz).l
-	String	$FF,$01,$FD,$00,$FC
+	String	CC_SetMap,$01,CC_SetX,$00,CC_SetY
 	moveq	#$28,d0
 	moveq	#$1C,d1
 	move.w	#$7FF,d2
 	jsr	(eraser).l
 	jsr	(printz).l
-	String	$BF,$00,$00
+	String	CC_Font1Pri,$00,$00
 	movea.l	#PlayerStatsBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -315,7 +315,7 @@ PListSetup							;PlayerStatsList: vram, fonts and the screen bitmaps
 	moveq	#8,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$BF,$0B,$01
+	String	CC_Font1Pri,$0B,$01
 	movea.l	#PlayerStatsTitleMap,a0
 	tst.w	(plistplayoff).w
 	beq.w	.0
@@ -333,7 +333,7 @@ PListSetup							;PlayerStatsList: vram, fonts and the screen bitmaps
 	jsr	(dobitmap).l
 	jsr	(PListHelp).l
 	jsr	(printz).l
-	String	$FE,$00,$00
+	String	CC_Font2,$00,$00
 	movea.l	#IceBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -357,7 +357,7 @@ PListTeamBlock						;PlayerStatsList: the team block of the shown team (DrawSetu
 									;then PListHeading
 	move.w	d7,-(sp)
 	jsr	(printz).l
-	String	$BF,$01,$05
+	String	CC_Font1Pri,$01,$05
 	move.w	(setupvalues).w,d4
 	move.w	(setupvalues+2).w,d7
 	jsr	(DrawSetupTeamBlock).l
@@ -369,20 +369,20 @@ PListHeading						;PlayerStatsList: the column heading, players or goalies
 	cmpi.w	#5,(DispAttribCtr).w
 	bge.w	.0
 	jsr	(printbigz).l
-	String	$F8,$04,$01,$04,$08,'#  PLAYER     g   a   p  sh   pim'
+	String	CC_SetMapAndPosition,$04,$01,$04,$08,'#  PLAYER     g   a   p  sh   pim'
 	bra.w	.3
 .0
 	jsr	(printbigz).l
-	String	$F8,$04,$01,$04,$08,'#  GOALIE        s     sh    sp  '
+	String	CC_SetMapAndPosition,$04,$01,$04,$08,'#  GOALIE        s     sh    sp  '
 .1
 	cmpi.w	#4,(DispAttribCtr).w
 	bge.w	.2
 	jsr	(printbigz).l
-	String	$F8,$04,$01,$04,$08,'#  PLAYER         g   a   p   pim'
+	String	CC_SetMapAndPosition,$04,$01,$04,$08,'#  PLAYER         g   a   p   pim'
 	bra.w	.3
 .2
 	jsr	(printbigz).l
-	String	$F8,$04,$01,$04,$08,'#  GOALIE        s     sh    sp  '
+	String	CC_SetMapAndPosition,$04,$01,$04,$08,'#  GOALIE        s     sh    sp  '
 .3
 	rts
 
@@ -401,11 +401,11 @@ PListHelp							;PlayerStatsList: the button help lines
 	tst.w	(plistplayoff).w
 	beq.w	.2
 	jsr	(printcurz).l
-	String	$8F,$04,$19,'{}-SCROLL LIST            ',$8F,$04,$1A,'[]-CATEGORY      B-GOALIES'
+	String	CC_Font1Pal3Pri,$04,$19,'{}-SCROLL LIST            ',CC_Font1Pal3Pri,$04,$1A,'[]-CATEGORY      B-GOALIES'
 	bra.w	.3
 .2
 	jsr	(printcurz).l
-	String	$8F,$04,$19,'{}-SCROLL LIST   A-TEAMS  ',$8F,$04,$1A,'[]-CATEGORY      B-GOALIES'
+	String	CC_Font1Pal3Pri,$04,$19,'{}-SCROLL LIST   A-TEAMS  ',CC_Font1Pal3Pri,$04,$1A,'[]-CATEGORY      B-GOALIES'
 .3
 	move.w	(sp)+,(smallfontchars).w
 	bra.w	.6
@@ -415,12 +415,12 @@ PListHelp							;PlayerStatsList: the button help lines
 	tst.w	(plistplayoff).w
 	beq.w	.5
 	jsr	(printcurz).l
-	String	$8F,$04,$19,'{}-SCROLL LIST            ',$8F,$04,$1A,'[]-CATEGORY      B-PLAYERS'
+	String	CC_Font1Pal3Pri,$04,$19,'{}-SCROLL LIST            ',CC_Font1Pal3Pri,$04,$1A,'[]-CATEGORY      B-PLAYERS'
 	move.w	(sp)+,(smallfontchars).w
 	bra.w	.6
 .5
 	jsr	(printcurz).l
-	String	$8F,$04,$19,'{}-SCROLL LIST   A-TEAMS  ',$8F,$04,$1A,'[]-CATEGORY      B-PLAYERS'
+	String	CC_Font1Pal3Pri,$04,$19,'{}-SCROLL LIST   A-TEAMS  ',CC_Font1Pal3Pri,$04,$1A,'[]-CATEGORY      B-PLAYERS'
 	move.w	(sp)+,(smallfontchars).w
 .6
 	rts
@@ -428,7 +428,7 @@ PListHelp							;PlayerStatsList: the button help lines
 PListCategory						;PlayerStatsList: the name of category DispAttribCtr (PListPlayoffCats or
 									;PListGameCats)
 	jsr	(printz).l
-	String	$BF,$15,$05
+	String	CC_Font1Pri,$15,$05
 	movea.l	#PListPlayoffCats,a1
 	tst.w	(plistplayoff).w
 	bne.w	.0
@@ -693,7 +693,7 @@ PListColumns						;PlayerStatsList: the stat column buffers
 PListPrint							;PlayerStatsList: print the rows of the list
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printz).l
-	String	$8F,$00,$00
+	String	CC_Font1Pal3Pri,$00,$00
 	clr.w	d6
 	move.w	#$B,(printy).w
 .0
@@ -893,7 +893,7 @@ PListMark							;PlayerStatsList: print a value, highlighted in the column of th
 	cmp.w	(word_FFD238).w,d0
 	bne.w	.0
 	jsr	(printsmallz).l
-	String	$FE,$05
+	String	CC_SetAttribute,$05
 .0
 	jsr	(printcur).l
 	move.w	(sp)+,(printa).w

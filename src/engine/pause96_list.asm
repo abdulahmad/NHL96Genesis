@@ -25,11 +25,11 @@ PrintMenuList						;Print the shown rows of the menu list (menulist) with the sc
 	dc.b	$00,$01,$BA,$40,$4C,$DF,$7F,$FF,$4E,$75
 
 ScrollClearTxt						;Scroll marks for PrintMenuList
-	String	$F9,$00,$20
+	String	CC_SetFont,$00,' '
 ScrollUpTxt
-	String	$F9,$00,$7B
+	String	CC_SetFont,$00,'{'
 ScrollDownTxt
-	String	$F9,$00,$7D
+	String	CC_SetFont,$00,'}'
 
 PrintMenuList2						;Print the shown rows of the menu list (menulist): each item through its
 									;routine, the selected item with the highlight
@@ -114,7 +114,7 @@ PrintMenuList2						;Print the shown rows of the menu list (menulist): each item
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 	;The same scroll marks again; nothing reads them
-	String	$F9,$00,$20
-	String	$F9,$00,$7B
-	String	$F9,$00,$7D
+	String	CC_SetFont,$00,$20
+	String	CC_SetFont,$00,'{'
+	String	CC_SetFont,$00,'}'
 

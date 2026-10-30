@@ -598,13 +598,13 @@ RecordHoldersScreen					;Pause menu Record Holders
 	dc.b	$C3,$54,$4E,$B9,$00,$01,$BE,$EC,$4E,$75
 
 RecHeaderWins						;Record screen heading: name, win%, win, loss, tie
-	String	$F8,$04,$01,$05,$06,'name',$FD,$10,'win% ',$FD,$17,'win',$FD,$1C,'loss',$FD,$21,'tie'
+	String	CC_SetMapAndPosition,$04,$01,$05,$06,'name',CC_SetX,$10,'win% ',CC_SetX,$17,'win',CC_SetX,$1C,'loss',CC_SetX,$21,'tie'
 
 RecHeaderGoals						;Record screen heading: name, goals, teams
-	String	$F8,$04,$01,$05,$06,'name',$FD,$10,'goals',$FD,$1C,'teams'
+	String	CC_SetMapAndPosition,$04,$01,$05,$06,'name',CC_SetX,$10,'goals',CC_SetX,$1C,'teams'
 
 RecHeaderSaves						;Record screen heading: name, saves, teams
-	String	$F8,$04,$01,$05,$06,'name',$FD,$10,'saves',$FD,$1C,'teams'
+	String	CC_SetMapAndPosition,$04,$01,$05,$06,'name',CC_SetX,$10,'saves',CC_SetX,$1C,'teams'
 	dc.b	$48,$E7,$FF,$FE,$08,$B8,$00,$02,$C3,$54,$4E,$B9,$00,$01,$BA,$2E
 	dc.b	$00,$08,$F8,$04,$01,$03,$09,$00,$3E,$3C,$00,$06,$20,$7C,$FF,$FF
 	dc.b	$D4,$02,$24,$7C,$FF,$FF,$D4,$0A,$2A,$7C,$FF,$FF,$D1,$30,$31,$FC

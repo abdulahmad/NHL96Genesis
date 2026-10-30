@@ -5,7 +5,7 @@ Credits								;The copyright and licence lines
 	String	'$ 1995 Electronic Arts'
 	String	'Licensed by'
 	String	'Sega Enterprises Ltd.'
-	String	-1
+	String	CC_ListEnd
 
 CreditsList							;The legal pages and the credits
 	String	'all nhl and team logos'

@@ -3,8 +3,8 @@
 ShootoutPauseMenu					;Menu item lists (InitMenuState): String control entries ($F9 / $FE), then
 									;each item as its String and the routine it runs, ended by String $FF. The
 									;pause menu in a shootout
-	String	$F9,$01
-	String	$F9,$02
+	String	CC_SetFont,$01
+	String	CC_SetFont,$02
 	String	'   RESUME GAME    '
 	dc.l	PlayGame
 	String	'  INSTANT REPLAY  '
@@ -15,11 +15,11 @@ ShootoutPauseMenu					;Menu item lists (InitMenuState): String control entries (
 	dc.l	RecordHoldersScreen
 	String	'    ABORT GAME    '
 	dc.l	AbortGame
-	String	$FF
+	String	CC_ListEnd
 
 PauseMenu							;The pause menu
-	String	$F9,$01
-	String	$F9,$02
+	String	CC_SetFont,$01
+	String	CC_SetFont,$02
 	String	'   RESUME GAME    '
 	dc.l	PlayGame
 	String	'  INSTANT REPLAY  '
@@ -48,11 +48,11 @@ PauseMenu							;The pause menu
 	dc.l	ManualGoalieMenu
 	String	'    ABORT GAME    '
 	dc.l	AbortGame
-	String	$FF
+	String	CC_ListEnd
 
 PauseMenuNoTimeout					;The pause menu once the team has used its timeout (team struct $30 bit 2)
-	String	$F9,$01
-	String	$F9,$02
+	String	CC_SetFont,$01
+	String	CC_SetFont,$02
 	String	'   Resume Game    '
 	dc.l	PlayGame
 	String	'  Instant Replay  '
@@ -79,11 +79,11 @@ PauseMenuNoTimeout					;The pause menu once the team has used its timeout (team 
 	dc.l	ManualGoalieMenu
 	String	'    ABORT GAME    '
 	dc.l	AbortGame
-	String	$FF
+	String	CC_ListEnd
 
 ShootoutIntermissionMenu			;The intermission menu before a shootout
-	String	$F9,$01
-	String	$F9,$02
+	String	CC_SetFont,$01
+	String	CC_SetFont,$02
 	String	'  Start Shootout  '
 	dc.l	rtss2
 	String	'  Shootout SetUp  '
@@ -94,11 +94,11 @@ ShootoutIntermissionMenu			;The intermission menu before a shootout
 	dc.l	RecordHoldersScreen
 	String	'    ABORT GAME    '
 	dc.l	AbortGame
-	String	$FF
+	String	CC_ListEnd
 
 PregameMenu							;The intermission menus by gsp (IntermissionMenus): before the game
-	String	$F9,$01
-	String	$F9,$02
+	String	CC_SetFont,$01
+	String	CC_SetFont,$02
 	String	'    Start Game    '
 	dc.l	PlayGame
 	String	'  Change Goalie   '
@@ -111,11 +111,11 @@ PregameMenu							;The intermission menus by gsp (IntermissionMenus): before the
 	dc.l	RecordHoldersScreen
 	String	'    ABORT GAME    '
 	dc.l	AbortGame
-	String	$FF
+	String	CC_ListEnd
 
 PlayoffPregameMenu					;Before a playoff game
-	String	$F9,$01
-	String	$F9,$02
+	String	CC_SetFont,$01
+	String	CC_SetFont,$02
 	String	'    Start Game    '
 	dc.l	PlayGame
 	String	'  Change Goalie   '
@@ -130,11 +130,11 @@ PlayoffPregameMenu					;Before a playoff game
 	dc.l	RecordHoldersScreen
 	String	'    ABORT GAME    '
 	dc.l	AbortGame
-	String	$FF
+	String	CC_ListEnd
 
 IntermissionMenu					;Between periods
-	String	$F9,$01
-	String	$F9,$02
+	String	CC_SetFont,$01
+	String	CC_SetFont,$02
 	String	'   Resume Game    '
 	dc.l	PlayGame
 	String	'    Game Stats    '
@@ -157,11 +157,11 @@ IntermissionMenu					;Between periods
 	dc.l	PeriodStatsScreen
 	String	'    ABORT GAME    '
 	dc.l	AbortGame
-	String	$FF
+	String	CC_ListEnd
 
 GameOverMenu						;After the game
-	String	$F9,$01
-	String	$F9,$02
+	String	CC_SetFont,$01
+	String	CC_SetFont,$02
 	String	'    quit Game     '
 	dc.l	PlayGame
 	String	'    Game Stats    '
@@ -178,11 +178,11 @@ GameOverMenu						;After the game
 	dc.l	RecordHoldersScreen
 	String	'   Period Stats   '
 	dc.l	PeriodStatsScreen
-	String	$FF
+	String	CC_ListEnd
 
 PlayoffGameOverMenu					;After a playoff game
-	String	$F9,$01
-	String	$F9,$02
+	String	CC_SetFont,$01
+	String	CC_SetFont,$02
 	String	'    quit Game     '
 	dc.l	PlayGame
 	String	'    Game Stats    '
@@ -199,4 +199,4 @@ PlayoffGameOverMenu					;After a playoff game
 	dc.l	RecordHoldersScreen
 	String	'   Period Stats   '
 	dc.l	PeriodStatsScreen
-	String	$FF
+	String	CC_ListEnd

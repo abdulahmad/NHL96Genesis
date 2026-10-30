@@ -249,7 +249,7 @@ HandleMenuInput						;Pause menu pad d1: up / down move the selection, C runs th
 UpdateMenuSelection					;Clamp menuitem to the list, scroll menuitem+2 to show it, and print the
 									;shown items
 	jsr	(printsmallz).l
-	String	$FE,$04
+	String	CC_SetAttribute,$04
 	move.w	(menuitem).w,d0
 	bpl.w	.1
 	clr.w	(menuitem).w
@@ -293,15 +293,15 @@ UpdateMenuSelection					;Clamp menuitem to the list, scroll menuitem+2 to show i
 	move.w	#4,(printy).w
 	bsr.w	SetMenuPrintX
 	jsr	(printsmallz).l
-	String	$FB,$01,$FA,$02,$20,$FB,$12,$20,$FA,$FE,$FB,$EB
+	String	CC_AddX,$01,CC_AddY,$02,' ',CC_AddX,$12,' ',CC_AddY,$FE,CC_AddX,$EB
 	move.w	(menuitem+2).w,d0
 	beq.w	.2
 	jsr	(printsmallz).l
-	String	$FE,$07,$FB,$01,$FA,$02,$7B,$FB,$12,$7B,$FA,$FE,$FE,$04
+	String	CC_SetAttribute,$07,CC_AddX,$01,CC_AddY,$02,'{',CC_AddX,$12,'{',CC_AddY,$FE,CC_SetAttribute,$04
 .2
 	bsr.w	SetMenuPrintX
 	jsr	(printsmallz).l
-	String	$FB,$02,$FA,$02
+	String	CC_AddX,$02,CC_AddY,$02
 	move.l	a1,-(sp)
 	movea.l	(menulist).w,a1
 	jsr	(printbigcur).l
@@ -318,12 +318,12 @@ UpdateMenuSelection					;Clamp menuitem to the list, scroll menuitem+2 to show i
 	bmi.w	.5
 	bsr.w	SetMenuPrintX
 	jsr	(printsmallz).l
-	String	$FE,$07,$FB,$01,$FC,$14,$7D,$FB,$12,$7D,$FE,$04
+	String	CC_SetAttribute,$07,CC_AddX,$01,CC_SetY,$14,'}',CC_AddX,$12,'}',CC_SetAttribute,$04
 	rts
 .5
 	bsr.w	SetMenuPrintX
 	jsr	(printsmallz).l
-	String	$FB,$01,$FC,$14,$20,$FB,$12,$20
+	String	CC_AddX,$01,CC_SetY,$14,' ',CC_AddX,$12,' '
 	rts
 
 PrintMenuItem						;printsmall item String a1; an item that starts with x prints MANUAL

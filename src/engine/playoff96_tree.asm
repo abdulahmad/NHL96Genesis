@@ -39,7 +39,7 @@ PlayoffScreen						;Bring up the playoff screen if in playoff mode (OptPlayMode 
 	move.w	#0,d0
 	jsr	(setVram).l
 	jsr	(printz).l
-	String	$FF,$00,$00
+	String	CC_Font1,$00,$00
 	move.l	#$80,d0
 	moveq	#$1C,d1
 	move.w	#$7FF,d2
@@ -64,7 +64,7 @@ PlayoffScreen						;Bring up the playoff screen if in playoff mode (OptPlayMode 
 	move.l	#RosterFont,(smallfontptr).w
 	movea.l	#PlayoffTreeMap+8,a2
 	jsr	(printz).l
-	String	$FF,$00,$00
+	String	CC_Font1,$00,$00
 	movea.l	#PlayoffTreeMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -80,7 +80,7 @@ PlayoffScreen						;Bring up the playoff screen if in playoff mode (OptPlayMode 
 	movea.l	#PlayoffTeamFrameMap+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	jsr	(printz).l
-	String	$FE,$00,$00
+	String	CC_Font2,$00,$00
 	movea.l	#PlayoffTreeBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -103,7 +103,7 @@ PlayoffScreen						;Bring up the playoff screen if in playoff mode (OptPlayMode 
 	move.b	(a0)+,d4
 .3
 	jsr	(printz).l
-	String	$BF,$00,$00
+	String	CC_Font1Pri,$00,$00
 	move.b	(a0)+,(printx+1).w
 	move.b	(a0)+,(printy+1).w
 	clr.w	d1
@@ -115,14 +115,14 @@ PlayoffScreen						;Bring up the playoff screen if in playoff mode (OptPlayMode 
 	move.b	(a0)+,d4
 .4
 	jsr	(printz).l
-	String	$BF,$00,$02
+	String	CC_Font1Pri,$00,$02
 	move.b	(a0)+,(printx+1).w
 	clr.w	d0
 	move.b	(a0)+,d0
 	bsr.w	DrawTreeArrow
 	dbf	d4,.4
 	jsr	(printz).l
-	String	$8F,$00,$00
+	String	CC_Font1Pal3Pri,$00,$00
 	cmpi.w	#7,(bosgames).w
 	beq.w	.6
 	clr.w	d4
@@ -285,7 +285,7 @@ DrawTeamBlocks						;Draw team block d1 at printx / printy; the user's team gets
 	subq.w	#1,(printy).w
 	move.w	(ExtraChars).w,d4
 	jsr	(printsmallz).l
-	String	$FE,$00,$FF,$02
+	String	CC_SetAttribute,$00,CC_SetMap,$02
 	movea.l	#PlayoffTeamFrameMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -301,7 +301,7 @@ DrawTeamBlocks						;Draw team block d1 at printx / printy; the user's team gets
 	move.w	(sp)+,(printy).w
 	move.w	(sp)+,(printx).w
 	jsr	(printsmallz).l
-	String	$FE,$04,$FF,$01
+	String	CC_SetAttribute,$04,CC_SetMap,$01
 	movem.l	(sp)+,d0-d7/a0-a6
 .0
 	movea.l	#setupvalues,a0

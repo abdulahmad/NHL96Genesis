@@ -50,7 +50,7 @@ SeasonAwards						;End of season awards: left / right go through the 9 awards (p
 
 DrawAwardWinnerLogo					;The team logo of the winner of award PlayerScrollCtr
 	jsr	(printz).l
-	String	$8F,$03,$08
+	String	CC_Font1Pal3Pri,$03,$08
 	bsr.w	GetAwardWinnerTeam
 	move.w	(awardlogochars).w,d4
 	clr.w	d5
@@ -59,7 +59,7 @@ DrawAwardWinnerLogo					;The team logo of the winner of award PlayerScrollCtr
 
 DrawAwardPicture					;Draw the picture of award PlayerScrollCtr (AwardPictures)
 	jsr	(printz).l
-	String	$BF,$19,$09
+	String	CC_Font1Pri,$19,$09
 	move.w	(PlayerScrollCtr).w,d0
 	movea.l	#AwardPictures,a0
 	asl.w	#2,d0
@@ -83,7 +83,7 @@ AwardPictures						;The award picture bitmaps, one per award
 
 PrintAwardName						;Print the name of award PlayerScrollCtr (AwardNames)
 	jsr	(printz).l
-	String	$BF,$13,$05
+	String	CC_Font1Pri,$13,$05
 	movea.l	#AwardNames,a1
 	move.w	(PlayerScrollCtr).w,d0
 	jsr	(SkipStrings).l
@@ -108,7 +108,7 @@ AwardNames							;PrintAwardName Strings: the award names
 
 PrintAwardDesc						;Print the description of award PlayerScrollCtr (AwardDescs)
 	jsr	(printcurz).l
-	String	$8F,$02,$14,'                ',$8F,$02,$15,'                ',$8F,$02,$16,'                ',$8F,$02,$17,'                ',$8F,$02,$18,'                '
+	String	CC_Font1Pal3Pri,$02,$14,'                ',CC_Font1Pal3Pri,$02,$15,'                ',CC_Font1Pal3Pri,$02,$16,'                ',CC_Font1Pal3Pri,$02,$17,'                ',CC_Font1Pal3Pri,$02,$18,'                '
 	movea.l	#AwardDescs,a1
 	move.w	(PlayerScrollCtr).w,d0
 	jsr	(SkipStrings).l
@@ -116,21 +116,21 @@ PrintAwardDesc						;Print the description of award PlayerScrollCtr (AwardDescs)
 	rts
 
 AwardDescs							;PrintAwardDesc Strings: the award descriptions
-	String	$8F,$02,$14,'to the player',$8F,$02,$15,'adjudged to be',$8F,$02,$16,'the most',$8F,$02,$17,'valuable to',$8F,$02,$18,'his team'
-	String	$8F,$02,$14,'to the player',$8F,$02,$15,'who leads the',$8F,$02,$16,'league in points',$8F,$02,$17,'at the end of',$8F,$02,$18,'the reg. season'
-	String	$8F,$02,$14,'to the defensive',$8F,$02,$15,'player showing',$8F,$02,$16,'the greatest all',$8F,$02,$17,'around ability',$8F,$02,$18,'in the position'
-	String	$8F,$02,$14,'to the goalie',$8F,$02,$15,'adjudged to be',$8F,$02,$16,'the best at',$8F,$02,$17,'his position'
-	String	$8F,$02,$14,'to the most',$8F,$02,$15,'valuable player',$8F,$02,$16,'for his team',$8F,$02,$17,'in the playoffs'
-	String	$8F,$02,$14,'to the club',$8F,$02,$15,'finishing the',$8F,$02,$16,'regular season',$8F,$02,$17,'with the best',$8F,$02,$18,'record'
-	String	$8F,$02,$14,'to the winners',$8F,$02,$15,'of the',$8F,$02,$16,'Eastern',$8F,$02,$17,'Conference',$8F,$02,$18,'Championship'
-	String	$8F,$02,$14,'to the winners',$8F,$02,$15,'of the',$8F,$02,$16,'Western',$8F,$02,$17,'Conference',$8F,$02,$18,'Championship'
-	String	$8F,$02,$14,'to the nhl''s',$8F,$02,$15,'outstanding',$8F,$02,$16,'player chosen by',$8F,$02,$17,'player members',$8F,$02,$18,'of the nhlpa'
+	String	CC_Font1Pal3Pri,$02,$14,'to the player',CC_Font1Pal3Pri,$02,$15,'adjudged to be',CC_Font1Pal3Pri,$02,$16,'the most',CC_Font1Pal3Pri,$02,$17,'valuable to',CC_Font1Pal3Pri,$02,$18,'his team'
+	String	CC_Font1Pal3Pri,$02,$14,'to the player',CC_Font1Pal3Pri,$02,$15,'who leads the',CC_Font1Pal3Pri,$02,$16,'league in points',CC_Font1Pal3Pri,$02,$17,'at the end of',CC_Font1Pal3Pri,$02,$18,'the reg. season'
+	String	CC_Font1Pal3Pri,$02,$14,'to the defensive',CC_Font1Pal3Pri,$02,$15,'player showing',CC_Font1Pal3Pri,$02,$16,'the greatest all',CC_Font1Pal3Pri,$02,$17,'around ability',CC_Font1Pal3Pri,$02,$18,'in the position'
+	String	CC_Font1Pal3Pri,$02,$14,'to the goalie',CC_Font1Pal3Pri,$02,$15,'adjudged to be',CC_Font1Pal3Pri,$02,$16,'the best at',CC_Font1Pal3Pri,$02,$17,'his position'
+	String	CC_Font1Pal3Pri,$02,$14,'to the most',CC_Font1Pal3Pri,$02,$15,'valuable player',CC_Font1Pal3Pri,$02,$16,'for his team',CC_Font1Pal3Pri,$02,$17,'in the playoffs'
+	String	CC_Font1Pal3Pri,$02,$14,'to the club',CC_Font1Pal3Pri,$02,$15,'finishing the',CC_Font1Pal3Pri,$02,$16,'regular season',CC_Font1Pal3Pri,$02,$17,'with the best',CC_Font1Pal3Pri,$02,$18,'record'
+	String	CC_Font1Pal3Pri,$02,$14,'to the winners',CC_Font1Pal3Pri,$02,$15,'of the',CC_Font1Pal3Pri,$02,$16,'Eastern',CC_Font1Pal3Pri,$02,$17,'Conference',CC_Font1Pal3Pri,$02,$18,'Championship'
+	String	CC_Font1Pal3Pri,$02,$14,'to the winners',CC_Font1Pal3Pri,$02,$15,'of the',CC_Font1Pal3Pri,$02,$16,'Western',CC_Font1Pal3Pri,$02,$17,'Conference',CC_Font1Pal3Pri,$02,$18,'Championship'
+	String	CC_Font1Pal3Pri,$02,$14,'to the nhl''s',CC_Font1Pal3Pri,$02,$15,'outstanding',CC_Font1Pal3Pri,$02,$16,'player chosen by',CC_Font1Pal3Pri,$02,$17,'player members',CC_Font1Pal3Pri,$02,$18,'of the nhlpa'
 
 PrintAwardWinner					;Print the winner of award PlayerScrollCtr: a team (TeamAwardFlags) or a
 									;player "F. Name"
 	bset	#2,(sflags11).w
 	jsr	(printbigz).l
-	String	$F8,$04,$01,$17,$15,'              '
+	String	CC_SetMapAndPosition,$04,$01,$17,$15,'              '
 	bsr.w	GetAwardWinner
 	movea.l	#TeamAwardFlags,a0
 	move.w	(PlayerScrollCtr).w,d1
@@ -167,7 +167,7 @@ PrintAwardWinner					;Print the winner of award PlayerScrollCtr: a team (TeamAwa
 	movea.l	#mesarea,a1
 .1
 	jsr	(printz).l
-	String	$BF,$1E,$15
+	String	CC_Font1Pri,$1E,$15
 	move.w	(a1),d0
 	subq.w	#2,d0
 	lsr.w	#1,d0
@@ -211,13 +211,13 @@ AwardsScreenSetup					;Awards screen setup: vram, fonts and the background bitma
 	jsr	(DecompressGraphicsPlain).l
 	bset	#2,(sflags11).w
 	jsr	(printsmallz).l
-	String	$FF,$01,$FD,$00,$FC
+	String	CC_SetMap,$01,CC_SetX,$00,CC_SetY
 	moveq	#$28,d0
 	moveq	#$1C,d1
 	move.w	#$7FF,d2
 	jsr	(eraser).l
 	jsr	(printz).l
-	String	$BF,$00,$00
+	String	CC_Font1Pri,$00,$00
 	movea.l	#AwardsBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -234,7 +234,7 @@ AwardsScreenSetup					;Awards screen setup: vram, fonts and the background bitma
 	move.w	d4,(DispAttribCtr).w
 	addi.w	#$64,d4
 	jsr	(printz).l
-	String	$BF,$0B,$01
+	String	CC_Font1Pri,$0B,$01
 	movea.l	#AwardsTitleMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -247,7 +247,7 @@ AwardsScreenSetup					;Awards screen setup: vram, fonts and the background bitma
 	moveq	#8,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$FE,$00,$00
+	String	CC_Font2,$00,$00
 	movea.l	#IceBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -501,13 +501,13 @@ CupChampionsScreen					;The user's team won the Cup: a full screen picture with 
 	dc.b	$04,$F3,$45,$67,$89,$CB,$CA,$9F	;remap table
 	bclr	#2,(sflags11).w
 	jsr	(printsmallz).l
-	String	$FF,$01,$FD,$00,$FC
+	String	CC_SetMap,$01,CC_SetX,$00,CC_SetY
 	moveq	#$28,d0
 	moveq	#$1C,d1
 	move.w	#$7FF,d2
 	jsr	(eraser).l
 	jsr	(printz).l
-	String	$BF,$00,$00
+	String	CC_Font1Pri,$00,$00
 	movea.l	#CupChampsMap2,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -530,7 +530,7 @@ CupChampionsScreen					;The user's team won the Cup: a full screen picture with 
 	move.l	(a0)+,(a1)+
 	dbf	d1,.0
 	jsr	(printz).l
-	String	$AF,$1D,$15
+	String	CC_Font1Pal1Pri,$1D,$15
 	movea.l	#SmallLogoPtrs,a0
 	clr.w	d0
 	move.b	(dword_FFDD82+2).w,d0
@@ -547,7 +547,7 @@ CupChampionsScreen					;The user's team won the Cup: a full screen picture with 
 	moveq	#0,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$FE,$00,$00
+	String	CC_Font2,$00,$00
 	movea.l	#CupChampsMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -560,7 +560,7 @@ CupChampionsScreen					;The user's team won the Cup: a full screen picture with 
 	moveq	#0,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$AF,$14,$16
+	String	CC_Font1Pal1Pri,$14,$16
 	movea.l	#TeamList,a1
 	clr.w	d0
 	move.b	(dword_FFDD82+2).w,d0
@@ -579,7 +579,7 @@ CupChampionsScreen					;The user's team won the Cup: a full screen picture with 
 	move.l	#BigFontMap,(bigfontptr).w
 	jsr	(printbigcur).l
 	jsr	(printz).l
-	String	$AF,$14,$18
+	String	CC_Font1Pal1Pri,$14,$18
 	movea.l	#TeamList,a1
 	clr.w	d0
 	move.b	(dword_FFDD82+2).w,d0

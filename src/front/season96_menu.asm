@@ -414,21 +414,21 @@ PStatsArrows						;SeasonPlayoffStats: the scroll marks { (pstatstop above 0) an
 	tst.w	(pstatstop).w
 	beq.w	.0
 	jsr	(printcurz).l
-	String	$8F,$02,$0B,$7B
+	String	CC_Font1Pal3Pri,$02,$0B,'{'
 	bra.w	.1
 .0
 	jsr	(printcurz).l
-	String	$8F,$02,$0B,$20
+	String	CC_Font1Pal3Pri,$02,$0B,' '
 .1
 	move.w	(pstatsrow).w,d1
 	cmp.w	(pstatslast).w,d1
 	bge.w	.2
 	jsr	(printcurz).l
-	String	$8F,$02,$17,$7D
+	String	CC_Font1Pal3Pri,$02,$17,'}'
 	bra.w	.3
 .2
 	jsr	(printcurz).l
-	String	$8F,$02,$17,$20
+	String	CC_Font1Pal3Pri,$02,$17,' '
 .3
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
@@ -440,7 +440,7 @@ PStatsClearList						;SeasonPlayoffStats: erase the list area
 	move.w	#$7FF,d2
 	ori.w	#$8000,d2
 	jsr	(printz).l
-	String	$BF,$02,$0B
+	String	CC_Font1Pri,$02,$0B
 	jsr	(eraser).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
@@ -482,13 +482,13 @@ PStatsSetup							;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the h
 	move.w	d4,(pstatsblockchars).l
 	addi.w	#$20,d4
 	jsr	(printsmallz).l
-	String	$FF,$01,$FD,$00,$FC
+	String	CC_SetMap,$01,CC_SetX,$00,CC_SetY
 	moveq	#$28,d0
 	moveq	#$1C,d1
 	move.w	#$7FF,d2
 	jsr	(eraser).l
 	jsr	(printz).l
-	String	$BF,$00,$00
+	String	CC_Font1Pri,$00,$00
 	movea.l	#PlayerStatsBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -501,12 +501,12 @@ PStatsSetup							;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the h
 	moveq	#8,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$BF,$0B,$01
+	String	CC_Font1Pri,$0B,$01
 	movea.l	#SeasonStatsTitleMap,a0
 	btst	#2,(SeasonFlags).w
 	beq.w	.0
 	jsr	(printz).l
-	String	$BF,$0B,$01
+	String	CC_Font1Pri,$0B,$01
 	movea.l	#PlayoffStatsTitleMap,a0
 .0
 	movea.l	a0,a1
@@ -521,7 +521,7 @@ PStatsSetup							;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the h
 	jsr	(dobitmap).l
 	bsr.w	PStatsHelp
 	jsr	(printz).l
-	String	$FE,$00,$00
+	String	CC_Font2,$00,$00
 	movea.l	#IceBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -543,7 +543,7 @@ PStatsSetup							;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the h
 PStatsTeamBlock						;SeasonPlayoffStats: the team block of the shown team (DrawSetupTeamBlock)
 	move.w	d7,-(sp)
 	jsr	(printz).l
-	String	$BF,$01,$05
+	String	CC_Font1Pri,$01,$05
 	move.w	(pstatsblockchars).l,d4
 	move.w	(word_FF2720).l,d7
 	btst	#2,(SeasonFlags).w
@@ -558,11 +558,11 @@ PStatsHeading						;SeasonPlayoffStats: the column heading, players or goalies (
 	cmpi.w	#4,(pstatscat).w
 	bge.w	.0
 	jsr	(printbigz).l
-	String	$F8,$04,$01,$04,$08,'#  PLAYER         g   a   p   pim'
+	String	CC_SetMapAndPosition,$04,$01,$04,$08,'#  PLAYER         g   a   p   pim'
 	bra.w	.1
 .0
 	jsr	(printbigz).l
-	String	$F8,$04,$01,$04,$08,'#  GOALIE        s     sh    sp  '
+	String	CC_SetMapAndPosition,$04,$01,$04,$08,'#  GOALIE        s     sh    sp  '
 .1
 	rts
 
@@ -572,21 +572,21 @@ PStatsHelp							;SeasonPlayoffStats: the button help lines
 	move.w	(smallfontchars).w,-(sp)
 	move.w	(smallfont2chars).w,(smallfontchars).w
 	jsr	(printcurz).l
-	String	$8F,$04,$19,'{}-SCROLL LIST   A/C-TEAMS',$8F,$04,$1A,'[]-CATEGORY      B-GOALIES'
+	String	CC_Font1Pal3Pri,$04,$19,'{}-SCROLL LIST   A/C-TEAMS',CC_Font1Pal3Pri,$04,$1A,'[]-CATEGORY      B-GOALIES'
 	move.w	(sp)+,(smallfontchars).w
 	bra.w	.0
 .1
 	move.w	(smallfontchars).w,-(sp)
 	move.w	(smallfont2chars).w,(smallfontchars).w
 	jsr	(printcurz).l
-	String	$8F,$04,$19,'{}-SCROLL LIST   A/C-TEAMS',$8F,$04,$1A,'[]-CATEGORY      B-PLAYERS'
+	String	CC_Font1Pal3Pri,$04,$19,'{}-SCROLL LIST   A/C-TEAMS',CC_Font1Pal3Pri,$04,$1A,'[]-CATEGORY      B-PLAYERS'
 	move.w	(sp)+,(smallfontchars).w
 .0
 	rts
 
 PStatsCategory						;SeasonPlayoffStats: the name of category pstatscat (PStatsCategoryTxt)
 	jsr	(printz).l
-	String	$BF,$15,$05
+	String	CC_Font1Pri,$15,$05
 	movea.l	#PStatsCategoryTxt,a1
 	move.w	(pstatscat).w,d0
 	jsr	(SkipStrings).l
@@ -779,7 +779,7 @@ PStatsColumns						;PStatsPrintValue: the stat offsets of each category
 PStatsPrintList						;SeasonPlayoffStats: print the rows of the list
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printz).l
-	String	$8F,$00,$00
+	String	CC_Font1Pal3Pri,$00,$00
 	clr.w	d6
 	move.w	#$B,(printy).w
 .0
@@ -904,7 +904,7 @@ PStatsMark							;SeasonPlayoffStats: print a value, highlighted in the column o
 	cmp.w	(pstatscol).l,d0
 	bne.w	.0
 	jsr	(printsmallz).l
-	String	$FE,$05
+	String	CC_SetAttribute,$05
 .0
 	jsr	(printcur).l
 	move.w	(sp)+,(printa).w
@@ -1003,7 +1003,7 @@ PlayoffMenuScreen					;The playoff menu screen: the playoff tree from save RAM (
 	move.w	#$D,(menux).w
 	move.w	#6,(menuy).w
 	jsr	(printsmallz).l
-	String	$FF,$01,$FD,$0C,$FC,$0B
+	String	CC_SetMap,$01,CC_SetX,$0C,CC_SetY,$0B
 	move.w	#$11,d0
 	move.w	#$D,d1
 	move.w	#$7FF,d2
@@ -1026,13 +1026,13 @@ PlayoffMenuScreen					;The playoff menu screen: the playoff tree from save RAM (
 	move.w	#$12,(menux).w
 	move.w	#$F,(menuy).w
 	jsr	(printsmallz).l
-	String	$FF,$01,$FD,$0C,$FC,$0B
+	String	CC_SetMap,$01,CC_SetX,$0C,CC_SetY,$0B
 	move.w	#$11,d0
 	move.w	#$D,d1
 	move.w	#$7FF,d2
 	jsr	(eraser).l
 	jsr	(printsmallz).l
-	String	$FE,$07,$F9,$00,$FD,$0E,$FC,$0B,'Reset Rosters'
+	String	CC_SetAttribute,$07,CC_SetFont,$00,CC_SetX,$0E,CC_SetY,$0B,'Reset Rosters'
 	bra.w	.draw
 .6
 	cmpi.l	#$772,(NextScreenPtr).w
@@ -1053,7 +1053,7 @@ PlayoffMenuRoutines					;PlayoffMenuScreen: the routine of each menu item
 PlayoffMenuDraw						;PlayoffMenuScreen: draw the menu (PrintMenuList2)
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printz).l
-	String	$8F,$00,$00
+	String	CC_Font1Pal3Pri,$00,$00
 	jsr	(PrintMenuList2).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
@@ -1102,13 +1102,13 @@ PlayoffMenuSetup					;PlayoffMenuScreen: vram and the screen bitmaps
 	jsr	(DecompressGraphicsPlain).l
 	bclr	#2,(sflags11).w
 	jsr	(printsmallz).l
-	String	$FF,$01,$FD,$00,$FC
+	String	CC_SetMap,$01,CC_SetX,$00,CC_SetY
 	moveq	#$28,d0
 	moveq	#$1C,d1
 	move.w	#$7FF,d2
 	jsr	(eraser).l
 	jsr	(printz).l
-	String	$BF,$00,$00
+	String	CC_Font1Pri,$00,$00
 	movea.l	#TransactionsBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -1121,7 +1121,7 @@ PlayoffMenuSetup					;PlayoffMenuScreen: vram and the screen bitmaps
 	moveq	#$C,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$BF,$0B,$01
+	String	CC_Font1Pri,$0B,$01
 	movea.l	#TransactionsTitleMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
@@ -1134,7 +1134,7 @@ PlayoffMenuSetup					;PlayoffMenuScreen: vram and the screen bitmaps
 	moveq	#8,d5
 	jsr	(dobitmap).l
 	jsr	(printz).l
-	String	$FE,$00,$00
+	String	CC_Font2,$00,$00
 	movea.l	#ControllerBgMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
