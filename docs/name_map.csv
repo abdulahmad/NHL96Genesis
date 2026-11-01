@@ -893,7 +893,7 @@ $022A2C,ShowInjuryBox,loc_22A2C,,goal96_box
 $022B70,PenaltyShotBox,sub_22B70,,goal96_box
 $022C3E,PenShotBigTxt,unk_22C3E,,goal96_box
 $022C5E,ShowGoalBox,loc_22C5E,,goal96_box
-$022DE0,GoalBigTxt,unk_22DE0,,goal96_box
+$022DE0,GoalBoxText,unk_22DE0,GoalBigTxt,goal96_box
 $022E1C,PPGoalBigTxt,unk_22E1C,,goal96_box
 $022E58,box,sub_22E58,,goal96_box
 $022E70,GetPlayerName,sub_22E70,,middle96
