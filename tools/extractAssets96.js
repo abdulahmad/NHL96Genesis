@@ -258,7 +258,7 @@ const assets = [
     { name: 'snd96_song_5E.bin', folder: 'NHL96/Sound/Bank', start: 0x00088318, end: 0x00088324 }, // song 94
     { name: 'snd96_list_00.bin', folder: 'NHL96/Sound/Bank', start: 0x00088324, end: 0x0008834b }, // list 0
     { name: 'snd96_list_01.bin', folder: 'NHL96/Sound/Bank', start: 0x0008834b, end: 0x0008839e }, // list 1
-    { name: 'ScoutTextScript.bin', folder: 'NHL96/Text', start: 0x0008880a, end: 0x00088a18 }, // ScoutTextScript
+    { name: 'ScoutingReportText.bin', folder: 'NHL96/Text', start: 0x0008880a, end: 0x00088a18 }, // ScoutingReportText
     { name: 'TitleScreenImg.map.jim', folder: 'NHL96/Graphics', start: 0x00088a18, end: 0x0008f2c6 }, // TitleScreenImg
     { name: 'NHLShieldMap.map.jim', folder: 'NHL96/Graphics', start: 0x0008f2c6, end: 0x00090686 }, // NHLShieldMap
     { name: 'NHLPALogoMap.map.jim', folder: 'NHL96/Graphics', start: 0x00090686, end: 0x000911b8 }, // NHLPALogoMap

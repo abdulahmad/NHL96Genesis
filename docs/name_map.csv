@@ -1023,7 +1023,7 @@ $08878C,RandomSongs,unk_8878C,,sound96
 $088794,p_initialZ80,,,sound96
 $0887DC,ClearAllTrackAndSFXSlots,,,sound96
 $0887E4,newcheck,sub_887E4,,sound96
-$08880A,ScoutTextScript,,,scout96
+$08880A,ScoutingReportText,,ScoutTextScript,scout96
 $088A18,TitleScreenImg,unk_88A18,,scout96
 $08F2C6,NHLShieldMap,unk_8F2C6,,graphics96
 $090686,NHLPALogoMap,unk_90686,,graphics96
