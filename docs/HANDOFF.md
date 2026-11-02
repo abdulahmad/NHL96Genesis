@@ -132,7 +132,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
 - code96_06 converted: updatereplay, updateplayers, updateanim, checkwindow, the pad switches (chgplayer,
   setcplayer, setc1-4player, restorepl, setpads), burst, Holdplayer, FindGoalie, GetGoalieCount(D7) and
   GetPlayerCount(D7) (96 reads the counts from save RAM SRTeamCounts). MATCH (segment and ROM).
-- The 96 asstab uses the 94 assignment numbers (NHL94Genesis data94.asm asstab), not 95's: entry n of the 96 table
+- The 96 asstab uses the 94 assignment numbers (NHL94Genesis tables94.asm asstab), not 95's: entry n of the 96 table
   matches the 94 routine n by bytes (RAM words masked). So the asstab entries take their 95 / 94 names by index:
   here assscore, assstanley (94 only), asseben, assepen, assbench, asspenalty, assdopen, assgoaliecpu, assgoaliectrl,
   assgoaliebreakwait. The entries in code96_03 ($1-$6: assdefo, assdefd, asswingd, asswingo, asscenterd,
