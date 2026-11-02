@@ -1,5 +1,13 @@
 # HANDOFF (NHL96)
 
+## Now
+
+- Stage / unit: see the shared plan (https://github.com/abdulahmad/nhl-disasm-report/blob/main/docs/ALIGNMENT.md); alignment work for 96G is on `claude/project-thread-ggw7zu`.
+- Branch: `claude/project-thread-ggw7zu`
+- Last check: (update when you stop)
+- Next: (update when you stop)
+- Open PRs: none
+
 ## Purpose
 A bit-perfect SNASM68k disassembly of NHL 96 (Sega Genesis) that reads like original source, named after
 the NHL95Genesis lineage. Code and data never change: every build must MATCH the retail ROM.
