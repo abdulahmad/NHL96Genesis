@@ -81,7 +81,7 @@ Every row is matched. Rows are in ROM order and tile `$000000` up to the `$FF` f
 | awards96 | matched, 1374 bytes | $013EA0 | $0143FD | code | awards95 | ScoutingReport, ResolveDayGames, BeginPlayoffs, InitPlayoffs, SeedPairings, SortSeeds, CalcSeedPoints, SetupPlayoffs, GetTeamPOSlot, BuildPOSlots |
 | pause96_list | matched, 590 bytes | $0143FE | $01464B | code | pause95 | PrintMenuList, ScrollClearTxt, PrintMenuList2 |
 | hockey96 | matched, 1660 bytes | $01464C | $014CC7 | code | hockey95 | Begin, StartGame, StartPer, Gameloop, DoGameFrame, DoFrameUpdates, ResetClock, restoreteams, RestoreBenchEnergy, updatecrowdf, clockcont |
-| pause96 | matched, 1330 bytes | $014CC8 | $0151F9 | code | pause95 | demoread, EndDemoOnPress, startpause1-4, Pausemode, SetupPauseScreen, seta2, InitMenuState, HandleMenuInput, UpdateMenuSelection, PrintMenuItem, vcountwait |
+| pause96 | matched, 1330 bytes | $014CC8 | $0151F9 | code | pause95 | demoread, EndDemoOnPress, startpause1-4, Pausemode, Pausemode_pall, seta2, Pausemode_top, HandleMenuInput, Pausemode_Pmenu, PrintMenuItem, vcountwait |
 | setup96 | matched, 662 bytes | $0151FA | $01548F | code | setup95 | GetNameandAttrib, attribjmp, AttribStatus, AttribEnergy, AttribHanded, AttribWeight, AttribFighting, AttribRating |
 | pause96_menu | matched, 740 bytes | $015490 | $015773 | code | pause95 | PlayoffStatsMenu, TimeoutMenu, SelectGoalieMenu |
 | players96_count | matched, 168 bytes | $015774 | $01581B | code | players95, middle95, video95 | GetGoalieCount(D7), GetPlayerCount(D7), WaitVSyncAndReadInput |

@@ -114,8 +114,8 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   names: InitPlayoffs, SeedPairings, SortSeeds, CalcSeedPoints, CopyBytes, ConferenceTeams1 / 2, SetupPlayoffs;
   96 seeds the 16 slots by conference and division, TeamDivisions), ResolveGames, the hockey95 game flow (Begin,
   StartGame, StartPer, Gameloop, DoGameFrame), ResetClock, restoreteams, RestoreBenchEnergy, updatecrowdf, clockcont,
-  demoread, startpause1-4 and the pause95 menu (Pausemode, seta2, InitMenuState, HandleMenuInput,
-  UpdateMenuSelection, PrintMenuItem). The 96 menu code is shorter than 95's; the names follow the 95 role.
+  demoread, startpause1-4 and the pause95 menu (Pausemode, seta2, Pausemode_top, HandleMenuInput,
+  Pausemode_Pmenu, PrintMenuItem). The 96 menu code is shorter than 95's; the names follow the 95 role.
 - unk_13558 is SeasonSchedule (the 95G Day format, 191 days): written with the Day macro and the team equates.
 - Byte runs with labels: GetNameandAttrib, attribjmp (written as offsets) and the Attrib column handlers
   (StatusTextTbl, InjuryGamesTbl, HandedTextTbl as Strings; 96 adds RatingToWeight / WeightTbl), TimeoutMenu and
@@ -211,7 +211,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   Z80 program and the start of the sound bank. MATCH (segment and ROM).
 - The tables are written as source: CrowdFrameTbl, bfasciicon, linelist, PlayerPositionText, PerLabels(2), sizetab,
   sublist, priolist and the attribute columns as in 95; the pause, intermission and line menus as String items with
-  dc.l handlers (InitMenuState lists). code96_09's intermission table is now IntermissionMenus (dc.l of the menus).
+  dc.l handlers (Pausemode_top lists). code96_09's intermission table is now IntermissionMenus (dc.l of the menus).
 - Menu handlers named by their item, as 95's pause menus name them: PlayGame, LineEditor, GameStatisticsScreen,
   PlayerStatsScreen, ScoringSummaryScreen, PenaltySummaryScreen, TeamRosterScreen, RecordHoldersScreen,
   PeriodStatsScreen, ManualGoalieMenu, ShootoutShooters, SaveTeamLine, LoadTeamLine (externs96), AbortGame and

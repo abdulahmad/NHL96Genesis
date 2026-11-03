@@ -454,13 +454,13 @@ $014D74,startpause2,loc_14D74,,pause96
 $014D7C,startpause3,loc_14D7C,,pause96
 $014D84,startpause4,loc_14D84,,pause96
 $014D8C,Pausemode,sub_14D8C,,pause96
-$014F14,SetupPauseScreen,unk_14F14,,pause96
+$014F14,Pausemode_pall,unk_14F14,SetupPauseScreen,pause96
 $014F20,seta2,sub_14F20,,pause96
-$014F70,InitMenuState,sub_14F70,,pause96
+$014F70,Pausemode_top,sub_14F70,InitMenuState,pause96
 $014F80,DrawMenuScreen,sub_14F80,,pause96
 $014F92,SetMenuPrintX,sub_14F92,,pause96
 $014FA8,HandleMenuInput,sub_14FA8,,pause96
-$015048,UpdateMenuSelection,sub_15048,,pause96
+$015048,Pausemode_Pmenu,sub_15048,UpdateMenuSelection,pause96
 $015170,PrintMenuItem,sub_15170,,pause96
 $0151E0,vcountwait,sub_151E0,,pause96
 $0151FA,GetNameandAttrib,,,setup96

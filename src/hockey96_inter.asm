@@ -40,8 +40,8 @@ Intermission						;Before the period: at game over (gsp 4) the records (UpdateRe
 	movea.l	#ShootoutIntermissionMenu,a0
 .3
 	bset	#sfpz,(sflags).w
-	movea.l	#SetupPauseScreen,a1
-	jsr	(InitMenuState).l
+	movea.l	#Pausemode_pall,a1
+	jsr	(Pausemode_top).l
 	move.w	#$A8C,(IntermissionTimer).w
 .4
 	tst.w	(demoflag).w

@@ -95,7 +95,7 @@ Pausemode							;Game is in pause mode now: restart the sound driver, run the pa
 	bsr.w	seta2
 	jsr	(SetMenuPadSide).l
 	movea.l	#PauseMenu,a0
-	lea	SetupPauseScreen(pc),a1
+	lea	Pausemode_pall(pc),a1
 	btst	#0,(gmode2).w
 	beq.w	.0
 	movea.l	#ShootoutPauseMenu,a0
@@ -105,7 +105,7 @@ Pausemode							;Game is in pause mode now: restart the sound driver, run the pa
 	beq.w	.1
 	movea.l	#PauseMenuNoTimeout,a0
 .1
-	bsr.w	InitMenuState
+	bsr.w	Pausemode_top
 .2
 	bsr.w	vcountwait
 	bsr.w	ReadMenuJoy
@@ -141,7 +141,7 @@ Pausemode							;Game is in pause mode now: restart the sound driver, run the pa
 	dc.b	$00,$02,$03,$4A,$31,$FC,$00,$18,$BD,$3C,$4A,$78,$BD,$3C,$6A,$FA
 	dc.b	$31,$F8,$B0,$52,$B0,$54,$4E,$75
 
-SetupPauseScreen					;Draw routine for the pause menu: the pause screen, then KillCrowd.
+Pausemode_pall						;Draw routine for the pause menu: the pause screen, then KillCrowd.
 									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$1E,$29,$70,$4E,$B9,$00,$02,$0E,$28
 
@@ -170,7 +170,7 @@ seta2								;Set a2 to the team struct of the pause pad
 .x
 	rts
 
-InitMenuState						;Start a menu: a0 = item list, a1 = screen draw routine; selection and
+Pausemode_top						;Start a menu: a0 = item list, a1 = screen draw routine; selection and
 									;first shown item 0. Falls into
 									;DrawMenuScreen
 	move.l	a0,(menulist).w
@@ -179,10 +179,10 @@ InitMenuState						;Start a menu: a0 = item list, a1 = screen draw routine; sele
 	clr.w	(menuitem+2).w
 
 DrawMenuScreen						;Call the draw routine, print the items
-									;(UpdateMenuSelection), palcount $18
+									;(Pausemode_Pmenu), palcount $18
 	movea.l	(menudraw).w,a0
 	jsr	(a0)
-	bsr.w	UpdateMenuSelection
+	bsr.w	Pausemode_Pmenu
 	move.w	#$18,(palcount).w
 	rts
 
@@ -200,12 +200,12 @@ HandleMenuInput						;Pause menu pad d1: up / down move the selection, C runs th
 	btst	#1,d1
 	beq.w	.up
 	addq.w	#1,(menuitem).w
-	bra.w	UpdateMenuSelection
+	bra.w	Pausemode_Pmenu
 .up
 	btst	#0,d1
 	beq.w	.sel
 	subq.w	#1,(menuitem).w
-	bra.w	UpdateMenuSelection
+	bra.w	Pausemode_Pmenu
 .sel
 	btst	#5,d1
 	beq.w	.2
@@ -235,7 +235,7 @@ HandleMenuInput						;Pause menu pad d1: up / down move the selection, C runs th
 	cmpa.l	#ManualGoalieMenu,a0
 	bne.w	.11
 .0
-	bsr.w	UpdateMenuSelection
+	bsr.w	Pausemode_Pmenu
 	bra.w	.1
 .11
 	bsr.w	DrawMenuScreen
@@ -246,7 +246,7 @@ HandleMenuInput						;Pause menu pad d1: up / down move the selection, C runs th
 	eori	#4,ccr
 	rts
 
-UpdateMenuSelection					;Clamp menuitem to the list, scroll menuitem+2 to show it, and print the
+Pausemode_Pmenu						;Clamp menuitem to the list, scroll menuitem+2 to show it, and print the
 									;shown items
 	jsr	(printsmallz).l
 	String	CC_SetAttribute,$04

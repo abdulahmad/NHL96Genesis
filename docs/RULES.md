@@ -24,3 +24,4 @@ rule in the same commit as the fix that confirmed it, newest last: `- YYYY-MM-DD
 
 ## Learned
 
+- 2026-11-03 names: the pause menu routines keep the 92G-95G names (Pausemode_pall, Pausemode_top, Pausemode_Pmenu), not new 96 names; the bodies match 95G line for line. (owner spotted SetupPauseScreen in the report)
