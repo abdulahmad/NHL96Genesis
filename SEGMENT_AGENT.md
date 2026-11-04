@@ -65,7 +65,7 @@ Every row is matched. Rows are in ROM order and tile `$000000` up to the `$FF` f
 | frames96 | matched, 14162 bytes | $005F96 | $0096E7 | data | frames95 | SPAlist and the sprite animation tables, named SPAxxxx by their SPA value until the code that uses them is converted |
 | srambits96 | matched, 738 bytes | $0096E8 | $0099C9 | code | - | WriteSRAMBits, ReadSRAMBits (new: bit fields in the save RAM), then bytes the listing does not decode |
 | faceoff96 | matched, 2834 bytes | $0099CA | $00A4DB | code | faceoff95 | faceoffinput, the faceoff routines assfaceoff ... puckfaceoff2 and Endfaceoff (bytes: not decoded in the listing), DrawFaceoffWindow, limitfo |
-| input96 | matched, 2930 bytes | $00A4DC | $00B04D | code | input95 | updatepadinput, doinput (doinput_goaliedive, doinput_cbut, ClampTargetY, doinput_chkanim, doinput_skater, doinput_ispc, doinput_islocked), PadOnTeam |
+| input96 | matched, 2930 bytes | $00A4DC | $00B04D | code | input95 | updatepadinput, doinput (doinput_goaliedive, doinput_cbut, ClampTargetY, doinput_chkanim, doinput_skater, doinput_ispc, doinput_islocked), StartDpadBoost, PadOnTeam |
 | goal96 | matched, 1402 bytes | $00B04E | $00B5C7 | code | goal95 | SetContTeams, DrawPadSetup, DrawPadIcon, ControllerSetupScreen, PrintSetupStr(Hi), ReadAllPads |
 | fourway96 | matched, 216 bytes | $00B5C8 | $00B69F | code | fourway95 | Detect4WayPlay, ReadJoySwapPad1-4 |
 | fight96 | matched, 3752 bytes | $00B6A0 | $00C547 | code | - | new in 96: checkfight, startfight, SetInst, fightinput, ClearMessageLine; assfight and assfwatch as bytes |

@@ -83,7 +83,7 @@ One module per commit. After each move: `tools/verify_all.sh` ends in `ALL MATCH
 1. `engine/fight96.asm` — done. `checkfight` through `SetFightingMajors`.
 2. `engine/fourway96.asm` — done. `Detect4WayPlay` through `ReadJoySwapPad4`.
 3. `engine/goal96.asm` — done. `SetContTeams` through `ReadAllPads`.
-4. `engine/input96.asm` — done. `updatepadinput` through `PadOnTeam` (doinput, including the goalie parts that 95G kept in skate95; they are inside doinput here). `PadOnTeam` follows `sub_AFDA` and `doinput` branches to it, so it stays in this file.
+4. `engine/input96.asm` — done. `updatepadinput` through `PadOnTeam` (doinput, including the goalie parts that 95G kept in skate95; they are inside doinput here). `PadOnTeam` follows `StartDpadBoost` and `doinput` branches to it, so it stays in this file.
 5. `engine/faceoff96.asm` — done. `faceoffinput` through `Endfaceoff`. What remains of code96_02 is `WriteSRAMBits` / `ReadSRAMBits` and the unreferenced bytes between them and the faceoff.
 6. `src/srambits96.asm` — done. `WriteSRAMBits` / `ReadSRAMBits` and the unreferenced bytes that follow them. The 95G save-RAM block is later and is the file that gets the name `src/sram96.asm`.
 7. `engine/logic96.asm` — done. `asstab` through `DoubleMinorPenalties`. The penalty texts sit at the end of that run and stay in the file until penalty96 is the next include. `SetLCmode` is what remains of code96_03.
@@ -177,7 +177,7 @@ File headers are already short stories in most converted files. When a file is s
 
 The file split, the asset extraction, and the names that already match 95G are done. What is left is inside those files. A generic label is finished when it has a real name in the source and in `docs/name_map.csv`, or a closed-list row with the reason. The symbols pass is finished when every hex immediate that already has an equate uses that equate and the ROM still matches.
 
-Status after the October 2026 naming pass (branch `naming-pass`, see `docs/HANDOFF.md`): 57 generic labels remain, each on the Unsure list with its reason. 46 RAM (`src/ram96.asm`; 14 of them have no uses), 4 graphics `unk_` incbins in `src/graphics96.asm`, and 7 code labels (`sub_AFDA`, `loc_C068`, `sub_11582`, `nullsub_2`, `sub_14804`, `sub_1D920A`, `sub_1E0D86`). `input96_shot` closed its three (`SetRoles`, `SetTeamRoles`, `ClearRolesIfGoalie`). Steps 1-6 below are done except for those; step 7 (symbols) and step 8 (docs) remain.
+Status after the October 2026 naming pass (branch `naming-pass`, see `docs/HANDOFF.md`): 56 generic labels remain, each on the Unsure list with its reason. 46 RAM (`src/ram96.asm`; 14 of them have no uses), 4 graphics `unk_` incbins in `src/graphics96.asm`, and 6 code labels (`loc_C068`, `sub_11582`, `nullsub_2`, `sub_14804`, `sub_1D920A`, `sub_1E0D86`). `input96_shot` closed its three; `input96` closed `StartDpadBoost`. Steps 1-6 below are done except for those; step 7 (symbols) and step 8 (docs) remain.
 
 A routine that matches 95G takes the 95G name. The clash rule stays: the earlier meaning keeps the name. A label with no parent match is named from what the code does, and only when that is obvious. A name that would be a guess is a closed-list row. One file per commit. `tools/verify_all.sh` ends in `ALL MATCH` before the commit. Push to main. No force-push.
 

@@ -2,11 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 `engine/input96_shot.asm` rename (SetRoles, SetTeamRoles, ClearRolesIfGoalie). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
+- Stage / unit: D6 `engine/input96.asm` rename (StartDpadBoost). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
 - Branch: `claude/project-thread-ggw7zu`
 - Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04)
-- D6: this unit renamed the three input96_shot generics. Other Unsure rows stay for later modules. Do not merge to main.
-- Next: one more 96G module of leftover generics. Stop after this unit. No 95PC leftovers, no C ports.
+- D6: this unit renamed input96 `sub_AFDA` → `StartDpadBoost`. Other Unsure rows stay for later modules. Do not merge to main.
+- Next: remaining 96G leftover generics (fight96, season96, create96, hockey96, code96_15, teamgfx96, graphics unk_, RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
 - Open PRs: #43
 
 ## Purpose
@@ -80,7 +80,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
 - Code the listing leaves as dc.b (reached through tables or not referenced) stays as bytes, split at the labels the
   pointers or 95G byte matches show (assfaceoff ... puckfaceoff2, Endfaceoff, ReadJoySwapPad1-4; PrintSetupStrHi
   is 95G source, same bytes). Code bytes after sub_975A have no reference and no name.
-- Kept as IDA names (no clear match): sub_AFDA, sub_B6A0, loc_AFD4, and outside loc_14D6E-loc_14D84 (doinput start
+- Kept as IDA names (no clear match): sub_B6A0, loc_AFD4, and outside loc_14D6E-loc_14D84 (doinput start)
   button), loc_EE0E (95 jumps to lineinput there, but the 96 code differs), loc_1A62A, loc_16934, loc_C26C.
 - RAM: about 80 IDA names renamed (ram96.asm, name_map.csv). Crowdlevel and padiconchars2 share $FFFFB8B2 (the setup
   screen keeps pad icon chars in game RAM). 96 tmstruct is $FFFFC726 with size $39E (equals.inc tmsize is still 95's
@@ -528,7 +528,7 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
 
 ## Unsure
 
-D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. `input96_shot` is done. Other rows stay until that module is the unit.
+D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. `input96_shot` and `input96` (`StartDpadBoost`) are done. Other rows stay until that module is the unit.
 
 Copied from `docs/align95_plan.md`. Leave these alone.
 
@@ -560,7 +560,8 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
 - For Abdul: names kept from 95G by role and interface where the body is new: SimTeamGoals, SimScorers, SimShots
   (season sim), ClearSeasonData (season96). Swap for new names if role is not enough.
 - For Abdul: the asstab entries $1-$6 are named by role and the 94 numbering, not a byte match (see the logic96 bullet).
-- sub_AFDA (input96): start + dpad sets SPA288C, pflags2 bit 1 and Xvel + $64. What SPA288C is, is not known.
+- StartDpadBoost (input96): closed 2026-11-04. Start + dpad on a skater sets SPA288C, pf2aip and Xvel + $64
+  unless pf2unav or gmclock. No 95G parent (95G start always pauses).
 - loc_C068 (fight96): a fighter engages (SPA3128); the second one turns the roughing calls into fighting majors.
   Reached from assfight and fightinput, so it stays global; the meaning of SPA3128 is not proven.
 - SetRoles / SetTeamRoles / ClearRolesIfGoalie (input96_shot): closed 2026-11-04. Once a second (sf3icetime)

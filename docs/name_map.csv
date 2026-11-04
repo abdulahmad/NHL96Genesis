@@ -232,7 +232,7 @@ $00AD52,doinput_skater,loc_AD52,,input96
 $00ADD4,doinput_ispc,loc_ADD4,,input96
 $00AF5A,doinput_islocked,loc_AF5A,,input96
 $00AFD4,JumpToDoplayeracc,loc_AFD4,,input96
-$00AFDA,sub_AFDA,,,input96
+$00AFDA,StartDpadBoost,sub_AFDA,,input96
 $00B00E,PadOnTeam,sub_B00E,,input96
 $00B04E,SetContTeams,sub_B04E,,goal96
 $00B1E2,ContTeamOrder1,,,goal96

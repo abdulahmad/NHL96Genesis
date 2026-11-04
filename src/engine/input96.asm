@@ -114,7 +114,7 @@ doinput								;Process controller input for player a3: d0 = dpad, d1 = new butt
 	andi.b	#$F,d3
 	movem.w	(sp)+,d3
 	beq.w	.8
-	jsr	(sub_AFDA).l
+	jsr	(StartDpadBoost).l
 	bra.w	.nostart
 .8
 	tst.w	d4
@@ -803,8 +803,8 @@ JumpToDoplayeracc					;jmp doplayeracc, shared by doinput_chkanim,
 									;doinput_skater and doinput_islocked
 	jmp	doplayeracc
 
-sub_AFDA							;Start with a dpad direction: SPA288C with pflags2 bit 1 set and Xvel +
-									;$64, not while pflags2 bit 2 or gmode bit 0 is set
+StartDpadBoost						;Start with a dpad direction: SPA288C with pf2aip set and Xvel +
+									;$64, not while pf2unav or gmclock is set
 	btst	#2,pflags2(a3)
 	bne.w	.0
 	btst	#gmclock,(gmode).w
