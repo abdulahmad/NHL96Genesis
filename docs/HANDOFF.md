@@ -4,7 +4,7 @@
 
 - Stage / unit: D6 ram96 leftover `word_FF` / `byte_FF` / `dword_FF` named from job, 94G/95G RAM, or layout.
 - Branch: `claude/project-thread-ggw7zu`
-- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04).
+- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04). Report `tools/gate.sh` PAIRING OK, 96G SHA `2a7c295`.
 - D6: leftover IDA RAM names closed. For-Abdul non-generic Unsure rows stay. Do not merge to main.
 - Next: pairing in nhl-disasm-report. No 95PC leftovers, no C ports.
 - Open PRs: #43
