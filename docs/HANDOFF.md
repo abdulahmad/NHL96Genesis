@@ -4,10 +4,10 @@
 
 - Stage / unit: D6 For-Abdul 95G names (ClearMenuBox, StanleyCupScreen; PauseScreenDraw, SimTeamGoals, SimScorers, SimShots, ClearSeasonData kept).
 - Branch: `claude/project-thread-ggw7zu`
-- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04)
+- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04). Report pairing OK, 96G SHA `fb49066`.
 - D6: same job + new body takes the 95G name. These For-Abdul role matches are closed. Do not merge to main.
 - Next: STOP. Remaining For-Abdul: asstab $1-$6, picture-contradiction names. No Studio, no 95PC leftovers, no C ports.
-- Open PRs: #43
+- Open PRs: #44
 
 ## Purpose
 A bit-perfect SNASM68k disassembly of NHL 96 (Sega Genesis) that reads like original source, named after
