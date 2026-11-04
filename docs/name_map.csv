@@ -440,7 +440,7 @@ $014554,ScrollDownTxt,,,pause96_list
 $01455A,PrintMenuList2,sub_1455A,,pause96_list
 $01464C,Begin,loc_1464C,,hockey96
 $014702,StartGame,loc_14702,,hockey96
-$014804,sub_14804,sub_14804,,hockey96
+$014804,ClearSavedPlayoffs,sub_14804,,hockey96
 $01481A,restoreteams,sub_1481A,,hockey96
 $01483A,ResetClock,sub_1483A,,hockey96
 $0148A2,GetPeriodTime,sub_148A2,,hockey96

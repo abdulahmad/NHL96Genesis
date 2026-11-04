@@ -61,7 +61,7 @@ StartGame							;Reset game state for a new game, then start the first period
 .1
 	cmpi.w	#1,(OptPlayMode).w
 	ble.w	.2
-	bsr.w	sub_14804
+	bsr.w	ClearSavedPlayoffs
 .2
 	jsr	(clearTeamStats).l
 	btst	#0,(gmode2).w
@@ -100,7 +100,8 @@ StartGame							;Reset game state for a new game, then start the first period
 	jsr	(InitCrowdMeter).l
 	jmp	IntermissionStart
 
-sub_14804
+ClearSavedPlayoffs					;StartGame when OptPlayMode > 1: clear save RAM $E68-$ECD (the playoff
+									;block ClearPlayoffSave also clears)
 	move.l	#$E68,d0
 	moveq	#$66,d1
 	jsr	(ClearSRAMBytes).l

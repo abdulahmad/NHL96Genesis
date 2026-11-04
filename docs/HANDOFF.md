@@ -2,11 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 `front/create96.asm` rename (CheckTeamLines). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
+- Stage / unit: D6 `hockey96.asm` rename (ClearSavedPlayoffs). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
 - Branch: `claude/project-thread-ggw7zu`
 - Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04)
-- D6: this unit renamed create96 `sub_1E0D86` → `CheckTeamLines`. Other Unsure rows stay for later modules. Do not merge to main.
-- Next: remaining 96G leftover generics (hockey96, code96_15, teamgfx96, graphics unk_, RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
+- D6: this unit renamed hockey96 `sub_14804` → `ClearSavedPlayoffs`. Other Unsure rows stay for later modules. Do not merge to main.
+- Next: remaining 96G leftover generics (code96_15, teamgfx96, graphics unk_, RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
 - Open PRs: #43
 
 ## Purpose
@@ -528,7 +528,7 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
 
 ## Unsure
 
-D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. `input96_shot`, `input96`, `fight96`, `season96` and `create96` (`CheckTeamLines`) are done. Other rows stay until that module is the unit.
+D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. Through `hockey96` (`ClearSavedPlayoffs`). Other rows stay until that module is the unit.
 
 Copied from `docs/align95_plan.md`. Leave these alone.
 
@@ -568,7 +568,8 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
   SetRoles remaps each full-strength team's role byte $65 from the last puck carrier and the puck's X zone
   (RoleTable); ClearRolesIfGoalie restores own positions when the goalie has the puck in his end. No 95G parent.
 - nullsub_2 (teamgfx96): an rts called once, at game over after EncodePW; 94 / 95 have no call there.
-- sub_14804 (hockey96): clears save RAM $E68-$ECD in StartGame (OptPlayMode above 1); what lives there is not known.
+- ClearSavedPlayoffs (hockey96): closed 2026-11-04. StartGame when OptPlayMode > 1: clear save RAM $E68-$ECD
+  (the playoff block ClearPlayoffSave also clears). No 95G parent (95 StartGame 2-3 calls ClearShotData).
 - sub_1D920A (code96_15): called before setpassmode / SetShotMode and has no effect (the movem undoes the load).
 - For Abdul: PauseScreenDraw (pause96_return) has 95G's caller and job but a rewritten body.
 - RAM: 46 IDA names stay. No uses at all (unk_FFB65E, unk_FFB6DE, byte_FFB7BC, unk_FFC058, unk_FFCFB4, dword_FFD234, the
