@@ -1,5 +1,8 @@
 ;	The shot and the pass. shotdiradj aims the shot, SetShotMode and ShotMode wind up, and
-;	doshot releases it. setpassmode, dopass and passtoa0 send the puck to a teammate.
+;	doshot releases it. setpassmode, dopass and passtoa0 send the puck to a teammate. Once a
+;	second SetRoles remaps each full-strength team's role byte from the last puck carrier
+;	and the puck's side of the ice; ClearRolesIfGoalie puts everyone back on their own
+;	position when the goalie has the puck in his end.
 
 shotdiradj							;Adjust the shot direction by the pad and the shooter
 	btst	#pf3onetimer,pflags3(a3)	;check if shooting one timer
@@ -495,7 +498,7 @@ dopass								;Pass the puck
 	bsr.w	passtoa0
 	bra.w	.8
 .7
-	move.w	SCnum(a3),(word_FFD238).w
+	move.w	SCnum(a3),(DumpPassSc).w
 	move.w	(passdir).w,d0			;just hit puck in pass dir not to any player
 	asl.w	#2,d0
 	movea.l	#dirtab,a0
@@ -572,7 +575,7 @@ dopass								;Pass the puck
 	rts
 
 passtoa0							;Pass the puck to player a0
-	st	(word_FFD238).w
+	st	(DumpPassSc).w
 	jsr	(loadTeamStruct).l
 	addq.w	#1,$12(a2)				;add 1 to total pass attempts
 	move.w	SCnum(a0),(passplayer).w
@@ -734,7 +737,9 @@ passtoa0							;Pass the puck to player a0
 .13
 	rts
 
-sub_FD14
+SetRoles							;Once a second (sf3icetime): CheckRoles, then SetTeamRoles for each
+									;full-strength team that has a last puck carrier. d7 is the puck's
+									;X zone: 0 left of -$32, 1 centre, 2 right of $32
 	movem.l	d0-d7/a0-a5,-(sp)
 	bsr.w	CheckRoles
 	move.w	(puckx).w,d0
@@ -751,23 +756,25 @@ sub_FD14
 	clr.w	d7
 .2
 	movea.l	#SortCords,a5
-	move.w	(word_FFD23A).w,d6
+	move.w	(LastCarrierHome).w,d6
 	bmi.w	.3
 	cmpi.w	#6,(tmstruct+tmap).w
 	bne.w	.3
-	bsr.w	sub_FD80
+	bsr.w	SetTeamRoles
 .3
 	movea.l	#SortCords+$300,a5
-	move.w	(word_FFD23C).w,d6
+	move.w	(LastCarrierAway).w,d6
 	bmi.w	.4
 	cmpi.w	#6,(AwShots+tmap).w
 	bne.w	.4
-	bsr.w	sub_FD80
+	bsr.w	SetTeamRoles
 .4
 	movem.l	(sp)+,d0-d7/a0-a5
 	rts
 
-sub_FD80
+SetTeamRoles						;Team a5, last carrier d6, puck zone d7. Remap each player's role byte
+									;$65 from RoleTable keyed by (carrier role<<2)|zone. A defenseman who
+									;has already walked past his matching winger is left alone.
 	move.w	d7,-(sp)
 	asl.w	#7,d6
 	movea.l	#SortCords,a3
@@ -784,7 +791,7 @@ sub_FD80
 	or.b	d7,d6
 	andi.w	#$1F,d6
 	asl.w	#2,d6
-	movea.l	#$FEAA,a0
+	movea.l	#RoleTable,a0
 	movea.l	(a0,d6.w),a0
 	cmpa.l	#0,a0
 	beq.w	.15
@@ -864,6 +871,9 @@ sub_FD80
 .15
 	move.w	(sp)+,d7
 	rts
+
+RoleTable							;Longs indexed by (role<<2)|puck X zone. Each long is a 6-byte remap of
+									;roles 0-5, or 0 for no change. Goalie (role 0) has no remap.
 	dc.b	$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 	dc.b	$00,$00,$FF,$59,$00,$00,$FF,$59,$00,$00,$FF,$59,$00,$00,$00,$00
 	dc.b	$00,$00,$FF,$60,$00,$00,$FF,$60,$00,$00,$FF,$60,$00,$00,$00,$00
@@ -875,16 +885,22 @@ sub_FD80
 	dc.b	$FF,$04,$03,$FF,$FF,$FF,$FF,$FF,$04,$03,$FF,$FF,$FF,$FF,$FF,$FF
 	dc.b	$05,$04,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$04,$05,$03
 	dc.b	$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$05,$04,$FF,$FF
-	dc.b	$03,$FF,$01,$FF,$FF,$FF,$FF,$FF,$05,$FF,$FF,$02,$FF,$FF,$48,$E7
-	dc.b	$70,$80,$0C,$78,$00,$02,$D2,$68,$67,$00,$00,$44,$4A,$6B,$00,$34
-	dc.b	$6B,$00,$00,$3C,$42,$40,$10,$2B,$00,$65,$6A,$00,$00,$06,$30,$2B
-	dc.b	$00,$34,$32,$2B,$00,$36,$12,$33,$10,$38,$20,$7C,$00,$00,$FF,$C2
-	dc.b	$B2,$30,$00,$00,$67,$00,$00,$18,$20,$7C,$00,$00,$FF,$C9,$B2,$30
-	dc.b	$00,$00,$67,$00,$00,$0A,$10,$30,$00,$00,$60,$00,$00,$06,$30,$3C
-	dc.b	$00,$00,$4C,$DF,$01,$0E,$4E,$75,$00,$01,$01,$04,$06,$04,$06,$00
-	dc.b	$02,$02,$03,$05,$03,$05
+	dc.b	$03,$FF,$01,$FF,$FF,$FF,$FF,$FF,$05,$FF,$FF,$02,$FF,$FF
 
-sub_FFD0
+GetRoleAss							;d0 = the defensive assignment for a3's role, or 0 when OptSkill is
+									;rookie or the current assignment is already the offensive or
+									;defensive one for that role. Called from the asstab bodies.
+	dc.b	$48,$E7,$70,$80,$0C,$78,$00,$02,$D2,$68,$67,$00,$00,$44,$4A,$6B
+	dc.b	$00,$34,$6B,$00,$00,$3C,$42,$40,$10,$2B,$00,$65,$6A,$00,$00,$06
+	dc.b	$30,$2B,$00,$34,$32,$2B,$00,$36,$12,$33,$10,$38,$20,$7C,$00,$00
+	dc.b	$FF,$C2,$B2,$30,$00,$00,$67,$00,$00,$18,$20,$7C,$00,$00,$FF,$C9
+	dc.b	$B2,$30,$00,$00,$67,$00,$00,$0A,$10,$30,$00,$00,$60,$00,$00,$06
+	dc.b	$30,$3C,$00,$00,$4C,$DF,$01,$0E,$4E,$75
+RoleAssOff							;Assignment numbers for roles 0-6: 7 offensive, then 7 defensive
+	dc.b	$00,$01,$01,$04,$06,$04,$06,$00,$02,$02,$03,$05,$03,$05
+
+ClearRolesIfGoalie					;If the puck carrier is the goalie and the puck is in that team's
+									;defensive zone, ClearTeamRoles for his team
 	tst.w	(puckc).w
 	bmi.w	.exit
 	movem.l	d0-d4/a0-a3,-(sp)

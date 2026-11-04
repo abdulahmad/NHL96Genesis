@@ -259,12 +259,12 @@ StartNewSeason						;New season (sflags10 bit 6): reset the season header (day 0
 	beq.w	.0
 	bset	#6,(GameFlags).w
 	clr.w	(SeasonDay).w
-	clr.b	(dword_FFDD82+3).w
+	clr.b	(SeasonTeam+1).w
 	clr.b	(SeasonFlags).w
 	bclr	#1,(sflags13).w
 	move.b	#0,(SeasonDay+3).w
-	move.b	#1,(dword_FFDD82).w
-	move.b	#0,(dword_FFDD82+1).w
+	move.b	#1,(SeasonPen).w
+	move.b	#0,(SeasonPen+1).w
 	move.b	#0,(SeasonDay+8).w
 	move.b	#1,(SeasonDay+8+1).w
 	move.b	#0,(SeasonDay+$A).w
@@ -289,10 +289,10 @@ SimSeasonDays						;Simulate simdays days: every unplayed game of each day, save
 	bsr.w	BuildSeasonTeamList
 	movea.l	#$FFFFDCFA,a2
 	clr.w	d6
-	move.b	(byte_FFDCF9).w,d6
+	move.b	(DayGameCount).w,d6
 	bra.w	.6
 .1
-	move.b	(dword_FFDD82+2).w,d0
+	move.b	(SeasonTeam).w,d0
 	cmp.b	(a2),d0
 	beq.w	.2
 	cmp.b	1(a2),d0
@@ -332,7 +332,7 @@ SimSeasonDays						;Simulate simdays days: every unplayed game of each day, save
 	jsr	(GetShifter).l
 	movea.l	#$FFFFCF44,a0
 	clr.w	d0
-	move.b	(dword_FFDD82+2).w,d0
+	move.b	(SeasonTeam).w,d0
 .7
 	cmp.w	(a0),d0
 	beq.w	.8
@@ -486,7 +486,7 @@ WriteDayGames						;Save the results of the day's games: the user game log (Save
 	move.b	(a2)+,d1
 	bra.w	.5
 .6
-	move.b	(dword_FFDD82+2).w,d0
+	move.b	(SeasonTeam).w,d0
 	cmp.b	(a2),d0
 	beq.w	.7
 	cmp.b	1(a2),d0
@@ -509,7 +509,7 @@ WriteDayGames						;Save the results of the day's games: the user game log (Save
 SaveUserGame						;Game a2 of the user team: add it to the save RAM game log (scores,
 									;opponent), mark the day played, count it
 	movem.l	d0-d2,-(sp)
-	move.b	(dword_FFDD82+2).w,d0
+	move.b	(SeasonTeam).w,d0
 	cmp.b	(a2),d0
 	beq.w	.0
 	cmp.b	1(a2),d0
@@ -533,7 +533,7 @@ SaveUserGame						;Game a2 of the user team: add it to the save RAM game log (sc
 	addi.l	#-$2EF8,d1
 	move.w	#8,d2
 	move.b	(a2),d0
-	cmp.b	(dword_FFDD82+2).w,d0
+	cmp.b	(SeasonTeam).w,d0
 	beq.w	.1
 	ori.b	#$80,d0
 	bra.w	.2
@@ -666,14 +666,14 @@ FindUserGame						;a2 = the user team's game in today's game list, or 0
 	movea.l	#0,a2
 	movea.l	#$FFFFDCFA,a0
 	clr.w	d0
-	move.b	(byte_FFDCF9).w,d0
+	move.b	(DayGameCount).w,d0
 	bra.w	.1
 .0
 	move.b	(a0),d2
-	cmp.b	(dword_FFDD82+2).w,d2
+	cmp.b	(SeasonTeam).w,d2
 	beq.w	.2
 	move.b	1(a0),d2
-	cmp.b	(dword_FFDD82+2).w,d2
+	cmp.b	(SeasonTeam).w,d2
 	beq.w	.2
 	addq.w	#5,a0
 .1
@@ -698,7 +698,8 @@ ClearSeasonData						;New season: clear the season stats, standings, game log an
 	movem.l	(sp)+,d0-d1
 	rts
 
-sub_11582
+ClearRosterSave						;Reset Rosters: clear player stats ($4D/$BEC, or playoff $89/$666),
+									;the 9 bytes at $DDD, injuries, and the free-agent stats
 	movem.l	d0-d1,-(sp)
 	jsr	(ReadSeasonHeader).l
 	moveq	#$4D,d0
@@ -728,9 +729,9 @@ LoadSeasonOptions					;Take the game options from the season header (period leng
 	clr.w	(Optperlen).w
 	move.b	(SeasonDay+3).w,(Optperlen+1).w
 	clr.w	(OptPen).w
-	move.b	(dword_FFDD82).w,(OptPen+1).w
+	move.b	(SeasonPen).w,(OptPen+1).w
 	clr.w	(OptLine).w
-	move.b	(dword_FFDD82+1).w,(OptLine+1).w
+	move.b	(SeasonPen+1).w,(OptLine+1).w
 	clr.w	(OptPlayMode).w
 	btst	#2,(SeasonFlags).w
 	beq.w	.0
@@ -818,7 +819,7 @@ TeamSelectScreen					;Team select: up / down change the team, left / right pick 
 	movem.l	d0-d7/a0-a6,-(sp)
 	btst	#7,(GameFlags).w
 	beq.w	.4
-	move.b	#0,(dword_FFDD82+2).w
+	move.b	#0,(SeasonTeam).w
 	bra.w	.10
 .4
 	tst.w	(demoflag).w
@@ -865,10 +866,10 @@ TeamSelectScreen					;Team select: up / down change the team, left / right pick 
 .9
 	bsr.w	PrintUserRanks
 .12
-	bset	#0,(byte_FF2710).l
-	bclr	#1,(byte_FF2710).l
-	bclr	#2,(byte_FF2710).l
-	move.w	#1,(word_FF2720).l
+	bset	#0,(TeamSelectRedraw).l
+	bclr	#1,(TeamSelectRedraw).l
+	bclr	#2,(TeamSelectRedraw).l
+	move.w	#1,(TeamSelectHome).l
 .frame
 	move.w	(Vcount).w,d0
 .loop2
@@ -884,19 +885,19 @@ TeamSelectScreen					;Team select: up / down change the team, left / right pick 
 	clr.w	(demoflag).w
 	bra.w	.33
 .14
-	bclr	#0,(byte_FF2710).l
+	bclr	#0,(TeamSelectRedraw).l
 	beq.w	.1
 	btst	#7,(GameFlags).w
 	bne.w	.17
 	bsr.w	RedrawTeamRanks
-	bclr	#1,(byte_FF2710).l
+	bclr	#1,(TeamSelectRedraw).l
 	bne.w	.15
 	bra.w	.16
 .15
 	bsr.w	DrawHomeLogo
 	bsr.w	PrintHomeRanks
 .16
-	bclr	#2,(byte_FF2710).l
+	bclr	#2,(TeamSelectRedraw).l
 	beq.w	.1
 	bsr.w	DrawVisLogo
 	bsr.w	PrintVisRanks
@@ -920,10 +921,10 @@ TeamSelectScreen					;Team select: up / down change the team, left / right pick 
 	btst	#2,d1
 	beq.w	.3
 	opt	osq-						;keep the subi (SNASM would make it subq)
-	subi.w	#1,(word_FF2720).l
+	subi.w	#1,(TeamSelectHome).l
 	opt	osq+
 	bpl.w	.19
-	clr.w	(word_FF2720).l
+	clr.w	(TeamSelectHome).l
 	bra.w	.frame
 .19
 	jsr	(RedrawTeamRanks).l
@@ -932,9 +933,9 @@ TeamSelectScreen					;Team select: up / down change the team, left / right pick 
 .3
 	btst	#3,d1
 	beq.w	.20
-	tst.w	(word_FF2720).l
+	tst.w	(TeamSelectHome).l
 	bne.w	.frame
-	move.w	#1,(word_FF2720).l
+	move.w	#1,(TeamSelectHome).l
 	jsr	(RedrawTeamRanks).l
 	move	#$2500,sr
 	bra.w	.frame
@@ -951,31 +952,31 @@ TeamSelectScreen					;Team select: up / down change the team, left / right pick 
 	move.w	#$19,(Opt1team).w
 .22
 	jsr	(NewPO).l
-	bset	#1,(byte_FF2710).l
-	bset	#2,(byte_FF2710).l
+	bset	#1,(TeamSelectRedraw).l
+	bset	#2,(TeamSelectRedraw).l
 	bra.w	.26
 .23
 	btst	#7,(GameFlags).w
 	bne.w	.25
-	tst.w	(word_FF2720).l
+	tst.w	(TeamSelectHome).l
 	bne.w	.24
-	bset	#2,(byte_FF2710).l
+	bset	#2,(TeamSelectRedraw).l
 	subq.w	#1,(VisTeam).w
 	bpl.w	.26
 	move.w	#$19,(VisTeam).w
 	bra.w	.26
 .24
-	bset	#1,(byte_FF2710).l
+	bset	#1,(TeamSelectRedraw).l
 	subq.w	#1,(HomeTeam).w
 	bpl.w	.26
 	move.w	#$19,(HomeTeam).w
 	bra.w	.26
 .25
-	subq.b	#1,(dword_FFDD82+2).w
+	subq.b	#1,(SeasonTeam).w
 	bpl.w	.26
-	move.b	#$19,(dword_FFDD82+2).w
+	move.b	#$19,(SeasonTeam).w
 .26
-	bset	#0,(byte_FF2710).l
+	bset	#0,(TeamSelectRedraw).l
 	bra.w	.frame
 .27
 	btst	#1,d1
@@ -990,35 +991,35 @@ TeamSelectScreen					;Team select: up / down change the team, left / right pick 
 	blt.w	.29
 	clr.w	(Opt1team).w
 .29
-	bset	#1,(byte_FF2710).l
-	bset	#2,(byte_FF2710).l
+	bset	#1,(TeamSelectRedraw).l
+	bset	#2,(TeamSelectRedraw).l
 	jsr	(NewPO).l
 	bra.w	.32
 .6
 	btst	#7,(GameFlags).w
 	bne.w	.31
-	tst.w	(word_FF2720).l
+	tst.w	(TeamSelectHome).l
 	bne.w	.30
-	bset	#2,(byte_FF2710).l
+	bset	#2,(TeamSelectRedraw).l
 	addq.w	#1,(VisTeam).w
 	cmpi.w	#$1A,(VisTeam).w
 	blt.w	.32
 	clr.w	(VisTeam).w
 	bra.w	.32
 .30
-	bset	#1,(byte_FF2710).l
+	bset	#1,(TeamSelectRedraw).l
 	addq.w	#1,(HomeTeam).w
 	cmpi.w	#$1A,(HomeTeam).w
 	blt.w	.32
 	clr.w	(HomeTeam).w
 	bra.w	.32
 .31
-	addq.b	#1,(dword_FFDD82+2).w
-	cmpi.b	#$1A,(dword_FFDD82+2).w
+	addq.b	#1,(SeasonTeam).w
+	cmpi.b	#$1A,(SeasonTeam).w
 	blt.w	.32
-	clr.b	(dword_FFDD82+2).w
+	clr.b	(SeasonTeam).w
 .32
-	bset	#0,(byte_FF2710).l
+	bset	#0,(TeamSelectRedraw).l
 	bra.w	.frame
 .33
 	movea.l	#tmstruct,a0
@@ -1158,7 +1159,7 @@ PrintHomeRanks						;Team select: the home team's ranks (TeamRankPtrs) as ordina
 									;highlighted when the home side is selected
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(printbigchars).w,-(sp)
-	cmpi.w	#1,(word_FFDDB6).w
+	cmpi.w	#1,(TeamSelSide).w
 	bne.w	.0
 	move.w	(BigFontchars).w,(printbigchars).w
 .0
@@ -1191,7 +1192,7 @@ PrintVisRanks						;Team select: the visiting team's ranks as ordinals, highligh
 									;visitor side is selected
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(printbigchars).w,-(sp)
-	cmpi.w	#2,(word_FFDDB6).w
+	cmpi.w	#2,(TeamSelSide).w
 	bne.w	.0
 	move.w	(BigFontchars).w,(printbigchars).w
 .0
@@ -1231,7 +1232,7 @@ PrintUserRanks						;Team select (new season): the ranks of the user team as ord
 	move.w	d7,d0
 	asl.w	#2,d0
 	movea.l	(a5,d0.w),a0
-	move.b	(dword_FFDD82+2).w,d0
+	move.b	(SeasonTeam).w,d0
 	jsr	(a0)
 	move.w	#2,d1
 	move.w	d0,-(sp)
@@ -1297,7 +1298,7 @@ DrawUserLogo						;Team select: draw the user team's logo
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),$01,$08,$00
 	clr.w	d7
-	move.b	(dword_FFDD82+2).w,d7
+	move.b	(SeasonTeam).w,d7
 	move.w	(homelogochars).l,d4
 	moveq	#2,d5
 	jsr	(DrawTeamLogoD7).l
@@ -1348,9 +1349,9 @@ DrawScreenSprite					;Put frame 0 of sprite file a0 at the screen's top left (ch
 	bset	#dfok,(disflags).w
 	rts
 
-TeamSelectSide						;Team select: word_FFDDB6 = the highlighted side (0 season, 1 home, 2
+TeamSelectSide						;Team select: TeamSelSide = the highlighted side (0 season, 1 home, 2
 									;visitors)
-	clr.w	(word_FFDDB6).w
+	clr.w	(TeamSelSide).w
 	btst	#7,(GameFlags).w
 	bne.w	.2
 	movem.l	d0/a0,-(sp)
@@ -1365,14 +1366,14 @@ TeamSelectSide						;Team select: word_FFDDB6 = the highlighted side (0 season, 
 	beq.w	.oneside
 	bra.w	.toomany
 .0
-	tst.w	(word_FF2720).l
+	tst.w	(TeamSelectHome).l
 	bne.w	.oneside
 	bra.w	.toomany
 .oneside
-	move.w	#1,(word_FFDDB6).w
+	move.w	#1,(TeamSelSide).w
 	bra.w	.1
 .toomany
-	move.w	#2,(word_FFDDB6).w
+	move.w	#2,(TeamSelSide).w
 .1
 	movem.l	(sp)+,d0/a0
 .2
@@ -1381,7 +1382,7 @@ TeamSelectSide						;Team select: word_FFDDB6 = the highlighted side (0 season, 
 RedrawTeamRanks						;Team select: update the selected side and reprint both teams' ranks with
 									;the highlight
 	bsr.s	TeamSelectSide
-	tst.w	(word_FFDDB6).w
+	tst.w	(TeamSelSide).w
 	beq.w	.0
 	bsr.w	PrintVisRanks
 	bsr.w	PrintHomeRanks
@@ -1395,7 +1396,7 @@ RunSeasonMenu						;Run the season screens: call the routine in NextScreenPtr
 	move.l	(menudraw).w,-(sp)
 	move.w	(menuitem).w,-(sp)
 	move.w	(menuitem+2).w,-(sp)
-	btst	#1,(byte_FFC35A).w
+	btst	#1,(sflags14).w
 	bne.w	.0
 	move.w	#3,-(sp)
 	jsr	(song).l
@@ -1410,7 +1411,7 @@ RunSeasonMenu						;Run the season screens: call the routine in NextScreenPtr
 	move.w	(sp)+,(HomeTeam).w
 	bra.s	.0
 .1
-	bclr	#1,(byte_FFC35A).w
+	bclr	#1,(sflags14).w
 	move.l	(sp)+,(menudraw).w
 	move.w	(sp)+,(menuitem).w
 	move.w	(sp)+,(menuitem+2).w

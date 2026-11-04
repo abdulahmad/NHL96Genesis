@@ -577,7 +577,7 @@ setffo								;Called from setvideo
 
 SetGloveAndSetupPad					;The setup pad (glovecords+2 at $3E8: none) and the glove (glovecords),
 									;then uppads
-	movea.w	#(unk_FFBE72-M68K_RAM),a0
+	movea.w	#(SetupPadStruct-M68K_RAM),a0
 	st	$18(a0)
 	cmpi.w	#$3E8,(glovecords+2).w
 	beq.w	.0
@@ -591,7 +591,7 @@ SetGloveAndSetupPad					;The setup pad (glovecords+2 at $3E8: none) and the glov
 	move.w	d1,$14(a0)
 	clr.w	$18(a0)
 .0
-	movea.w	#(unk_FFBE8E-M68K_RAM),a0
+	movea.w	#(glovestruct-M68K_RAM),a0
 	st	$18(a0)
 	cmpi.w	#$3E8,(glovecords).w
 	beq.w	uppads

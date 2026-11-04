@@ -150,7 +150,7 @@ checkcx								;d4 = obj. # * 2 for possible collision so check x range and dist
 	add.l	d5,d0
 	cmp.l	#$100,d0
 	bgt.w	.exit
-	move.w	#0,(word_FFBFF0).w
+	move.w	#0,(collscale).w
 	move.b	pflags(a3),d6
 	move.b	pflags(a2),d0
 	eor.b	d0,d6
@@ -239,14 +239,14 @@ checkcx								;d4 = obj. # * 2 for possible collision so check x range and dist
 	clr.b	d1
 .8
 	addi.w	#$8C,d1
-	move.w	(word_FFBFF0).w,d7
+	move.w	(collscale).w,d7
 	mulu.w	d1,d7
 	lsr.w	#4,d7
 	add.w	d0,d1
 	sub.w	d7,d0
 	muls.w	d4,d0
 	divs.w	d1,d0
-	move.w	(word_FFBFF0).w,d1
+	move.w	(collscale).w,d1
 	muls.w	d4,d1
 	asr.w	#4,d1
 	add.w	d0,d1

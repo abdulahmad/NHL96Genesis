@@ -59,9 +59,9 @@ checkfight							;Look for the start of a fight between players a2 and a3 (impac
 	dbf	d0,.0
 	addi.w	#$3E8,(Crowdlevel).w
 	addi.w	#$23,(CwdExciteLvl).w
-	clr.w	(word_FFDCEA).w
-	clr.l	(dword_FFDCE0).w
-	clr.l	(dword_FFDCE4).w
+	clr.w	(FightSpare).w
+	clr.l	(FightMash).w
+	clr.l	(FightMash34).w
 	bclr	#1,(sflags10).w
 	bclr	#2,(sflags10).w
 	bclr	#sfspdir,(sflags).w
@@ -122,7 +122,7 @@ startfight							;Start the fight for player a3 against a2: AddPenalty2 $2E, set
 	move.w	#$2E,d0
 	jsr	(AddPenalty2).l
 	move.w	#$140,(PenCntDwn).w
-	clr.w	(word_FFDCDE).w
+	clr.w	(FightEngageCount).w
 	move.w	SCnum(a3),d0
 	jsr	(setd0player).l
 	move.l	#$14,d0
@@ -291,13 +291,15 @@ assfight							;Assignment $14: the fighter. Not decoded in the listing: kept as
 	dc.b	$3F,$3C,$00,$0B,$08,$2B,$00,$06,$00,$62,$66,$00,$00,$0A,$45,$EA
 	dc.b	$03,$9E,$3E,$BC,$00,$0C,$4E,$B9,$00,$08,$85,$86,$60,$00,$FC,$C0
 
-loc_C068
+EngageFight							;A/B/C during SPAfight: stop Xvel, SPA3128, count this fighter
+									;(FightEngageCount). The second one: SetFightingMajors and GameFlags bit 5;
+									;the first: PenCntDwn $140
 	movem.l	d0-d3,-(sp)
 	clr.w	Xvel(a3)
-	addq.w	#1,(word_FFDCDE).w
+	addq.w	#1,(FightEngageCount).w
 	move.w	#SPA3128,d1
 	jsr	(SetSPA).l
-	cmpi.w	#2,(word_FFDCDE).w
+	cmpi.w	#2,(FightEngageCount).w
 	beq.w	.0
 	move.w	#$140,(PenCntDwn).w
 	bra.w	.1
@@ -355,7 +357,7 @@ fightinput							;Controller processing for fighting
 	btst	#2,(sflags10).w
 	beq.w	.1
 	movem.w	d0,-(sp)
-	move.w	(word_FFDCE8).w,d0
+	move.w	(FightMasher).w,d0
 	cmp.w	SCnum(a3),d0
 	movem.w	(sp)+,d0
 	bne.w	.1
@@ -370,14 +372,14 @@ fightinput							;Controller processing for fighting
 .2
 	cmpi.w	#2,facedir(a3)
 	beq.w	.3
-	bclr	#1,(byte_FFDCEC).w
+	bclr	#1,(FightFaceBits).w
 	bra.w	.4
 .3
-	bclr	#0,(byte_FFDCEC).w
+	bclr	#0,(FightFaceBits).w
 .4
 	move.w	d0,d2
 	move.w	d1,-(sp)
-	cmpi.w	#2,(word_FFDCDE).w
+	cmpi.w	#2,(FightEngageCount).w
 	beq.w	.5
 	move.w	#$280,(fightidletimer).w
 	bne.w	.8
@@ -408,10 +410,10 @@ fightinput							;Controller processing for fighting
 .9
 	cmpi.w	#2,facedir(a3)
 	beq.w	.10
-	bset	#1,(byte_FFDCEC).w
+	bset	#1,(FightFaceBits).w
 	bra.w	.11
 .10
-	bset	#0,(byte_FFDCEC).w
+	bset	#0,(FightFaceBits).w
 .11
 	bra.w	.13
 .12
@@ -481,7 +483,7 @@ fightinput							;Controller processing for fighting
 	btst	#4,d2
 	beq.w	.25
 .23
-	bra.w	loc_C068
+	bra.w	EngageFight
 .24
 	btst	#1,(sflags10).w
 	bne.w	.26
@@ -523,13 +525,13 @@ fightinput							;Controller processing for fighting
 	bra.w	.34
 .29
 	movem.l	a0,-(sp)
-	movea.l	#unk_FFDCE0,a0
+	movea.l	#FightMash,a0
 	addq.w	#1,(a0,d4.w)
 	cmpi.w	#$11,(a0,d4.w)
 	movem.l	(sp)+,a0
 	blt.w	.30
 	bset	#2,(sflags10).w
-	move.w	SCnum(a3),(word_FFDCE8).w
+	move.w	SCnum(a3),(FightMasher).w
 	bra.w	.34
 .30
 	movem.l	d1/a0/a3,-(sp)

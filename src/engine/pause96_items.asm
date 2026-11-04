@@ -1,6 +1,6 @@
 ;	The pause, pregame, intermission and game-over menus.
 
-ShootoutPauseMenu					;Menu item lists (InitMenuState): String control entries ($F9 / $FE), then
+ShootoutPauseMenu					;Menu item lists (Pausemode_top): String control entries ($F9 / $FE), then
 									;each item as its String and the routine it runs, ended by String $FF. The
 									;pause menu in a shootout
 	String	CC_SetFont,$01

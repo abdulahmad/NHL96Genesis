@@ -20,7 +20,7 @@ SetContTeams						;The controller setup screen: pick the team of each pad (cont1
 	btst	#7,(GameFlags).w
 	beq.w	.0
 	move.w	(HomeTeam).w,d0
-	cmp.b	(dword_FFDD82+2).w,d0
+	cmp.b	(SeasonTeam).w,d0
 	beq.w	.0
 	move.w	#2,(cont1team).w
 .0

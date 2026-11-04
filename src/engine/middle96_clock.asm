@@ -204,7 +204,7 @@ ShowBigScore						;The big score of both teams with the EASN logo; in a shootout
 									;period (ScorePeriodText)
 	movem.l	d0-d7/a0-a6,-(sp)
 	bset	#2,(sflags12).w
-	bset	#0,(byte_FFC35A).w
+	bset	#0,(sflags14).w
 	jsr	(ErasePowerPlayBox).l
 	jsr	(EASNLogo).l
 	jsr	(printbigz2).l
@@ -275,7 +275,7 @@ ScorePeriodText						;ShowBigScore: the period names
 
 ClearBigScore						;Erase the big score
 	movem.l	d0-d7/a0-a6,-(sp)
-	bclr	#0,(byte_FFC35A).w
+	bclr	#0,(sflags14).w
 	jsr	(printz).l
 	String	CC_Font1Pri,$01,$15
 	move.w	#$1B,d0

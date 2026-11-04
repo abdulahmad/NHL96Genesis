@@ -104,7 +104,7 @@ ResolveDayGames						;Compute winners and losers for the playoff matchups of the
 .5
 	move.b	(a1),d0
 	bclr	#3,(SeasonFlags).w
-	cmp.b	(dword_FFDD82+2).w,d0
+	cmp.b	(SeasonTeam).w,d0
 	bne.w	.6
 	bset	#3,(SeasonFlags).w
 .6
@@ -142,7 +142,7 @@ InitPlayoffs						;Seed the playoffs: the two conferences (ConferenceTeams1 / 2)
 									;points (SortSeeds), the pairings
 									;to save RAM SRPOPairings and SRPOSlots (BuildPOSlots). With sflags11 bit
 									;0 the pairings go to POPairingsTmp instead, and sflags11 bit 1 is set
-									;when the team in dword_FFDD82+2 is not in them
+									;when the team in SeasonTeam is not in them
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	#$B,d0
 	movea.l	#AwardIds,a0
@@ -175,7 +175,7 @@ InitPlayoffs						;Seed the playoffs: the two conferences (ConferenceTeams1 / 2)
 	beq.w	.3
 	bset	#1,(sflags11).w
 	movea.l	#POPairingsTmp,a0
-	move.b	(dword_FFDD82+2).w,d1
+	move.b	(SeasonTeam).w,d1
 	move.w	#$F,d0
 .1
 	cmp.b	1(a0),d1
@@ -331,9 +331,9 @@ SetupPlayoffs						;Start the playoffs: save the season header (SRSeasonHeaderSa
 	movem.l	d0-d7/a0-a6,-(sp)
 	bset	#6,(GameFlags).w
 	move.b	(SeasonDay+3).w,-(sp)
-	move.b	(dword_FFDD82).w,-(sp)
-	move.b	(dword_FFDD82+1).w,-(sp)
-	move.b	(dword_FFDD82+2).w,-(sp)
+	move.b	(SeasonPen).w,-(sp)
+	move.b	(SeasonPen+1).w,-(sp)
+	move.b	(SeasonTeam).w,-(sp)
 	movea.l	#SaveRAM+SRSeasonHeader,a0
 	movea.l	#SaveRAM+SRSeasonHeaderSave,a1
 	move.w	#$C,d0
@@ -345,11 +345,11 @@ SetupPlayoffs						;Start the playoffs: save the season header (SRSeasonHeaderSa
 	clr.l	(a0)
 	jsr	(ReadSeasonHeader).l
 	bset	#2,(SeasonFlags).w
-	move.b	(sp)+,(dword_FFDD82+2).w
-	move.b	(sp)+,(dword_FFDD82+1).w
-	move.b	(sp)+,(dword_FFDD82).w
+	move.b	(sp)+,(SeasonTeam).w
+	move.b	(sp)+,(SeasonPen+1).w
+	move.b	(sp)+,(SeasonPen).w
 	move.b	(sp)+,(SeasonDay+3).w
-	clr.b	(dword_FFDD82+3).w
+	clr.b	(SeasonTeam+1).w
 	jsr	(WriteSeasonHeader).l
 	move.l	#$CBF,d0
 	move.w	#$54,d1

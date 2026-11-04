@@ -66,7 +66,7 @@ doinput								;Process controller input for player a3: d0 = dpad, d1 = new butt
 	btst	#6,d2
 	bne.w	.0
 	movem.l	a0,-(sp)
-	movea.l	#unk_FFC38C,a0
+	movea.l	#PadChanged,a0
 	asr.w	#1,d4
 	clr.b	(a0,d4.w)
 	add.w	d4,d4
@@ -114,7 +114,7 @@ doinput								;Process controller input for player a3: d0 = dpad, d1 = new butt
 	andi.b	#$F,d3
 	movem.w	(sp)+,d3
 	beq.w	.8
-	jsr	(sub_AFDA).l
+	jsr	(StartDpadBoost).l
 	bra.w	.nostart
 .8
 	tst.w	d4
@@ -666,7 +666,7 @@ doinput_ispc						;The puck carrier: checkob, then pass mode, shot mode, or the 
 	bne.w	ShotMode
 	btst	#4,d1
 	beq.w	.0
-	jsr	(sub_1D920A).l
+	jsr	(PrepShotPass).l
 	bra.w	setpassmode
 .0
 	movem.l	a0,-(sp)
@@ -695,7 +695,7 @@ doinput_ispc						;The puck carrier: checkob, then pass mode, shot mode, or the 
 	btst	#6,d2
 	beq.w	.6
 	movem.l	a0,-(sp)
-	movea.l	#unk_FFC38C,a0
+	movea.l	#PadChanged,a0
 	asr.w	#1,d4
 	tst.b	(a0,d4.w)
 	bmi.w	.5
@@ -757,7 +757,7 @@ doinput_ispc						;The puck carrier: checkob, then pass mode, shot mode, or the 
 .7
 	btst	#5,d1
 	beq.w	JumpToDoplayeracc
-	jsr	(sub_1D920A).l
+	jsr	(PrepShotPass).l
 	bra.w	SetShotMode
 
 doinput_islocked					;B with the player not the carrier: change player (chgplayer)
@@ -803,8 +803,8 @@ JumpToDoplayeracc					;jmp doplayeracc, shared by doinput_chkanim,
 									;doinput_skater and doinput_islocked
 	jmp	doplayeracc
 
-sub_AFDA							;Start with a dpad direction: SPA288C with pflags2 bit 1 set and Xvel +
-									;$64, not while pflags2 bit 2 or gmode bit 0 is set
+StartDpadBoost						;Start with a dpad direction: SPA288C with pf2aip set and Xvel +
+									;$64, not while pf2unav or gmclock is set
 	btst	#2,pflags2(a3)
 	bne.w	.0
 	btst	#gmclock,(gmode).w

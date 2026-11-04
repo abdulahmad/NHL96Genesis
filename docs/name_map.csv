@@ -232,7 +232,7 @@ $00AD52,doinput_skater,loc_AD52,,input96
 $00ADD4,doinput_ispc,loc_ADD4,,input96
 $00AF5A,doinput_islocked,loc_AF5A,,input96
 $00AFD4,JumpToDoplayeracc,loc_AFD4,,input96
-$00AFDA,sub_AFDA,,,input96
+$00AFDA,StartDpadBoost,sub_AFDA,,input96
 $00B00E,PadOnTeam,sub_B00E,,input96
 $00B04E,SetContTeams,sub_B04E,,goal96
 $00B1E2,ContTeamOrder1,,,goal96
@@ -257,7 +257,7 @@ $00B8D0,SetInst,sub_B8D0,,fight96
 $00B8FC,.tm (SetInst),loc_B8FC,,fight96
 $00B986,rtsfight,locret_B986,,fight96
 $00B988,assfight,,,fight96
-$00C068,loc_C068,,,fight96
+$00C068,EngageFight,loc_C068,,fight96
 $00C0A2,ClearMessageLine,sub_C0A2,,fight96
 $00C1C8,assfwatch,,,fight96
 $00C26C,fightinput,loc_C26C,,fight96
@@ -322,7 +322,13 @@ $00F8D0,rtss,locret_F8D0,,input96_shot
 $00F8D2,passmode,loc_F8D2,,input96_shot
 $00F8F6,dopass,loc_F8F6,,input96_shot
 $00FB46,passtoa0,sub_FB46,,input96_shot
-$010054,.exit (sub_FFD0),locret_10054,,input96_shot
+$00FD14,SetRoles,sub_FD14,,input96_shot
+$00FD80,SetTeamRoles,sub_FD80,,input96_shot
+$00FEAA,RoleTable,,,input96_shot
+$00FF68,GetRoleAss,,,input96_shot
+$00FFC2,RoleAssOff,,,input96_shot
+$00FFD0,ClearRolesIfGoalie,sub_FFD0,,input96_shot
+$010054,.exit (ClearRolesIfGoalie),locret_10054,,input96_shot
 $010056,ClearTeamRoles,sub_10056,,input96_shot
 $010070,CheckRoles,sub_10070,,input96_shot
 $01008E,CheckTeamRoles,sub_1008E,,input96_shot
@@ -380,6 +386,7 @@ $01147E,WriteSeasonHeader,sub_1147E,,season96
 $01149E,ReadSeasonHeader,sub_1149E,,season96
 $011510,FindUserGame,sub_11510,,season96
 $011552,ClearSeasonData,sub_11552,,season96
+$011582,ClearRosterSave,sub_11582,,season96
 $0115EA,LoadSeasonOptions,sub_115EA,,season96
 $01161E,ReadStandings,sub_1161E,,season96
 $01169C,SetupSeasonGame,sub_1169C,,season96
@@ -408,7 +415,7 @@ $012BFE,TeamBlockPtrs,unk_12BFE,,teamgfx96
 $012C6E,TeamLogoPtrs,unk_12C6E,,teamgfx96
 $012CDE,SmallLogoPtrs,unk_12CDE,,teamgfx96
 $012D46,VBlank_Menus,unk_12D46,,teamgfx96
-$013556,nullsub_2,nullsub_2,,teamgfx96
+$013556,rtsPlayoffOver,nullsub_2,,teamgfx96
 $013558,SeasonSchedule,unk_13558,,schedule96
 $013EA0,ScoutingReport,nullsub_3,,awards96
 $013EA2,ResolveDayGames,sub_13EA2,ResolveGames,awards96
@@ -433,7 +440,7 @@ $014554,ScrollDownTxt,,,pause96_list
 $01455A,PrintMenuList2,sub_1455A,,pause96_list
 $01464C,Begin,loc_1464C,,hockey96
 $014702,StartGame,loc_14702,,hockey96
-$014804,sub_14804,sub_14804,,hockey96
+$014804,ClearSavedPlayoffs,sub_14804,,hockey96
 $01481A,restoreteams,sub_1481A,,hockey96
 $01483A,ResetClock,sub_1483A,,hockey96
 $0148A2,GetPeriodTime,sub_148A2,,hockey96
@@ -454,13 +461,13 @@ $014D74,startpause2,loc_14D74,,pause96
 $014D7C,startpause3,loc_14D7C,,pause96
 $014D84,startpause4,loc_14D84,,pause96
 $014D8C,Pausemode,sub_14D8C,,pause96
-$014F14,SetupPauseScreen,unk_14F14,,pause96
+$014F14,Pausemode_pall,unk_14F14,SetupPauseScreen,pause96
 $014F20,seta2,sub_14F20,,pause96
-$014F70,InitMenuState,sub_14F70,,pause96
+$014F70,Pausemode_top,sub_14F70,InitMenuState,pause96
 $014F80,DrawMenuScreen,sub_14F80,,pause96
 $014F92,SetMenuPrintX,sub_14F92,,pause96
 $014FA8,HandleMenuInput,sub_14FA8,,pause96
-$015048,UpdateMenuSelection,sub_15048,,pause96
+$015048,Pausemode_Pmenu,sub_15048,UpdateMenuSelection,pause96
 $015170,PrintMenuItem,sub_15170,,pause96
 $0151E0,vcountwait,sub_151E0,,pause96
 $0151FA,GetNameandAttrib,,,setup96
@@ -1047,7 +1054,7 @@ $13DA74,EASportsMap,unk_13DA74,,graphics96
 $13E99A,RevRinkTilelist,unk_13E99A,,graphics96
 $140AFE,ReplayIconMap,,,graphics96
 $141228,ReplayBannerMap,,,graphics96
-$1417B6,unk_1417B6,,,graphics96
+$1417B6,ArenaAnimGfx,unk_1417B6,,graphics96
 $1468D6,HiScoreBgMap,unk_1468D6,,graphics96
 $147896,HiScoreImg,unk_147896,,graphics96
 $148054,TeamBlockANH,,,graphics96
@@ -1135,7 +1142,7 @@ $179A76,SmallFontMap,unk_179A76,,graphics96
 $17A164,SmallFontMap2,unk_17A164,,graphics96
 $17AA72,BigFontMap2,unk_17AA72,BigFontMap,graphics96
 $17B680,BigFontMap4,unk_17B680,BigFontMap2,graphics96
-$17C2AE,unk_17C2AE,unk_17C2AE,,graphics96
+$17C2AE,PStatsPal,unk_17C2AE,,graphics96
 $17C2CE,LeagueOptionsBgMap,unk_17C2CE,,graphics96
 $17DBDC,LeagueOptionsTitleMap,unk_17DBDC,,graphics96
 $17E3FC,LeagueOptionsSprites,unk_17E3FC,,graphics96
@@ -1237,8 +1244,8 @@ $1C4C4E,PuckAnimMap,unk_1C4C4E,,graphics96
 $1C6C4C,CupChampsMap,unk_1C6C4C,,graphics96
 $1CAEFA,CupChampsMap2,unk_1CAEFA,,graphics96
 $1CCBA8,CupChampsPals,unk_1CCBA8,,graphics96
-$1CCEE8,unk_1CCEE8,unk_1CCEE8,,graphics96
-$1D5420,unk_1D5420,,,graphics96
+$1CCEE8,CupCelebrationSpr,unk_1CCEE8,,graphics96
+$1D5420,CupCelebrationMap,unk_1D5420,,graphics96
 $1D579E,revframetbl,unk_1D579E,,graphics96
 $1D6622,puckvzadj,sub_1D6622,,logic96_timer
 $1D66AC,OneTimerPass,sub_1D66AC,,logic96_timer
@@ -1335,7 +1342,7 @@ $1D8F66,PlaceBoardFall,sub_1D8F66,,code96_15
 $1D9062,getFgtbyte,sub_1D9062,,code96_15
 $1D906C,chkFgtBit1,sub_1D906C,,code96_15
 $1D9114,HiScoreScreen,sub_1D9114,,code96_15
-$1D920A,sub_1D920A,sub_1D920A,,code96_15
+$1D920A,PrepShotPass,sub_1D920A,,code96_15
 $1D92EC,SetSflags8Bit1,sub_1D92EC,,code96_15
 $1D9352,ReadGoaliePulled,sub_1D9352,,code96_15
 $1D9376,EndOneTimer,sub_1D9376,,code96_15
@@ -1535,7 +1542,7 @@ $1E0948,DrawReleaseRoster,,,create96
 $1E0AF6,ReleaseMsgText,,,create96
 $1E0B76,ReleaseGfx,sub_1E0B76,,create96
 $1E0D66,PStatsPalette2,sub_1E0D66,,create96
-$1E0D86,sub_1E0D86,,,create96
+$1E0D86,CheckTeamLines,sub_1E0D86,,create96
 $1E0DDE,OptionsScreen,sub_1E0DDE,,options96
 $1E1114,OptionVars,unk_1E1114,,options96
 $1E1138,OptionsMenuDraw,sub_1E1138,,options96
@@ -1784,6 +1791,8 @@ $FFFFB058,asv,word_FFB058,,ram96
 $FFFFB05A,lldisp,word_FFB05A,,ram96
 $FFFFB05C,periodendtime,word_FFB05C,,ram96
 $FFFFB05E,SortCords,unk_FFB05E,,ram96
+$FFFFB65E,SortObj12,unk_FFB65E,,ram96
+$FFFFB6DE,SortObj13,unk_FFB6DE,,ram96
 $FFFFB75E,puckx,word_FFB75E,,ram96
 $FFFFB772,pucky,word_FFB772,,ram96
 $FFFFB776,puckz,unk_FFB776,,ram96
@@ -1835,6 +1844,8 @@ $FFFFBDCA,pads,unk_FFBDCA,,ram96
 $FFFFBDE6,Joy1Struct,unk_FFBDE6,,ram96
 $FFFFBE1E,Joy3Struct,unk_FFBE1E,,ram96
 $FFFFBE3A,Joy4Struct,unk_FFBE3A,,ram96
+$FFFFBE72,SetupPadStruct,unk_FFBE72,,ram96
+$FFFFBE8E,glovestruct,unk_FFBE8E,,ram96
 $FFFFBEAA,PadControlBits,dword_FFBEAA,,ram96
 $FFFFBEAE,padcont,dword_FFBEAE,,ram96
 $FFFFBEB2,padcont+4,dword_FFBEB2,,ram96
@@ -1895,6 +1906,7 @@ $FFFFBFF2,mesarea,word_FFBFF2,,ram96
 $FFFFBFF4,TextBuffer,word_FFBFF4,,ram96
 $FFFFC010,mesarea+30,unk_FFC010,,ram96
 $FFFFC056,PushWidthBuf,unk_FFC056,,ram96
+$FFFFC058,PushWidthBuf2,unk_FFC058,,ram96
 $FFFFC062,ltack,word_FFC062,,ram96
 $FFFFC064,lastsfx,word_FFC064,,ram96
 $FFFFC066,Satt,unk_FFC066,,ram96
@@ -1933,6 +1945,7 @@ $FFFFC384,c1playernum,word_FFC384,,ram96
 $FFFFC386,c2playernum,word_FFC386,,ram96
 $FFFFC388,c3playernum,word_FFC388,,ram96
 $FFFFC38A,c4playernum,word_FFC38A,,ram96
+$FFFFC38C,PadChanged,unk_FFC38C,,ram96
 $FFFFC390,cont1team,word_FFC390,,ram96
 $FFFFC392,cont2team,word_FFC392,,ram96
 $FFFFC394,cont3team,word_FFC394,,ram96
@@ -1955,6 +1968,7 @@ $FFFFC4BC,gsp,word_FFC4BC,,ram96
 $FFFFC4BE,gameclock,word_FFC4BE,,ram96
 $FFFFC4C2,PerTimeTotal,word_FFC4C2,,ram96
 $FFFFC4C4,ChkCnt,word_FFC4C4,,ram96
+$FFFFC4C6,ChkCnt2,unk_FFC4C6,,ram96
 $FFFFC4C8,TempPlOffset,word_FFC4C8,,ram96
 $FFFFC4CA,ScoreSumbytes,word_FFC4CA,,ram96
 $FFFFC4CC,ScoreSum,unk_FFC4CC,,ram96
@@ -1980,6 +1994,7 @@ $FFFFCB68,AwShots+$A4,byte_FFCB68,,ram96
 $FFFFCE62,statsbuffer,unk_FFCE62,,ram96
 $FFFFCF42,plistplayoff,word_FFCF42,,ram96
 $FFFFCF44,gsstruct,unk_FFCF44,,ram96
+$FFFFCFB4,gsstruct7,unk_FFCFB4,,ram96
 $FFFFCFC4,gamenum,word_FFCFC4,,ram96
 $FFFFCFC6,postarts,word_FFCFC6,,ram96
 $FFFFCFC8,bosgames,word_FFCFC8,,ram96
@@ -2108,6 +2123,7 @@ $FFFFDCCA,TmpPuckZ,word_FFDCCA,,ram96
 $FFFFDCCC,inputjoy,word_FFDCCC,,ram96
 $FFFFDCCE,PlayerChked,dword_FFDCCE,,ram96
 $FFFFDCD2,PlayerChking,dword_FFDCD2,,ram96
+$FFFFDCE0,FightMash,unk_FFDCE0,,ram96
 $FFFFDCF2,replaydelay,word_FFDCF2,,ram96
 $FFFFDCF6,PALflag,word_FFDCF6,,ram96
 $FFFFDD7E,SeasonDay,dword_FFDD7E,,ram96
@@ -2126,3 +2142,43 @@ $FFFFFDFA,Stack,unk_FFFDFA,,ram96
 $FFFFFDFC,SndDrvRAM,,,ram96
 $FFFFFDFE,SndSeqPtr,,,ram96
 $FFFFFE3E,SndSeqId,unk_FFFE3E,,ram96
+$FFFFFFF6,RamTop,unk_FFFFF6,,ram96
+$FFFFFFFF,RamLast,unk_FFFFFF,,ram96
+$FFFF1388,LeaderIds,word_FF1388,,ram96
+$FFFF2710,TeamSelectRedraw,byte_FF2710,,ram96
+$FFFF2720,TeamSelectHome,word_FF2720,,ram96
+$FFFF2720,pstatsteam,word_FF2720,,ram96
+$FFFFB7BC,pucknopuck,byte_FFB7BC,puckx+nopuck,ram96
+$FFFFB8C4,puckanimchars,word_FFB8C4,,ram96
+$FFFFB8C4,PlayoffHpos,word_FFB8C4,,ram96
+$FFFFBF88,smallfontalt,word_FFBF88,,ram96
+$FFFFBFF0,collscale,word_FFBFF0,,ram96
+$FFFFC35A,sflags14,byte_FFC35A,,ram96
+$FFFFC73C,HomeTmLine,word_FFC73C,tmstruct+tmline,ram96
+$FFFFC74C,HomeTmGoalie,word_FFC74C,,ram96
+$FFFFC756,HomeTmFlags,byte_FFC756,,ram96
+$FFFFCADA,AwayTmLine,word_FFCADA,AwShots+tmline,ram96
+$FFFFCAEA,AwayTmGoalie,word_FFCAEA,,ram96
+$FFFFCAF4,AwayTmFlags,byte_FFCAF4,,ram96
+$FFFFD036,PListRows,word_FFD036,,ram96
+$FFFFD038,PListMax,word_FFD038,,ram96
+$FFFFD234,nibblebuffer4,dword_FFD234,,ram96
+$FFFFD238,DumpPassSc,word_FFD238,,ram96
+$FFFFD238,PListCol,word_FFD238,,ram96
+$FFFFD23A,LastCarrierHome,word_FFD23A,,ram96
+$FFFFD23C,LastCarrierAway,word_FFD23C,,ram96
+$FFFFD300,SetupSpare,word_FFD300,,ram96
+$FFFFD310,SetupSpare16,word_FFD310,,ram96
+$FFFFD474,arenaanim,byte_FFD474,,ram96
+$FFFFD47E,faceoffanim,byte_FFD47E,,ram96
+$FFFFDCA6,OptPad,byte_FFDCA6,,ram96
+$FFFFDCDE,FightEngageCount,word_FFDCDE,,ram96
+$FFFFDCE4,FightMash34,dword_FFDCE4,,ram96
+$FFFFDCE8,FightMasher,word_FFDCE8,,ram96
+$FFFFDCEA,FightSpare,word_FFDCEA,,ram96
+$FFFFDCEC,FightFaceBits,byte_FFDCEC,,ram96
+$FFFFDCF9,DayGameCount,byte_FFDCF9,,ram96
+$FFFFDD82,SeasonPen,dword_FFDD82,,ram96
+$FFFFDD84,SeasonTeam,dword_FFDD82+2,,ram96
+$FFFFDDB6,TeamSelSide,word_FFDDB6,,ram96
+$FFFFDDBE,PlayoffMenuTeam,word_FFDDBE,,ram96

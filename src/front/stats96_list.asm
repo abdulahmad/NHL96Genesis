@@ -18,7 +18,7 @@ PlayerStatsList						;Stats screen for team a2, d7 = 0 game / 1 playoff (plistpl
 	move.w	#$18,(palcount).w
 	bclr	#dfng,(disflags).w
 	clr.w	(VertLineScrolling).w
-	move.w	#$D,(word_FFD036).w
+	move.w	#$D,(PListRows).w
 	move.w	#$C,(PlayerScrollCtr).w
 	clr.w	(DispAttribCtr).w
 .0
@@ -34,7 +34,7 @@ PlayerStatsList						;Stats screen for team a2, d7 = 0 game / 1 playoff (plistpl
 .2
 	jsr	(GetGoalieCountD7).l
 	subq.w	#1,d0
-	move.w	d0,(word_FFD038).w
+	move.w	d0,(PListMax).w
 	bra.w	.draw
 .3
 	jsr	(GetGoalieCountD7).l
@@ -42,7 +42,7 @@ PlayerStatsList						;Stats screen for team a2, d7 = 0 game / 1 playoff (plistpl
 	jsr	(GetPlayerCountD7).l
 	sub.w	(sp)+,d0
 	subq.w	#1,d0
-	move.w	d0,(word_FFD038).w
+	move.w	d0,(PListMax).w
 .draw
 	bsr.w	PListBuild
 	move.w	(Vcount).w,d0
@@ -121,7 +121,7 @@ PlayerStatsList						;Stats screen for team a2, d7 = 0 game / 1 playoff (plistpl
 	btst	#1,d1
 	beq.w	.12
 	move.w	(PlayerScrollCtr).w,d0
-	cmp.w	(word_FFD038).w,d0
+	cmp.w	(PListMax).w,d0
 	bge.w	.input
 	addq.w	#1,(VertLineScrolling).w
 	addq.w	#1,(PlayerScrollCtr).w	;next lower item
@@ -247,7 +247,7 @@ PListArrows							;PlayerStatsList: the scroll marks { (VertLineScrolling above 
 	String	CC_Font1Pal3Pri,$02,$0B,' '
 .1
 	move.w	(PlayerScrollCtr).w,d1
-	cmp.w	(word_FFD038).w,d1
+	cmp.w	(PListMax).w,d1
 	bge.w	.2
 	jsr	(printcurz).l
 	String	CC_Font1Pal3Pri,$02,$17,'}'
@@ -697,20 +697,20 @@ PListPrint							;PlayerStatsList: print the rows of the list
 	clr.w	d6
 	move.w	#$B,(printy).w
 .0
-	clr.w	(word_FFD238).w
+	clr.w	(PListCol).w
 	tst.w	(plistplayoff).w
 	bne.w	.1
 	cmpi.w	#5,(DispAttribCtr).w
 	blt.w	.2
-	move.w	#5,(word_FFD238).w
+	move.w	#5,(PListCol).w
 	bra.w	.2
 .1
 	cmpi.w	#4,(DispAttribCtr).w
 	blt.w	.2
-	move.w	#4,(word_FFD238).w
+	move.w	#4,(PListCol).w
 .2
 	movea.l	#PListColumns,a5
-	move.w	(word_FFD238).w,d0
+	move.w	(PListCol).w,d0
 	asl.w	#2,d0
 	movea.l	(a5,d0.w),a5
 	move.w	#4,(printx).w
@@ -722,9 +722,9 @@ PListPrint							;PlayerStatsList: print the rows of the list
 	blt.w	.3
 	move.w	d6,d0
 	add.w	(VertLineScrolling).w,d0
-	cmp.w	(word_FFD038).w,d0
+	cmp.w	(PListMax).w,d0
 	bge.w	.20
-	move.w	d0,(word_FFD038).w
+	move.w	d0,(PListMax).w
 	bra.w	.20
 .3
 	move.w	#4,(printx).w
@@ -841,14 +841,14 @@ PListPrint							;PlayerStatsList: print the rows of the list
 .20
 	addq.w	#1,(printy).w
 	addq.w	#1,d6
-	cmp.w	(word_FFD036).w,d6
+	cmp.w	(PListRows).w,d6
 	blt.w	.0
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-PListValue							;PlayerStatsList: print stat column word_FFD238 of row d0
+PListValue							;PlayerStatsList: print stat column PListCol of row d0
 	move.w	d0,-(sp)
-	move.w	(word_FFD238).w,d0
+	move.w	(PListCol).w,d0
 	asl.w	#2,d0
 	movea.l	#PListColumns,a0
 	movea.l	(a0,d0.w),a0
@@ -858,39 +858,39 @@ PListValue							;PlayerStatsList: print stat column word_FFD238 of row d0
 	move.w	#3,d1
 	tst.w	(plistplayoff).w
 	bne.w	.0
-	cmpi.w	#5,(word_FFD238).w
+	cmpi.w	#5,(PListCol).w
 	blt.w	.2
-	cmpi.w	#7,(word_FFD238).w
+	cmpi.w	#7,(PListCol).w
 	beq.w	.2
 	bra.w	.1
 .0
-	cmpi.w	#4,(word_FFD238).w
+	cmpi.w	#4,(PListCol).w
 	blt.w	.2
-	cmpi.w	#6,(word_FFD238).w
+	cmpi.w	#6,(PListCol).w
 	beq.w	.2
 .1
 	move.w	#4,d1
 .2
 	jsr	(PushNumberWidth).l
 	bsr.w	PListMark
-	addq.w	#1,(word_FFD238).w
+	addq.w	#1,(PListCol).w
 	tst.w	(plistplayoff).w
 	bne.w	.3
-	cmpi.w	#5,(word_FFD238).w
+	cmpi.w	#5,(PListCol).w
 	beq.w	.4
-	cmpi.w	#8,(word_FFD238).w
+	cmpi.w	#8,(PListCol).w
 	rts
 .3
-	cmpi.w	#4,(word_FFD238).w
+	cmpi.w	#4,(PListCol).w
 	beq.w	.4
-	cmpi.w	#7,(word_FFD238).w
+	cmpi.w	#7,(PListCol).w
 .4
 	rts
 
 PListMark							;PlayerStatsList: print a value, highlighted in the column of the category
 	move.w	(printa).w,-(sp)
 	move.w	(DispAttribCtr).w,d0
-	cmp.w	(word_FFD238).w,d0
+	cmp.w	(PListCol).w,d0
 	bne.w	.0
 	jsr	(printsmallz).l
 	String	CC_SetAttribute,$05

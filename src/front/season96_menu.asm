@@ -211,7 +211,7 @@ SeasonPlayoffStats					;The playoff stats screen in a season (PlayoffStatsMenu w
 	movem.l	d0-d7/a0-a6,-(sp)
 	clr.w	(carddelay).w
 	clr.w	(pstatscat).w
-	clr.w	(word_FF2720).l
+	clr.w	(pstatsteam).l
 	bset	#5,(sflags12).w
 	bsr.w	PStatsSetup
 	movea.l	#PlayerStatsSprites,a0
@@ -223,7 +223,7 @@ SeasonPlayoffStats					;The playoff stats screen in a season (PlayoffStatsMenu w
 	move.w	#$C,(pstatsrow).w
 	clr.w	(pstatscat).w
 .1
-	move.w	(word_FF2720).l,d7
+	move.w	(pstatsteam).l,d7
 	btst	#2,(SeasonFlags).w
 	beq.w	.2
 	jsr	(GetPOSlotTeam).l
@@ -312,28 +312,28 @@ SeasonPlayoffStats					;The playoff stats screen in a season (PlayoffStatsMenu w
 .6
 	btst	#6,d1
 	beq.w	.5
-	subq.w	#1,(word_FF2720).l
+	subq.w	#1,(pstatsteam).l
 	bpl.w	.1
 	btst	#2,(SeasonFlags).w
 	beq.w	.10
-	move.w	#$F,(word_FF2720).l
+	move.w	#$F,(pstatsteam).l
 	bra.w	.1
 .10
-	move.w	#$19,(word_FF2720).l
+	move.w	#$19,(pstatsteam).l
 	bra.w	.1
 .5
 	btst	#5,d1
 	beq.w	.14
-	addq.w	#1,(word_FF2720).l
+	addq.w	#1,(pstatsteam).l
 	btst	#2,(SeasonFlags).w
 	beq.w	.11
-	cmpi.w	#$10,(word_FF2720).l
+	cmpi.w	#$10,(pstatsteam).l
 	bra.w	.12
 .11
-	cmpi.w	#$1A,(word_FF2720).l
+	cmpi.w	#$1A,(pstatsteam).l
 .12
 	bne.w	.1
-	clr.w	(word_FF2720).l
+	clr.w	(pstatsteam).l
 	bra.w	.1
 .14
 	btst	#4,d1
@@ -545,7 +545,7 @@ PStatsTeamBlock						;SeasonPlayoffStats: the team block of the shown team (Draw
 	jsr	(printz).l
 	String	CC_Font1Pri,$01,$05
 	move.w	(pstatsblockchars).l,d4
-	move.w	(word_FF2720).l,d7
+	move.w	(pstatsteam).l,d7
 	btst	#2,(SeasonFlags).w
 	beq.w	.0
 	jsr	(GetPOSlotTeam).l
@@ -606,7 +606,7 @@ PStatsCategoryTxt					;PStatsCategory: the category names
 PStatsBuildList						;SeasonPlayoffStats: the player or goalie list of the shown team, sorted
 									;by category
 	movem.l	d0-d7/a0-a6,-(sp)
-	move.w	(word_FF2720).l,d7
+	move.w	(pstatsteam).l,d7
 	btst	#2,(SeasonFlags).w
 	beq.w	.0
 	jsr	(GetPOSlotTeam).l
@@ -620,7 +620,7 @@ PStatsBuildList						;SeasonPlayoffStats: the player or goalie list of the shown
 	sub.w	(sp)+,d0
 	neg.w	d0
 	move.w	d0,(pstatscount).l
-	movea.l	#$FFFF1388,a0
+	movea.l	#LeaderIds,a0
 	bra.w	.2
 .1
 	move.w	d1,(a0)+
@@ -682,7 +682,7 @@ PStatsBuildList						;SeasonPlayoffStats: the player or goalie list of the shown
 .9
 	jsr	(GetGoalieCountD7).l
 	move.w	d0,(pstatscount).l
-	movea.l	#$FFFF1388,a0
+	movea.l	#LeaderIds,a0
 	clr.w	d1
 	bra.w	.11
 .10
@@ -740,7 +740,7 @@ PStatsBuildList						;SeasonPlayoffStats: the player or goalie list of the shown
 	move.w	(pstatscat).w,d0
 	asl.w	#2,d0
 	movea.l	(a0,d0.w),a0
-	movea.l	#$FFFF1388,a1
+	movea.l	#LeaderIds,a1
 	move.w	(a1),d0
 	add.w	d0,d0
 	suba.w	d0,a0
@@ -807,14 +807,14 @@ PStatsPrintList						;SeasonPlayoffStats: print the rows of the list
 	bra.w	.11
 .2
 	move.w	#4,(printx).w
-	movea.l	#$FFFF1388,a0
+	movea.l	#LeaderIds,a0
 	move.w	d6,d0
 	add.w	(pstatstop).w,d0
 	add.w	d0,d0
 	move.w	(a0,d0.w),d0
 	ext.l	d0
 	move.w	d0,-(sp)
-	move.w	(word_FF2720).l,d7
+	move.w	(pstatsteam).l,d7
 	btst	#2,(SeasonFlags).w
 	beq.w	.3
 	jsr	(GetPOSlotTeam).l
@@ -823,7 +823,7 @@ PStatsPrintList						;SeasonPlayoffStats: print the rows of the list
 	jsr	(printcur).l
 	cmpi.w	#4,(pstatscat).w
 	bge.w	.5
-	move.w	(word_FF2720).l,d7
+	move.w	(pstatsteam).l,d7
 	btst	#2,(SeasonFlags).w
 	beq.w	.4
 	jsr	(GetPOSlotTeam).l
@@ -910,9 +910,9 @@ PStatsMark							;SeasonPlayoffStats: print a value, highlighted in the column o
 	move.w	(sp)+,(printa).w
 	rts
 
-PStatsPalette						;The palette of unk_17C2AE to palfadenew+$20
+PStatsPalette						;The palette of PStatsPal to palfadenew+$20
 	movem.l	a0-a1,-(sp)
-	movea.l	#unk_17C2AE,a0
+	movea.l	#PStatsPal,a0
 	movea.l	#palfadenew+$20,a1
 	move.w	#7,d0
 .pal
@@ -926,7 +926,7 @@ PlayoffMenuScreen					;The playoff menu screen: the playoff tree from save RAM (
 									;roster menu loop (RosterMenuList); Reset Rosters asks Yes / No
 									;(YesNoMenuList) before ClearPlayoffSave
 	movem.l	d0-d7/a0-a6,-(sp)
-	move.w	#$FFFF,(word_FFDDBE).w
+	move.w	#$FFFF,(PlayoffMenuTeam).w
 	move.w	(GameFlags).w,-(sp)
 	bclr	#7,(GameFlags).w
 	jsr	(ReadPassData).l
@@ -943,8 +943,8 @@ PlayoffMenuScreen					;The playoff menu screen: the playoff tree from save RAM (
 	movea.l	#potree,a0
 	move.w	(potreeteam).w,d2
 	move.b	(a0,d2.w),d2
-	clr.w	(word_FFDDBE).w
-	move.b	d2,(word_FFDDBE+1).w
+	clr.w	(PlayoffMenuTeam).w
+	move.b	d2,(PlayoffMenuTeam+1).w
 .0
 	clr.w	(carddelay).w
 	bsr.w	PlayoffMenuInit
@@ -1187,7 +1187,7 @@ ClearPlayoffSave					;Clear the saved playoffs in save RAM ($E68 and $DB4)
 	move.l	#$86E,d1
 	movea.l	#$FFFF1550,a0
 	jsr	(WriteSRAM).l
-	jsr	(sub_11582).l
+	jsr	(ClearRosterSave).l
 	bclr	#6,(GameFlags).w
 	jsr	(MakeSRAMChecksum).l
 	rts

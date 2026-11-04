@@ -44,13 +44,13 @@ NewPO								;New playoff tree
 	beq.w	.0
 	rts
 .0
-	move.w	(dword_FFDD82+2).w,(Opt1team).w
+	move.w	(SeasonTeam).w,(Opt1team).w
 	movea.l	#$FFFFD130,a0
 	moveq	#$57,d0
 	moveq	#$10,d1
 	jsr	(ReadSRAM).l
 	clr.w	(Opt1team).w
-	move.b	(dword_FFDD82+2).w,(Opt1team+1).w
+	move.b	(SeasonTeam).w,(Opt1team+1).w
 	bra.w	.2
 .1
 	move.l	#$E5E,d0
@@ -334,7 +334,7 @@ FigureJoy							;Set cont1team ... cont4team
 	btst	#7,(GameFlags).w
 	beq.w	.0
 	clr.w	d2
-	move.b	(dword_FFDD82+2).w,d2
+	move.b	(SeasonTeam).w,d2
 .0
 	movea.w	#(gsstruct-M68K_RAM),a1
 	moveq	#$10,d4

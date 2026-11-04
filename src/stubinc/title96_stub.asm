@@ -42,8 +42,8 @@ TitleScreenImg = $088A18			;scout96
 NHLShieldMap = $08F2C6				;graphics96
 NHLPALogoMap = $090686				;graphics96
 CreditsBgMap = $0911B8				;graphics96
-unk_1CCEE8 = $1CCEE8				;graphics96
-unk_1D5420 = $1D5420				;graphics96
+CupCelebrationSpr = $1CCEE8			;graphics96
+CupCelebrationMap = $1D5420			;graphics96
 TeamList = $00077E					;teamdata96
 
 

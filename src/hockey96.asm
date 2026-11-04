@@ -48,7 +48,7 @@ StartGame							;Reset game state for a new game, then start the first period
 	move.l	#VBlank,(VBint).l
 	clr.w	(RefStep).w
 	bclr	#5,(GameFlags).w
-	st	(byte_FFD474).w
+	st	(arenaanim).w
 	jsr	(ReadJoy1).l
 	cmp.b	#$E0,d3
 	bne.w	.0
@@ -61,7 +61,7 @@ StartGame							;Reset game state for a new game, then start the first period
 .1
 	cmpi.w	#1,(OptPlayMode).w
 	ble.w	.2
-	bsr.w	sub_14804
+	bsr.w	ClearSavedPlayoffs
 .2
 	jsr	(clearTeamStats).l
 	btst	#0,(gmode2).w
@@ -100,7 +100,8 @@ StartGame							;Reset game state for a new game, then start the first period
 	jsr	(InitCrowdMeter).l
 	jmp	IntermissionStart
 
-sub_14804
+ClearSavedPlayoffs					;StartGame when OptPlayMode > 1: clear save RAM $E68-$ECD (the playoff
+									;block ClearPlayoffSave also clears)
 	move.l	#$E68,d0
 	moveq	#$66,d1
 	jsr	(ClearSRAMBytes).l
@@ -166,7 +167,7 @@ StartPer							;Start a period: reset stack, rink and clock, face off, run the g
 	bset	#1,(sflags7).w
 	bset	#5,(GameFlags).w
 .0
-	st	(byte_FFD47E).w
+	st	(faceoffanim).w
 	movea.w	#(Stack-M68K_RAM),sp
 	jsr	(SoundOff).l
 	jsr	(setupice).l
@@ -240,8 +241,8 @@ DoGameFrame							;Wait for at least one vblank, then run one frame of game logi
 	bsr.w	DoFrameUpdates
 	btst	#6,(sflags3).w
 	beq.w	.0
-	jsr	(sub_FD14).l
-	jsr	(sub_FFD0).l
+	jsr	(SetRoles).l
+	jsr	(ClearRolesIfGoalie).l
 .0
 	bsr.w	updateplayers
 	tst.w	(songdelay).w
@@ -269,7 +270,7 @@ DoFrameUpdates						;The frame updates of DoGameFrame: the new puck carrier chec
 	move.w	(puckc).w,(lastpuckc).w
 	tst.w	(puckc).w
 	bmi.w	.1
-	st	(word_FFD238).w
+	st	(DumpPassSc).w
 .1
 	jsr	(PenaltyManager).l
 	bsr.w	updatecrowdf

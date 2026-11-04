@@ -83,7 +83,7 @@ One module per commit. After each move: `tools/verify_all.sh` ends in `ALL MATCH
 1. `engine/fight96.asm` — done. `checkfight` through `SetFightingMajors`.
 2. `engine/fourway96.asm` — done. `Detect4WayPlay` through `ReadJoySwapPad4`.
 3. `engine/goal96.asm` — done. `SetContTeams` through `ReadAllPads`.
-4. `engine/input96.asm` — done. `updatepadinput` through `PadOnTeam` (doinput, including the goalie parts that 95G kept in skate95; they are inside doinput here). `PadOnTeam` follows `sub_AFDA` and `doinput` branches to it, so it stays in this file.
+4. `engine/input96.asm` — done. `updatepadinput` through `PadOnTeam` (doinput, including the goalie parts that 95G kept in skate95; they are inside doinput here). `PadOnTeam` follows `StartDpadBoost` and `doinput` branches to it, so it stays in this file.
 5. `engine/faceoff96.asm` — done. `faceoffinput` through `Endfaceoff`. What remains of code96_02 is `WriteSRAMBits` / `ReadSRAMBits` and the unreferenced bytes between them and the faceoff.
 6. `src/srambits96.asm` — done. `WriteSRAMBits` / `ReadSRAMBits` and the unreferenced bytes that follow them. The 95G save-RAM block is later and is the file that gets the name `src/sram96.asm`.
 7. `engine/logic96.asm` — done. `asstab` through `DoubleMinorPenalties`. The penalty texts sit at the end of that run and stay in the file until penalty96 is the next include. `SetLCmode` is what remains of code96_03.
@@ -177,7 +177,7 @@ File headers are already short stories in most converted files. When a file is s
 
 The file split, the asset extraction, and the names that already match 95G are done. What is left is inside those files. A generic label is finished when it has a real name in the source and in `docs/name_map.csv`, or a closed-list row with the reason. The symbols pass is finished when every hex immediate that already has an equate uses that equate and the ROM still matches.
 
-Status after the October 2026 naming pass (branch `naming-pass`, see `docs/HANDOFF.md`): 60 generic labels remain, each on the Unsure list with its reason. 46 RAM (`src/ram96.asm`; 14 of them have no uses), 4 graphics `unk_` incbins in `src/graphics96.asm`, and 10 code labels (`sub_AFDA`, `loc_C068`, `sub_FD14`, `sub_FD80`, `sub_FFD0`, `sub_11582`, `nullsub_2`, `sub_14804`, `sub_1D920A`, `sub_1E0D86`). Steps 1-6 below are done except for those; step 7 (symbols) and step 8 (docs) remain.
+Status after the October 2026 naming pass (branch `naming-pass`, see `docs/HANDOFF.md`): leftover `sub_`/`loc_`/`unk_` and RAM `word_FF` / `byte_FF` / `dword_FF` are closed. Steps 1-6 of those prefixes are done; step 7 (symbols) and step 8 (docs) remain.
 
 A routine that matches 95G takes the 95G name. The clash rule stays: the earlier meaning keeps the name. A label with no parent match is named from what the code does, and only when that is obvious. A name that would be a guess is a closed-list row. One file per commit. `tools/verify_all.sh` ends in `ALL MATCH` before the commit. Push to main. No force-push.
 
@@ -187,7 +187,7 @@ These stay as they are: the "Do not rename" table above, `print` / `printcur`, t
 2. `front/season96.asm`. New in 96, no 95G byte match. `SortBytesByWords` and `PrintOrdinal` are already named. Name a screen only when the text, the vblank, or the menu shows which screen it is. A routine that is still just a season screen stays on the closed list.
 3. `dc.b` entries (`logic96`, `create96`, `logic96_vec`, `trade96_edit`, and the remaining blobs in `collide96` and `playoff96`). Name the entry when the caller or a 95G body identifies it. Decode an instruction only when each opcode is checked against the ROM. Leave the rest as bytes under that name.
 4. One more 95G body search. A long masked compare on the labels that are still generic, and on interior points the way `Goal` was found. Take a name only when the body matches. `$02032C` stays unnamed.
-5. Graphics `unk_` labels, including the scout96 picture (now `TitleScreenImg`). Rename one only when the picture is the same asset as a 95G picture, judged by more than the map header, or when one caller already says what the picture is. A rename also changes `tools/extractAssets96.js`, the incbin path, and the extracted file, then the ROM is rebuilt and matched. A header-only lookalike stays `unk_` and is closed.
+5. Graphics `unk_` labels, including the scout96 picture (now `TitleScreenImg`). Rename one only when the picture is the same asset as a 95G picture, judged by more than the map header, or when one caller already says what the picture is. A rename also changes `tools/extractAssets96.js`, the incbin path, and the extracted file, then the ROM is rebuilt and matched. A header-only lookalike stays `unk_` and is closed. Closed 2026-11-04: ArenaAnimGfx, PStatsPal, CupCelebrationSpr, CupCelebrationMap.
 6. RAM. Rename a `word_FF` / `byte_FF` / `unk_FF` only when converted code shows the 95G variable, or the use is obvious. Update every use and `docs/name_map.csv`. An address match alone is not a rename. The rest are closed.
 7. Symbols and immediates. Replace hex with an existing equate where 95G writes `SPA*` / `SPF*`, a RAM field, a team equate, or an `SFX_*` id, and only where the bytes do not change. The player-struct fields past `$60` are their own step: confirm the one-byte shift against 95G before any offset becomes a name.
 8. Docs. Shrink the Unsure list as each item closes. `SEGMENT_AGENT.md` name cells change when a file's main names change. `SetSframe` is the one reopen on the old list: compare it with 95G `SetSframe` and `AddSpriteFrame`. If it is `SetSframe`, close it. If it is `AddSpriteFrame` and that name is free, rename it.
@@ -196,7 +196,7 @@ These stay as they are: the "Do not rename" table above, `print` / `printcur`, t
 
 - `SetSframe` versus 95G `AddSpriteFrame` (see the table above).
 - Which `season96` routine is which season screen. No 95G byte match. Name one only when the body makes the screen obvious (finish plan step 2). `SortBytesByWords`, `PrintOrdinal` and `OrdinalSuffix` are already named and are in the name map.
-- 145 IDA RAM names. No rename until a use shows the 95G variable.
+- 145 IDA RAM names. Closed 2026-11-04: leftover word_/byte_/dword_FF named from job, 94G/95G RAM, or layout.
 - 95G `print` versus 96G `print` / `printcur`. Already decided (clash). Do not revisit.
 - Dotted 95G locals reported by the masked search (`sortValuesUp`, `createListMove`, `rtsCreate2`). Not copied.
 - Whether `ClockDigitChar` at `$020892` is the same routine as middle95 or a second copy. Resolved: `$020892` is the 95 routine (offset `$64`, smallfontchars) and is `ClockDigitChar` in display96. The big-font copy in middle96_clock is `BigClockDigitChar`.
