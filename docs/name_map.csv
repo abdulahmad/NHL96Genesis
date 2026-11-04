@@ -1542,7 +1542,7 @@ $1E0948,DrawReleaseRoster,,,create96
 $1E0AF6,ReleaseMsgText,,,create96
 $1E0B76,ReleaseGfx,sub_1E0B76,,create96
 $1E0D66,PStatsPalette2,sub_1E0D66,,create96
-$1E0D86,sub_1E0D86,,,create96
+$1E0D86,CheckTeamLines,sub_1E0D86,,create96
 $1E0DDE,OptionsScreen,sub_1E0DDE,,options96
 $1E1114,OptionVars,unk_1E1114,,options96
 $1E1138,OptionsMenuDraw,sub_1E1138,,options96

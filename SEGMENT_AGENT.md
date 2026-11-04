@@ -133,7 +133,7 @@ Every row is matched. Rows are in ROM order and tile `$000000` up to the `$FF` f
 | season96_stand | matched, 2554 bytes | $1D9CC6 | $1DA6BF | code | season95 | StandingsPoints, StandingsGroups, StandingsGroup0-4, SortStandings |
 | season96_menu | matched, 6524 bytes | $1DA6C0 | $1DC03B | code | season95, playoff95 | SetSframe, LeadersScrollArrows, SortValuesUp, SeasonPlayoffStats, WaitAnyPad, PlayoffMenuScreen, ClearPlayoffSave |
 | trade96_edit | matched, 6362 bytes | $1DC03C | $1DD915 | code | trade95 | RosterMenuList, YesNoMenuList, TradePlayers, CheckTrade, InvalidTradeText |
-| create96 | matched, 13512 bytes | $1DD916 | $1E0DDD | code | create95 | CreatePlayer, the Field... / Edit... routines, ClearCreatedPlayers, SignFreeAgents, ReleasePlayers |
+| create96 | matched, 13512 bytes | $1DD916 | $1E0DDD | code | create95 | CreatePlayer, the Field... / Edit... routines, ClearCreatedPlayers, SignFreeAgents, ReleasePlayers, CheckTeamLines |
 | options96 | matched, 3386 bytes | $1E0DDE | $1E1B17 | code | - | OptionsScreen, OptionsMenuList, SetGoalieModes, SetLineOption, SetPenOption, SetSkillLevel, OptionsAnimFrame |
 | stats96 | matched, 2928 bytes | $1E1B18 | $1E2687 | code | stats95 | LineEditor, PrintAttribHeader, DrawLineIcons, SetLineSlot, LoadTeamLine, SaveTeamLine |
 | pause96_return | matched, 2030 bytes | $1E2688 | $1E2E75 | code | pause95 | ReturnToGame, RestoreGameScreen, ClearOldFrames, PeriodText, PrintDigit |

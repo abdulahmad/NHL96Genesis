@@ -1366,8 +1366,9 @@ PStatsPalette2						;The PStatsPalette palette to palfadenew+$40 (sign free agen
 	dc.b	$48,$E7,$00,$C0,$20,$7C,$00,$17,$C2,$AE,$22,$7C,$FF,$FF,$BD,$7E
 	dc.b	$30,$3C,$00,$07,$22,$D8,$51,$C8,$FF,$FC,$4C,$DF,$03,$00,$4E,$75
 
-sub_1E0D86							;Called from ExecuteTrade, SignFreeAgents and ReleasePlayers Code the
-									;listing does not decode: kept as bytes
+CheckTeamLines						;Team d7: clear the $41-byte saved line block at 0 or $C39 if it belongs
+									;to that team. Called from ExecuteTrade, SignFreeAgents and ReleasePlayers.
+									;Code the listing does not decode: kept as bytes
 	dc.b	$48,$E7,$FF,$FE,$30,$39,$00,$20,$00,$00,$53,$00,$B0,$07,$66,$00
 	dc.b	$00,$06,$61,$00,$00,$2C,$30,$39,$00,$20,$18,$72,$53,$00,$B0,$07
 	dc.b	$66,$00,$00,$06,$61,$00,$00,$24,$4C,$DF,$7F,$FF,$4E,$75,$48,$E7

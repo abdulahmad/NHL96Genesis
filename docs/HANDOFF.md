@@ -2,11 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 `front/season96.asm` rename (ClearRosterSave). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
+- Stage / unit: D6 `front/create96.asm` rename (CheckTeamLines). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
 - Branch: `claude/project-thread-ggw7zu`
 - Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04)
-- D6: this unit renamed season96 `sub_11582` → `ClearRosterSave`. Other Unsure rows stay for later modules. Do not merge to main.
-- Next: remaining 96G leftover generics (create96, hockey96, code96_15, teamgfx96, graphics unk_, RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
+- D6: this unit renamed create96 `sub_1E0D86` → `CheckTeamLines`. Other Unsure rows stay for later modules. Do not merge to main.
+- Next: remaining 96G leftover generics (hockey96, code96_15, teamgfx96, graphics unk_, RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
 - Open PRs: #43
 
 ## Purpose
@@ -387,7 +387,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   `front/season96_stand.asm` is the standings (StandingsPoints through SortStandings, $1D9CC6-$1DA6BF).
   `front/season96_menu.asm` is the season stats screen and the playoff menu (SetSframe through ClearPlayoffSave, $1DA6C0-$1DC03B). code96_16 is gone.
   `front/trade96_edit.asm` is the roster menu and the trade screen (RosterMenuList through PositionLetters, $1DC03C-$1DD915).
-  `front/create96.asm` is the create-player screen and the created-player list (CreatePlayer through sub_1E0D86, $1DD916-$1E0DDD).
+  `front/create96.asm` is the create-player screen and the created-player list (CreatePlayer through CheckTeamLines, $1DD916-$1E0DDD).
   `front/options96.asm` is the options screen, new in 96 (OptionsScreen through OptionsAnimFrame, $1E0DDE-$1E1B17).
   `front/stats96.asm` is the line editor (LineEditor through sub_1E2644, $1E1B18-$1E2687).
   `engine/pause96_return.asm` is the return to the game (ReturnToGame through PrintDigit, $1E2688-$1E2E75).
@@ -528,7 +528,7 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
 
 ## Unsure
 
-D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. `input96_shot`, `input96`, `fight96` and `season96` (`ClearRosterSave`) are done. Other rows stay until that module is the unit.
+D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. `input96_shot`, `input96`, `fight96`, `season96` and `create96` (`CheckTeamLines`) are done. Other rows stay until that module is the unit.
 
 Copied from `docs/align95_plan.md`. Leave these alone.
 
@@ -553,9 +553,9 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
 - For Abdul: BlankMenuBox (summary96) has the callers and job of 95G ClearMenuBox (TimeoutMenu, SelectGoalieMenu), but
   95 calls eraser and 96 prints blank big-font rows, so it was named from the job. Rename to ClearMenuBox if role is enough.
 - For Abdul: CupChampionsScreen (awards96_show) has the job of 95G StanleyCupScreen with a different body; same question.
-- sub_1E0D86 (create96): clears the $41-byte save RAM block at 0 or $C39 that belongs to team d7, called where 95 called
-  CheckSavedLines (ExecuteTrade, SignFreeAgents, ReleasePlayers). $41 is 95's saved line set size, but no reader of the
-  blocks was found. Candidate ClearSavedLinesD7 once a reader confirms it.
+- CheckTeamLines (create96): closed 2026-11-04. Team d7: clear the $41-byte saved line block at 0 or $C39 if it
+  belongs to that team. ExecuteTrade calls it for both trade teams (95G CheckSavedLines). Same job as 95G
+  CheckTeamLines, new body.
 - For Abdul: names kept from 95G by role and interface where the body is new: SimTeamGoals, SimScorers, SimShots
   (season sim), ClearSeasonData (season96). Swap for new names if role is not enough.
 - For Abdul: the asstab entries $1-$6 are named by role and the 94 numbering, not a byte match (see the logic96 bullet).
