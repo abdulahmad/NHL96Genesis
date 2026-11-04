@@ -1,5 +1,5 @@
 ;	RAM map. Each variable takes its 95G name (or a name from
-;	what it holds) once the code that uses it shows which it is; the rest keep their IDA names. Define each
+;	what it holds) once the code that uses it shows which it is. Define each
 ;	name once.
 AwardIds			equ	$FFFF0000	;InitPlayoffs: the teams of the two conferences (ConferenceTeams1 at +0,
 									;ConferenceTeams2 at +$14), sorted by SortSeeds. Shares M68K_RAM
@@ -7,14 +7,15 @@ Z80_RAM				equ	$A00000
 Z80_YM2612			equ	$A04000
 Stack				equ	$FFFFFDFA
 M68K_RAM			equ	$FFFF0000
-word_FF1388			equ	$FFFF1388
+LeaderIds			equ	$FFFF1388	;BuildPlayerLeaders: sorted player ids (team*$1B+slot). Not 95G TradeBuf
 pstatscol			equ	$FFFF1EB2	;SeasonPlayoffStats: the stat column being printed
-byte_FF2710			equ	$FFFF2710
+TeamSelectRedraw	equ	$FFFF2710	;Team select: bit 0 ranks, bit 1 home logo, bit 2 vis logo
 pstatsblockchars	equ	$FFFF2712	;SeasonPlayoffStats: team block chars
 pstatscount			equ	$FFFF2714	;SeasonPlayoffStats: rows in the list
 homelogochars		equ	$FFFF2716	;Team select: chars of the left (home / user) team logo
 vislogochars		equ	$FFFF2718	;Team select: chars of the VisTeam logo
-word_FF2720			equ	$FFFF2720
+TeamSelectHome		equ	$FFFF2720	;Team select: 1 home side, 0 visitors. Shares pstatsteam
+pstatsteam			equ	$FFFF2720	;SeasonPlayoffStats: the team shown
 CreatePoints		equ	$FFFF7536
 replayend			equ	$FFFFAF64	;End of the replay buffer from M68K_RAM: updatereplay wraps recbpr there
 VSCRLPM				equ	$FFFFB000
@@ -68,7 +69,7 @@ pucky				equ	$FFFFB772
 puckvy				equ	$FFFFB788
 puckz				equ	$FFFFB776
 puckvz				equ	$FFFFB78A
-byte_FFB7BC			equ	$FFFFB7BC
+pucknopuck			equ	$FFFFB7BC	;puckx+nopuck (layout; unused as a label)
 puckc				equ	$FFFFB7BE
 puck_pflags2		equ	$FFFFB7C1
 Ylist				equ	$FFFFB85E
@@ -84,7 +85,8 @@ NumCwdExciteLvl		equ	$FFFFB8BC
 SumCwdExciteLvl		equ	$FFFFB8BE
 crowdtblidx			equ	$FFFFB8B4	;updatecrowdf: the crowd frame step. Shares padiconchars3
 Zamx				equ	$FFFFB8C2
-word_FFB8C4			equ	$FFFFB8C4
+puckanimchars		equ	$FFFFB8C4	;OptionsScreen: vram char of PuckAnimMap. Shares PlayoffHpos
+PlayoffHpos			equ	$FFFFB8C4	;Playoff tree: scroll+$100 when in $40..$200
 optanimframe		equ	$FFFFB8C6	;OptionsScreen: animation frame 0-7
 optanimdelay		equ	$FFFFB8C8	;OptionsScreen: frames to the next animation frame
 DMAList				equ	$FFFFB8CA
@@ -141,7 +143,7 @@ pstatsrow			equ	$FFFFBF5A	;SeasonPlayoffStats: bottom row shown
 pstatsrows			equ	$FFFFBF5C	;SeasonPlayoffStats: rows on screen
 pstatslast			equ	$FFFFBF5E	;SeasonPlayoffStats: last row
 recwins				equ	$FFFFBF7C
-word_FFBF88			equ	$FFFFBF88
+smallfontalt		equ	$FFFFBF88	;printsmall / printcur: char base when sflags6 bit 3
 onetimerplayer		equ	$FFFFBFA6
 onetimerflags		equ	$FFFFBFB0
 disflags			equ	$FFFFBFB2
@@ -159,7 +161,7 @@ fodir1				equ	$FFFFBFE6
 fodir2				equ	$FFFFBFE8
 collflag			equ	$FFFFBFEE
 lldisp				equ	$FFFFB05A
-word_FFBFF0			equ	$FFFFBFF0
+collscale			equ	$FFFFBFF0	;checkplcoll: collision scale (96 stores 0, then multiplies)
 mesarea				equ	$FFFFBFF2
 TextBuffer			equ	$FFFFBFF4
 PushWidthBuf		equ	$FFFFC056
@@ -186,7 +188,7 @@ sflags10			equ	$FFFFC352
 sflags11			equ	$FFFFC354
 sflags12			equ	$FFFFC356
 sflags13			equ	$FFFFC358
-byte_FFC35A			equ	$FFFFC35A
+sflags14			equ	$FFFFC35A	;bit 0 big score on (ShowBigScore); bit 1 skip season menu song
 LineHoldFlag		equ	$FFFFC35C
 lastpuckc			equ	$FFFFB8AE
 menupadnum			equ	$FFFFD252
@@ -258,14 +260,14 @@ PenSumLength		equ	$FFFFC634
 PenSum				equ	$FFFFC636
 tmstruct			equ	$FFFFC726	;the home team struct; AwShots the away team
 HmGoals				equ	$FFFFC732
-word_FFC73C			equ	$FFFFC73C
-word_FFC74C			equ	$FFFFC74C
-byte_FFC756			equ	$FFFFC756
+HomeTmLine			equ	$FFFFC73C	;tmstruct+tmline
+HomeTmGoalie		equ	$FFFFC74C	;tmstruct+tmgoalie
+HomeTmFlags			equ	$FFFFC756	;tmstruct+tmflags
 AwShots				equ	$FFFFCAC4
 AwGoals				equ	$FFFFCAD0
-word_FFCADA			equ	$FFFFCADA
-word_FFCAEA			equ	$FFFFCAEA
-byte_FFCAF4			equ	$FFFFCAF4
+AwayTmLine			equ	$FFFFCADA	;AwShots+tmline
+AwayTmGoalie		equ	$FFFFCAEA	;AwShots+tmgoalie
+AwayTmFlags			equ	$FFFFCAF4	;AwShots+tmflags
 statsbuffer			equ	$FFFFCE62
 plistplayoff		equ	$FFFFCF42	;PlayerStatsList: 0 this game, 1 playoffs
 gsstruct			equ	$FFFFCF44
@@ -286,8 +288,8 @@ menurows			equ	$FFFFD00A	;PrintMenuList2: items shown
 TickerNum			equ	$FFFFD026
 PPBonus				equ	$FFFFD028
 callbackPtr			equ	$FFFFD02C
-word_FFD036			equ	$FFFFD036
-word_FFD038			equ	$FFFFD038
+PListRows			equ	$FFFFD036	;PlayerStatsList: rows on screen
+PListMax			equ	$FFFFD038	;PlayerStatsList: last row index
 CalTeam				equ	$FFFFD130	;CalendarScreen team (StandingsScreen: the group size). Shares ThreeStars
 SeedCount			equ	$FFFF00B4
 ThreeStars			equ	$FFFFD130
@@ -308,10 +310,11 @@ VertLineScrolling	equ	$FFFFD032	;Stats screens: the row scroll
 PlayerScrollCtr		equ	$FFFFD034	;Stats screens: the player row
 screentimer			equ	$FFFFD03A	;Stats screens: the row count
 nibblebuffer		equ	$FFFFD230
-dword_FFD234		equ	$FFFFD234
-word_FFD238			equ	$FFFFD238
-word_FFD23A			equ	$FFFFD23A
-word_FFD23C			equ	$FFFFD23C
+nibblebuffer4		equ	$FFFFD234	;nibblebuffer+4
+DumpPassSc			equ	$FFFFD238	;dump-pass: SCnum of the passer, or -1 if passed to a player. Shares PListCol
+PListCol			equ	$FFFFD238	;PlayerStatsList: the stat column being printed (PListValue)
+LastCarrierHome		equ	$FFFFD23A	;SetRoles: last puck carrier SCnum, home (negative: none)
+LastCarrierAway		equ	$FFFFD23C	;SetRoles: last puck carrier SCnum, away
 pad1user			equ	$FFFFD248
 pad2user			equ	$FFFFD24A
 pad3user			equ	$FFFFD24C
@@ -359,8 +362,8 @@ FallXPos			equ	$FFFFD2EA
 LineHoldTimer		equ	$FFFFD2EC
 setuphome			equ	$FFFFD2FC
 setupvis			equ	$FFFFD2FE
-word_FFD300			equ	$FFFFD300
-word_FFD310			equ	$FFFFD310
+SetupSpare			equ	$FFFFD300	;ClearGameRAM leftover between setupvis and carddelay
+SetupSpare16		equ	$FFFFD310	;SetupSpare+$10
 carddelay			equ	$FFFFD312
 homegoalies			equ	$FFFFD31A
 awaygoalies			equ	$FFFFD31C
@@ -379,8 +382,8 @@ awayshootgoals		equ	$FFFFD436
 shootoutround		equ	$FFFFD438	;Shootout round
 homeshootnum		equ	$FFFFD446	;The shooter index of the shootout
 shootoutteam		equ	$FFFFD454
-byte_FFD474			equ	$FFFFD474
-byte_FFD47E			equ	$FFFFD47E
+arenaanim			equ	$FFFFD474	;94G arenaanim (StartGame st; RunArenaAnim is rts-disabled)
+faceoffanim			equ	$FFFFD47E	;94G faceoffanim (StartPer st; SetFaceoffAnim)
 SeasonDay			equ	$FFFFDD7E	;The season header in RAM (ReadSeasonHeader / WriteSeasonHeader):
 									;the season day word first
 SeasonFlags			equ	SeasonDay+2	;Season header flags (bit 0 regular season over, bit 1 season done, bit 2
@@ -401,7 +404,7 @@ SongIndex			equ	$FFFFD48E
 attribsum			equ	$FFFFD490
 attribcount			equ	$FFFFD492
 sopathdir			equ	$FFFFD81C	;passdir at the end of the shootout path
-byte_FFDCA6			equ	$FFFFDCA6
+OptPad				equ	$FFFFDCA6	;OptionsScreen: last pad bits from ProcessInputWithRepeat
 songdelay			equ	$FFFFDCC0
 delayedsong			equ	$FFFFDCC2
 shootoutdelay		equ	$FFFFDCC4	;Frames before the shootout ends
@@ -411,24 +414,25 @@ TmpPuckZ			equ	$FFFFDCCA	;puckz last frame
 inputjoy			equ	$FFFFDCCC
 PlayerChked			equ	$FFFFDCCE
 PlayerChking		equ	$FFFFDCD2
-word_FFDCDE			equ	$FFFFDCDE
+FightEngageCount	equ	$FFFFDCDE	;EngageFight: fighters who have pressed A/B/C
 FightMash			equ	$FFFFDCE0	;fight button-mash count, one word a pad
-dword_FFDCE4		equ	$FFFFDCE4
-word_FFDCE8			equ	$FFFFDCE8
-word_FFDCEA			equ	$FFFFDCEA
-byte_FFDCEC			equ	$FFFFDCEC
+FightMash34			equ	$FFFFDCE4	;FightMash+4 (pads 3-4)
+FightMasher			equ	$FFFFDCE8	;fightinput: SCnum of the pad that reached the mash limit
+FightSpare			equ	$FFFFDCEA	;startfight leftover (cleared)
+FightFaceBits		equ	$FFFFDCEC	;fightinput: bit 0/1 facing (facedir 2 vs the other)
 replaydelay			equ	$FFFFDCF2
 PALflag				equ	$FFFFDCF6
-byte_FFDCF9			equ	$FFFFDCF9
-dword_FFDD82		equ	$FFFFDD82
+DayGameCount		equ	$FFFFDCF9	;games in today's list at DayGameCount+1 (5 bytes each)
+SeasonPen			equ	$FFFFDD82	;season header: OptPen, OptLine at +1
+SeasonTeam			equ	$FFFFDD84	;season header: the user's team ($FF none)
 jerseynum			equ	$FFFFDDAA
 NextScreenPtr		equ	$FFFFDDAC	;The next season screen routine (RunSeasonMenu, PlayoffMenuScreen)
 simdays				equ	$FFFFDDB0	;Days for SimSeasonDays to simulate
 fightidletimer		equ	$FFFFDDB4	;Fight: frames left with no button before it ends
-word_FFDDB6			equ	$FFFFDDB6
+TeamSelSide			equ	$FFFFDDB6	;Team select: highlighted side (0 season, 1 home, 2 visitors)
 SRAMChecksum		equ	$FFFFDDBC
 shotpflags			equ	$FFFFC364	;pflags of the last shooter (doshot)
-word_FFDDBE			equ	$FFFFDDBE
+PlayoffMenuTeam		equ	$FFFFDDBE	;PlayoffMenuScreen: the user's tree team ($FFFF none)
 IntermissionTimer	equ	$FFFFDDC4	;Intermission: frames before it continues by itself
 SndDrvRAM			equ	$FFFFFDFC	;Sound driver RAM base: word $1234 = driver on, 0 = off
 SndSeqPtr			equ	$FFFFFDFE	;8 song slots: song data (-1 = free)

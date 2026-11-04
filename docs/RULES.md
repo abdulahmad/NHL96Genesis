@@ -37,3 +37,4 @@ rule in the same commit as the fix that confirmed it, newest last: `- YYYY-MM-DD
 - 2026-11-04 D6 names: teamgfx96 rtsPlayoffOver (empty return after EncodePW at playoff over). Not 95G StanleyCupScreen. (owner)
 - 2026-11-04 D6 names: graphics96 ArenaAnimGfx, PStatsPal, CupCelebrationSpr, CupCelebrationMap; extractor incbin names follow the labels. (owner)
 - 2026-11-04 D6 names: ram96 unk_FF named from job/layout (glovestruct from 94G; SetupPadStruct, PadChanged, FightMash). (owner)
+- 2026-11-04 D6 names: ram96 leftover word_FF / byte_FF / dword_FF named from job, 94G/95G RAM, or layout; two jobs at one address keep both names (TeamSelectHome/pstatsteam, puckanimchars/PlayoffHpos, DumpPassSc/PListCol). Unused slots get a layout name. (owner)

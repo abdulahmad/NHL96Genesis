@@ -193,7 +193,7 @@ OpeningClear						;Reset the stack and clear the game variables (keeping the sea
 	move.w	#1,(simdays).w
 .10
 	jsr	(SimSeasonDays).l
-	bset	#1,(byte_FFC35A).w
+	bset	#1,(sflags14).w
 	btst	#0,(SeasonFlags).w
 	beq.s	.8
 .11

@@ -2,11 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 leftover `sub_`/`loc_`/`unk_` closed (input96 through ram96). Same job + new body uses the 95G name.
+- Stage / unit: D6 ram96 leftover `word_FF` / `byte_FF` / `dword_FF` named from job, 94G/95G RAM, or layout.
 - Branch: `claude/project-thread-ggw7zu`
-- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04). Report `tools/gate.sh` PAIRING OK, 96G SHA `f170dbe`.
-- D6: leftover prefixes empty in source. For-Abdul non-generic Unsure rows stay. Do not merge to main.
-- Next: no 95PC leftovers, no C ports.
+- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04).
+- D6: leftover IDA RAM names closed. For-Abdul non-generic Unsure rows stay. Do not merge to main.
+- Next: pairing in nhl-disasm-report. No 95PC leftovers, no C ports.
 - Open PRs: #43
 
 ## Purpose
@@ -528,13 +528,13 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
 
 ## Unsure
 
-D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. Code, graphics and RAM `unk_` are closed. `word_FF` / `byte_FF` / `dword_FF` remain on the Unsure list.
+D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. Code, graphics, RAM `unk_`, and leftover `word_FF` / `byte_FF` / `dword_FF` are closed.
 
 Copied from `docs/align95_plan.md`. Leave these alone.
 
 - SetSframe versus 95G AddSpriteFrame. 95G also has SetSframe. The 96 comment matches SetSframe. Left alone.
 - Which season96 routine is which season screen. No 95 byte match. Name one only when its body makes the screen obvious. Do not invent a screen name.
-- 145 IDA RAM names (`word_FF` / `byte_FF` / `unk_FF`). Rename one only when a converted use matches a 95G RAM name by what the code does. Do not rename from the address alone.
+- 145 IDA RAM names (`word_FF` / `byte_FF` / `unk_FF`). Closed 2026-11-04: leftover word_/byte_/dword_FF named from job, 94G/95G RAM, or layout. Two jobs at one address keep both names.
 - 95G `print` versus 96G `print` / `printcur`. Already decided (clash). Do not revisit.
 - Dotted 95G locals (`sortValuesUp`, `createListMove`, `rtsCreate2`). Not copied.
 - ClockDigitChar at $020892 is the 95 routine (offset $64, smallfontchars), named in display96. The big-font copy in middle96_clock is BigClockDigitChar.
@@ -562,7 +562,7 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
 - StartDpadBoost (input96): closed 2026-11-04. Start + dpad on a skater sets SPA288C, pf2aip and Xvel + $64
   unless pf2unav or gmclock. No 95G parent (95G start always pauses).
 - EngageFight (fight96): closed 2026-11-04. A/B/C during SPAfight: SPA3128, count this fighter
-  (word_FFDCDE). The second one: SetFightingMajors and GameFlags bit 5; the first: PenCntDwn $140.
+  (FightEngageCount). The second one: SetFightingMajors and GameFlags bit 5; the first: PenCntDwn $140.
   No 93G parent (93 punches from SPAfight directly).
 - SetRoles / SetTeamRoles / ClearRolesIfGoalie (input96_shot): closed 2026-11-04. Once a second (sf3icetime)
   SetRoles remaps each full-strength team's role byte $65 from the last puck carrier and the puck's X zone
@@ -575,7 +575,11 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
   when the clock is running, then the movem restores d1. No 95G parent.
 - For Abdul: PauseScreenDraw (pause96_return) has 95G's caller and job but a rewritten body.
 - RAM unk_: closed 2026-11-04. glovestruct (94G), SetupPadStruct, PadChanged, FightMash, SortObj12/13,
-  PushWidthBuf2, ChkCnt2, gsstruct7, RamTop, RamLast. word_FF / byte_FF / dword_FF remain.
+  PushWidthBuf2, ChkCnt2, gsstruct7, RamTop, RamLast.
+- RAM word_FF / byte_FF / dword_FF: closed 2026-11-04. Named from job (LeaderIds, TeamSelectRedraw,
+  SeasonTeam, FightEngageCount, ...), 94G (arenaanim, faceoffanim, tmstruct layout), or layout
+  (HomeTmLine, pucknopuck, nibblebuffer4). Shared addresses: TeamSelectHome/pstatsteam,
+  puckanimchars/PlayoffHpos, DumpPassSc/PListCol.
 - Graphics: closed 2026-11-04. ArenaAnimGfx (dead RunArenaAnim frame offsets), PStatsPal (PStatsPalette source),
   CupCelebrationSpr and CupCelebrationMap (CupCelebration rink sprites and the 6,$C picture).
 - For Abdul: names that the pictures now contradict. OptionsScreen's banner reads MAIN MENU (the GAME OPTIONS screen is

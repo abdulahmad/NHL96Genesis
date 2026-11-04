@@ -48,7 +48,7 @@ StartGame							;Reset game state for a new game, then start the first period
 	move.l	#VBlank,(VBint).l
 	clr.w	(RefStep).w
 	bclr	#5,(GameFlags).w
-	st	(byte_FFD474).w
+	st	(arenaanim).w
 	jsr	(ReadJoy1).l
 	cmp.b	#$E0,d3
 	bne.w	.0
@@ -167,7 +167,7 @@ StartPer							;Start a period: reset stack, rink and clock, face off, run the g
 	bset	#1,(sflags7).w
 	bset	#5,(GameFlags).w
 .0
-	st	(byte_FFD47E).w
+	st	(faceoffanim).w
 	movea.w	#(Stack-M68K_RAM),sp
 	jsr	(SoundOff).l
 	jsr	(setupice).l
@@ -270,7 +270,7 @@ DoFrameUpdates						;The frame updates of DoGameFrame: the new puck carrier chec
 	move.w	(puckc).w,(lastpuckc).w
 	tst.w	(puckc).w
 	bmi.w	.1
-	st	(word_FFD238).w
+	st	(DumpPassSc).w
 .1
 	jsr	(PenaltyManager).l
 	bsr.w	updatecrowdf

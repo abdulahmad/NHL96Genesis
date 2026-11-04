@@ -293,7 +293,7 @@ SetSeasonAwardWinners				;Write the regular season award winners (Hart, Art Ross
 	move.w	#2,(pstatscat).w
 	jsr	(BuildPlayerLeaders).l
 	movea.l	#$201B28,a6
-	move.w	(word_FF1388).l,d0
+	move.w	(LeaderIds).l,d0
 	ext.l	d0
 	divu.w	#$1B,d0
 	move.w	d0,d7
@@ -305,7 +305,7 @@ SetSeasonAwardWinners				;Write the regular season award winners (Hart, Art Ross
 	move.b	(jerseynum).w,1(a6)
 	move.b	(jerseynum+1).w,3(a6)
 	addq.l	#8,a6
-	move.w	(word_FF1388).l,d0
+	move.w	(LeaderIds).l,d0
 	ext.l	d0
 	divu.w	#$1B,d0
 	move.w	d0,d7
@@ -317,7 +317,7 @@ SetSeasonAwardWinners				;Write the regular season award winners (Hart, Art Ross
 	move.b	(jerseynum).w,1(a6)
 	move.b	(jerseynum+1).w,3(a6)
 	addq.l	#8,a6
-	movea.l	#$FFFF1388,a5
+	movea.l	#LeaderIds,a5
 .0
 	move.w	(a5),d0
 	ext.l	d0
@@ -344,7 +344,7 @@ SetSeasonAwardWinners				;Write the regular season award winners (Hart, Art Ross
 	addq.l	#8,a6
 	move.w	#3,(pstatscat).w
 	jsr	(BuildPlayerLeaders).l
-	move.w	(word_FF1388).l,d0
+	move.w	(LeaderIds).l,d0
 	ext.l	d0
 	divu.w	#$1B,d0
 	move.w	d0,d7
@@ -388,7 +388,7 @@ SetPlayoffAwardWinners				;Write the Conn Smythe, Wales and Campbell winners to 
 	move.w	#2,(pstatscat).w
 	jsr	(BuildPlayerLeaders).l
 	movea.l	#$201B48,a6
-	move.w	(word_FF1388).l,d0
+	move.w	(LeaderIds).l,d0
 	btst	#1,(sflags11).w
 	beq.w	.0
 	move.w	($201B56).l,d7
@@ -521,7 +521,7 @@ CupChampionsScreen					;The user's team won the Cup: a full screen picture with 
 	jsr	(dobitmap).l
 	movea.l	#CupChampsPals,a0
 	clr.l	d0
-	move.b	(dword_FFDD82+2).w,d0
+	move.b	(SeasonTeam).w,d0
 	asl.w	#5,d0
 	adda.l	d0,a0
 	move.w	#7,d1
@@ -533,7 +533,7 @@ CupChampionsScreen					;The user's team won the Cup: a full screen picture with 
 	String	CC_Font1Pal1Pri,$1D,$15
 	movea.l	#SmallLogoPtrs,a0
 	clr.w	d0
-	move.b	(dword_FFDD82+2).w,d0
+	move.b	(SeasonTeam).w,d0
 	asl.w	#2,d0
 	movea.l	(a0,d0.w),a0
 	movea.l	a0,a1
@@ -563,7 +563,7 @@ CupChampionsScreen					;The user's team won the Cup: a full screen picture with 
 	String	CC_Font1Pal1Pri,$14,$16
 	movea.l	#TeamList,a1
 	clr.w	d0
-	move.b	(dword_FFDD82+2).w,d0
+	move.b	(SeasonTeam).w,d0
 	asl.w	#2,d0
 	movea.l	(a1,d0.w),a1
 	adda.w	4(a1),a1
@@ -582,7 +582,7 @@ CupChampionsScreen					;The user's team won the Cup: a full screen picture with 
 	String	CC_Font1Pal1Pri,$14,$18
 	movea.l	#TeamList,a1
 	clr.w	d0
-	move.b	(dword_FFDD82+2).w,d0
+	move.b	(SeasonTeam).w,d0
 	asl.w	#2,d0
 	movea.l	(a1,d0.w),a1
 	adda.w	4(a1),a1

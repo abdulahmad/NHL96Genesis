@@ -498,7 +498,7 @@ dopass								;Pass the puck
 	bsr.w	passtoa0
 	bra.w	.8
 .7
-	move.w	SCnum(a3),(word_FFD238).w
+	move.w	SCnum(a3),(DumpPassSc).w
 	move.w	(passdir).w,d0			;just hit puck in pass dir not to any player
 	asl.w	#2,d0
 	movea.l	#dirtab,a0
@@ -575,7 +575,7 @@ dopass								;Pass the puck
 	rts
 
 passtoa0							;Pass the puck to player a0
-	st	(word_FFD238).w
+	st	(DumpPassSc).w
 	jsr	(loadTeamStruct).l
 	addq.w	#1,$12(a2)				;add 1 to total pass attempts
 	move.w	SCnum(a0),(passplayer).w
@@ -756,14 +756,14 @@ SetRoles							;Once a second (sf3icetime): CheckRoles, then SetTeamRoles for ea
 	clr.w	d7
 .2
 	movea.l	#SortCords,a5
-	move.w	(word_FFD23A).w,d6
+	move.w	(LastCarrierHome).w,d6
 	bmi.w	.3
 	cmpi.w	#6,(tmstruct+tmap).w
 	bne.w	.3
 	bsr.w	SetTeamRoles
 .3
 	movea.l	#SortCords+$300,a5
-	move.w	(word_FFD23C).w,d6
+	move.w	(LastCarrierAway).w,d6
 	bmi.w	.4
 	cmpi.w	#6,(AwShots+tmap).w
 	bne.w	.4

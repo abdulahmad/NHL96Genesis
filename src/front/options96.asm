@@ -34,7 +34,7 @@ OptionsScreen						;The game options screen: play mode, rosters, period length, 
 	bne.w	.2
 	btst	#1,(sflags13).w
 	bne.w	.2
-	tst.b	(dword_FFDD82+2).w
+	tst.b	(SeasonTeam).w
 	bpl.w	.2
 	clr.w	(OptPlayMode).w
 .2
@@ -83,7 +83,7 @@ OptionsScreen						;The game options screen: play mode, rosters, period length, 
 	beq.w	.6
 	clr.w	(carddelay).w
 .6
-	move.b	d1,(byte_FFDCA6).w
+	move.b	d1,(OptPad).w
 	btst	#7,d1
 	bne.w	.17
 	btst	#1,d1
@@ -251,7 +251,7 @@ OptionsScreenSetup					;OptionsScreen: vram, fonts, the screen bitmaps and the r
 	movea.l	#SmallFontMap2+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.l	#RosterFont,(smallfontptr).w
-	move.w	d4,(word_FFB8C4).w
+	move.w	d4,(puckanimchars).w
 	movea.l	#PuckAnimMap+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	jsr	(printsmallz).l
@@ -325,8 +325,8 @@ ClearGameRAM						;Clear the shootout words, both team structs, PenBuf and the g
 	clr.w	(sflags4).w
 	clr.w	(sflags6).w
 	clr.w	(gmode2).w
-	clr.w	(word_FFD300).w
-	clr.w	(word_FFD310).w
+	clr.w	(SetupSpare).w
+	clr.w	(SetupSpare16).w
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
@@ -612,7 +612,7 @@ OptionsAnimFrame					;OptionsScreen: draw frame optanimframe of the animation (P
 	movem.l	d0-d7/a0-a6,-(sp)
 	jsr	(printz).l
 	String	CC_Font1Pri,$1F,$01
-	move.w	(word_FFB8C4).w,d4
+	move.w	(puckanimchars).w,d4
 	movea.l	#PuckAnimMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2

@@ -13,7 +13,7 @@ PlayoffScreen						;Bring up the playoff screen if in playoff mode (OptPlayMode 
 	move.b	(potree+$1C).w,d0
 	move.b	(potree+$1D).w,d1
 	move.b	d0,d2
-	cmp.b	(dword_FFDD82+2).w,d2
+	cmp.b	(SeasonTeam).w,d2
 	bne.w	.0
 	move.b	d1,d2
 .0
@@ -196,14 +196,14 @@ UpdatePlayoffScroll					;Move the tree one step and stop on a page boundary
 	cmp.w	d1,d0
 	blt.w	rtsPlayoffScreen
 	move.w	d0,(DispAttribCtr).w
-	clr.w	(word_FFB8C4).w
+	clr.w	(PlayoffHpos).w
 	move.w	d0,d1
 	addi.w	#$100,d1
 	cmp.w	#$40,d1
 	blt.w	.nox
 	cmp.w	#$200,d1
 	bgt.w	.nox
-	move.w	d1,(word_FFB8C4).w
+	move.w	d1,(PlayoffHpos).w
 .nox
 	ext.l	d0
 	movea.l	#PlayoffScrollStops,a0

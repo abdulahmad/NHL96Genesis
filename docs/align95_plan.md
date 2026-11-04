@@ -177,7 +177,7 @@ File headers are already short stories in most converted files. When a file is s
 
 The file split, the asset extraction, and the names that already match 95G are done. What is left is inside those files. A generic label is finished when it has a real name in the source and in `docs/name_map.csv`, or a closed-list row with the reason. The symbols pass is finished when every hex immediate that already has an equate uses that equate and the ROM still matches.
 
-Status after the October 2026 naming pass (branch `naming-pass`, see `docs/HANDOFF.md`): leftover `sub_`/`loc_`/`unk_` are closed. RAM `word_FF` / `byte_FF` / `dword_FF` remain on the Unsure list. Steps 1-6 of those prefixes are done; step 7 (symbols) and step 8 (docs) remain.
+Status after the October 2026 naming pass (branch `naming-pass`, see `docs/HANDOFF.md`): leftover `sub_`/`loc_`/`unk_` and RAM `word_FF` / `byte_FF` / `dword_FF` are closed. Steps 1-6 of those prefixes are done; step 7 (symbols) and step 8 (docs) remain.
 
 A routine that matches 95G takes the 95G name. The clash rule stays: the earlier meaning keeps the name. A label with no parent match is named from what the code does, and only when that is obvious. A name that would be a guess is a closed-list row. One file per commit. `tools/verify_all.sh` ends in `ALL MATCH` before the commit. Push to main. No force-push.
 
@@ -196,7 +196,7 @@ These stay as they are: the "Do not rename" table above, `print` / `printcur`, t
 
 - `SetSframe` versus 95G `AddSpriteFrame` (see the table above).
 - Which `season96` routine is which season screen. No 95G byte match. Name one only when the body makes the screen obvious (finish plan step 2). `SortBytesByWords`, `PrintOrdinal` and `OrdinalSuffix` are already named and are in the name map.
-- 145 IDA RAM names. No rename until a use shows the 95G variable.
+- 145 IDA RAM names. Closed 2026-11-04: leftover word_/byte_/dword_FF named from job, 94G/95G RAM, or layout.
 - 95G `print` versus 96G `print` / `printcur`. Already decided (clash). Do not revisit.
 - Dotted 95G locals reported by the masked search (`sortValuesUp`, `createListMove`, `rtsCreate2`). Not copied.
 - Whether `ClockDigitChar` at `$020892` is the same routine as middle95 or a second copy. Resolved: `$020892` is the 95 routine (offset `$64`, smallfontchars) and is `ClockDigitChar` in display96. The big-font copy in middle96_clock is `BigClockDigitChar`.

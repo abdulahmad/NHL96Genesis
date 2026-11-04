@@ -843,7 +843,7 @@ printsmallz							;printsmall with the String after the call
 	rts
 
 printsmall							;print String a1 at printx / printy with the small font chars
-									;(smallfontchars, or word_FFBF88 with
+									;(smallfontchars, or smallfontalt with
 									;sflags6 bit 3): a negative byte is a control code (ControlCodeJumpTable)
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
@@ -851,7 +851,7 @@ printsmall							;print String a1 at printx / printy with the small font chars
 	movea.w	#(smallfontchars-M68K_RAM),a3
 	btst	#3,(sflags6).w
 	beq.w	.1
-	movea.w	#(word_FFBF88-M68K_RAM),a3
+	movea.w	#(smallfontalt-M68K_RAM),a3
 .1
 	bsr.w	xyVmMap
 	move.w	(printa).w,d2
@@ -1010,7 +1010,7 @@ print								;print String a1 at printx / printy with the font map SmallFontMap:
 	move.w	4(a2,d0.w),d0
 	btst	#3,(sflags6).w
 	beq.w	.2
-	add.w	(word_FFBF88).w,d0
+	add.w	(smallfontalt).w,d0
 	bra.w	.p
 .2
 	add.w	(smallfontchars).w,d0
@@ -1089,7 +1089,7 @@ printcur							;print with the font map at smallfontptr
 	move.w	4(a2,d0.w),d0
 	btst	#3,(sflags6).w
 	beq.w	.2
-	add.w	(word_FFBF88).w,d0
+	add.w	(smallfontalt).w,d0
 	bra.w	.p
 .2
 	add.w	(smallfontchars).w,d0
