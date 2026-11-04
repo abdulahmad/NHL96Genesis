@@ -468,7 +468,7 @@ SetPlayoffAwardWinners				;Write the Conn Smythe, Wales and Campbell winners to 
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-CupChampionsScreen					;The user's team won the Cup: a full screen picture with the team palette,
+StanleyCupScreen					;The user's team won the Cup: a full screen picture with the team palette,
 									;small logo and name, until start
 	btst	#3,(SeasonFlags).w
 	beq.w	.3
@@ -613,9 +613,9 @@ CupChampionsScreen					;The user's team won the Cup: a full screen picture with 
 .3
 	rts
 
-MightyDucksTxt						;CupChampionsScreen: Anaheim's first name line
+MightyDucksTxt						;StanleyCupScreen: Anaheim's first name line
 	String	'mighty ducks'
 
-OfAnaheimTxt						;CupChampionsScreen: Anaheim's second name line
+OfAnaheimTxt						;StanleyCupScreen: Anaheim's second name line
 	String	'of anaheim'
 

@@ -17,7 +17,7 @@ VBlank_SpriteFade					;VBint for the period summary and the awards screen: the s
 	movem.l	(sp)+,d0-d7/a0-a6
 	rte
 
-BlankMenuBox						;Blank the pause menu box (big font rows) and its corners before a submenu
+ClearMenuBox						;Blank the pause menu box (big font rows) and its corners before a submenu
 									;is drawn
 									;Code the listing does not decode: kept as bytes
 	dc.b	$4E,$B9,$00,$01,$BA,$2E,$00,$14,$F8,$07,$01,$0A,$06,$20,$FD,$1D

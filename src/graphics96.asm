@@ -638,14 +638,14 @@ PuckAnimMap							;The spinning puck animation, 7x7 tiles a frame
 									;(OptionsAnimFrame); +8 the tiles
 	incbin	..\Extracted\NHL96\Graphics\PuckAnimMap.map.jim
 
-CupChampsMap						;The Stanley Cup champions team picture (CupChampionsScreen)
+CupChampsMap						;The Stanley Cup champions team picture (StanleyCupScreen)
 	incbin	..\Extracted\NHL96\Graphics\CupChampsMap.map.jim
 
-CupChampsMap2						;The champions picture layer in the team palette (CupChampionsScreen)
+CupChampsMap2						;The champions picture layer in the team palette (StanleyCupScreen)
 	incbin	..\Extracted\NHL96\Graphics\CupChampsMap2.map.jim
 
 CupChampsPals						;One palette per team for the Stanley Cup champions picture
-									;(CupChampionsScreen)
+									;(StanleyCupScreen)
 	incbin	..\Extracted\NHL96\Graphics\CupChampsPals.map.jim
 
 CupCelebrationSpr					;The sprites CupCelebration animates over the rink

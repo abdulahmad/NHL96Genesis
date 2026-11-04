@@ -2,11 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 ram96 leftover `word_FF` / `byte_FF` / `dword_FF` named from job, 94G/95G RAM, or layout.
+- Stage / unit: D6 For-Abdul 95G names (ClearMenuBox, StanleyCupScreen; PauseScreenDraw, SimTeamGoals, SimScorers, SimShots, ClearSeasonData kept).
 - Branch: `claude/project-thread-ggw7zu`
-- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04). Report `tools/gate.sh` PAIRING OK, 96G SHA `2a7c295`.
-- D6: leftover IDA RAM names closed. For-Abdul non-generic Unsure rows stay. Do not merge to main.
-- Next: pairing in nhl-disasm-report. No 95PC leftovers, no C ports.
+- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04)
+- D6: same job + new body takes the 95G name. These For-Abdul role matches are closed. Do not merge to main.
+- Next: STOP. Remaining For-Abdul: asstab $1-$6, picture-contradiction names. No Studio, no 95PC leftovers, no C ports.
 - Open PRs: #43
 
 ## Purpose
@@ -550,14 +550,15 @@ SegaInit locals exist in `src/sega/SegaInit.asm` and in `docs/name_map.csv`. Do 
 Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidence below is found.
 - ClearRosterSave (season96): closed 2026-11-04. Last step of ClearPlayoffSave (Reset Rosters): player stats
   ($4D/$BEC or playoff $89/$666), 9 bytes at $DDD, injuries, and the ClearFreeAgentStats block. No 95G parent.
-- For Abdul: BlankMenuBox (summary96) has the callers and job of 95G ClearMenuBox (TimeoutMenu, SelectGoalieMenu), but
-  95 calls eraser and 96 prints blank big-font rows, so it was named from the job. Rename to ClearMenuBox if role is enough.
-- For Abdul: CupChampionsScreen (awards96_show) has the job of 95G StanleyCupScreen with a different body; same question.
+- ClearMenuBox (summary96): closed 2026-11-04. Callers and job of 95G ClearMenuBox (TimeoutMenu,
+  SelectGoalieMenu). 95 calls eraser; 96 prints blank big-font rows. Same job, new body: 95G name.
+- StanleyCupScreen (awards96_show): closed 2026-11-04. User's team won the Cup. Same job as 95G
+  StanleyCupScreen, new body: 95G name.
 - CheckTeamLines (create96): closed 2026-11-04. Team d7: clear the $41-byte saved line block at 0 or $C39 if it
   belongs to that team. ExecuteTrade calls it for both trade teams (95G CheckSavedLines). Same job as 95G
   CheckTeamLines, new body.
-- For Abdul: names kept from 95G by role and interface where the body is new: SimTeamGoals, SimScorers, SimShots
-  (season sim), ClearSeasonData (season96). Swap for new names if role is not enough.
+- SimTeamGoals, SimScorers, SimShots (season sim), ClearSeasonData (season96): closed 2026-11-04.
+  Same job and interface as 95G, new body: keep the 95G names.
 - For Abdul: the asstab entries $1-$6 are named by role and the 94 numbering, not a byte match (see the logic96 bullet).
 - StartDpadBoost (input96): closed 2026-11-04. Start + dpad on a skater sets SPA288C, pf2aip and Xvel + $64
   unless pf2unav or gmclock. No 95G parent (95G start always pauses).
@@ -573,7 +574,8 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
   (the playoff block ClearPlayoffSave also clears). No 95G parent (95 StartGame 2-3 calls ClearShotData).
 - PrepShotPass (code96_15): closed 2026-11-04. Called before setpassmode / SetShotMode; loads TempWord1 to d1
   when the clock is running, then the movem restores d1. No 95G parent.
-- For Abdul: PauseScreenDraw (pause96_return) has 95G's caller and job but a rewritten body.
+- PauseScreenDraw (pause96_return): closed 2026-11-04. 95G caller and job, rewritten body: keep
+  the 95G name.
 - RAM unk_: closed 2026-11-04. glovestruct (94G), SetupPadStruct, PadChanged, FightMash, SortObj12/13,
   PushWidthBuf2, ChkCnt2, gsstruct7, RamTop, RamLast.
 - RAM word_FF / byte_FF / dword_FF: closed 2026-11-04. Named from job (LeaderIds, TeamSelectRedraw,

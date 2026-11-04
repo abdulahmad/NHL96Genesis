@@ -73,9 +73,9 @@ Every row is matched. Rows are in ROM order and tile `$000000` up to the `$FF` f
 | lines96 | matched, 720 bytes | $00EC30 | $00EEFF | code | lines95 | SetLCmode, SetLCmode2, setlccords, getlchoice, lineinput, lcfound, lcfound2 |
 | lines96_set | matched, 1140 bytes | $00EF00 | $00F373 | code | lines95 | NullSaveClear, GetTeamLines (the team data lines, or lines built from the ratings: BuildPosList, AddLineSkaters, AddLinePlayer) |
 | input96_shot | matched, 3404 bytes | $00F374 | $0100BF | code | input95 | shotdiradj, shotdirmath, SetShotMode, ShotMode, doshot, setpassmode, passmode, dopass, passtoa0, SetRoles, SetTeamRoles, ClearRolesIfGoalie |
-| trade96 | matched, 2138 bytes | $0100C0 | $010919 | code | trade95 | DefaultRosters, FormatPlayerNameD7, GetRosterName, GetJerseyNumber |
-| season96_sim | matched, 920 bytes | $01091A | $010CB1 | code | season95 | SimGameStats, SimGoalieStats, SimGoalie, PickSimGoalie |
-| season96 | matched, 8012 bytes | $010CB2 | $012BFD | code | - | SaveGameStats, TickTeamInjuries, SimSeasonDays, WriteDayGames, Read/WriteSeasonHeader, ClearRosterSave, ReadStandings, TeamSelectScreen, RunSeasonMenu, SeasonMenuScreen, DrawSetupTeamBlock |
+| trade96 | matched, 2138 bytes | $0100C0 | $010919 | code | trade95 | DefaultRosters, FormatPlayerNameD7, GetRosterName, GetJerseyNumber, SimTeamGoals |
+| season96_sim | matched, 920 bytes | $01091A | $010CB1 | code | season95 | SimGameStats, SimGoalieStats, SimGoalie, PickSimGoalie, SimScorers, SimShots |
+| season96 | matched, 8012 bytes | $010CB2 | $012BFD | code | - | SaveGameStats, TickTeamInjuries, SimSeasonDays, WriteDayGames, Read/WriteSeasonHeader, ClearRosterSave, ClearSeasonData, ReadStandings, TeamSelectScreen, RunSeasonMenu, SeasonMenuScreen, DrawSetupTeamBlock |
 | teamgfx96 | matched, 2394 bytes | $012BFE | $013557 | data | - | TeamBlockPtrs, TeamLogoPtrs, SmallLogoPtrs, VBlank_Menus (bytes), rtsPlayoffOver |
 | schedule96 | matched, 2376 bytes | $013558 | $013E9F | data | schedule95 | SeasonSchedule (Day) |
 | awards96 | matched, 1374 bytes | $013EA0 | $0143FD | code | awards95 | ScoutingReport, ResolveDayGames, BeginPlayoffs, InitPlayoffs, SeedPairings, SortSeeds, CalcSeedPoints, SetupPlayoffs, GetTeamPOSlot, BuildPOSlots |
@@ -136,13 +136,13 @@ Every row is matched. Rows are in ROM order and tile `$000000` up to the `$FF` f
 | create96 | matched, 13512 bytes | $1DD916 | $1E0DDD | code | create95 | CreatePlayer, the Field... / Edit... routines, ClearCreatedPlayers, SignFreeAgents, ReleasePlayers, CheckTeamLines |
 | options96 | matched, 3386 bytes | $1E0DDE | $1E1B17 | code | - | OptionsScreen, OptionsMenuList, SetGoalieModes, SetLineOption, SetPenOption, SetSkillLevel, OptionsAnimFrame |
 | stats96 | matched, 2928 bytes | $1E1B18 | $1E2687 | code | stats95 | LineEditor, PrintAttribHeader, DrawLineIcons, SetLineSlot, LoadTeamLine, SaveTeamLine |
-| pause96_return | matched, 2030 bytes | $1E2688 | $1E2E75 | code | pause95 | ReturnToGame, RestoreGameScreen, ClearOldFrames, PeriodText, PrintDigit |
-| summary96 | matched, 10052 bytes | $1E2E76 | $1E55B9 | code | summary95, shootout95, records95 | TeamRosterScreen, ScoringSummaryScreen, PenaltySummaryScreen, PeriodStatsScreen, GameStatistics, ShootoutShooters, RecordHoldersScreen |
+| pause96_return | matched, 2030 bytes | $1E2688 | $1E2E75 | code | pause95 | ReturnToGame, RestoreGameScreen, ClearOldFrames, PauseScreenDraw, PeriodText, PrintDigit |
+| summary96 | matched, 10052 bytes | $1E2E76 | $1E55B9 | code | summary95, shootout95, records95 | ClearMenuBox, TeamRosterScreen, ScoringSummaryScreen, PenaltySummaryScreen, PeriodStatsScreen, GameStatistics, ShootoutShooters, RecordHoldersScreen |
 | stats96_list | matched, 3762 bytes | $1E55BA | $1E646B | code | stats95 | PlayerStatsScreen, PlayerStatsList, the PList... helpers, PListPrint, PListValue, PListMark |
 | records96 | matched, 2974 bytes | $1E646C | $1E7009 | code | records95 | NameEntryScreen, CreateLetterGrid, UserNameEntry, PrintNameLogRecords |
 | playoff96_tree | matched, 1626 bytes | $1E700A | $1E7663 | code | playoff95 | PlayoffScreen, HandlePlayoffInput, PrintSeriesScore, DrawTreeArrow |
 | middle96_clock | matched, 1120 bytes | $1E7664 | $1E7AC3 | code | middle95 | showclock, showclockdma, BigClockDigitChar, ClockDigitChar2, ShowBigScore, ClearBigScore |
-| awards96_show | matched, 3280 bytes | $1E7AC4 | $1E8793 | code | awards95 | SeasonAwards, DrawAwardPicture, AwardPictures, PrintAwardWinner, GetAwardWinner |
+| awards96_show | matched, 3280 bytes | $1E7AC4 | $1E8793 | code | awards95 | SeasonAwards, DrawAwardPicture, AwardPictures, PrintAwardWinner, GetAwardWinner, StanleyCupScreen |
 | injury96 | matched, 264 bytes | $1E8794 | $1E889B | code | injury95 | RandomInjuryGames, SetInjuryGames, SetSeasonInjuries, GetInjuryGames |
 | title96 | matched, 1932 bytes | $1E889C | $1E9027 | code | - | the opening screens new in 96 (sub_ names) |
 | checksum96 | matched, 170 bytes | $1E9028 | $1E90D1 | code | checksum95 | ChecksumLongs, ChecksumValue, ValidationRoutine |

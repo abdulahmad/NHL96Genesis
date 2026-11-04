@@ -1601,7 +1601,7 @@ $1E2DE8,PeriodText,,,pause96_return
 $1E2E3C,DigitText,,,pause96_return
 $1E2E64,PrintDigit,,,pause96_return
 $1E2E76,VBlank_SpriteFade,unk_1E2E76,,summary96
-$1E2EAA,BlankMenuBox,sub_1E2EAA,,summary96
+$1E2EAA,ClearMenuBox,sub_1E2EAA,BlankMenuBox,summary96
 $1E2EFC,TeamRosterScreen,,,summary96
 $1E352A,ScoringSummaryScreen,,,summary96
 $1E36D6,GoalTypeTbl,,,summary96
@@ -1710,7 +1710,7 @@ $1E821C,GetAwardWinnerTeam,sub_1E821C,,awards96_show
 $1E824C,GetAwardWinner,sub_1E824C,,awards96_show
 $1E827A,SetSeasonAwardWinners,sub_1E827A,,awards96_show
 $1E83E6,SetPlayoffAwardWinners,sub_1E83E6,,awards96_show
-$1E8544,CupChampionsScreen,sub_1E8544,,awards96_show
+$1E8544,StanleyCupScreen,sub_1E8544,CupChampionsScreen,awards96_show
 $1E877A,MightyDucksTxt,unk_1E877A,,awards96_show
 $1E8788,OfAnaheimTxt,unk_1E8788,,awards96_show
 $1E8794,RandomInjuryGames,sub_1E8794,,injury96

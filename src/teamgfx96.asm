@@ -22,7 +22,7 @@ TeamLogoPtrs						;The team logo bitmap of each team, a long pointer per team
 	dc.l	TeamLogoWSH,TeamLogoWPG,TeamLogoCHI,TeamLogoCHI
 
 SmallLogoPtrs						;The small team logo of each team, a long pointer per team (read by
-									;CupChampionsScreen)
+									;StanleyCupScreen)
 	dc.l	SmallLogoANH,SmallLogoBOS,SmallLogoBUF,SmallLogoCGY
 	dc.l	SmallLogoCHI,SmallLogoDAL,SmallLogoDET,SmallLogoEDM
 	dc.l	SmallLogoFLA,SmallLogoHFD,SmallLogoLA,SmallLogoMTL

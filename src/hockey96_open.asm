@@ -253,7 +253,7 @@ OpeningClear						;Reset the stack and clear the game variables (keeping the sea
 .20
 	move.w	#0,-(sp)
 	jsr	(song).l
-	jsr	(CupChampionsScreen).l
+	jsr	(StanleyCupScreen).l
 .21
 	jsr	(SeasonAwards).l
 	btst	#1,(sflags13).w
