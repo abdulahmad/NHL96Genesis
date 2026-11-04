@@ -910,9 +910,9 @@ PStatsMark							;SeasonPlayoffStats: print a value, highlighted in the column o
 	move.w	(sp)+,(printa).w
 	rts
 
-PStatsPalette						;The palette of unk_17C2AE to palfadenew+$20
+PStatsPalette						;The palette of PStatsPal to palfadenew+$20
 	movem.l	a0-a1,-(sp)
-	movea.l	#unk_17C2AE,a0
+	movea.l	#PStatsPal,a0
 	movea.l	#palfadenew+$20,a1
 	move.w	#7,d0
 .pal

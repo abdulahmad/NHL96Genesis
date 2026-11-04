@@ -2,11 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 `teamgfx96.asm` rename (rtsPlayoffOver). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
+- Stage / unit: D6 `graphics96.asm` rename (ArenaAnimGfx, PStatsPal, CupCelebrationSpr, CupCelebrationMap). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
 - Branch: `claude/project-thread-ggw7zu`
-- Last check: `tools/verify_all.sh` ALL MATCH pending this unit
-- D6: this unit renamed teamgfx96 `nullsub_2` → `rtsPlayoffOver`. Other Unsure rows stay for later modules. Do not merge to main.
-- Next: remaining 96G leftover generics (graphics unk_, RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
+- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04)
+- D6: this unit renamed graphics96 `unk_` incbins. Other Unsure rows stay for later modules. Do not merge to main.
+- Next: remaining 96G leftover generics (RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
 - Open PRs: #43
 
 ## Purpose
@@ -528,7 +528,7 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
 
 ## Unsure
 
-D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. Through `teamgfx96` (`rtsPlayoffOver`). Other rows stay until that module is the unit.
+D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. Through `graphics96` (`ArenaAnimGfx`, `PStatsPal`, `CupCelebrationSpr`, `CupCelebrationMap`). Other rows stay until that module is the unit.
 
 Copied from `docs/align95_plan.md`. Leave these alone.
 
@@ -581,8 +581,8 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
   objects unk_FFBE72 / unk_FFBE8E, word_FFD036 / word_FFD038 in the stats block, byte_FFC35A, unk_FFC38C, word_FFBF88,
   word_FFBFF0, word_FFD300, word_FFD310, byte_FFD474 / byte_FFD47E (94 arenaanim / faceoffanim by the dead 94 code only),
   byte_FFDCA6, byte_FFDCF9, dword_FFDD82, word_FFDDB6, word_FFDDBE, byte_FF2710, word_FF1388). unk_FFC4C6 is ScoreSum-6 but has no uses left.
-- Graphics: unk_1417B6 (a frame offset table used only by the dead arena animation), unk_17C2AE (a palette; what it
-  colours is not shown), unk_1CCEE8 and unk_1D5420 (CupCelebration's sprites and banner; not identified by content).
+- Graphics: closed 2026-11-04. ArenaAnimGfx (dead RunArenaAnim frame offsets), PStatsPal (PStatsPalette source),
+  CupCelebrationSpr and CupCelebrationMap (CupCelebration rink sprites and the 6,$C picture).
 - For Abdul: names that the pictures now contradict. OptionsScreen's banner reads MAIN MENU (the GAME OPTIONS screen is
   other code); PlayoffMenuScreen / PlayoffMenuSetup draw TRANSACTIONS and run RosterMenuList; ControllerBgMap is also the
   background of the select team, main menu and transactions screens. Left as they are (not IDA names).

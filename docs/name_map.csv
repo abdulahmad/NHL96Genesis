@@ -1054,7 +1054,7 @@ $13DA74,EASportsMap,unk_13DA74,,graphics96
 $13E99A,RevRinkTilelist,unk_13E99A,,graphics96
 $140AFE,ReplayIconMap,,,graphics96
 $141228,ReplayBannerMap,,,graphics96
-$1417B6,unk_1417B6,,,graphics96
+$1417B6,ArenaAnimGfx,unk_1417B6,,graphics96
 $1468D6,HiScoreBgMap,unk_1468D6,,graphics96
 $147896,HiScoreImg,unk_147896,,graphics96
 $148054,TeamBlockANH,,,graphics96
@@ -1142,7 +1142,7 @@ $179A76,SmallFontMap,unk_179A76,,graphics96
 $17A164,SmallFontMap2,unk_17A164,,graphics96
 $17AA72,BigFontMap2,unk_17AA72,BigFontMap,graphics96
 $17B680,BigFontMap4,unk_17B680,BigFontMap2,graphics96
-$17C2AE,unk_17C2AE,unk_17C2AE,,graphics96
+$17C2AE,PStatsPal,unk_17C2AE,,graphics96
 $17C2CE,LeagueOptionsBgMap,unk_17C2CE,,graphics96
 $17DBDC,LeagueOptionsTitleMap,unk_17DBDC,,graphics96
 $17E3FC,LeagueOptionsSprites,unk_17E3FC,,graphics96
@@ -1244,8 +1244,8 @@ $1C4C4E,PuckAnimMap,unk_1C4C4E,,graphics96
 $1C6C4C,CupChampsMap,unk_1C6C4C,,graphics96
 $1CAEFA,CupChampsMap2,unk_1CAEFA,,graphics96
 $1CCBA8,CupChampsPals,unk_1CCBA8,,graphics96
-$1CCEE8,unk_1CCEE8,unk_1CCEE8,,graphics96
-$1D5420,unk_1D5420,,,graphics96
+$1CCEE8,CupCelebrationSpr,unk_1CCEE8,,graphics96
+$1D5420,CupCelebrationMap,unk_1D5420,,graphics96
 $1D579E,revframetbl,unk_1D579E,,graphics96
 $1D6622,puckvzadj,sub_1D6622,,logic96_timer
 $1D66AC,OneTimerPass,sub_1D66AC,,logic96_timer

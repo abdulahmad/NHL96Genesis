@@ -68,9 +68,9 @@ ReplayIconMap						;The replay icon map (ShowReplayIcon); continued in data96_07
 ReplayBannerMap						;The replay banner map (ShowReplayBanner)
 	incbin	..\Extracted\NHL96\Graphics\ReplayBannerMap.map.jim
 
-unk_1417B6							;Used by the table after RunArenaAnim (the dead arena animation): a frame
+ArenaAnimGfx						;Used by the table after RunArenaAnim (the dead arena animation): a frame
 									;offset table, not a plain picture
-	incbin	..\Extracted\NHL96\Graphics\unk_1417B6.map.jim
+	incbin	..\Extracted\NHL96\Graphics\ArenaAnimGfx.map.jim
 
 HiScoreBgMap						;The high score screen background (HiScoreScreen)
 	incbin	..\Extracted\NHL96\Graphics\HiScoreBgMap.map.jim
@@ -333,9 +333,9 @@ BigFontMap2							;The big font map (printbig, bigfontptr); +8 the tiles
 BigFontMap4							;The big font map printbig takes with sflags11 bit 2; +8 the tiles
 	incbin	..\Extracted\NHL96\Graphics\BigFontMap4.map.jim
 
-unk_17C2AE							;A 16-colour palette (PStatsPalette, PStatsPalette2, SaveTeamLine copy
-									;it); what it colours is not known
-	incbin	..\Extracted\NHL96\Graphics\unk_17C2AE.map.jim
+PStatsPal							;A 16-colour palette (PStatsPalette, PStatsPalette2, SaveTeamLine copy
+									;it) for the player-stats screens
+	incbin	..\Extracted\NHL96\Graphics\PStatsPal.map.jim
 
 LeagueOptionsBgMap					;The League Options screen background
 	incbin	..\Extracted\NHL96\Graphics\LeagueOptionsBgMap.map.jim
@@ -648,11 +648,11 @@ CupChampsPals						;One palette per team for the Stanley Cup champions picture
 									;(CupChampionsScreen)
 	incbin	..\Extracted\NHL96\Graphics\CupChampsPals.map.jim
 
-unk_1CCEE8							;The sprites CupCelebration animates over the rink
-	incbin	..\Extracted\NHL96\Graphics\unk_1CCEE8.map.jim
+CupCelebrationSpr					;The sprites CupCelebration animates over the rink
+	incbin	..\Extracted\NHL96\Graphics\CupCelebrationSpr.map.jim
 
-unk_1D5420							;A picture CupCelebrationSetup draws at 6,$C
-	incbin	..\Extracted\NHL96\Graphics\unk_1D5420.map.jim
+CupCelebrationMap					;A picture CupCelebrationSetup draws at 6,$C
+	incbin	..\Extracted\NHL96\Graphics\CupCelebrationMap.map.jim
 
 revframetbl							;One word per sprite frame: the frame for a reverse angle replay
 									;(RevReplayAdj)

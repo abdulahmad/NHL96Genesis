@@ -282,7 +282,7 @@ const assets = [
     { name: 'RevRinkTilelist.bin', folder: 'NHL96/Graphics', start: 0x0013e99a, end: 0x00140afe }, // RevRinkTilelist
     { name: 'ReplayIconMap.map.jim', folder: 'NHL96/Graphics', start: 0x00140afe, end: 0x00141228 }, // ReplayIconMap
     { name: 'ReplayBannerMap.map.jim', folder: 'NHL96/Graphics', start: 0x00141228, end: 0x001417b6 }, // ReplayBannerMap
-    { name: 'unk_1417B6.map.jim', folder: 'NHL96/Graphics', start: 0x001417b6, end: 0x001468d6 }, // unk_1417B6
+    { name: 'ArenaAnimGfx.map.jim', folder: 'NHL96/Graphics', start: 0x001417b6, end: 0x001468d6 }, // ArenaAnimGfx
     { name: 'HiScoreBgMap.map.jim', folder: 'NHL96/Graphics', start: 0x001468d6, end: 0x00147896 }, // HiScoreBgMap
     { name: 'HiScoreImg.map.jim', folder: 'NHL96/Graphics', start: 0x00147896, end: 0x00148054 }, // HiScoreImg
     { name: 'TeamBlockANH.map.jim', folder: 'NHL96/Graphics', start: 0x00148054, end: 0x00148502 }, // TeamBlockANH
@@ -370,7 +370,7 @@ const assets = [
     { name: 'SmallFontMap2.map.jim', folder: 'NHL96/Graphics', start: 0x0017a164, end: 0x0017aa72 }, // SmallFontMap2
     { name: 'BigFontMap2.map.jim', folder: 'NHL96/Graphics', start: 0x0017aa72, end: 0x0017b680 }, // BigFontMap2
     { name: 'BigFontMap4.map.jim', folder: 'NHL96/Graphics', start: 0x0017b680, end: 0x0017c2ae }, // BigFontMap4
-    { name: 'unk_17C2AE.map.jim', folder: 'NHL96/Graphics', start: 0x0017c2ae, end: 0x0017c2ce }, // unk_17C2AE
+    { name: 'PStatsPal.map.jim', folder: 'NHL96/Graphics', start: 0x0017c2ae, end: 0x0017c2ce }, // PStatsPal
     { name: 'LeagueOptionsBgMap.map.jim', folder: 'NHL96/Graphics', start: 0x0017c2ce, end: 0x0017dbdc }, // LeagueOptionsBgMap
     { name: 'LeagueOptionsTitleMap.map.jim', folder: 'NHL96/Graphics', start: 0x0017dbdc, end: 0x0017e3fc }, // LeagueOptionsTitleMap
     { name: 'LeagueOptionsSprites.map.jim', folder: 'NHL96/Graphics', start: 0x0017e3fc, end: 0x0017ecea }, // LeagueOptionsSprites
@@ -471,8 +471,8 @@ const assets = [
     { name: 'CupChampsMap.map.jim', folder: 'NHL96/Graphics', start: 0x001c6c4c, end: 0x001caefa }, // CupChampsMap
     { name: 'CupChampsMap2.map.jim', folder: 'NHL96/Graphics', start: 0x001caefa, end: 0x001ccba8 }, // CupChampsMap2
     { name: 'CupChampsPals.map.jim', folder: 'NHL96/Graphics', start: 0x001ccba8, end: 0x001ccee8 }, // CupChampsPals
-    { name: 'unk_1CCEE8.map.jim', folder: 'NHL96/Graphics', start: 0x001ccee8, end: 0x001d5420 }, // unk_1CCEE8
-    { name: 'unk_1D5420.map.jim', folder: 'NHL96/Graphics', start: 0x001d5420, end: 0x001d579e }, // unk_1D5420
+    { name: 'CupCelebrationSpr.map.jim', folder: 'NHL96/Graphics', start: 0x001ccee8, end: 0x001d5420 }, // CupCelebrationSpr
+    { name: 'CupCelebrationMap.map.jim', folder: 'NHL96/Graphics', start: 0x001d5420, end: 0x001d579e }, // CupCelebrationMap
     { name: 'revframetbl.map.jim', folder: 'NHL96/Graphics', start: 0x001d579e, end: 0x001d6622 }, // revframetbl
 ];
 // The licensed names of the ROM, in the order of the rows of src/teamdata96.asm (the team records in ROM order): the player names

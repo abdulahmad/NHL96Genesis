@@ -370,11 +370,11 @@ CupCelebrationSetup					;CupCelebration: vram, the team and rink palettes, the r
 	jsr	(DecompressGraphicsPlain).l
 	move.w	d4,(animchars).w
 	move.w	(animchars).w,d4
-	movea.l	#unk_1CCEE8+8,a2
+	movea.l	#CupCelebrationSpr+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.w	d4,(ExtraChars).w
 	move.w	(ExtraChars).w,d4
-	movea.l	#unk_1D5420+8,a2
+	movea.l	#CupCelebrationMap+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.w	(disflags).w,-(sp)
 	bset	#dfng,(disflags).w
@@ -390,7 +390,7 @@ CupCelebrationSetup					;CupCelebration: vram, the team and rink palettes, the r
 	jsr	(printz).l
 	String	CC_Font1,$06,$0C
 	move.w	(ExtraChars).w,d4
-	movea.l	#unk_1D5420,a0
+	movea.l	#CupCelebrationMap,a0
 	movea.l	a0,a1
 	movea.l	a0,a2
 	adda.l	(a2)+,a0
@@ -408,7 +408,7 @@ CupCelebrationSetup					;CupCelebration: vram, the team and rink palettes, the r
 	rts
 
 CupCelebrationSprites				;CupCelebration: the sprites of the current frame that are in view
-	movea.l	#unk_1CCEE8,a1
+	movea.l	#CupCelebrationSpr,a1
 	adda.l	4(a1),a1
 	move.w	(Hpos).w,d4
 	move.w	(Vpos).w,d5
