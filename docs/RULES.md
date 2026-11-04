@@ -33,3 +33,4 @@ rule in the same commit as the fix that confirmed it, newest last: `- YYYY-MM-DD
 - 2026-11-04 D6 names: season96 ClearRosterSave (Reset Rosters: stats, $DDD, injuries, FA stats). No 95G parent. (owner)
 - 2026-11-04 D6 names: create96 CheckTeamLines is the 95G name (team d7 saved lines); 96 clears the $41-byte block instead of fixing slots. (owner)
 - 2026-11-04 D6 names: hockey96 ClearSavedPlayoffs (StartGame OptPlayMode>1: SRAM $E68-$ECD). Not 95G ClearShotData. (owner)
+- 2026-11-04 D6 names: code96_15 PrepShotPass (before setpassmode/SetShotMode; movem undoes the TempWord1 load). (owner)

@@ -60,7 +60,7 @@ checkcoll = $01D7FE					;collide96
 doassignment = $024380				;logic96_do
 PuckOnAttackHalf = $1D6B66			;code96_14
 ShortenMsgTimer = $1D8676			;shootout96_path
-sub_1D920A = $1D920A				;code96_15
+PrepShotPass = $1D920A				;code96_15
 
 
 ; Main segment code

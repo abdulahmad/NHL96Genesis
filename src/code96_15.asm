@@ -227,7 +227,8 @@ HiScoreScreen						;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up t
 	dc.b	$24,$7C,$FF,$FF,$C7,$26,$B4,$6A,$00,$28,$67,$00,$00,$08,$24,$7C
 	dc.b	$FF,$FF,$CA,$C4,$4E,$75
 
-sub_1D920A							;Called before setpassmode / SetShotMode (input96)
+PrepShotPass						;Called before setpassmode / SetShotMode. Loads TempWord1 to d1 when the
+									;clock is running, then the movem restores d1 so it has no effect.
 	movem.l	d1-d7/a0,-(sp)
 	btst	#gmclock,(gmode).w
 	bne.w	.0

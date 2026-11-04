@@ -2,11 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 `hockey96.asm` rename (ClearSavedPlayoffs). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
+- Stage / unit: D6 `code96_15.asm` rename (PrepShotPass). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
 - Branch: `claude/project-thread-ggw7zu`
-- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04)
-- D6: this unit renamed hockey96 `sub_14804` → `ClearSavedPlayoffs`. Other Unsure rows stay for later modules. Do not merge to main.
-- Next: remaining 96G leftover generics (code96_15, teamgfx96, graphics unk_, RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
+- Last check: `tools/verify_all.sh` ALL MATCH pending this unit
+- D6: this unit renamed code96_15 `sub_1D920A` → `PrepShotPass`. Other Unsure rows stay for later modules. Do not merge to main.
+- Next: remaining 96G leftover generics (teamgfx96, graphics unk_, RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
 - Open PRs: #43
 
 ## Purpose
@@ -528,7 +528,7 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
 
 ## Unsure
 
-D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. Through `hockey96` (`ClearSavedPlayoffs`). Other rows stay until that module is the unit.
+D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. Through `code96_15` (`PrepShotPass`). Other rows stay until that module is the unit.
 
 Copied from `docs/align95_plan.md`. Leave these alone.
 
@@ -570,7 +570,8 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
 - nullsub_2 (teamgfx96): an rts called once, at game over after EncodePW; 94 / 95 have no call there.
 - ClearSavedPlayoffs (hockey96): closed 2026-11-04. StartGame when OptPlayMode > 1: clear save RAM $E68-$ECD
   (the playoff block ClearPlayoffSave also clears). No 95G parent (95 StartGame 2-3 calls ClearShotData).
-- sub_1D920A (code96_15): called before setpassmode / SetShotMode and has no effect (the movem undoes the load).
+- PrepShotPass (code96_15): closed 2026-11-04. Called before setpassmode / SetShotMode; loads TempWord1 to d1
+  when the clock is running, then the movem restores d1. No 95G parent.
 - For Abdul: PauseScreenDraw (pause96_return) has 95G's caller and job but a rewritten body.
 - RAM: 46 IDA names stay. No uses at all (unk_FFB65E, unk_FFB6DE, byte_FFB7BC, unk_FFC058, unk_FFCFB4, dword_FFD234, the
   unused tmstruct / AwShots offsets word_FFC73C, word_FFC74C, byte_FFC756, word_FFCADA, word_FFCAEA, byte_FFCAF4,

@@ -1342,7 +1342,7 @@ $1D8F66,PlaceBoardFall,sub_1D8F66,,code96_15
 $1D9062,getFgtbyte,sub_1D9062,,code96_15
 $1D906C,chkFgtBit1,sub_1D906C,,code96_15
 $1D9114,HiScoreScreen,sub_1D9114,,code96_15
-$1D920A,sub_1D920A,sub_1D920A,,code96_15
+$1D920A,PrepShotPass,sub_1D920A,,code96_15
 $1D92EC,SetSflags8Bit1,sub_1D92EC,,code96_15
 $1D9352,ReadGoaliePulled,sub_1D9352,,code96_15
 $1D9376,EndOneTimer,sub_1D9376,,code96_15

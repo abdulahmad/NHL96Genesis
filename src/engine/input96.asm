@@ -666,7 +666,7 @@ doinput_ispc						;The puck carrier: checkob, then pass mode, shot mode, or the 
 	bne.w	ShotMode
 	btst	#4,d1
 	beq.w	.0
-	jsr	(sub_1D920A).l
+	jsr	(PrepShotPass).l
 	bra.w	setpassmode
 .0
 	movem.l	a0,-(sp)
@@ -757,7 +757,7 @@ doinput_ispc						;The puck carrier: checkob, then pass mode, shot mode, or the 
 .7
 	btst	#5,d1
 	beq.w	JumpToDoplayeracc
-	jsr	(sub_1D920A).l
+	jsr	(PrepShotPass).l
 	bra.w	SetShotMode
 
 doinput_islocked					;B with the player not the carrier: change player (chgplayer)
