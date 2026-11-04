@@ -2,11 +2,12 @@
 
 ## Now
 
-- Stage / unit: CONTRIBUTING.md rewrite (lineage in `docs/name_map.csv` only; stay on the cleanup branch).
+- Stage / unit: D6 parked. Remaining generic labels and role-only 95G matches stay on the Unsure list; 95G wins only when the body is the same.
 - Branch: `claude/project-thread-ggw7zu`
-- Last check: docs-only
-- Next: do not merge to main
-- Open PRs: (this unit)
+- Last check: docs-only (no 96G rename this unit; no MATCH re-run)
+- D6: steps 1–6 of `docs/align95_plan.md` already took 95G names where the body matches. The Unsure rows below (including the "For Abdul" role matches) stay until there is a body match or Abdul picks them. Do not guess.
+- Next: no further 96G naming in the leftovers. C ports may start. Do not merge to main.
+- Open PRs: #43
 
 ## Purpose
 A bit-perfect SNASM68k disassembly of NHL 96 (Sega Genesis) that reads like original source, named after
@@ -526,6 +527,8 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
   RandomInjuryGames reads the high byte of the SeasonDay word.
 
 ## Unsure
+
+D6 parked 2026-11-04: leave these alone. A 95G name is taken only when the body is the same; role and interface are not enough.
 
 Copied from `docs/align95_plan.md`. Leave these alone.
 
