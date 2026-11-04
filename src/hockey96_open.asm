@@ -52,7 +52,7 @@ IntermissionStart					;The end of a period: ResetClock, restart the sound driver
 	jmp	StartPer
 .0
 	bsr.w	EncodePW
-	jsr	(nullsub_2).l
+	jsr	(rtsPlayoffOver).l
 	tst.w	(OptPlayMode).w
 	beq.w	.checkadjust
 	bclr	#1,(sflags).w

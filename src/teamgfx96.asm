@@ -1,5 +1,5 @@
 ;	Team graphics pointers. TeamBlockPtrs, TeamLogoPtrs and SmallLogoPtrs are one long per team.
-;	VBlank_Menus is the front-end vertical blank handler, kept as bytes. nullsub_2 is an rts.
+;	VBlank_Menus is the front-end vertical blank handler, kept as bytes. rtsPlayoffOver is an rts.
 
 TeamBlockPtrs						;The setup team block bitmap of each team, a long pointer per team
 									;(DrawSetupTeamBlock)
@@ -164,6 +164,6 @@ VBlank_Menus						;The front-end VBint (most menu screens): sprites (dfok), cram
 	dc.b	$70,$0A,$FF,$FF,$DD,$AC,$4E,$75,$23,$FC,$00,$1D,$B0,$20,$FF,$FF
 	dc.b	$DD,$AC,$4E,$75,$23,$FC,$00,$1D,$BB,$B2,$FF,$FF,$DD,$AC,$4E,$75
 
-nullsub_2
+rtsPlayoffOver						;Empty return after EncodePW when the playoffs are over
 	rts
 

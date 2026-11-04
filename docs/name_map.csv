@@ -415,7 +415,7 @@ $012BFE,TeamBlockPtrs,unk_12BFE,,teamgfx96
 $012C6E,TeamLogoPtrs,unk_12C6E,,teamgfx96
 $012CDE,SmallLogoPtrs,unk_12CDE,,teamgfx96
 $012D46,VBlank_Menus,unk_12D46,,teamgfx96
-$013556,nullsub_2,nullsub_2,,teamgfx96
+$013556,rtsPlayoffOver,nullsub_2,,teamgfx96
 $013558,SeasonSchedule,unk_13558,,schedule96
 $013EA0,ScoutingReport,nullsub_3,,awards96
 $013EA2,ResolveDayGames,sub_13EA2,ResolveGames,awards96
