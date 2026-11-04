@@ -2,11 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 parked. Remaining generic labels and role-only 95G matches stay on the Unsure list; 95G wins only when the body is the same.
+- Stage / unit: D6 `engine/input96_shot.asm` rename (SetRoles, SetTeamRoles, ClearRolesIfGoalie). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
 - Branch: `claude/project-thread-ggw7zu`
-- Last check: docs-only (no 96G rename this unit; no MATCH re-run)
-- D6: steps 1–6 of `docs/align95_plan.md` already took 95G names where the body matches. The Unsure rows below (including the "For Abdul" role matches) stay until there is a body match or Abdul picks them. Do not guess.
-- Next: no further 96G naming in the leftovers. C ports may start. Do not merge to main.
+- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04)
+- D6: this unit renamed the three input96_shot generics. Other Unsure rows stay for later modules. Do not merge to main.
+- Next: one more 96G module of leftover generics. Stop after this unit. No 95PC leftovers, no C ports.
 - Open PRs: #43
 
 ## Purpose
@@ -528,7 +528,7 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
 
 ## Unsure
 
-D6 parked 2026-11-04: leave these alone. A 95G name is taken only when the body is the same; role and interface are not enough.
+D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. `input96_shot` is done. Other rows stay until that module is the unit.
 
 Copied from `docs/align95_plan.md`. Leave these alone.
 
@@ -563,8 +563,9 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
 - sub_AFDA (input96): start + dpad sets SPA288C, pflags2 bit 1 and Xvel + $64. What SPA288C is, is not known.
 - loc_C068 (fight96): a fighter engages (SPA3128); the second one turns the roughing calls into fighting majors.
   Reached from assfight and fightinput, so it stays global; the meaning of SPA3128 is not proven.
-- sub_FD14, sub_FD80, sub_FFD0 (input96_shot): once a second they rework the role byte $65 of each team around its last
-  puck carrier by puck zone. The role scheme is not understood well enough to name them.
+- SetRoles / SetTeamRoles / ClearRolesIfGoalie (input96_shot): closed 2026-11-04. Once a second (sf3icetime)
+  SetRoles remaps each full-strength team's role byte $65 from the last puck carrier and the puck's X zone
+  (RoleTable); ClearRolesIfGoalie restores own positions when the goalie has the puck in his end. No 95G parent.
 - nullsub_2 (teamgfx96): an rts called once, at game over after EncodePW; 94 / 95 have no call there.
 - sub_14804 (hockey96): clears save RAM $E68-$ECD in StartGame (OptPlayMode above 1); what lives there is not known.
 - sub_1D920A (code96_15): called before setpassmode / SetShotMode and has no effect (the movem undoes the load).

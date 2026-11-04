@@ -322,7 +322,13 @@ $00F8D0,rtss,locret_F8D0,,input96_shot
 $00F8D2,passmode,loc_F8D2,,input96_shot
 $00F8F6,dopass,loc_F8F6,,input96_shot
 $00FB46,passtoa0,sub_FB46,,input96_shot
-$010054,.exit (sub_FFD0),locret_10054,,input96_shot
+$00FD14,SetRoles,sub_FD14,,input96_shot
+$00FD80,SetTeamRoles,sub_FD80,,input96_shot
+$00FEAA,RoleTable,,,input96_shot
+$00FF68,GetRoleAss,,,input96_shot
+$00FFC2,RoleAssOff,,,input96_shot
+$00FFD0,ClearRolesIfGoalie,sub_FFD0,,input96_shot
+$010054,.exit (ClearRolesIfGoalie),locret_10054,,input96_shot
 $010056,ClearTeamRoles,sub_10056,,input96_shot
 $010070,CheckRoles,sub_10070,,input96_shot
 $01008E,CheckTeamRoles,sub_1008E,,input96_shot

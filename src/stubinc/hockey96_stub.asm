@@ -13,8 +13,8 @@
 
 ; External addresses outside, read from lst/nhl96.bin.
 Detect4WayPlay = $00B5C8			;fourway96
-sub_FD14 = $00FD14					;input96_shot
-sub_FFD0 = $00FFD0					;input96_shot
+SetRoles = $00FD14					;input96_shot
+ClearRolesIfGoalie = $00FFD0		;input96_shot
 updatereplay = $0161E2				;replay96
 rtss8 = $0162EE						;replay96
 updateplayers = $0162F0				;control96

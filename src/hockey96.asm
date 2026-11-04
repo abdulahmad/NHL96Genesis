@@ -240,8 +240,8 @@ DoGameFrame							;Wait for at least one vblank, then run one frame of game logi
 	bsr.w	DoFrameUpdates
 	btst	#6,(sflags3).w
 	beq.w	.0
-	jsr	(sub_FD14).l
-	jsr	(sub_FFD0).l
+	jsr	(SetRoles).l
+	jsr	(ClearRolesIfGoalie).l
 .0
 	bsr.w	updateplayers
 	tst.w	(songdelay).w
