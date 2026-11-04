@@ -60,7 +60,7 @@ checkfight							;Look for the start of a fight between players a2 and a3 (impac
 	addi.w	#$3E8,(Crowdlevel).w
 	addi.w	#$23,(CwdExciteLvl).w
 	clr.w	(word_FFDCEA).w
-	clr.l	(dword_FFDCE0).w
+	clr.l	(FightMash).w
 	clr.l	(dword_FFDCE4).w
 	bclr	#1,(sflags10).w
 	bclr	#2,(sflags10).w
@@ -525,7 +525,7 @@ fightinput							;Controller processing for fighting
 	bra.w	.34
 .29
 	movem.l	a0,-(sp)
-	movea.l	#unk_FFDCE0,a0
+	movea.l	#FightMash,a0
 	addq.w	#1,(a0,d4.w)
 	cmpi.w	#$11,(a0,d4.w)
 	movem.l	(sp)+,a0

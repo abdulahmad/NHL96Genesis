@@ -60,8 +60,8 @@ repeatdelayframes	equ	$FFFFB056
 asv					equ	$FFFFB058
 periodendtime		equ	$FFFFB05C
 SortCords			equ	$FFFFB05E
-unk_FFB65E			equ	$FFFFB65E
-unk_FFB6DE			equ	$FFFFB6DE
+SortObj12			equ	$FFFFB65E	;SortCords+12*SCstruct
+SortObj13			equ	$FFFFB6DE	;SortCords+13*SCstruct
 puckx				equ	$FFFFB75E
 puckvx				equ	$FFFFB786
 pucky				equ	$FFFFB772
@@ -103,8 +103,8 @@ pads				equ	$FFFFBDCA
 Joy1Struct			equ	$FFFFBDE6
 Joy3Struct			equ	$FFFFBE1E
 Joy4Struct			equ	$FFFFBE3A
-unk_FFBE72			equ	$FFFFBE72
-unk_FFBE8E			equ	$FFFFBE8E
+SetupPadStruct		equ	$FFFFBE72	;controller-setup pad object (glovecords+2)
+glovestruct			equ	$FFFFBE8E	;glove object (glovecords)
 PadControlBits		equ	$FFFFBEAA
 padcont				equ	$FFFFBEAE
 ssonum				equ	4			;screen objects not tied to the rink scroll
@@ -163,7 +163,7 @@ word_FFBFF0			equ	$FFFFBFF0
 mesarea				equ	$FFFFBFF2
 TextBuffer			equ	$FFFFBFF4
 PushWidthBuf		equ	$FFFFC056
-unk_FFC058			equ	$FFFFC058
+PushWidthBuf2		equ	$FFFFC058	;PushWidthBuf+2
 ltack				equ	$FFFFC062
 lastsfx				equ	$FFFFC064
 Satt				equ	$FFFFC066
@@ -205,7 +205,7 @@ c1playernum			equ	$FFFFC384
 c2playernum			equ	$FFFFC386
 c3playernum			equ	$FFFFC388
 c4playernum			equ	$FFFFC38A
-unk_FFC38C			equ	$FFFFC38C
+PadChanged			equ	$FFFFC38C	;one byte a pad: $FF after setcplayer, cleared when C is not held
 cont1team			equ	$FFFFC390
 cont2team			equ	$FFFFC392
 cont3team			equ	$FFFFC394
@@ -250,7 +250,7 @@ gsp					equ	$FFFFC4BC
 gameclock			equ	$FFFFC4BE
 PerTimeTotal		equ	$FFFFC4C2
 ChkCnt				equ	$FFFFC4C4
-unk_FFC4C6			equ	$FFFFC4C6
+ChkCnt2				equ	$FFFFC4C6	;ChkCnt+2
 TempPlOffset		equ	$FFFFC4C8
 ScoreSumbytes		equ	$FFFFC4CA
 ScoreSum			equ	$FFFFC4CC
@@ -269,7 +269,7 @@ byte_FFCAF4			equ	$FFFFCAF4
 statsbuffer			equ	$FFFFCE62
 plistplayoff		equ	$FFFFCF42	;PlayerStatsList: 0 this game, 1 playoffs
 gsstruct			equ	$FFFFCF44
-unk_FFCFB4			equ	$FFFFCFB4
+gsstruct7			equ	$FFFFCFB4	;gsstruct+7*$10
 gamenum				equ	$FFFFCFC4
 postarts			equ	$FFFFCFC6
 bosgames			equ	$FFFFCFC8
@@ -412,8 +412,7 @@ inputjoy			equ	$FFFFDCCC
 PlayerChked			equ	$FFFFDCCE
 PlayerChking		equ	$FFFFDCD2
 word_FFDCDE			equ	$FFFFDCDE
-dword_FFDCE0		equ	$FFFFDCE0
-unk_FFDCE0			equ	$FFFFDCE0
+FightMash			equ	$FFFFDCE0	;fight button-mash count, one word a pad
 dword_FFDCE4		equ	$FFFFDCE4
 word_FFDCE8			equ	$FFFFDCE8
 word_FFDCEA			equ	$FFFFDCEA
@@ -434,8 +433,8 @@ IntermissionTimer	equ	$FFFFDDC4	;Intermission: frames before it continues by its
 SndDrvRAM			equ	$FFFFFDFC	;Sound driver RAM base: word $1234 = driver on, 0 = off
 SndSeqPtr			equ	$FFFFFDFE	;8 song slots: song data (-1 = free)
 SndSeqId			equ	$FFFFFE3E	;8 words: the id SndStartSeq gave the slot
-unk_FFFFF6			equ	$FFFFFFF6
-unk_FFFFFF			equ	$FFFFFFFF
+RamTop				equ	$FFFFFFF6
+RamLast				equ	$FFFFFFFF
 SaveRAM				equ	$200000		;the cartridge save RAM (header SRAM range)
 SRSeasonHeader		equ	$82			;save RAM offset: the season header (SetupPlayoffs keeps a copy at
 									;SRSeasonHeaderSave)

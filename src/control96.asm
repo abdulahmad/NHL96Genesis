@@ -683,7 +683,7 @@ setcplayer							;Give pad d4 (0 / 2 / 4 / 6) player d0: restorepl the old one, 
 	bmi.w	.2
 .1
 	asr.w	#1,d4
-	movea.l	#unk_FFC38C,a1
+	movea.l	#PadChanged,a1
 	st	(a1,d4.w)
 	add.w	d4,d4
 	move.w	(a0,d4.w),d1

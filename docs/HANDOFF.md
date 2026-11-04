@@ -2,11 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 `graphics96.asm` rename (ArenaAnimGfx, PStatsPal, CupCelebrationSpr, CupCelebrationMap). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
+- Stage / unit: D6 `ram96.asm` rename (glovestruct, SetupPadStruct, PadChanged, FightMash, SortObj12/13). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
 - Branch: `claude/project-thread-ggw7zu`
 - Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04)
-- D6: this unit renamed graphics96 `unk_` incbins. Other Unsure rows stay for later modules. Do not merge to main.
-- Next: remaining 96G leftover generics (RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
+- D6: this unit renamed ram96 `unk_FF` labels. `sub_`/`loc_`/`unk_` should now be empty. Do not merge to main.
+- Next: pairing in nhl-disasm-report. No 95PC leftovers, no C ports.
 - Open PRs: #43
 
 ## Purpose
@@ -528,7 +528,7 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
 
 ## Unsure
 
-D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. Through `graphics96` (`ArenaAnimGfx`, `PStatsPal`, `CupCelebrationSpr`, `CupCelebrationMap`). Other rows stay until that module is the unit.
+D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. Code, graphics and RAM `unk_` are closed. `word_FF` / `byte_FF` / `dword_FF` remain on the Unsure list.
 
 Copied from `docs/align95_plan.md`. Leave these alone.
 
@@ -574,13 +574,8 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
 - PrepShotPass (code96_15): closed 2026-11-04. Called before setpassmode / SetShotMode; loads TempWord1 to d1
   when the clock is running, then the movem restores d1. No 95G parent.
 - For Abdul: PauseScreenDraw (pause96_return) has 95G's caller and job but a rewritten body.
-- RAM: 46 IDA names stay. No uses at all (unk_FFB65E, unk_FFB6DE, byte_FFB7BC, unk_FFC058, unk_FFCFB4, dword_FFD234, the
-  unused tmstruct / AwShots offsets word_FFC73C, word_FFC74C, byte_FFC756, word_FFCADA, word_FFCAEA, byte_FFCAF4,
-  unk_FFFFF6, unk_FFFFFF). Two jobs at one address (word_FF2720, word_FFB8C4, word_FFD238). The rest have uses in code
-  whose job is not known yet (the fight counters word_FFDCDE ... byte_FFDCEC, the role carriers word_FFD23A / C, the pad
-  objects unk_FFBE72 / unk_FFBE8E, word_FFD036 / word_FFD038 in the stats block, byte_FFC35A, unk_FFC38C, word_FFBF88,
-  word_FFBFF0, word_FFD300, word_FFD310, byte_FFD474 / byte_FFD47E (94 arenaanim / faceoffanim by the dead 94 code only),
-  byte_FFDCA6, byte_FFDCF9, dword_FFDD82, word_FFDDB6, word_FFDDBE, byte_FF2710, word_FF1388). unk_FFC4C6 is ScoreSum-6 but has no uses left.
+- RAM unk_: closed 2026-11-04. glovestruct (94G), SetupPadStruct, PadChanged, FightMash, SortObj12/13,
+  PushWidthBuf2, ChkCnt2, gsstruct7, RamTop, RamLast. word_FF / byte_FF / dword_FF remain.
 - Graphics: closed 2026-11-04. ArenaAnimGfx (dead RunArenaAnim frame offsets), PStatsPal (PStatsPalette source),
   CupCelebrationSpr and CupCelebrationMap (CupCelebration rink sprites and the 6,$C picture).
 - For Abdul: names that the pictures now contradict. OptionsScreen's banner reads MAIN MENU (the GAME OPTIONS screen is

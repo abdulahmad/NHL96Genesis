@@ -1791,6 +1791,8 @@ $FFFFB058,asv,word_FFB058,,ram96
 $FFFFB05A,lldisp,word_FFB05A,,ram96
 $FFFFB05C,periodendtime,word_FFB05C,,ram96
 $FFFFB05E,SortCords,unk_FFB05E,,ram96
+$FFFFB65E,SortObj12,unk_FFB65E,,ram96
+$FFFFB6DE,SortObj13,unk_FFB6DE,,ram96
 $FFFFB75E,puckx,word_FFB75E,,ram96
 $FFFFB772,pucky,word_FFB772,,ram96
 $FFFFB776,puckz,unk_FFB776,,ram96
@@ -1842,6 +1844,8 @@ $FFFFBDCA,pads,unk_FFBDCA,,ram96
 $FFFFBDE6,Joy1Struct,unk_FFBDE6,,ram96
 $FFFFBE1E,Joy3Struct,unk_FFBE1E,,ram96
 $FFFFBE3A,Joy4Struct,unk_FFBE3A,,ram96
+$FFFFBE72,SetupPadStruct,unk_FFBE72,,ram96
+$FFFFBE8E,glovestruct,unk_FFBE8E,,ram96
 $FFFFBEAA,PadControlBits,dword_FFBEAA,,ram96
 $FFFFBEAE,padcont,dword_FFBEAE,,ram96
 $FFFFBEB2,padcont+4,dword_FFBEB2,,ram96
@@ -1902,6 +1906,7 @@ $FFFFBFF2,mesarea,word_FFBFF2,,ram96
 $FFFFBFF4,TextBuffer,word_FFBFF4,,ram96
 $FFFFC010,mesarea+30,unk_FFC010,,ram96
 $FFFFC056,PushWidthBuf,unk_FFC056,,ram96
+$FFFFC058,PushWidthBuf2,unk_FFC058,,ram96
 $FFFFC062,ltack,word_FFC062,,ram96
 $FFFFC064,lastsfx,word_FFC064,,ram96
 $FFFFC066,Satt,unk_FFC066,,ram96
@@ -1940,6 +1945,7 @@ $FFFFC384,c1playernum,word_FFC384,,ram96
 $FFFFC386,c2playernum,word_FFC386,,ram96
 $FFFFC388,c3playernum,word_FFC388,,ram96
 $FFFFC38A,c4playernum,word_FFC38A,,ram96
+$FFFFC38C,PadChanged,unk_FFC38C,,ram96
 $FFFFC390,cont1team,word_FFC390,,ram96
 $FFFFC392,cont2team,word_FFC392,,ram96
 $FFFFC394,cont3team,word_FFC394,,ram96
@@ -1962,6 +1968,7 @@ $FFFFC4BC,gsp,word_FFC4BC,,ram96
 $FFFFC4BE,gameclock,word_FFC4BE,,ram96
 $FFFFC4C2,PerTimeTotal,word_FFC4C2,,ram96
 $FFFFC4C4,ChkCnt,word_FFC4C4,,ram96
+$FFFFC4C6,ChkCnt2,unk_FFC4C6,,ram96
 $FFFFC4C8,TempPlOffset,word_FFC4C8,,ram96
 $FFFFC4CA,ScoreSumbytes,word_FFC4CA,,ram96
 $FFFFC4CC,ScoreSum,unk_FFC4CC,,ram96
@@ -1987,6 +1994,7 @@ $FFFFCB68,AwShots+$A4,byte_FFCB68,,ram96
 $FFFFCE62,statsbuffer,unk_FFCE62,,ram96
 $FFFFCF42,plistplayoff,word_FFCF42,,ram96
 $FFFFCF44,gsstruct,unk_FFCF44,,ram96
+$FFFFCFB4,gsstruct7,unk_FFCFB4,,ram96
 $FFFFCFC4,gamenum,word_FFCFC4,,ram96
 $FFFFCFC6,postarts,word_FFCFC6,,ram96
 $FFFFCFC8,bosgames,word_FFCFC8,,ram96
@@ -2115,6 +2123,7 @@ $FFFFDCCA,TmpPuckZ,word_FFDCCA,,ram96
 $FFFFDCCC,inputjoy,word_FFDCCC,,ram96
 $FFFFDCCE,PlayerChked,dword_FFDCCE,,ram96
 $FFFFDCD2,PlayerChking,dword_FFDCD2,,ram96
+$FFFFDCE0,FightMash,unk_FFDCE0,,ram96
 $FFFFDCF2,replaydelay,word_FFDCF2,,ram96
 $FFFFDCF6,PALflag,word_FFDCF6,,ram96
 $FFFFDD7E,SeasonDay,dword_FFDD7E,,ram96
@@ -2133,3 +2142,5 @@ $FFFFFDFA,Stack,unk_FFFDFA,,ram96
 $FFFFFDFC,SndDrvRAM,,,ram96
 $FFFFFDFE,SndSeqPtr,,,ram96
 $FFFFFE3E,SndSeqId,unk_FFFE3E,,ram96
+$FFFFFFF6,RamTop,unk_FFFFF6,,ram96
+$FFFFFFFF,RamLast,unk_FFFFFF,,ram96

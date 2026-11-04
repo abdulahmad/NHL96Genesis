@@ -66,7 +66,7 @@ doinput								;Process controller input for player a3: d0 = dpad, d1 = new butt
 	btst	#6,d2
 	bne.w	.0
 	movem.l	a0,-(sp)
-	movea.l	#unk_FFC38C,a0
+	movea.l	#PadChanged,a0
 	asr.w	#1,d4
 	clr.b	(a0,d4.w)
 	add.w	d4,d4
@@ -695,7 +695,7 @@ doinput_ispc						;The puck carrier: checkob, then pass mode, shot mode, or the 
 	btst	#6,d2
 	beq.w	.6
 	movem.l	a0,-(sp)
-	movea.l	#unk_FFC38C,a0
+	movea.l	#PadChanged,a0
 	asr.w	#1,d4
 	tst.b	(a0,d4.w)
 	bmi.w	.5
