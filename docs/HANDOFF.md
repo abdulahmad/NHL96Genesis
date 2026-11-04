@@ -2,11 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 `engine/fight96.asm` rename (EngageFight). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
+- Stage / unit: D6 `front/season96.asm` rename (ClearRosterSave). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
 - Branch: `claude/project-thread-ggw7zu`
-- Last check: `tools/verify_all.sh` ALL MATCH pending this unit
-- D6: this unit renamed fight96 `loc_C068` → `EngageFight`. Other Unsure rows stay for later modules. Do not merge to main.
-- Next: remaining 96G leftover generics (season96, create96, hockey96, code96_15, teamgfx96, graphics unk_, RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
+- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04)
+- D6: this unit renamed season96 `sub_11582` → `ClearRosterSave`. Other Unsure rows stay for later modules. Do not merge to main.
+- Next: remaining 96G leftover generics (create96, hockey96, code96_15, teamgfx96, graphics unk_, RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
 - Open PRs: #43
 
 ## Purpose
@@ -528,7 +528,7 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
 
 ## Unsure
 
-D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. `input96_shot`, `input96` (`StartDpadBoost`) and `fight96` (`EngageFight`) are done. Other rows stay until that module is the unit.
+D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. `input96_shot`, `input96`, `fight96` and `season96` (`ClearRosterSave`) are done. Other rows stay until that module is the unit.
 
 Copied from `docs/align95_plan.md`. Leave these alone.
 
@@ -548,9 +548,8 @@ Named from the matching 95 body: chkpk, UpdatePenaltyShotEnd, PenShotTable, a2to
 SegaInit locals exist in `src/sega/SegaInit.asm` and in `docs/name_map.csv`. Do not invent a second copy.
 
 Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidence below is found.
-- sub_11582 (season96): called last by ClearPlayoffSave (Reset Rosters). Clears the player stat totals, the injuries,
-  the free agent stat words (the block ClearFreeAgentStats clears) and one more save RAM block ($DDD, 9 bytes) whose use
-  is not known yet; name it once that block is identified.
+- ClearRosterSave (season96): closed 2026-11-04. Last step of ClearPlayoffSave (Reset Rosters): player stats
+  ($4D/$BEC or playoff $89/$666), 9 bytes at $DDD, injuries, and the ClearFreeAgentStats block. No 95G parent.
 - For Abdul: BlankMenuBox (summary96) has the callers and job of 95G ClearMenuBox (TimeoutMenu, SelectGoalieMenu), but
   95 calls eraser and 96 prints blank big-font rows, so it was named from the job. Rename to ClearMenuBox if role is enough.
 - For Abdul: CupChampionsScreen (awards96_show) has the job of 95G StanleyCupScreen with a different body; same question.

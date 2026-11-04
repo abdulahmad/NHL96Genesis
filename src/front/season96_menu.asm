@@ -1187,7 +1187,7 @@ ClearPlayoffSave					;Clear the saved playoffs in save RAM ($E68 and $DB4)
 	move.l	#$86E,d1
 	movea.l	#$FFFF1550,a0
 	jsr	(WriteSRAM).l
-	jsr	(sub_11582).l
+	jsr	(ClearRosterSave).l
 	bclr	#6,(GameFlags).w
 	jsr	(MakeSRAMChecksum).l
 	rts

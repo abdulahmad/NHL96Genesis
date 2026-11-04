@@ -698,7 +698,8 @@ ClearSeasonData						;New season: clear the season stats, standings, game log an
 	movem.l	(sp)+,d0-d1
 	rts
 
-sub_11582
+ClearRosterSave						;Reset Rosters: clear player stats ($4D/$BEC, or playoff $89/$666),
+									;the 9 bytes at $DDD, injuries, and the free-agent stats
 	movem.l	d0-d1,-(sp)
 	jsr	(ReadSeasonHeader).l
 	moveq	#$4D,d0

@@ -386,6 +386,7 @@ $01147E,WriteSeasonHeader,sub_1147E,,season96
 $01149E,ReadSeasonHeader,sub_1149E,,season96
 $011510,FindUserGame,sub_11510,,season96
 $011552,ClearSeasonData,sub_11552,,season96
+$011582,ClearRosterSave,sub_11582,,season96
 $0115EA,LoadSeasonOptions,sub_115EA,,season96
 $01161E,ReadStandings,sub_1161E,,season96
 $01169C,SetupSeasonGame,sub_1169C,,season96

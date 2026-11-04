@@ -30,3 +30,4 @@ rule in the same commit as the fix that confirmed it, newest last: `- YYYY-MM-DD
 - 2026-11-04 D6 names: same job + new body takes the 95G name; leftover sub_/loc_/unk_ are named from job, callers, SRAM or role. input96_shot: SetRoles / SetTeamRoles / ClearRolesIfGoalie (no 95G parent). (owner)
 - 2026-11-04 D6 names: input96 StartDpadBoost (start + dpad on a skater: SPA288C, pf2aip, Xvel+$64). No 95G parent. (owner)
 - 2026-11-04 D6 names: fight96 EngageFight (A/B/C during SPAfight: SPA3128, second fighter SetFightingMajors). No 93G parent. (owner)
+- 2026-11-04 D6 names: season96 ClearRosterSave (Reset Rosters: stats, $DDD, injuries, FA stats). No 95G parent. (owner)
