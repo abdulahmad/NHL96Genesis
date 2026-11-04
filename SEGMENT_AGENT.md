@@ -68,7 +68,7 @@ Every row is matched. Rows are in ROM order and tile `$000000` up to the `$FF` f
 | input96 | matched, 2930 bytes | $00A4DC | $00B04D | code | input95 | updatepadinput, doinput (doinput_goaliedive, doinput_cbut, ClampTargetY, doinput_chkanim, doinput_skater, doinput_ispc, doinput_islocked), StartDpadBoost, PadOnTeam |
 | goal96 | matched, 1402 bytes | $00B04E | $00B5C7 | code | goal95 | SetContTeams, DrawPadSetup, DrawPadIcon, ControllerSetupScreen, PrintSetupStr(Hi), ReadAllPads |
 | fourway96 | matched, 216 bytes | $00B5C8 | $00B69F | code | fourway95 | Detect4WayPlay, ReadJoySwapPad1-4 |
-| fight96 | matched, 3752 bytes | $00B6A0 | $00C547 | code | - | new in 96: checkfight, startfight, SetInst, fightinput, ClearMessageLine; assfight and assfwatch as bytes |
+| fight96 | matched, 3752 bytes | $00B6A0 | $00C547 | code | - | new in 96: checkfight, startfight, SetInst, fightinput, EngageFight, ClearMessageLine; assfight and assfwatch as bytes |
 | logic96 | matched, 9960 bytes | $00C548 | $00EC2F | code | logic95, penalty95 | asstab, the assignment routines (bytes, labelled at their asstab entries), Penaltylist, PenShotPenalties, DoubleMinorPenalties |
 | lines96 | matched, 720 bytes | $00EC30 | $00EEFF | code | lines95 | SetLCmode, SetLCmode2, setlccords, getlchoice, lineinput, lcfound, lcfound2 |
 | lines96_set | matched, 1140 bytes | $00EF00 | $00F373 | code | lines95 | NullSaveClear, GetTeamLines (the team data lines, or lines built from the ratings: BuildPosList, AddLineSkaters, AddLinePlayer) |
@@ -151,6 +151,6 @@ Every row is matched. Rows are in ROM order and tile `$000000` up to the `$FF` f
 
 Add a system here when the listing shows something 95 does not have.
 
-- Fighting (`engine/fight96.asm`): back from 93 (checkfight, SetInst, fightinput, assfight, assfwatch, ClearMessageLine take the 93G names), with new fight moves (more SPAs) and a second round (word_FFDCDE).
+- Fighting (`engine/fight96.asm`): back from 93 (checkfight, SetInst, fightinput, assfight, assfwatch, ClearMessageLine take the 93G names), with new fight moves (more SPAs), EngageFight, and a second round (word_FFDCDE).
 - Save RAM bit fields (`src/srambits96.asm`): WriteSRAMBits and ReadSRAMBits pack a value into the save RAM. The later save-RAM block keeps the name sram96.
 - Options screen (`front/options96.asm`), the season playoff menu (`front/season96_menu.asm`), and the opening screens (`front/title96.asm`).

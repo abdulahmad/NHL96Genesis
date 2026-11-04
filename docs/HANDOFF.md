@@ -2,11 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 `engine/input96.asm` rename (StartDpadBoost). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
+- Stage / unit: D6 `engine/fight96.asm` rename (EngageFight). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
 - Branch: `claude/project-thread-ggw7zu`
-- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04)
-- D6: this unit renamed input96 `sub_AFDA` → `StartDpadBoost`. Other Unsure rows stay for later modules. Do not merge to main.
-- Next: remaining 96G leftover generics (fight96, season96, create96, hockey96, code96_15, teamgfx96, graphics unk_, RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
+- Last check: `tools/verify_all.sh` ALL MATCH pending this unit
+- D6: this unit renamed fight96 `loc_C068` → `EngageFight`. Other Unsure rows stay for later modules. Do not merge to main.
+- Next: remaining 96G leftover generics (season96, create96, hockey96, code96_15, teamgfx96, graphics unk_, RAM unk_) until those prefixes are empty. No 95PC leftovers, no C ports.
 - Open PRs: #43
 
 ## Purpose
@@ -528,7 +528,7 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
 
 ## Unsure
 
-D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. `input96_shot` and `input96` (`StartDpadBoost`) are done. Other rows stay until that module is the unit.
+D6 2026-11-04: same job + new body takes the 95G name. Generic labels are named from job/callers/SRAM/role. `input96_shot`, `input96` (`StartDpadBoost`) and `fight96` (`EngageFight`) are done. Other rows stay until that module is the unit.
 
 Copied from `docs/align95_plan.md`. Leave these alone.
 
@@ -562,8 +562,9 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
 - For Abdul: the asstab entries $1-$6 are named by role and the 94 numbering, not a byte match (see the logic96 bullet).
 - StartDpadBoost (input96): closed 2026-11-04. Start + dpad on a skater sets SPA288C, pf2aip and Xvel + $64
   unless pf2unav or gmclock. No 95G parent (95G start always pauses).
-- loc_C068 (fight96): a fighter engages (SPA3128); the second one turns the roughing calls into fighting majors.
-  Reached from assfight and fightinput, so it stays global; the meaning of SPA3128 is not proven.
+- EngageFight (fight96): closed 2026-11-04. A/B/C during SPAfight: SPA3128, count this fighter
+  (word_FFDCDE). The second one: SetFightingMajors and GameFlags bit 5; the first: PenCntDwn $140.
+  No 93G parent (93 punches from SPAfight directly).
 - SetRoles / SetTeamRoles / ClearRolesIfGoalie (input96_shot): closed 2026-11-04. Once a second (sf3icetime)
   SetRoles remaps each full-strength team's role byte $65 from the last puck carrier and the puck's X zone
   (RoleTable); ClearRolesIfGoalie restores own positions when the goalie has the puck in his end. No 95G parent.

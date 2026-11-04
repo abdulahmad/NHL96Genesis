@@ -257,7 +257,7 @@ $00B8D0,SetInst,sub_B8D0,,fight96
 $00B8FC,.tm (SetInst),loc_B8FC,,fight96
 $00B986,rtsfight,locret_B986,,fight96
 $00B988,assfight,,,fight96
-$00C068,loc_C068,,,fight96
+$00C068,EngageFight,loc_C068,,fight96
 $00C0A2,ClearMessageLine,sub_C0A2,,fight96
 $00C1C8,assfwatch,,,fight96
 $00C26C,fightinput,loc_C26C,,fight96

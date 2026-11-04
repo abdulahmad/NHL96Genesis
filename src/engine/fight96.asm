@@ -291,7 +291,9 @@ assfight							;Assignment $14: the fighter. Not decoded in the listing: kept as
 	dc.b	$3F,$3C,$00,$0B,$08,$2B,$00,$06,$00,$62,$66,$00,$00,$0A,$45,$EA
 	dc.b	$03,$9E,$3E,$BC,$00,$0C,$4E,$B9,$00,$08,$85,$86,$60,$00,$FC,$C0
 
-loc_C068
+EngageFight							;A/B/C during SPAfight: stop Xvel, SPA3128, count this fighter
+									;(word_FFDCDE). The second one: SetFightingMajors and GameFlags bit 5;
+									;the first: PenCntDwn $140
 	movem.l	d0-d3,-(sp)
 	clr.w	Xvel(a3)
 	addq.w	#1,(word_FFDCDE).w
@@ -481,7 +483,7 @@ fightinput							;Controller processing for fighting
 	btst	#4,d2
 	beq.w	.25
 .23
-	bra.w	loc_C068
+	bra.w	EngageFight
 .24
 	btst	#1,(sflags10).w
 	bne.w	.26
