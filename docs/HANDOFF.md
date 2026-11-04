@@ -2,11 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 `ram96.asm` rename (glovestruct, SetupPadStruct, PadChanged, FightMash, SortObj12/13). Same job + new body uses the 95G name; leftover sub_/loc_/unk_ are named from job/callers/SRAM/role.
+- Stage / unit: D6 leftover `sub_`/`loc_`/`unk_` closed (input96 through ram96). Same job + new body uses the 95G name.
 - Branch: `claude/project-thread-ggw7zu`
-- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04)
-- D6: this unit renamed ram96 `unk_FF` labels. `sub_`/`loc_`/`unk_` should now be empty. Do not merge to main.
-- Next: pairing in nhl-disasm-report. No 95PC leftovers, no C ports.
+- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04). Report `tools/gate.sh` PAIRING OK, 96G SHA `f170dbe`.
+- D6: leftover prefixes empty in source. For-Abdul non-generic Unsure rows stay. Do not merge to main.
+- Next: no 95PC leftovers, no C ports.
 - Open PRs: #43
 
 ## Purpose
