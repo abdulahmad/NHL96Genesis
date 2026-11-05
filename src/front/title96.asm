@@ -77,7 +77,7 @@ TitleWaitFrame						;TitleScreen: wait for the next frame (Vcount)
 	beq.s	.loop
 	rts
 
-CreditsScreen						;The legal and credits pages (CreditsList) over three pictures; start
+CreditsScreen						;The legal and credits pages (CreditsPages) over three pictures; start
 									;skips after the first page
 	move	#$2700,sr
 	move.w	(HVcount).l,(seed).w
@@ -187,7 +187,7 @@ CreditsScreen						;The legal and credits pages (CreditsList) over three picture
 .5
 	rts
 
-PrintCreditsPage					;Print the CreditsList page at setupvalues, one String a row up to the
+PrintCreditsPage					;Print the CreditsPages page at setupvalues, one String a row up to the
 									;empty String, then step setupvalues
 	jsr	(printz).l
 	String	CC_Font1Pal1Pri,$10,$01

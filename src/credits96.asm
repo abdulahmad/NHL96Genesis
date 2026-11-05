@@ -1,4 +1,4 @@
-;	The copyright lines and the credits, as Strings. Credits is ended by String -1; CreditsList is
+;	The copyright lines and the credits, as Strings. Credits is ended by String -1; CreditsPages is
 ;	shown a page at a time, and an empty String ends each page.
 
 Credits								;The copyright and licence lines
@@ -7,7 +7,7 @@ Credits								;The copyright and licence lines
 	String	'Sega Enterprises Ltd.'
 	String	CC_ListEnd
 
-CreditsList							;The legal pages and the credits
+CreditsPages						;The legal pages and the credits
 	String	'all nhl and team logos'
 	String	'and other marks'
 	String	'depicted herein are'
