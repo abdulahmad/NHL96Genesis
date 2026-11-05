@@ -80,7 +80,7 @@ $004F0C,Washington,,,teamdata96
 $0051F4,Winnipeg,,,teamdata96
 $0054F0,playoffseats,,,teamdata96
 $0056F0,Credits,,,credits96
-$005732,CreditsList,,,credits96
+$005732,CreditsPages,,CreditsList,credits96
 $005F96,SPAlist,,,frames96
 $005F98,SPA0002_table,,,frames96
 $00600A,SPA0074_table,,,frames96

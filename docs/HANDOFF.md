@@ -2,12 +2,11 @@
 
 ## Now
 
-- Stage / unit: D6 For-Abdul 95G names (ClearMenuBox, StanleyCupScreen; PauseScreenDraw, SimTeamGoals, SimScorers, SimShots, ClearSeasonData kept).
-- Branch: `claude/project-thread-ggw7zu`
-- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-04). Report pairing OK, 96G SHA `fb49066`.
-- D6: same job + new body takes the 95G name. These For-Abdul role matches are closed. Do not merge to main.
-- Next: STOP. Remaining For-Abdul: asstab $1-$6, picture-contradiction names. No Studio, no 95PC leftovers, no C ports.
-- Open PRs: #44
+- Stage / unit: rename CreditsList → CreditsPages (93G name; legal/credits pages after Credits).
+- Branch: `cursor/creditspages-399a`
+- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-05).
+- Next: PR. Same rename in 94G / 95G / 95S.
+- Open PRs: (this unit)
 
 ## Purpose
 A bit-perfect SNASM68k disassembly of NHL 96 (Sega Genesis) that reads like original source, named after
@@ -62,7 +61,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
 - main96 converted (test of the docs): 95G names for SegaInit, CHECK_VDP, RegionPrint, RegionFont, RegionOK, VBjsr, Begin, IRQ7, ValidationRoutine; the 96 region lock (hex digit country code) named from what it does. MATCH (segment and ROM).
 - code96_01 ($000776-$0096E7) turned out to be data only, in the 95G order of teamdata95, credits95 and frames95, so it
   is split into three segments: teamdata96 (VBjsr in front of TeamList, the team blocks, playoffseats), credits96 (Credits,
-  CreditsList) and frames96 (SPAlist and the animation tables). All three MATCH (whole range) and the ROM MATCHes.
+  CreditsPages) and frames96 (SPAlist and the animation tables). All three MATCH (whole range) and the ROM MATCHes.
   Source written from the ROM bytes with the 95G macros (src/macros/genesis.mac copied from 95G: String, Player).
 - 96 team data: no All-Star teams (TeamList slots 26 and 27 point to Boston and Montreal), and every block ends with
   .pos, one nibble per player: the player's slot in .ls order (0 G ... 5 RW), $F padded.
