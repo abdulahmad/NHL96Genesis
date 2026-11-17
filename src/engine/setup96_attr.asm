@@ -9,7 +9,7 @@ PAttribColumns						;Skater attribute columns. String header, then a long: high 
 PAttribOverall						;The Overall entry; PAttribOverallMask is read
 	String	'[   Overall    ]'
 
-PAttribOverallMask
+PAttribOverallMask					;player attribute screen: overall rating label mask
 	dc.w	$1FBA,$A
 	String	'[   Energy     ]'
 	dc.w	$0000,$2
@@ -50,7 +50,7 @@ GAttribColumns						;Goalie attribute columns, same format as PAttribColumns
 GAttribOverall						;The Overall entry; GAttribOverallMask is read
 	String	'[   Overall    ]'
 
-GAttribOverallMask
+GAttribOverallMask					;goalie attribute screen: overall rating label mask
 	dc.w	$130F,$A
 	String	'[   Agility    ]'
 	dc.w	$1000,$A

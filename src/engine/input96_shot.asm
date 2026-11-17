@@ -76,7 +76,7 @@ shotdiradj							;Adjust the shot direction by the pad and the shooter
 .2
 	rts
 
-shotdirmath
+shotdirmath							;shot direction math: puck offset in d3/d4, scaled by d0
 	sub.w	(puckx).w,d3
 	sub.w	(pucky).w,d4
 	muls.w	d0,d4
@@ -150,7 +150,7 @@ ShotMode							;Shot mode: wind up, then doshot
 .end
 	rts
 
-prepshot
+prepshot							;prepares a shot: clears sflags5 bit 4 and starts from d0 = $B
 	bclr	#4,(sflags5).w
 	move.w	#$B,d0
 	btst	#pfteam,pflags(a3)

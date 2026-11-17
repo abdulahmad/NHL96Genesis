@@ -106,7 +106,7 @@ getlchoice							;Line choice d0 from the line change box
 	beq.w	getlchoice2
 	move.w	-$37A(a2),d2
 
-getlchoice2
+getlchoice2							;second line choice lookup (continues getlchoice)
 	sub.w	$24(a2),d2
 	beq.w	.0
 	addi.w	#$15,d0
@@ -181,7 +181,7 @@ lcfound								;Line choice d2 made: set the line, close the box
 	move.w	d0,$16(a2)
 	jsr	(setpersonel).l
 
-lcfound2
+lcfound2							;line change choice found: sets the line change cords
 	btst	#4,(sflags9).w
 	bne.w	rtss
 	bsr.w	setlccords

@@ -236,7 +236,7 @@ RegionJapanNtsc
 	dc.b	1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0
 RegionJapanPal
 	dc.b	1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0
-RegionOverseasNtsc
+RegionOverseasNtsc					;overseas flags per region code, NTSC consoles
 	dc.b	1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0
 RegionOverseasPal
 	dc.b	1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0
@@ -245,11 +245,11 @@ DevelopedTxt
 	dc.b	6,'DEVELOPED FOR USE ONLY WITH',0
 AndTxt
 	dc.b	$12,'&',0
-SystemsTxt
+SystemsTxt							;region screen text: SYSTEMS.
 	dc.b	$F,'SYSTEMS.',0
-NtscMegaDriveTxt
+NtscMegaDriveTxt					;region screen text: NTSC MEGA DRIVE
 	dc.b	$C,'NTSC MEGA DRIVE',0
-NtscGenesisTxt
+NtscGenesisTxt						;region screen text: NTSC GENESIS
 	dc.b	$D,'NTSC GENESIS',0
 PalMegaDriveTxt
 	dc.b	4,'PAL AND FRENCH SECAM MEGA DRIVE',0

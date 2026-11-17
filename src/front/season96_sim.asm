@@ -146,7 +146,7 @@ SimPenaltyBase						;Per team: the base sim penalty count (SimPenalties)
 	dc.b	$04,$04,$06,$09,$07,$07,$06,$08,$04,$05,$06,$05,$04,$05,$04,$04
 	dc.b	$04,$06,$04,$05,$06,$07,$04,$07,$08,$08
 
-SimGoalieStats
+SimGoalieStats						;simulated game: adds goalie stats for the home and away teams
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(HomeTeam).w,d7
 	movea.l	#tmstruct,a1
@@ -159,7 +159,7 @@ SimGoalieStats
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
 
-SimGoalie
+SimGoalie							;simulated game: picks the goalie who played
 	jsr	(GetGoalieCountD7).l
 	subq.w	#1,d0
 	bsr.w	PickSimGoalie
@@ -181,7 +181,7 @@ SimGoalie
 	move.b	d4,(a1,d3.w)
 	rts
 
-PickSimGoalie
+PickSimGoalie						;weighted random pick of a goalie, d0 starts at 100
 	movem.l	d1-d7,-(sp)
 	clr.w	d1
 	move.w	#$64,d0

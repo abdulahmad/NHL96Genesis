@@ -13,7 +13,7 @@ LineMenu1							;The line editor exit menus
 	dc.l	LoadTeamLine
 	String	CC_ListEnd
 
-LineMenu2
+LineMenu2							;line editor menu text, second page
 	String	CC_SetAttribute,$06,CC_SetFont,$01
 	String	CC_SetAttribute,$04,CC_SetFont,$01
 	String	'       Exit       '
