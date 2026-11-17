@@ -63,7 +63,7 @@ PrintParenNumber					;Print the number at d0 of a2 (1 to 3 digits) and ")"
 	movem.l	(sp)+,d0/a2
 	rts
 
-PlaceBoardFall
+PlaceBoardFall						;places a player falling at the boards (tests the position word at $58)
 	cmpi.w	#$2084,$58(a3)
 	beq.w	.10
 	cmpi.w	#$24C4,$58(a3)

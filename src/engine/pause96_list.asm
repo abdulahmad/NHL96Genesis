@@ -26,7 +26,7 @@ PrintMenuList						;Print the shown rows of the menu list (menulist) with the sc
 
 ScrollClearTxt						;Scroll marks for PrintMenuList
 	String	CC_SetFont,$00,' '
-ScrollUpTxt
+ScrollUpTxt							;scroll up arrow text
 	String	CC_SetFont,$00,'{'
 ScrollDownTxt
 	String	CC_SetFont,$00,'}'

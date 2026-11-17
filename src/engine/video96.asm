@@ -554,7 +554,7 @@ setVram_0							;Second half of setVram without the fade: clear vram and set the
 	move.w	(sp)+,(disflags).w
 	rts
 
-Vmaddr
+Vmaddr								;turns a VRAM address in d0 into a VDP control word
 	movea.l	#Vdata,a0
 	asl.l	#2,d0
 	lsr.w	#2,d0

@@ -64,7 +64,7 @@ DefaultRosters
 	;Not decoded in the listing and not referenced from it: kept as bytes
 	dc.b	$48,$E7,$F1,$A0,$61,$00,$00,$4E,$22,$48,$4C,$DF,$05,$8F,$4E,$75
 
-FormatPlayerNameD7
+FormatPlayerNameD7					;formats the name of roster player d7 for printing
 	movem.l	d0-d3/d7-a0/a2,-(sp)
 	bsr.w	getplayernameD7
 	move.l	a0,-(sp)
@@ -148,7 +148,7 @@ GetRosterName						;a1 = name String of player d0 of team d7 (season roster awar
 	move.b	3(a1,d0.w),1(a0)
 	move.w	(a0),d0
 
-GetRosterNameTail
+GetRosterNameTail					;tail of the roster name lookup: tests the group in the high byte of d0
 	move.w	d0,-(sp)
 	andi.w	#$1F00,d0
 	cmp.w	#$1E00,d0

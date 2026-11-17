@@ -561,7 +561,7 @@ MaxSpeed							;Max speed values for each rating level 0-$F
 	dc.l	$388B190,$3CA77F1,$40E8D24,$454F129
 	dc.l	$49DA400,$4E8A5A9,$535F624,$5859571
 
-dostop
+dostop								;stop skating: user players and CPU players take separate paths
 	btst	#3,$62(a3)
 	beq.w	.cpu
 	cmpi.w	#$1000,$28(a3)
