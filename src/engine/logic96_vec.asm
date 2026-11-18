@@ -6,7 +6,7 @@ puckflip							;Flip the puck
 	eor.w	d0,facedir(a3)			;facedir
 	andi.w	#3,facedir(a3)
 	st	SPAcnt(a3)					;SPAcnt
-	move.w	#$2BBA,d1
+	move.w	#SPApflip,d1
 	bra.w	SetSPA
 
 puckshadow							;asstab entry: the puck shadow.

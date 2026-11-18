@@ -166,11 +166,11 @@ $0088E8,SPA2952_table,,,frames96
 $0089FA,SPA2A64_table,,,frames96
 $008A8C,SPA2AF6_table,,,frames96
 $008B1E,SPA2B88_table,,,frames96
-$008B50,SPA2BBA_table,,,frames96
+$008B50,SPApflip_table,,,frames96
 $008BF2,SPAburst_table,,SPA2C5C_table,frames96
 $008D04,SPA2D6E_table,,,frames96
 $008DD6,SPA2E40_table,,,frames96
-$008F08,SPA2F72_table,,,frames96
+$008F08,SPAshotf_table,,,frames96
 $00903A,SPAfight_table,,SPA30A4_table,frames96
 $00907C,SPA30E6_table,,,frames96
 $0090BE,SPA3128_table,,,frames96

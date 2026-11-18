@@ -122,7 +122,7 @@ SetShotMode							;Start the shot mode (C button)
 	move.w	#$FB6,d1
 	btst	#0,(GameFlags).w
 	beq.w	.3
-	move.w	#$2F72,d1
+	move.w	#SPAshotf,d1
 .3
 	move.w	#$F,(passspeed).w
 .4

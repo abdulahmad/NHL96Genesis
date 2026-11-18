@@ -19,6 +19,7 @@ assinsert = $01A3D0					;logic96_vec
 vtoa = $01A3EE						;logic96_vec
 GetHot = $01A458					;logic96_vec
 SetSPA = $01A614					;skate96
+SPAshotf = $2F72					;SPA value (frames96)
 dirtab = $01AE60					;skate96
 runspeed = 200
 randomd0s = $01B09A					;video96
