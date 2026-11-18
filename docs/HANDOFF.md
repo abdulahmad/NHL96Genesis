@@ -257,8 +257,8 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   reference (kept as dc.b). MATCH (segment and ROM). RAM: ltack.
 - data96_05 converted: graphics. The maps chain one after another, each as its header (dc.l .pal-X,.map-X), the
   tile count and tiles (dc.b), the palette (.pal, dc.w) and the map (.map: width, height, the words): unk_8F2C6,
-  unk_90686, unk_911B8 (used from code96_20, purpose not known yet), FramerMap, FaceOffMap, Rinktilelist, RefTiles,
-  RefTilesHor (95 names by use); then Sprites (header: the palette and frameSprData offsets land in data96_06) and
+  unk_90686, unk_911B8 (used from code96_20, purpose not known yet), FramerMap, FaceOffMap, Rinktilelist, RefsMap,
+  RefMap2 (95 names by use); then Sprites (header: the palette and frameSprData offsets land in data96_06) and
   the start of Spritetiles. MATCH (segment and ROM).
 - The +8 references (the tiles) are written Label+8 in the other files. code96_11's sub_2109A is setupIceRinkPal.
 - The listing's unk_A0000 (from data96_10, move.l #unk_A0000,d1 before a divu) is the number $A0000: no label; write
@@ -266,7 +266,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   and frameSprData at $12F608 (Sprites + $94B6A).
 - data96_06 converted: graphics, dc.b with labels at the resources the code uses (95 names by use): the rest of
   Spritetiles, SpritePalette and frameSprData (the Sprites header offsets), HotList, HotList2 (the GetHot variants in
-  code96_08), Crowdframelist, FaceOffSprites, EnergyBarMap and EASNmap (written as maps), EASportsMap, RevRinkTilelist
+  code96_08), CrowdSprites, FaceOffSprites, EnergyBarMap and EASNmap (written as maps), EASportsSplashMap, RevRinkTilelist
   and the start of ReplayIconMap (used by ShowReplayIcon; its tiles at +8 open data96_07). MATCH (segment and ROM).
   code96_11's sub_210B0 is setupEASNmap.
 - data96_07 converted: graphics maps, each written as a map (header, tiles, .pal, .map): the rest of ReplayIconMap,

@@ -4,4 +4,4 @@ ScoutingReportText					;The scouting text lines, each ended by $D
 	incbin	..\Extracted\NHL96\Text\ScoutingReportText.bin
 
 TitleScreenImg						;The title screen picture (TitleScreen)
-	incbin	..\Extracted\NHL96\Graphics\TitleScreenImg.map.jim
+	incbin	..\Extracted\NHL96\Graphics\Title96-1.map.jim

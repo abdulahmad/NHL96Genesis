@@ -259,27 +259,27 @@ const assets = [
     { name: 'snd96_list_00.bin', folder: 'NHL96/Sound/Bank', start: 0x00088324, end: 0x0008834b }, // list 0
     { name: 'snd96_list_01.bin', folder: 'NHL96/Sound/Bank', start: 0x0008834b, end: 0x0008839e }, // list 1
     { name: 'ScoutingReportText.bin', folder: 'NHL96/Text', start: 0x0008880a, end: 0x00088a18 }, // ScoutingReportText
-    { name: 'TitleScreenImg.map.jim', folder: 'NHL96/Graphics', start: 0x00088a18, end: 0x0008f2c6 }, // TitleScreenImg
+    { name: 'Title96-1.map.jim', folder: 'NHL96/Graphics', start: 0x00088a18, end: 0x0008f2c6 }, // TitleScreenImg
     { name: 'NHLShieldMap.map.jim', folder: 'NHL96/Graphics', start: 0x0008f2c6, end: 0x00090686 }, // NHLShieldMap
-    { name: 'NHLPALogoMap.map.jim', folder: 'NHL96/Graphics', start: 0x00090686, end: 0x000911b8 }, // NHLPALogoMap
+    { name: 'NHLPALogo.map.jim', folder: 'NHL96/Graphics', start: 0x00090686, end: 0x000911b8 }, // NHLPALogoMap
     { name: 'CreditsBgMap.map.jim', folder: 'NHL96/Graphics', start: 0x000911b8, end: 0x00091b86 }, // CreditsBgMap
-    { name: 'Framermap.map.jim', folder: 'NHL96/Graphics', start: 0x00091b86, end: 0x00091d46 }, // Framermap
-    { name: 'FaceOffMap.map.jim', folder: 'NHL96/Graphics', start: 0x00091d46, end: 0x000923e4 }, // FaceOffMap
-    { name: 'Rinktilelist.map.jim', folder: 'NHL96/Graphics', start: 0x000923e4, end: 0x00097e72 }, // Rinktilelist
-    { name: 'RefTiles.map.jim', folder: 'NHL96/Graphics', start: 0x00097e72, end: 0x00098f30 }, // RefTiles
-    { name: 'RefTilesHor.map.jim', folder: 'NHL96/Graphics', start: 0x00098f30, end: 0x0009aa9e }, // RefTilesHor
+    { name: 'Framer.map.jim', folder: 'NHL96/Graphics', start: 0x00091b86, end: 0x00091d46 }, // Framermap
+    { name: 'FaceOff.map.jim', folder: 'NHL96/Graphics', start: 0x00091d46, end: 0x000923e4 }, // FaceOffMap
+    { name: 'IceRink96.map.jim', folder: 'NHL96/Graphics', start: 0x000923e4, end: 0x00097e72 }, // Rinktilelist
+    { name: 'Refs.map.jim', folder: 'NHL96/Graphics', start: 0x00097e72, end: 0x00098f30 }, // RefsMap
+    { name: 'Refs2.map.jim', folder: 'NHL96/Graphics', start: 0x00098f30, end: 0x0009aa9e }, // RefMap2
     { name: 'Sprites.bin', folder: 'NHL96/Graphics', start: 0x0009aa9e, end: 0x0009aaa8 }, // Sprites
     { name: 'Spritetiles.bin', folder: 'NHL96/Graphics', start: 0x0009aaa8, end: 0x0012f588 }, // Spritetiles
     { name: 'SpritePalette.bin', folder: 'NHL96/Graphics', start: 0x0012f588, end: 0x0012f608 }, // SpritePalette
     { name: 'frameSprData.bin', folder: 'NHL96/Graphics', start: 0x0012f608, end: 0x0013938e }, // frameSprData
     { name: 'HotList.bin', folder: 'NHL96/Graphics', start: 0x0013938e, end: 0x0013a212 }, // HotList
     { name: 'HotList2.bin', folder: 'NHL96/Graphics', start: 0x0013a212, end: 0x0013aa96 }, // HotList2
-    { name: 'CrowdFrameList.map.jim', folder: 'NHL96/Graphics', start: 0x0013aa96, end: 0x0013bcb0 }, // CrowdFrameList
-    { name: 'FaceOffSprites.map.jim', folder: 'NHL96/Graphics', start: 0x0013bcb0, end: 0x0013d290 }, // FaceOffSprites
-    { name: 'EnergyBarMap.map.jim', folder: 'NHL96/Graphics', start: 0x0013d290, end: 0x0013d59e }, // EnergyBarMap
-    { name: 'EASNmap.map.jim', folder: 'NHL96/Graphics', start: 0x0013d59e, end: 0x0013da74 }, // EASNmap
-    { name: 'EASportsSplash.map.jim', folder: 'NHL96/Graphics', start: 0x0013da74, end: 0x0013e99a }, // EASportsMap
-    { name: 'RevRinkTilelist.bin', folder: 'NHL96/Graphics', start: 0x0013e99a, end: 0x00140afe }, // RevRinkTilelist
+    { name: 'Crowd.anim', folder: 'NHL96/Graphics', start: 0x0013aa96, end: 0x0013bcb0 }, // CrowdSprites
+    { name: 'FaceOff.anim', folder: 'NHL96/Graphics', start: 0x0013bcb0, end: 0x0013d290 }, // FaceOffSprites
+    { name: 'EnergyBar.map.jim', folder: 'NHL96/Graphics', start: 0x0013d290, end: 0x0013d59e }, // EnergyBarMap
+    { name: 'EASN.map.jim', folder: 'NHL96/Graphics', start: 0x0013d59e, end: 0x0013da74 }, // EASNmap
+    { name: 'EASportsSplash.map.jim', folder: 'NHL96/Graphics', start: 0x0013da74, end: 0x0013e99a }, // EASportsSplashMap
+    { name: 'IceRink96Reverse.map.jim', folder: 'NHL96/Graphics', start: 0x0013e99a, end: 0x00140afe }, // RevRinkTilelist
     { name: 'ReplayIconMap.map.jim', folder: 'NHL96/Graphics', start: 0x00140afe, end: 0x00141228 }, // ReplayIconMap
     { name: 'ReplayBannerMap.map.jim', folder: 'NHL96/Graphics', start: 0x00141228, end: 0x001417b6 }, // ReplayBannerMap
     { name: 'ArenaAnimGfx.map.jim', folder: 'NHL96/Graphics', start: 0x001417b6, end: 0x001468d6 }, // ArenaAnimGfx
@@ -365,11 +365,11 @@ const assets = [
     { name: 'SmallLogoWPG.map.jim', folder: 'NHL96/Graphics', start: 0x0017074c, end: 0x00170b0c }, // SmallLogoWPG
     { name: 'IceBgMap.map.jim', folder: 'NHL96/Graphics', start: 0x00170b0c, end: 0x00173c7a }, // IceBgMap
     { name: 'ControllerBgMap.map.jim', folder: 'NHL96/Graphics', start: 0x00173c7a, end: 0x00179168 }, // ControllerBgMap
-    { name: 'RosterFont.bin', folder: 'NHL96/Graphics', start: 0x00179168, end: 0x00179a76 }, // RosterFont
-    { name: 'SmallFontMap.map.jim', folder: 'NHL96/Graphics', start: 0x00179a76, end: 0x0017a164 }, // SmallFontMap
-    { name: 'SmallFontMap2.map.jim', folder: 'NHL96/Graphics', start: 0x0017a164, end: 0x0017aa72 }, // SmallFontMap2
-    { name: 'BigFontMap2.map.jim', folder: 'NHL96/Graphics', start: 0x0017aa72, end: 0x0017b680 }, // BigFontMap2
-    { name: 'BigFontMap4.map.jim', folder: 'NHL96/Graphics', start: 0x0017b680, end: 0x0017c2ae }, // BigFontMap4
+    { name: 'SmallFont.map.jim', folder: 'NHL96/Graphics', start: 0x00179168, end: 0x00179a76 }, // RosterFont
+    { name: 'SmallFont96.map.jim', folder: 'NHL96/Graphics', start: 0x00179a76, end: 0x0017a164 }, // SmallFontMap
+    { name: 'SmallFont96-2.map.jim', folder: 'NHL96/Graphics', start: 0x0017a164, end: 0x0017aa72 }, // SmallFontMap2
+    { name: 'BigFont96-2.map.jim', folder: 'NHL96/Graphics', start: 0x0017aa72, end: 0x0017b680 }, // BigFontMap2
+    { name: 'BigFont96-4.map.jim', folder: 'NHL96/Graphics', start: 0x0017b680, end: 0x0017c2ae }, // BigFontMap4
     { name: 'PStatsPal.map.jim', folder: 'NHL96/Graphics', start: 0x0017c2ae, end: 0x0017c2ce }, // PStatsPal
     { name: 'LeagueOptionsBgMap.map.jim', folder: 'NHL96/Graphics', start: 0x0017c2ce, end: 0x0017dbdc }, // LeagueOptionsBgMap
     { name: 'LeagueOptionsTitleMap.map.jim', folder: 'NHL96/Graphics', start: 0x0017dbdc, end: 0x0017e3fc }, // LeagueOptionsTitleMap
@@ -456,8 +456,8 @@ const assets = [
     { name: 'PadCursorMap.map.jim', folder: 'NHL96/Graphics', start: 0x001b69bc, end: 0x001b6f3a }, // PadCursorMap
     { name: 'ControllerTitleMap.map.jim', folder: 'NHL96/Graphics', start: 0x001b6f3a, end: 0x001b773a }, // ControllerTitleMap
     { name: 'ControllerFrameMap.map.jim', folder: 'NHL96/Graphics', start: 0x001b773a, end: 0x001b89c8 }, // ControllerFrameMap
-    { name: 'BigFontMap.map.jim', folder: 'NHL96/Graphics', start: 0x001b89c8, end: 0x001b9416 }, // BigFontMap
-    { name: 'BigFontMap3.map.jim', folder: 'NHL96/Graphics', start: 0x001b9416, end: 0x001b9ed8 }, // BigFontMap3
+    { name: 'BigFont96.map.jim', folder: 'NHL96/Graphics', start: 0x001b89c8, end: 0x001b9416 }, // BigFontMap
+    { name: 'BigFont96-3.map.jim', folder: 'NHL96/Graphics', start: 0x001b9416, end: 0x001b9ed8 }, // BigFontMap3
     { name: 'DigitFontMap.map.jim', folder: 'NHL96/Graphics', start: 0x001b9ed8, end: 0x001ba4be }, // DigitFontMap
     { name: 'PauseRinkMap.map.jim', folder: 'NHL96/Graphics', start: 0x001ba4be, end: 0x001bbbec }, // PauseRinkMap
     { name: 'PauseBgBitmap.map.jim', folder: 'NHL96/Graphics', start: 0x001bbbec, end: 0x001bcbfa }, // PauseBgBitmap
@@ -473,7 +473,7 @@ const assets = [
     { name: 'CupChampsPals.map.jim', folder: 'NHL96/Graphics', start: 0x001ccba8, end: 0x001ccee8 }, // CupChampsPals
     { name: 'CupCelebrationSpr.map.jim', folder: 'NHL96/Graphics', start: 0x001ccee8, end: 0x001d5420 }, // CupCelebrationSpr
     { name: 'CupCelebrationMap.map.jim', folder: 'NHL96/Graphics', start: 0x001d5420, end: 0x001d579e }, // CupCelebrationMap
-    { name: 'revframetbl.map.jim', folder: 'NHL96/Graphics', start: 0x001d579e, end: 0x001d6622 }, // revframetbl
+    { name: 'revframetbl.bin', folder: 'NHL96/Graphics', start: 0x001d579e, end: 0x001d6622 }, // revframetbl
 ];
 // The licensed names of the ROM, in the order of the rows of src/teamdata96.asm (the team records in ROM order): the player names
 // (the Player rows) and the team nicknames (the .tm String of each team). TeamList ($77E) holds 28 long pointers to the team

@@ -305,7 +305,7 @@ chkprogress							;Control the progress of the ref and the game through penalty 
 	bset	#sfslock,(sflags).w
 .5
 	move.w	(ExtraChars).w,d4		;load horizontal ref tiles
-	movea.l	#RefTilesHor+8,a2
+	movea.l	#RefMap2+8,a2
 	bsr.w	DecompressGraphicsPlain
 	st	(puckc).w
 	movea.w	#(puckx-M68K_RAM),a3
@@ -776,10 +776,10 @@ PushRef								;Tell vblank what to display: ref frame d0
 	cmp.w	#$40,d0
 	beq.w	.clearit
 	mulu.w	#$70,d0					;refwidth*refheight*2
-	movea.l	#RefTiles,a0
+	movea.l	#RefsMap,a0
 	btst	#4,(sflags9).w
 	beq.w	.m1
-	movea.l	#RefTilesHor,a0
+	movea.l	#RefMap2,a0
 .m1
 	adda.l	4(a0),a0
 	addq.w	#4,a0
