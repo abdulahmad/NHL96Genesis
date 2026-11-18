@@ -591,3 +591,5 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
 - For Abdul: names that the pictures now contradict. OptionsScreen's banner reads MAIN MENU (the GAME OPTIONS screen is
   other code); PlayoffMenuScreen / PlayoffMenuSetup draw TRANSACTIONS and run RosterMenuList; ControllerBgMap is also the
   background of the select team, main menu and transactions screens. Left as they are (not IDA names).
+
+- 2026-11-18: `code96_14.asm` and `code96_15.asm` were split by job at routine boundaries, in ROM order, into 23 files named after where 95G keeps the same routines (logic96_onetimer, display96_meter, collide96_corner, players96_attr, scout96_hotcold, collide96_wall, logic96_slot, graphics96_logopal, middle96_string, records96_io, middle96_names, middle96_teamgfx, goal96_print, skate96_board, injury96_fight, title96_hiscore, logic96_shotpass, middle96_goalie, logic96_onetimerend, graphics96_logopal2, penalty96_song, pause96_pad, replay96_block). The ROM map in `src/nhl96.asm` lists each. ALL MATCH.

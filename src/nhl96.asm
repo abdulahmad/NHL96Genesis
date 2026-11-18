@@ -76,9 +76,30 @@
 	include	front\scout96.asm		; $08880A  scout text
 	include	graphics96.asm			; $08F2C6  graphics
 	include	engine\logic96_timer.asm	; $1D6622  one-timer
-	include	code96_14.asm			; $1D6B66  records and attributes
+	include	engine\logic96_onetimer.asm	; $1D6B66  one-timer shot
+	include	display96_meter.asm	; $1D6D22  crowd meter
+	include	engine\collide96_corner.asm	; $1D6E0E  corner collision
+	include	engine\players96_attr.asm	; $1D6F24  attribute calc
+	include	front\scout96_hotcold.asm	; $1D6FC6  hot and cold players
+	include	engine\collide96_wall.asm	; $1D72F6  wall collision
+	include	engine\logic96_slot.asm	; $1D733C  slot bit
+	include	graphics96_logopal.asm	; $1D7390  logo palettes
+	include	engine\middle96_string.asm	; $1D7A90  string copy
+	include	front\records96_io.asm	; $1D7B08  team records
+	include	engine\middle96_names.asm	; $1D7D62  name appending, attribute weights
 	include	front\shootout96_path.asm	; $1D7FA6  shootout
-	include	code96_15.asm			; $1D8E5C  loads and hi-score
+	include	engine\middle96_teamgfx.asm	; $1D8E5C  replay icon, team graphics
+	include	engine\goal96_print.asm	; $1D8EF6  goal and assist counts
+	include	engine\skate96_board.asm	; $1D8F66  board fall
+	include	front\injury96_fight.asm	; $1D9062  fight bytes
+	include	front\title96_hiscore.asm	; $1D9114  hi-score screen
+	include	engine\logic96_shotpass.asm	; $1D920A  shot and pass prep
+	include	engine\middle96_goalie.asm	; $1D9352  goalie pulled
+	include	engine\logic96_onetimerend.asm	; $1D9376  one-timer end
+	include	graphics96_logopal2.asm	; $1D93C8  logo palettes
+	include	engine\penalty96_song.asm	; $1D9748  lead song, penalty clear
+	include	engine\pause96_pad.asm	; $1D9844  pause pad side
+	include	engine\replay96_block.asm	; $1D98EE  can block
 	include	front\season96_stand.asm	; $1D9CC6  standings
 	include	front\season96_menu.asm	; $1DA6C0  season menu
 	include	front\trade96_edit.asm	; $1DC03C  trades
