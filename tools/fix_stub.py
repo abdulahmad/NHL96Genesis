@@ -37,10 +37,12 @@ for it in range(12):
         elif k in const: nm, v = const[k]; add.append('%s = $%X\t\t\t\t;%s' % (nm, v, src.get(k, '')))
         else: print('unknown symbol', n)
     if not add: sys.exit(1)
-    t = open(stub, errors='replace').read()
+    t = open(stub, errors='replace', newline='').read()
+    crlf = '\r\n' in t
+    t = t.replace('\r\n', '\n')
     i = t.find('\n\n; Main segment code')
     if i < 0:
         i = len(t)
     t = t[:i].rstrip('\n') + '\n' + '\n'.join(add) + '\n' + t[i:]
-    open(stub, 'w', newline='').write(t)
+    open(stub, 'w', newline='').write(t.replace('\n', '\r\n') if crlf else t)
     print('added', len(add))

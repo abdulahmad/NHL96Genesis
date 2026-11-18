@@ -14,8 +14,10 @@ def split(line):
         elif ch == ';': return line[:i], line[i:]
     return line, None
 for f in sys.argv[1:]:
+    raw = open(f, errors='replace', newline='').read()
+    crlf = '\r\n' in raw
     out = []
-    for l in open(f, errors='replace').read().split('\n'):
+    for l in raw.replace('\r\n', '\n').split('\n'):
         code, com = split(l)
         if com is not None and code.strip() and not l.startswith(';'):
             c = code.rstrip(' \t')
@@ -24,4 +26,4 @@ for f in sys.argv[1:]:
                 pad = '\t' * (-(-(36 - v) // 4)) if v < 36 else '\t'
                 l = c + pad + com
         out.append(l)
-    open(f, 'w', newline='').write('\n'.join(out))
+    open(f, 'w', newline='').write(('\r\n' if crlf else '\n').join(out))

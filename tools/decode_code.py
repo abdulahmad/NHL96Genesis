@@ -695,7 +695,9 @@ def main():
     tot = {'blocks': 0, 'ok': 0, 'bad': 0}
     for f in files:
         f = os.path.abspath(f)
-        src = open(f, errors='replace').read().split('\n')
+        raw = open(f, errors='replace', newline='').read()
+        crlf = '\r\n' in raw
+        src = raw.replace('\r\n', '\n').split('\n')
         rel = os.path.relpath(f, os.path.join(ROOT, 'src'))
         i, newsrc, changed, used_names = 0, [], False, set()
         while i < len(src):
@@ -746,7 +748,7 @@ def main():
             else:
                 newsrc.append(line); i += 1
         if a.apply and changed:
-            open(f, 'w', newline='').write('\n'.join(newsrc))
+            open(f, 'w', newline='').write(('\r\n' if crlf else '\n').join(newsrc))
     print(tot)
 
 
