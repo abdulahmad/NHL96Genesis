@@ -3,6 +3,7 @@
 
 TeamBlockPtrs						;The setup team block bitmap of each team, a long pointer per team
 									;(DrawSetupTeamBlock)
+; Code kept as bytes (decoded by decode_code.py).
 	dc.l	TeamBlockANH,TeamBlockBOS,TeamBlockBUF,TeamBlockCGY
 	dc.l	TeamBlockCHI,TeamBlockDAL,TeamBlockDET,TeamBlockEDM
 	dc.l	TeamBlockFLA,TeamBlockHFD,TeamBlockLA,TeamBlockMTL

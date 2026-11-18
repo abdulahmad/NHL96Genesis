@@ -1832,6 +1832,7 @@ wallcoll							;d0 = cosine, d1 = sine of angle of incidence with wall, a3 = obj
 	beq.w	rtss2
 	move.w	#5,-(sp)
 	jmp	(sfx).l
+; Code kept as bytes (decoded by decode_code.py).
 	dc.w	$0C6B,$0190,$0014,$6E00,$000C,$0C6B,$FE70,$0014
 	dc.w	$6E00,$0006,$426B,$002A,$0C6B,$0010,$0018,$6ECC
 	dc.w	$302B,$0052,$E340,$307C,$B87E,$327C,$B89E,$347C

@@ -902,6 +902,7 @@ RoleTable							;Longs indexed by (role<<2)|puck X zone. Each long is a 6-byte r
 GetRoleAss							;d0 = the defensive assignment for a3's role, or 0 when OptSkill is
 									;rookie or the current assignment is already the offensive or
 									;defensive one for that role. Called from the asstab bodies.
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$48,$E7,$70,$80,$0C,$78,$00,$02,$D2,$68,$67,$00,$00,$44,$4A,$6B
 	dc.b	$00,$34,$6B,$00,$00,$3C,$42,$40,$10,$2B,$00,$65,$6A,$00,$00,$06
 	dc.b	$30,$2B,$00,$34,$32,$2B,$00,$36,$12,$33,$10,$38,$20,$7C,$00,$00

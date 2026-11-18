@@ -473,6 +473,7 @@ JumpToShowClock						;setvideo enters showclock here
 	rts
 
 .digits								;.digit: the digit chars
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$00,$04,$30,$00,$00,$04,$31,$00,$00,$04,$32,$00,$00,$04,$33,$00
 	dc.b	$00,$04,$34,$00,$00,$04,$35,$00,$00,$04,$36,$00,$00,$04,$37,$00
 	dc.b	$00,$04,$38,$00,$00,$04,$39,$00,$08,$B8,$00,$03,$BF,$B2,$67,$00
@@ -1048,6 +1049,7 @@ setupice							;Set all variables, send non purgeable graphics, build sprite fra
 	move	#$2300,sr
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$48,$E7,$FF,$FE,$61,$00,$9F,$B2,$08,$B8,$00,$00,$C3,$3A,$3F,$38
 	dc.b	$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$42,$78,$BD,$32,$42,$78,$BD,$2E
 	dc.b	$31,$FC,$07,$D0,$BD,$30,$50,$F8,$B8,$C2,$38,$38,$B0,$2E,$61,$00

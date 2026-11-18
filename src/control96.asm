@@ -97,6 +97,7 @@ updateplayers						;This routine calls all collision/animation/assignment code f
 	beq.w	.20
 	move.w	#$FF70,(a3)
 	bra.w	.20
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$36,$BC,$00,$96,$08,$2B,$00,$03,$00,$04,$67,$00,$00,$2E,$36,$BC
 	dc.b	$FF,$6A,$60,$00,$00,$26
 .8

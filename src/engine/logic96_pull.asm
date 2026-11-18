@@ -350,6 +350,7 @@ a2offsides							;Offsides on a2 when his team is offside and the puck is past t
 
 a2touchpuck							;Player a2 touched the puck: last touch, scorer / assist slots, offsides,
 									;icing
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$31,$D2,$BF,$B6,$31,$EA,$00,$14,$BF,$B8
 	dc.b	$31,$EA,$00,$52,$BF,$B4,$30,$7C,$C7,$26,$08,$2A,$00,$06,$00,$62
 	dc.b	$67,$00,$00,$06,$41,$E8,$03,$9E,$42,$40,$10,$2A,$00,$67,$08,$2A

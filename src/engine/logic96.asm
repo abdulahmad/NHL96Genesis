@@ -58,6 +58,7 @@ asstab								;Assignment routines: assignment number = index
 asscentero4							;Center on offense, two men short (tmap 4); back to asscentero /
 									;asscentero5 when tmap changes, asscenterd4
 									;when the other team has the puck
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$01,$D4,$0C,$6A,$00,$04,$00,$24
 	dc.b	$67,$00,$00,$22,$30,$3C,$00,$06,$0C,$6A,$00,$06,$00,$24,$66,$00
 	dc.b	$00,$04,$60,$D6,$30,$3C,$00,$2E,$0C,$6A,$00,$05,$00,$24,$66,$00
@@ -91,6 +92,7 @@ asscentero4							;Center on offense, two men short (tmap 4); back to asscentero
 
 asscentero5							;Center on offense, one man short (tmap 5); asscenterd5 when the other
 									;team has the puck
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$0C,$6A,$00,$05,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$06,$0C,$6A
 	dc.b	$00,$06,$00,$24,$66,$00,$00,$06,$60,$00,$FE,$02,$30,$3C,$00,$2F
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$FD,$F0,$08,$2B
@@ -119,6 +121,7 @@ asscentero5							;Center on offense, one man short (tmap 5); asscenterd5 when t
 
 asscenterd4							;Center on defense, two men short (tmap 4); asscentero4 when his team gets
 									;the puck
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$0C,$6A,$00,$04,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$05,$0C,$6A
 	dc.b	$00,$06,$00,$24,$66,$00,$00,$06,$60,$00,$FC,$74,$30,$3C,$00,$2C
 	dc.b	$0C,$6A,$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$FC,$62,$08,$2B
@@ -145,6 +148,7 @@ asscenterd4							;Center on defense, two men short (tmap 4); asscentero4 when h
 
 asscenterd5							;Center on defense, one man short (tmap 5); asscentero5 when his team gets
 									;the puck
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$0C,$6A,$00,$05,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$05,$0C,$6A
 	dc.b	$00,$06,$00,$24,$66,$00,$00,$06,$60,$00,$FB,$04,$30,$3C,$00,$2D
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$FA,$F2,$08,$2B
@@ -183,6 +187,7 @@ asswingo4							;Winger on offense, two men short (tmap 4): does nothing
 
 asswingo5							;Winger on offense, one man short (tmap 5); asswingd5 when the other team
 									;has the puck
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$0C,$6A,$00,$05,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$04,$0C,$6A
 	dc.b	$00,$06,$00,$24,$66,$00,$00,$06,$60,$00,$F9,$0C,$30,$3C,$00,$2B
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$F8,$FA,$08,$2B
@@ -214,6 +219,7 @@ asswingd4							;Winger on defense, two men short (tmap 4): does nothing
 
 asswingd5							;Winger on defense, one man short (tmap 5); asswingo5 when his team gets
 									;the puck
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$0C,$6A,$00,$05,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$03,$0C,$6A
 	dc.b	$00,$06,$00,$24,$66,$00,$00,$06,$60,$00,$F7,$7C,$30,$3C,$00,$29
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$F7,$6A,$08,$2B
@@ -249,6 +255,7 @@ asswingd5							;Winger on defense, one man short (tmap 5); asswingo5 when his t
 
 assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his team
 									;loses the puck
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$02,$B6,$0C,$6A,$00,$04,$00,$24
 	dc.b	$67,$00,$00,$26,$30,$3C,$00,$01,$0C,$6A,$00,$06,$00,$24,$66,$00
 	dc.b	$00,$06,$60,$00,$F5,$7A,$30,$3C,$00,$24,$0C,$6A,$00,$05,$00,$24
@@ -296,6 +303,7 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 
 assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his team
 									;loses the puck
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$02,$B6,$0C,$6A,$00,$05,$00,$24
 	dc.b	$67,$00,$00,$26,$30,$3C,$00,$01,$0C,$6A,$00,$06,$00,$24,$66,$00
 	dc.b	$00,$06,$60,$00,$F2,$BA,$30,$3C,$00,$26,$0C,$6A,$00,$04,$00,$24
@@ -343,6 +351,7 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 
 assdefd4							;Defenseman on defense, two men short (tmap 4); assdefo4 when his team
 									;gets the puck
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$01,$B0,$0C,$6A,$00,$04,$00,$24
 	dc.b	$67,$00,$00,$26,$30,$3C,$00,$02,$0C,$6A,$00,$06,$00,$24,$66,$00
 	dc.b	$00,$06,$60,$00,$EF,$FA,$30,$3C,$00,$25,$0C,$6A,$00,$05,$00,$24
@@ -374,6 +383,7 @@ assdefd4							;Defenseman on defense, two men short (tmap 4); assdefo4 when his
 
 assdefd5							;Defenseman on defense, one man short (tmap 5); assdefo5 when his team
 									;gets the puck
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$01,$A8,$0C,$6A,$00,$05,$00,$24
 	dc.b	$67,$00,$00,$26,$30,$3C,$00,$02,$0C,$6A,$00,$06,$00,$24,$66,$00
 	dc.b	$00,$06,$60,$00,$EE,$40,$30,$3C,$00,$27,$0C,$6A,$00,$04,$00,$24
@@ -406,6 +416,7 @@ assdefd5							;Defenseman on defense, one man short (tmap 5); assdefo5 when his
 assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo when his
 									;team carries the puck up; ends in
 									;check4check
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$0C,$6A,$00,$06,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$25,$0C,$6A
 	dc.b	$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$EC,$98,$30,$3C,$00,$27
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$EC,$86,$08,$2B
@@ -466,6 +477,7 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 
 asswingd							;Winger on defense (tmap 5 / 4: asswingd5 / asswingd4); asswingo when his
 									;team gets the puck
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$0C,$6A,$00,$06,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$28,$0C,$6A
 	dc.b	$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$E9,$10,$30,$3C,$00,$29
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$E8,$FE,$08,$2B
@@ -518,6 +530,7 @@ asswingd							;Winger on defense (tmap 5 / 4: asswingd5 / asswingd4); asswingo 
 
 asscenterd							;Center on defense (tmap 5 / 4: asscenterd5 / asscenterd4); asscentero
 									;when his team gets the puck
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$0C,$6A,$00,$06,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$2C,$0C,$6A
 	dc.b	$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$E6,$02,$30,$3C,$00,$2D
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$E5,$F0,$08,$2B
@@ -555,6 +568,7 @@ asscenterd							;Center on defense (tmap 5 / 4: asscenterd5 / asscenterd4); ass
 assdefo								;Defenseman on offense (tmap 5 / 4: assdefo5 / assdefo4); assdefd when his
 									;team loses the puck or it leaves the
 									;zone
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$0C,$6A,$00,$06,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$24,$0C,$6A
 	dc.b	$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$E3,$F6,$30,$3C,$00,$26
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$E3,$E4,$08,$2B
@@ -604,6 +618,7 @@ assdefo								;Defenseman on offense (tmap 5 / 4: assdefo5 / assdefo4); assdefd
 asscentero							;Center on offense (tmap 5 / 4: asscentero5 / asscentero4): a random spot
 									;ahead of the puck; asscenterd when it
 									;is lost
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$0C,$6A,$00,$06,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$2E,$0C,$6A
 	dc.b	$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$E1,$2A,$30,$3C,$00,$2F
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$E1,$18,$08,$2B
@@ -632,6 +647,7 @@ asscentero							;Center on offense (tmap 5 / 4: asscentero5 / asscentero4): a r
 asswingo							;Winger on offense (tmap 5 / 4: asswingo5 / asswingo4): a random spot in
 									;the puck zone; asswingd when the puck
 									;is lost
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$0C,$6A,$00,$06,$00,$24,$67,$00,$00,$26,$30,$3C,$00,$2A,$0C,$6A
 	dc.b	$00,$05,$00,$24,$66,$00,$00,$06,$60,$00,$DF,$B0,$30,$3C,$00,$2B
 	dc.b	$0C,$6A,$00,$04,$00,$24,$66,$00,$00,$06,$60,$00,$DF,$9E,$08,$2B
