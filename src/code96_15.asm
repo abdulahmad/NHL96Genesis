@@ -64,15 +64,15 @@ PrintParenNumber					;Print the number at d0 of a2 (1 to 3 digits) and ")"
 	rts
 
 PlaceBoardFall						;places a player falling at the boards (tests the position word at $58)
-	cmpi.w	#$2084,$58(a3)
+	cmpi.w	#SPAboardmidl,$58(a3)
 	beq.w	.10
-	cmpi.w	#$24C4,$58(a3)
+	cmpi.w	#SPAboardmidr,$58(a3)
 	beq.w	.8
-	cmpi.w	#$2360,$58(a3)
+	cmpi.w	#SPAboardleft,$58(a3)
 	beq.w	.6
-	cmpi.w	#$22AE,$58(a3)
+	cmpi.w	#SPAboardtop,$58(a3)
 	beq.w	.0
-	cmpi.w	#$2412,$58(a3)
+	cmpi.w	#SPAboardbot,$58(a3)
 	beq.w	.3
 	bra.w	.11
 .0
@@ -284,7 +284,7 @@ EndOneTimer							;End a one-timer for a3: the one-timer bits cleared, onetimerp
 	clr.w	(onetimerflags).w
 	st	(onetimerplayer).w
 	move.w	d1,-(sp)
-	move.w	#$856,d1				;SPA
+	move.w	#SPAglide,d1			;SPA
 	jsr	(SetSPA).l
 	tst.w	$34(a3)
 	bpl.w	.0

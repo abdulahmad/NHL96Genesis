@@ -4,7 +4,7 @@
 
 faceoffinput						;The faceoff player (assignment $17): store the dpad pull (fodir1 /
 									;fodir2) and start the faceoff
-									;SPA (SPA2126 with B, else SPA2150)
+									;SPA (SPAfaceoff with B, else SPAfaceoffr)
 	btst	#6,(sflags5).w
 	beq.w	.1
 	rts
@@ -22,11 +22,11 @@ faceoffinput						;The faceoff player (assignment $17): store the dpad pull (fod
 	bne.w	rtss7
 	btst	#4,d1					;test for b button press
 	beq.w	.3
-	move.w	#SPA2126,d1
+	move.w	#SPAfaceoff,d1
 	bset	#pf2aip,pflags2(a3)		;set anim in progress
 	jmp	SetSPA
 .3
-	move.w	#SPA2150,d1
+	move.w	#SPAfaceoffr,d1
 	jmp	SetSPA
 
 assfaceoff							;Assignment: wait for the faceoff to end (sflags2 bit 0), then assexit.

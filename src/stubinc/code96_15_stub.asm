@@ -27,6 +27,12 @@ vb2 = $0202C4						;display96
 ReplayIconMap = $140AFE				;graphics96
 HiScoreBgMap = $1468D6				;graphics96
 HiScoreImg = $147896				;graphics96
+SPAboardbot = $2412					;SPA value (frames96)
+SPAboardleft = $2360				;SPA value (frames96)
+SPAboardmidl = $2084				;SPA value (frames96)
+SPAboardmidr = $24C4				;SPA value (frames96)
+SPAboardtop = $22AE					;SPA value (frames96)
+SPAglide = $856						;SPA value (frames96)
 
 
 ; Main segment code

@@ -11,8 +11,9 @@
 SPAlist								;The animation tables: the animation code adds SPA to it
 	dc.w	0
 
-SPA0002	=	*-SPAlist
-SPA0002_table:
+;	Goalie pass swing (dopass, goalies) (confidence high)
+SPAgswing	=	*-SPAlist
+SPAgswing_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -33,8 +34,9 @@ SPA0002_table:
 .6	dc.w	13,5,14,5,13,-10
 .7	dc.w	15,5,16,5,15,-10
 
-SPA0074	=	*-SPAlist
-SPA0074_table:
+;	Goalie reach-out glove save, right side (saveanim slot 10) (confidence medium)
+SPAgglover2	=	*-SPAlist
+SPAgglover2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -53,8 +55,9 @@ SPA0074_table:
 .5	dc.w	25,2,26,30,41,-4
 .6	dc.w	27,2,28,30,42,-4
 
-SPA00CE	=	*-SPAlist
-SPA00CE_table:
+;	Goalie CPU pose with the puck far from the crease (assgoaliecpu, over $194 away) (confidence low)
+SPAgposefar	=	*-SPAlist
+SPAgposefar_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -70,8 +73,9 @@ SPA00CE_table:
 .2	dc.w	30,-16
 .6	dc.w	29,-16
 
-SPA00EC	=	*-SPAlist
-SPA00EC_table:
+;	Goalie ready stance bobbing, 4-frame cycle; no code sets it (confidence low)
+SPAgreadybob	=	*-SPAlist
+SPAgreadybob_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -107,8 +111,9 @@ SPAgglover_table:
 .5	dc.w	59,2,60,-30
 .6	dc.w	61,2,62,-30
 
-SPA0170	=	*-SPAlist
-SPA0170_table:
+;	Goalie save with the puck right at the goalie and slow (goaliesave, vz up to $600) (confidence low)
+SPAgcatchlow	=	*-SPAlist
+SPAgcatchlow_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -187,8 +192,9 @@ SPAgstickr_table:
 .5	dc.w	107,2,108,30,41,-4
 .6	dc.w	109,2,110,30,42,-4
 
-SPA02C0	=	*-SPAlist
-SPA02C0_table:
+;	Goalie reach-out glove save, left side (goaliesave, saveanim slot 11) (confidence high)
+SPAgglovel2	=	*-SPAlist
+SPAgglovel2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -207,8 +213,9 @@ SPA02C0_table:
 .5	dc.w	119,2,120,30,35,-4
 .6	dc.w	121,2,122,30,36,-4
 
-SPA031A	=	*-SPAlist
-SPA031A_table:
+;	Goalie save with the puck right at the goalie and fast (goaliesave, vz $600-$C00) (confidence low)
+SPAgblock	=	*-SPAlist
+SPAgblock_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -244,8 +251,10 @@ SPA0344_table:
 .2	dc.w	132,4,133,4,134,-30
 .6	dc.w	129,4,130,4,131,-30
 
-SPA037A	=	*-SPAlist
-SPA037A_table:
+;	Goalie stick slam after a goal; ends by setting sflags12 bit 1 (assgoaliecpu, updateanim)
+;	(confidence medium)
+SPAgslam	=	*-SPAlist
+SPAgslam_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -340,8 +349,9 @@ SPAgdive_table:
 .6	dc.w	195,5,196,5,197,5,198,-30
 .7	dc.w	199,5,200,5,201,5,202,-30
 
-SPA052C	=	*-SPAlist
-SPA052C_table:
+;	Goalie sweep check (Sweepcheck for goalies, CCStart) (confidence high)
+SPAgsweepchk	=	*-SPAlist
+SPAgsweepchk_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -362,8 +372,9 @@ SPA052C_table:
 .6	dc.w	228,4,229,-4
 .7	dc.w	232,4,233,-4
 
-SPA057E	=	*-SPAlist
-SPA057E_table:
+;	Goalie CPU pose with the puck at medium distance (assgoaliecpu, $A8-$194 away) (confidence low)
+SPAgposemid	=	*-SPAlist
+SPAgposemid_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -420,8 +431,9 @@ SPA05F2_table:
 .5	dc.w	263,5,264,10,263,-5
 .6	dc.w	263,5,264,10,263,-5
 
-SPA0640	=	*-SPAlist
-SPA0640_table:
+;	Goalie skating (goalieacc) (confidence medium)
+SPAgskate	=	*-SPAlist
+SPAgskate_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -442,8 +454,9 @@ SPA0640_table:
 .6	dc.w	295,7,296,7,297,7,298,7,299,7,300,-7
 .7	dc.w	301,7,302,7,303,7,304,7,305,7,306,-7
 
-SPA0712	=	*-SPAlist
-SPA0712_table:
+;	Goalie ready stance (goalieacc, assgoaliecpu) (confidence medium)
+SPAgready	=	*-SPAlist
+SPAgready_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -464,8 +477,9 @@ SPA0712_table:
 .6	dc.w	361,-10
 .7	dc.w	362,-10
 
-SPA0744	=	*-SPAlist
-SPA0744_table:
+;	Skating with the puck (noturn0 when the player has the puck) (confidence high)
+SPAskatewp	=	*-SPAlist
+SPAskatewp_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -486,8 +500,9 @@ SPA0744_table:
 .6	dc.w	411,8,412,8,413,8,414,8,415,8,416,8,417,8,418,-8
 .7	dc.w	419,8,420,8,421,8,422,8,423,8,424,8,425,8,426,-8
 
-SPA0856	=	*-SPAlist
-SPA0856_table:
+;	Gliding, no leg movement (doplayeracc, dostop, bench and penalty box walks) (confidence high)
+SPAglide	=	*-SPAlist
+SPAglide_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -508,8 +523,9 @@ SPA0856_table:
 .6	dc.w	433,-8
 .7	dc.w	434,-8
 
-SPA0888	=	*-SPAlist
-SPA0888_table:
+;	Skating backwards (noturn0 with pfrev set) (confidence medium)
+SPAskateback	=	*-SPAlist
+SPAskateback_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -530,8 +546,9 @@ SPA0888_table:
 .6	dc.w	483,5,484,5,485,5,486,5,487,5,488,5,489,5,490,-5
 .7	dc.w	491,5,492,5,493,5,494,5,495,5,496,5,497,5,498,-5
 
-SPA099A	=	*-SPAlist
-SPA099A_table:
+;	Stick swing check: hook animation plus button 6 (doinput) (confidence low)
+SPAcheckswing	=	*-SPAlist
+SPAcheckswing_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -551,8 +568,10 @@ SPA099A_table:
 .5	dc.w	515,5,516,5,517,5,518,40,1045,6,1046,6,1047,6,1048,-6
 .6	dc.w	519,5,520,5,521,5,522,40,1049,6,1050,6,1051,6,1052,-6
 
-SPA0A70	=	*-SPAlist
-SPA0A70_table:
+;	Alternate pass animation used for forehand and backhand when GameFlags bit 1 is set (dopass)
+;	(confidence medium)
+SPApassalt	=	*-SPAlist
+SPApassalt_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -573,8 +592,10 @@ SPA0A70_table:
 .6	dc.w	529,-5
 .7	dc.w	530,-5
 
-SPA0AA2	=	*-SPAlist
-SPA0AA2_table:
+;	Skater into the penalty box: wall lean right, door sfx at step $10 (asspenalty, updateanim)
+;	(confidence medium)
+SPAboxwallright	=	*-SPAlist
+SPAboxwallright_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -589,8 +610,10 @@ SPA0AA2_table:
 .0	dc.w	531,4,532,4,533,4,534,4,535,4,536,4,537,4,538,4
 	dc.w	539,4,540,4,541,4,542,4,543,4,544,4,545,4,546,-4
 
-SPA0AF4	=	*-SPAlist
-SPA0AF4_table:
+;	Skater out of the penalty box: wall lean left (assepen); display clears its flip bit (confidence
+;	medium)
+SPAboxwallleft	=	*-SPAlist
+SPAboxwallleft_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -604,8 +627,9 @@ SPA0AF4_table:
 
 .0	dc.w	546,8,545,8,544,8,543,8,430,-2
 
-SPA0B1A	=	*-SPAlist
-SPA0B1A_table:
+;	Backhand pass (dopass, Findhittype) (confidence high)
+SPApassb	=	*-SPAlist
+SPApassb_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -626,8 +650,9 @@ SPA0B1A_table:
 .6	dc.w	559,2,560,-2
 .7	dc.w	561,2,562,-2
 
-SPA0B6C	=	*-SPAlist
-SPA0B6C_table:
+;	Forehand pass (dopass default) (confidence high)
+SPApassf	=	*-SPAlist
+SPApassf_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -648,8 +673,10 @@ SPA0B6C_table:
 .6	dc.w	575,2,576,-2
 .7	dc.w	577,2,578,-2
 
-SPA0BBE	=	*-SPAlist
-SPA0BBE_table:
+;	Flail variant that drops the puck: holder is hit while the partner is in SPAHold3 (holdcheck)
+;	(confidence low)
+SPAflailpuck	=	*-SPAlist
+SPAflailpuck_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -666,8 +693,9 @@ SPA0BBE_table:
 .3	dc.w	583,7,584,7,583,7,584,7,583,7,584,-7
 .5	dc.w	585,7,586,7,585,7,586,7,585,7,586,-7
 
-SPA0C30	=	*-SPAlist
-SPA0C30_table:
+;	Scoring player arm pump (assscore) (confidence medium)
+SPApump	=	*-SPAlist
+SPApump_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -682,8 +710,9 @@ SPA0C30_table:
 .0	dc.w	590,6,587,3,588,3,589,6,588,3,587,3,588,3,589,6
 	dc.w	588,3,587,3,588,3,589,6,588,3,589,6,590,-3
 
-SPA0C7E	=	*-SPAlist
-SPA0C7E_table:
+;	Goal celebration (assscore default) (confidence medium)
+SPAcelebrate	=	*-SPAlist
+SPAcelebrate_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -697,8 +726,9 @@ SPA0C7E_table:
 
 .0	dc.w	598,4,597,4,596,4,593,-8
 
-SPA0CA0	=	*-SPAlist
-SPA0CA0_table:
+;	Skating with the Stanley Cup overhead (assstanley) (confidence high)
+SPAstanley	=	*-SPAlist
+SPAstanley_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -714,8 +744,9 @@ SPA0CA0_table:
 	dc.w	598,4,596,591,593,4,594,4,595,4,594,4,593,4,594,4
 	dc.w	595,4,594,4,593,4,594,4,595,4,594,4,596,-4
 
-SPA0D0E	=	*-SPAlist
-SPA0D0E_table:
+;	Goal celebration, second variant (assscore, bit 0 of $D279) (confidence medium)
+SPAcelebrate2	=	*-SPAlist
+SPAcelebrate2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -729,8 +760,9 @@ SPA0D0E_table:
 
 .0	dc.w	599,4,602,-10
 
-SPA0D28	=	*-SPAlist
-SPA0D28_table:
+;	Scoring player arm pump, second variant (assscore, bit 3 of $D279 clear) (confidence medium)
+SPApump2	=	*-SPAlist
+SPApump2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -745,8 +777,9 @@ SPA0D28_table:
 .0	dc.w	599,4,600,4,601,4,602,4,603,4,604,4,603,4,602,4
 	dc.w	603,4,604,4,603,4,602,4,603,4,604,4,603,4,599,-4
 
-SPA0D7A	=	*-SPAlist
-SPA0D7A_table:
+;	Lean on the wall, forwards sequence (asseben, leaving the bench) (confidence medium)
+SPAwallright	=	*-SPAlist
+SPAwallright_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -761,8 +794,9 @@ SPA0D7A_table:
 .0	dc.w	605,8,606,8,607,8,608,8,609,8,610,-8
 .3	dc.w	610,8,609,8,608,8,607,8,606,8,605,-8
 
-SPA0DBC	=	*-SPAlist
-SPA0DBC_table:
+;	Lean on the wall, reverse of SPAwallright (assbench, entering the bench) (confidence medium)
+SPAwallleft	=	*-SPAlist
+SPAwallleft_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -777,8 +811,9 @@ SPA0DBC_table:
 .0	dc.w	610,8,609,8,608,8,607,8,606,8,605,-8
 .3	dc.w	605,8,606,8,607,8,608,8,609,8,610,-8
 
-SPA0DFE	=	*-SPAlist
-SPA0DFE_table:
+;	Goalie lean on the wall, forwards (asseben) (confidence medium)
+SPAgwallright	=	*-SPAlist
+SPAgwallright_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -793,8 +828,9 @@ SPA0DFE_table:
 .0	dc.w	611,8,612,8,613,8,614,8,615,8,616,-8
 .3	dc.w	616,8,615,8,614,8,613,8,612,8,611,-8
 
-SPA0E40	=	*-SPAlist
-SPA0E40_table:
+;	Goalie lean on the wall, reverse (assbench) (confidence medium)
+SPAgwallleft	=	*-SPAlist
+SPAgwallleft_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -831,8 +867,9 @@ SPA0E82_table:
 .6	dc.w	641,2,642,2,643,2,644,-2
 .7	dc.w	645,2,646,2,647,2,648,-2
 
-SPA0F14	=	*-SPAlist
-SPA0F14_table:
+;	Player flips over a checker (FallDown, hit from behind high) (confidence medium)
+SPAflip	=	*-SPAlist
+SPAflip_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -851,8 +888,9 @@ SPA0F14_table:
 .6	dc.w	1029,4,1030,4,1031,4,1032,4,1033,4,1034,4,1035,4,1036,50
 	dc.w	1049,6,1050,6,1051,6,1052,-6
 
-SPA0FB6	=	*-SPAlist
-SPA0FB6_table:
+;	Backhand shot (SetShotMode, doshot) (confidence high)
+SPAshotb	=	*-SPAlist
+SPAshotb_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -881,8 +919,9 @@ SPA0FB6_table:
 .7	dc.w	707,4,706,4,705,4,705,4,705,4,706,4,707,4,708,4
 	dc.w	708,-20
 
-SPA10E8	=	*-SPAlist
-SPA10E8_table:
+;	Quick shot, between the backhand and forehand shot tables; no code sets it (confidence low)
+SPAshotquick	=	*-SPAlist
+SPAshotquick_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -903,8 +942,9 @@ SPA10E8_table:
 .6	dc.w	745,1,746,1,747,1,748,1,749,3,750,-1
 .7	dc.w	751,1,752,1,753,1,754,1,755,3,756,-1
 
-SPA11BA	=	*-SPAlist
-SPA11BA_table:
+;	Forehand shot (SetShotMode default) (confidence high)
+SPAshotf	=	*-SPAlist
+SPAshotf_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -933,8 +973,9 @@ SPA11BA_table:
 .7	dc.w	802,3,801,3,800,3,799,3,800,3,801,3,802,3,803,3
 	dc.w	804,-15
 
-SPA12EC	=	*-SPAlist
-SPA12EC_table:
+;	Stumble (noturn0, FallDown) (confidence high)
+SPAstumble	=	*-SPAlist
+SPAstumble_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -955,8 +996,9 @@ SPA12EC_table:
 .6	dc.w	877,4,878,4,879,4,880,4,879,-4
 .7	dc.w	881,4,882,4,883,4,884,4,883,-4
 
-SPA139E	=	*-SPAlist
-SPA139E_table:
+;	Flailing when held or hooked (holdcheck) (confidence high)
+SPAflail	=	*-SPAlist
+SPAflail_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -999,8 +1041,9 @@ SPA13F0_table:
 .6	dc.w	913,20,914,-20
 .7	dc.w	915,20,916,-20
 
-SPA1442	=	*-SPAlist
-SPA1442_table:
+;	Catch a slow puck (puckbody) (confidence high)
+SPAcatch	=	*-SPAlist
+SPAcatch_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1021,8 +1064,9 @@ SPA1442_table:
 .6	dc.w	929,6,930,-6
 .7	dc.w	931,6,932,-6
 
-SPA1494	=	*-SPAlist
-SPA1494_table:
+;	Check right: CCStart picks by direction (checkinglist, indexes 1-4) (confidence medium)
+SPAcheckr	=	*-SPAlist
+SPAcheckr_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1043,8 +1087,9 @@ SPA1494_table:
 .6	dc.w	957,2,958,6,959,4,960,-2
 .7	dc.w	961,2,962,6,963,4,964,-2
 
-SPA1526	=	*-SPAlist
-SPA1526_table:
+;	Check left: CCStart picks by direction (checkinglist, indexes 0 and 5-7) (confidence medium)
+SPAcheckl	=	*-SPAlist
+SPAcheckl_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1065,8 +1110,9 @@ SPA1526_table:
 .6	dc.w	1021,2,1022,6,1023,4,1024,-2
 .7	dc.w	1025,2,1026,6,1027,4,1028,-2
 
-SPA15B8	=	*-SPAlist
-SPA15B8_table:
+;	Cross check (FallDown, checkcheck penalty test) (confidence high)
+SPAcrosscheck	=	*-SPAlist
+SPAcrosscheck_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1087,8 +1133,9 @@ SPA15B8_table:
 .6	dc.w	989,2,990,2,991,4,992,-2
 .7	dc.w	993,2,994,2,995,4,996,-2
 
-SPA164A	=	*-SPAlist
-SPA164A_table:
+;	Being held while the partner is in SPAHold (holdcheck) (confidence medium)
+SPAHold2	=	*-SPAlist
+SPAHold2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1131,8 +1178,9 @@ SPAHold_table:
 .6	dc.w	1065,13,1066,-13
 .7	dc.w	1067,13,1068,-13
 
-SPA16EE	=	*-SPAlist
-SPA16EE_table:
+;	Third hold state: holdplayer sets it away from the boards; holdcheck mirrors it (confidence low)
+SPAHold3	=	*-SPAlist
+SPAHold3_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1153,8 +1201,9 @@ SPA16EE_table:
 .6	dc.w	1065,13,1066,-13
 .7	dc.w	1067,13,1068,-13
 
-SPA1740	=	*-SPAlist
-SPA1740_table:
+;	Being hooked while the partner is in SPAhook (holdcheck) (confidence medium)
+SPAhook2	=	*-SPAlist
+SPAhook2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1197,8 +1246,9 @@ SPAhook_table:
 .6	dc.w	1081,8,1082,-22
 .7	dc.w	1083,8,1084,-22
 
-SPA17E4	=	*-SPAlist
-SPA17E4_table:
+;	Fall of an injured player (FallDown, seed bit 0 clear) (confidence medium)
+SPAinjuryfall	=	*-SPAlist
+SPAinjuryfall_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1217,8 +1267,9 @@ SPA17E4_table:
 	dc.w	1768,4,1769,16,1768,4,1767,4,1766,10,1767,4,1768,4,1769,4
 	dc.w	1768,4,1767,4,1766,-1024
 
-SPA188E	=	*-SPAlist
-SPA188E_table:
+;	Injured player lying, second variant (FallDown, seed bit 0 set) (confidence medium)
+SPAinjury2	=	*-SPAlist
+SPAinjury2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1283,8 +1334,9 @@ SPA188E_table:
 	dc.w	1776,4,1775,4,1774,20,1775,4,1776,4,1777,12,1776,4,1775,4
 	dc.w	1774,-20
 
-SPA1EAC	=	*-SPAlist
-SPA1EAC_table:
+;	Fall of an injured player, second variant (FallDown, seed bit 0 set) (confidence medium)
+SPAinjuryfall2	=	*-SPAlist
+SPAinjuryfall2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1303,8 +1355,9 @@ SPA1EAC_table:
 	dc.w	1772,4,1771,4,1770,12,1771,4,1772,4,1773,8,1772,4,1771,4
 	dc.w	1770,20,1771,4,1772,4,1773,12,1772,4,1771,-1024
 
-SPA1F76	=	*-SPAlist
-SPA1F76_table:
+;	Injured player lying (FallDown, seed bit 0 clear) (confidence medium)
+SPAinjury1	=	*-SPAlist
+SPAinjury1_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1323,8 +1376,9 @@ SPA1F76_table:
 	dc.w	1780,4,1781,24,1780,4,1779,4,1778,4,1779,4,1780,4,1781,24
 	dc.w	1780,4,1779,4,1778,-1024
 
-SPA2020	=	*-SPAlist
-SPA2020_table:
+;	Turn left (playeracc picks it with SPAturnr) (confidence medium)
+SPAturnl	=	*-SPAlist
+SPAturnl_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1345,8 +1399,9 @@ SPA2020_table:
 .6	dc.w	1107,-8
 .7	dc.w	1108,-8
 
-SPA2052	=	*-SPAlist
-SPA2052_table:
+;	Turn right (playeracc picks it with SPAturnl) (confidence medium)
+SPAturnr	=	*-SPAlist
+SPAturnr_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1387,8 +1442,9 @@ SPAboardmidl_table:
 .6	dc.w	1117,4,1118,4,1119,4,1120,4,1121,4,1122,30,610,8,609,8
 	dc.w	608,8,607,8,606,8,605,-8
 
-SPA2126	=	*-SPAlist
-SPA2126_table:
+;	Faceoff stance (faceoffinput, assfaceoffpl) (confidence high)
+SPAfaceoff	=	*-SPAlist
+SPAfaceoff_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1403,8 +1459,9 @@ SPA2126_table:
 .0	dc.w	1133,1,1134,10,1135,-6
 .1	dc.w	1129,1,1130,10,1131,-6
 
-SPA2150	=	*-SPAlist
-SPA2150_table:
+;	Alternate faceoff stance (faceoffinput, assfaceoffpl) (confidence high)
+SPAfaceoffr	=	*-SPAlist
+SPAfaceoffr_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1419,8 +1476,9 @@ SPA2150_table:
 .0	dc.w	1133,-2
 .1	dc.w	1129,-2
 
-SPA216A	=	*-SPAlist
-SPA216A_table:
+;	Sweep check for skaters (Sweepcheck, CCStart) (confidence high)
+SPAsweepchk	=	*-SPAlist
+SPAsweepchk_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1551,8 +1609,9 @@ SPAboardmidr_table:
 .6	dc.w	1291,4,1292,4,1293,4,1294,4,1295,4,1296,20,1041,4,1042,4
 	dc.w	1043,4,1044,-4
 
-SPA2576	=	*-SPAlist
-SPA2576_table:
+;	Fall forwards (FallDown) (confidence high)
+SPAfallfwd	=	*-SPAlist
+SPAfallfwd_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1581,8 +1640,9 @@ SPA2576_table:
 .7	dc.w	1339,6,1340,6,1341,6,1342,50,1343,8,1344,-8
 	dc.w	1049,6,1050,6,1051,6,1052,-6	;past the end
 
-SPA26C8	=	*-SPAlist
-SPA26C8_table:
+;	Fall backwards (FallDown) (confidence high)
+SPAfallback	=	*-SPAlist
+SPAfallback_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1611,8 +1671,9 @@ SPA26C8_table:
 .7	dc.w	1387,6,1388,6,1389,6,1390,6,1391,6,1392,50,1049,6,1050,6
 	dc.w	1051,6,1052,-6
 
-SPA281A	=	*-SPAlist
-SPA281A_table:
+;	Skid stop (dostop, not skating backwards) (confidence medium)
+SPAstop	=	*-SPAlist
+SPAstop_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1633,8 +1694,9 @@ SPA281A_table:
 .6	dc.w	1411,3,1412,3,1413,-3
 .7	dc.w	1414,3,1415,3,1416,-3
 
-SPA288C	=	*-SPAlist
-SPA288C_table:
+;	Burst of fast skating when Start and the dpad are pressed (StartDpadBoost) (confidence low)
+SPAskatefast	=	*-SPAlist
+SPAskatefast_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1649,8 +1711,9 @@ SPA288C_table:
 .0	dc.w	1417,6,1418,2,1419,2,1420,2,1421,2,1422,-4
 .1	dc.w	1423,6,1424,2,1425,2,1426,2,1427,2,1428,-4
 
-SPA28CE	=	*-SPAlist
-SPA28CE_table:
+;	Goal siren, top goal (Goal, puck Y at or above 0) (confidence medium)
+SPAsiren	=	*-SPAlist
+SPAsiren_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1665,8 +1728,9 @@ SPA28CE_table:
 .0	dc.w	1429,3,1430,3,1431,3,1432,3,1433,3,1434,3,1435,3,1436,-3
 .1	dc.w	1682,3,1683,3,1684,3,1685,3,1686,3,1687,3,1688,3,1689,-3
 
-SPA2920	=	*-SPAlist
-SPA2920_table:
+;	Goal siren, bottom goal (Goal, puck Y below 0) (confidence medium)
+SPAsiren2	=	*-SPAlist
+SPAsiren2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1680,8 +1744,9 @@ SPA2920_table:
 
 .0	dc.w	1682,3,1683,3,1684,3,1685,3,1686,3,1687,3,1688,3,1689,-3
 
-SPA2952	=	*-SPAlist
-SPA2952_table:
+;	Skating without the puck (noturn0) (confidence high)
+SPAskate	=	*-SPAlist
+SPAskate_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1702,8 +1767,9 @@ SPA2952_table:
 .6	dc.w	1750,8,1751,8,1752,8,1753,8,1754,8,1755,8,1756,8,1757,-8
 .7	dc.w	1758,8,1759,8,1760,8,1761,8,1762,8,1763,8,1764,8,1765,-8
 
-SPA2A64	=	*-SPAlist
-SPA2A64_table:
+;	Penalty box door opening, 4 frames forwards; no code sets it (confidence low)
+SPAboxdooropen	=	*-SPAlist
+SPAboxdooropen_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1724,8 +1790,9 @@ SPA2A64_table:
 .6	dc.w	1820,3,1821,3,1822,3,1823,-3
 .7	dc.w	1824,3,1825,3,1826,3,1827,-3
 
-SPA2AF6	=	*-SPAlist
-SPA2AF6_table:
+;	Penalty box door closing, reverse of SPAboxdooropen; no code sets it (confidence low)
+SPAboxdoorclose	=	*-SPAlist
+SPAboxdoorclose_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1746,8 +1813,9 @@ SPA2AF6_table:
 .6	dc.w	1823,3,1822,3,1821,3,1820,-3
 .7	dc.w	1827,3,1826,3,1825,3,1824,-3
 
-SPA2B88	=	*-SPAlist
-SPA2B88_table:
+;	Player hits the glass (wallcollb) (confidence high)
+SPAbglass	=	*-SPAlist
+SPAbglass_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1762,7 +1830,7 @@ SPA2B88_table:
 .0	dc.w	1850,8,1851,8,1852,8,1853,8,1854,8,1855,8,1856,8,1857,-1000
 
 SPApflip	=	*-SPAlist
-SPA2BBA_table:
+SPApflip_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1805,8 +1873,9 @@ SPAburst_table:
 .6	dc.w	1750,2,1751,2,1752,2,1753,2,1754,2,1755,2,1756,2,1757,-2
 .7	dc.w	1758,2,1759,2,1760,2,1761,2,1762,2,1763,2,1764,2,1765,-2
 
-SPA2D6E	=	*-SPAlist
-SPA2D6E_table:
+;	Fake shot: mixed shot frames; no code sets it (confidence low)
+SPAfake	=	*-SPAlist
+SPAfake_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1827,8 +1896,9 @@ SPA2D6E_table:
 .6	dc.w	1107,4,1106,4,1153,20,1114,4,1115,4,1116,-4
 .7	dc.w	1108,4,1107,4,1157,20,1115,4,1116,4,1109,-4
 
-SPA2E40	=	*-SPAlist
-SPA2E40_table:
+;	One-timer forehand shot (SetShotMode, GameFlags bit 0) (confidence medium)
+SPAonetimef	=	*-SPAlist
+SPAonetimef_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1857,8 +1927,9 @@ SPA2E40_table:
 .7	dc.w	802,4,801,4,800,4,799,4,800,4,801,4,802,4,802,4
 	dc.w	802,-10
 
-SPAshotf	=	*-SPAlist
-SPA2F72_table:
+;	One-timer backhand shot (SetShotMode, GameFlags bit 0) (confidence medium)
+SPAonetimeb	=	*-SPAlist
+SPAonetimeb_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1903,8 +1974,9 @@ SPAfight_table:
 .0	dc.w	1507,8,1508,8,1509,8,1510,8,1509,8,1508,-8
 .3	dc.w	1507,8,1508,8,1509,8,1510,8,1509,8,1508,-8
 
-SPA30E6	=	*-SPAlist
-SPA30E6_table:
+;	Fighters weaving while waiting (assfight when SPA is 0) (confidence medium)
+SPAfightweave	=	*-SPAlist
+SPAfightweave_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1919,8 +1991,9 @@ SPA30E6_table:
 .0	dc.w	1515,7,1516,7,1517,7,1518,7,1517,7,1516,-7
 .3	dc.w	1519,7,1520,7,1521,7,1522,7,1521,7,1520,-7
 
-SPA3128	=	*-SPAlist
-SPA3128_table:
+;	Fight stance when the fighters engage (EngageFight) (confidence high)
+SPAfightstance	=	*-SPAlist
+SPAfightstance_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1937,8 +2010,9 @@ SPA3128_table:
 .3	dc.w	1511,4,1512,4,1513,4,1514,4,1519,4,1520,4,1521,4,1522,4
 	dc.w	1520,-4
 
-SPA3182	=	*-SPAlist
-SPA3182_table:
+;	C button during the fight: mashing (fightinput, FightMash count) (confidence low)
+SPAfmash	=	*-SPAlist
+SPAfmash_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1969,8 +2043,9 @@ SPAfhigh_table:
 .0	dc.w	1555,6,1556,6,1557,6,1558,6,1516,-4
 .3	dc.w	1559,6,1560,6,1561,6,1562,6,1520,-4
 
-SPA31F6	=	*-SPAlist
-SPA31F6_table:
+;	Fighter held after the high grab (assfight when frame $613/$617 lands) (confidence medium)
+SPAfheld	=	*-SPAlist
+SPAfheld_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1985,8 +2060,9 @@ SPA31F6_table:
 .0	dc.w	1555,6,1556,6,1557,6,1558,6,1516,-4
 .3	dc.w	1559,6,1560,6,1561,6,1562,6,1520,-4
 
-SPA3230	=	*-SPAlist
-SPA3230_table:
+;	Two-frame weave that ends a fight pose; no immediate reference (confidence low)
+SPAfweaveend	=	*-SPAlist
+SPAfweaveend_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2001,8 +2077,9 @@ SPA3230_table:
 .0	dc.w	1517,4,1516,-4
 .3	dc.w	1521,4,1520,-4
 
-SPA3252	=	*-SPAlist
-SPA3252_table:
+;	Punch with button A while the fighters are locked (fightinput) (confidence low)
+SPAfpunchA	=	*-SPAlist
+SPAfpunchA_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2049,8 +2126,9 @@ SPAflow_table:
 .0	dc.w	1539,4,1540,4,1541,4,1542,14,1516,-15
 .3	dc.w	1543,4,1544,4,1545,4,1546,14,1520,-15
 
-SPA3300	=	*-SPAlist
-SPA3300_table:
+;	Punch with A or B once the fight is decided (fightinput, sflags10 bit 2) (confidence low)
+SPAfpunchfinal	=	*-SPAlist
+SPAfpunchfinal_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2065,8 +2143,9 @@ SPA3300_table:
 .0	dc.w	1651,6,1652,8,1653,8,1654,4,1516,-16
 .3	dc.w	1651,6,1652,8,1653,8,1654,4,1520,-16
 
-SPA333A	=	*-SPAlist
-SPA333A_table:
+;	Punch with button B while the fighters are locked (fightinput) (confidence low)
+SPAfpunchB	=	*-SPAlist
+SPAfpunchB_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2081,8 +2160,9 @@ SPA333A_table:
 .0	dc.w	1579,6,1580,8,1581,8,1582,4,1516,-4
 .3	dc.w	1583,6,1584,8,1585,8,1586,4,1520,-4
 
-SPA3374	=	*-SPAlist
-SPA3374_table:
+;	Reaction to the SPAfgrab blow, slowest (assfight, table at $BF6C) (confidence medium)
+SPAfgrabhit1	=	*-SPAlist
+SPAfgrabhit1_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2097,8 +2177,9 @@ SPA3374_table:
 .0	dc.w	1531,3,1532,3,1533,3,1534,8,1516,-4
 .3	dc.w	1535,3,1536,3,1537,3,1538,8,1520,-4
 
-SPA33AE	=	*-SPAlist
-SPA33AE_table:
+;	Reaction to the SPAfgrab blow, medium (assfight, table at $BF6C) (confidence medium)
+SPAfgrabhit2	=	*-SPAlist
+SPAfgrabhit2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2113,8 +2194,9 @@ SPA33AE_table:
 .0	dc.w	1531,3,1532,3,1533,3,1534,7,1516,-4
 .3	dc.w	1535,3,1536,3,1537,3,1538,7,1520,-4
 
-SPA33E8	=	*-SPAlist
-SPA33E8_table:
+;	Reaction to the SPAfgrab blow, fastest (assfight, table at $BF6C) (confidence medium)
+SPAfgrabhit3	=	*-SPAlist
+SPAfgrabhit3_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2129,8 +2211,9 @@ SPA33E8_table:
 .0	dc.w	1531,3,1532,3,1533,3,1534,6,1516,-4
 .3	dc.w	1535,3,1536,3,1537,3,1538,6,1520,-4
 
-SPA3422	=	*-SPAlist
-SPA3422_table:
+;	Reaction to the SPAflow blow, slowest (assfight, table at $BFBE) (confidence medium)
+SPAflowhit1	=	*-SPAlist
+SPAflowhit1_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2145,8 +2228,9 @@ SPA3422_table:
 .0	dc.w	1547,3,1548,3,1549,3,1550,8,1516,-4
 .3	dc.w	1551,3,1552,3,1553,3,1554,8,1520,-4
 
-SPA345C	=	*-SPAlist
-SPA345C_table:
+;	Reaction to the SPAflow blow, medium (assfight, table at $BFBE) (confidence medium)
+SPAflowhit2	=	*-SPAlist
+SPAflowhit2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2161,8 +2245,9 @@ SPA345C_table:
 .0	dc.w	1547,3,1548,3,1549,3,1550,7,1516,-4
 .3	dc.w	1551,3,1552,3,1553,3,1554,7,1520,-4
 
-SPA3496	=	*-SPAlist
-SPA3496_table:
+;	Reaction to the SPAflow blow, fastest (assfight, table at $BFBE) (confidence medium)
+SPAflowhit3	=	*-SPAlist
+SPAflowhit3_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2177,8 +2262,9 @@ SPA3496_table:
 .0	dc.w	1547,3,1548,3,1549,3,1550,6,1516,-4
 .3	dc.w	1551,3,1552,3,1553,3,1554,6,1520,-4
 
-SPA34D0	=	*-SPAlist
-SPA34D0_table:
+;	Fighter that mashed C 17 times wins the struggle (fightinput) (confidence low)
+SPAfmashwin	=	*-SPAlist
+SPAfmashwin_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2193,8 +2279,9 @@ SPA34D0_table:
 .0	dc.w	1603,7,1604,7,1605,8,1606,8,1516,-8
 .3	dc.w	1607,7,1608,7,1609,8,1610,8,1520,-8
 
-SPA350A	=	*-SPAlist
-SPA350A_table:
+;	Reaction to punch A, slowest (assfight, table at $BE18) (confidence medium)
+SPAfpunchAhit1	=	*-SPAlist
+SPAfpunchAhit1_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2209,8 +2296,9 @@ SPA350A_table:
 .0	dc.w	1571,7,1572,7,1573,8,1574,8,1516,-8
 .3	dc.w	1575,7,1576,7,1577,8,1578,8,1520,-8
 
-SPA3544	=	*-SPAlist
-SPA3544_table:
+;	Reaction to punch A, medium (assfight, table at $BE18) (confidence medium)
+SPAfpunchAhit2	=	*-SPAlist
+SPAfpunchAhit2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2225,8 +2313,9 @@ SPA3544_table:
 .0	dc.w	1571,6,1572,6,1573,6,1574,6,1516,-8
 .3	dc.w	1575,6,1576,6,1577,6,1578,6,1520,-8
 
-SPA357E	=	*-SPAlist
-SPA357E_table:
+;	Reaction to punch A, fastest (assfight, table at $BE18) (confidence medium)
+SPAfpunchAhit3	=	*-SPAlist
+SPAfpunchAhit3_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2241,8 +2330,9 @@ SPA357E_table:
 .0	dc.w	1571,4,1572,4,1573,4,1574,4,1516,-8
 .3	dc.w	1575,4,1576,4,1577,4,1578,4,1520,-8
 
-SPA35B8	=	*-SPAlist
-SPA35B8_table:
+;	Reaction to punch B, slowest (assfight, table at $BE6A) (confidence medium)
+SPAfpunchBhit1	=	*-SPAlist
+SPAfpunchBhit1_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2257,8 +2347,9 @@ SPA35B8_table:
 .0	dc.w	1587,7,1588,7,1589,8,1590,8,1516,-8
 .3	dc.w	1591,7,1592,7,1593,8,1594,8,1520,-8
 
-SPA35F2	=	*-SPAlist
-SPA35F2_table:
+;	Reaction to punch B, medium (assfight, table at $BE6A) (confidence medium)
+SPAfpunchBhit2	=	*-SPAlist
+SPAfpunchBhit2_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2273,8 +2364,9 @@ SPA35F2_table:
 .0	dc.w	1587,6,1588,6,1589,6,1590,6,1516,-8
 .3	dc.w	1591,6,1592,6,1593,6,1594,6,1520,-8
 
-SPA362C	=	*-SPAlist
-SPA362C_table:
+;	Reaction to punch B, fastest (assfight, table at $BE6A) (confidence medium)
+SPAfpunchBhit3	=	*-SPAlist
+SPAfpunchBhit3_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2289,8 +2381,9 @@ SPA362C_table:
 .0	dc.w	1587,4,1588,4,1589,4,1590,4,1516,-8
 .3	dc.w	1591,4,1592,4,1593,4,1594,4,1520,-8
 
-SPA3666	=	*-SPAlist
-SPA3666_table:
+;	Fight winner pose (assfight) (confidence medium)
+SPAfwin	=	*-SPAlist
+SPAfwin_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2305,8 +2398,9 @@ SPA3666_table:
 .0	dc.w	1643,8,1644,8,1645,8,1646,8,1646,8,1646,8,1646,8,1646,8
 	dc.w	1516,-2
 
-SPA369C	=	*-SPAlist
-SPA369C_table:
+;	Fight loser pose, long wait (assfight) (confidence medium)
+SPAflose	=	*-SPAlist
+SPAflose_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -2321,8 +2415,9 @@ SPA369C_table:
 .0	dc.w	1647,8,1648,8,1649,8,1650,8,1650,8,1650,8,1650,8,1650,160
 	dc.w	1650,-2
 
-SPA36D2	=	*-SPAlist
-SPA36D2_table:
+;	Loser falls once the fight is decided (assfight) (confidence medium)
+SPAffall	=	*-SPAlist
+SPAffall_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t

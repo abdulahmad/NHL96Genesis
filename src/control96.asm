@@ -136,9 +136,9 @@ updateplayers						;This routine calls all collision/animation/assignment code f
 	jsr	(loadTeamStruct).l
 	addq.w	#1,(a2,d0.w)			;add 1 to TOI for player
 .21
-	cmpi.w	#SPA17E4,SPA(a3)
+	cmpi.w	#SPAinjuryfall,SPA(a3)
 	blt.w	.22
-	cmpi.w	#SPA1F76,SPA(a3)
+	cmpi.w	#SPAinjury1,SPA(a3)
 	ble.w	.done
 .22
 	move.w	(skillspeed).w,d4
@@ -153,7 +153,7 @@ updateplayers						;This routine calls all collision/animation/assignment code f
 	addq.w	#2,d4
 .24
 	mulu.w	d7,d4
-	cmpi.w	#SPA2B88,SPA(a3)
+	cmpi.w	#SPAbglass,SPA(a3)
 	beq.w	.done
 	tst.w	Zpos(a3)
 	bne.w	.29
@@ -281,7 +281,7 @@ updateanim							;Frame switch control on struct a3. Called from updateplayers
 	bpl.w	.cframe					;branch if SPAcnt is positive
 	btst	#gmclock,(gmode).w
 	beq.w	.3
-	cmpi.w	#SPA3300,SPA(a3)
+	cmpi.w	#SPAfpunchfinal,SPA(a3)
 	bne.w	.3
 	cmpi.w	#8,SPAnum(a3)
 	bne.w	.3
@@ -290,7 +290,7 @@ updateanim							;Frame switch control on struct a3. Called from updateplayers
 .3
 	btst	#4,(sflags9).w
 	beq.w	.4
-	cmpi.w	#SPA0AA2,SPA(a3)
+	cmpi.w	#SPAboxwallright,SPA(a3)
 	bne.w	.4
 	cmpi.w	#$10,SPAnum(a3)
 	bne.w	.4
@@ -301,7 +301,7 @@ updateanim							;Frame switch control on struct a3. Called from updateplayers
 	addq.w	#4,d0					;add 4 to d0 (currently holds current index)
 	tst.w	-2(a0,d0.w)				;the frame time for the previous frame
 	bpl.w	.1						;branch if positive (not the end of the animation)
-	cmpi.w	#SPA037A,SPA(a3)
+	cmpi.w	#SPAgslam,SPA(a3)
 	bne.w	.5
 	bset	#1,(sflags12).w
 .5
@@ -507,7 +507,7 @@ Holdplayer							;Hold check (SPAhook, SPAHold with the stick up); a puck carrie
 	blt.w	.0
 	bra.w	.1
 .0
-	move.w	#SPA16EE,d1
+	move.w	#SPAHold3,d1
 	bra.w	.2
 .1
 	move.w	Ypos(a3),d0				;move Ypos checker into d0
@@ -619,9 +619,9 @@ chgplayer							;The pad d4 takes the nearest free skater to where the puck is g
 	bne.w	.next
 	btst	#pfalock,pflags(a0)
 	beq.w	.5
-	cmpi.w	#SPA2576,SPA(a0)
+	cmpi.w	#SPAfallfwd,SPA(a0)
 	beq.w	.next
-	cmpi.w	#SPA26C8,SPA(a0)
+	cmpi.w	#SPAfallback,SPA(a0)
 	beq.w	.next
 .5
 	move.w	SCnum(a0),d1
@@ -660,7 +660,7 @@ chgplayer							;The pad d4 takes the nearest free skater to where the puck is g
 	jmp	Sweepcheck
 .9
 	bset	#pfalock,pflags(a3)
-	move.w	#$52C,d1
+	move.w	#SPAgsweepchk,d1
 	jmp	SetSPA
 
 setcplayer							;Give pad d4 (0 / 2 / 4 / 6) player d0: restorepl the old one, then
@@ -723,11 +723,11 @@ setc4player							;Give pad 4 player d0 (setcplayer, d4 = 6)
 	move.w	(sp)+,d4
 	rts
 
-Sweepcheck							;Sweep check animation for player a3 (SPA052C for a goalie, else SPA216A)
-	move.w	#SPA216A,d1
+Sweepcheck							;Sweep check animation for a3 (goalie: SPAgsweepchk, else SPAsweepchk)
+	move.w	#SPAsweepchk,d1
 	tst.w	position(a3)
 	bne.w	.0
-	move.w	#SPA052C,d1
+	move.w	#SPAgsweepchk,d1
 .0
 	bset	#pfalock,pflags(a3)
 	bra.w	SetSPA

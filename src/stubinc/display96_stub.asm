@@ -40,6 +40,8 @@ LoadReplayIcon = $1D8E5C			;code96_15
 LoadHomeTeamGfx = $1D8E6C			;code96_15
 showclock = $1E7664					;middle96_clock
 setplayercolors = $0215B2			;control96_team
+SPAboardmidl = $2084				;SPA value (frames96)
+SPAboxwallleft = $AF4				;SPA value (frames96)
 
 
 ; Main segment code

@@ -12,8 +12,8 @@
 	include	macros\genesis.mac		;String
 
 ; External addresses outside, read from lst/nhl96.bin.
-SPA2126 = $2126						;SPA value (frames96)
-SPA2150 = $2150						;SPA value (frames96)
+SPAfaceoff = $2126					;SPA value (frames96)
+SPAfaceoffr = $2150					;SPA value (frames96)
 SetSPA = $01A614					;skate96
 dobitmap = $01B692					;video96
 Framer = $01B9B0					;video96
