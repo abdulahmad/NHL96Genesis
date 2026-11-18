@@ -112,17 +112,17 @@ SetShotMode							;Start the shot mode (C button)
 	sub.w	Ypos(a3),d1				;Sub Ypos of player from Y boards
 	jsr	(vtoa).l
 	move.w	#$F,(passspeed).w
-	move.w	#$11BA,d1
+	move.w	#SPAshotf,d1
 	btst	#0,(GameFlags).w
 	beq.w	.13
-	move.w	#$2E40,d1
+	move.w	#SPAonetimef,d1
 .13
 	jsr	(Findhittype).l
 	beq.w	.4
-	move.w	#$FB6,d1
+	move.w	#SPAshotb,d1
 	btst	#0,(GameFlags).w
 	beq.w	.3
-	move.w	#SPAshotf,d1
+	move.w	#SPAonetimeb,d1
 .3
 	move.w	#$F,(passspeed).w
 .4
@@ -212,7 +212,7 @@ doshot								;Shoot the puck
 .2
 	move.w	#SFXshotfh,(sp)			;#SFXshotfh
 	bset	#sf2shot,(sflags2).w
-	cmpi.w	#$FB6,SPA(a3)
+	cmpi.w	#SPAshotb,SPA(a3)
 	bne.w	.nbh
 	move.w	#SFXshotbh,(sp)			;#SFXshotbh
 	move.w	(passspeed).w,d0
@@ -544,20 +544,20 @@ dopass								;Pass the puck
 	move.w	(puckvx).w,d0
 	move.w	(puckvy).w,d1
 	jsr	(vtoa).l
-	move.w	#2,d1
+	move.w	#SPAgswing,d1
 	tst.w	position(a3)			;$34 = position
 	beq.w	.9
-	move.w	#$B6C,d1
+	move.w	#SPApassf,d1
 	btst	#1,(GameFlags).w
 	beq.w	.13
-	move.w	#$A70,d1
+	move.w	#SPApassalt,d1
 .13
 	jsr	(Findhittype).l
 	beq.w	.9
-	move.w	#$B1A,d1
+	move.w	#SPApassb,d1
 	btst	#1,(GameFlags).w
 	beq.w	.9
-	move.w	#$A70,d1
+	move.w	#SPApassalt,d1
 .9
 	jsr	(SetSPA).l
 	bset	#pfalock,pflags(a3)

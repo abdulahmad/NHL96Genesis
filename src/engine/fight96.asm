@@ -291,13 +291,13 @@ assfight							;Assignment $14: the fighter. Not decoded in the listing: kept as
 	dc.b	$3F,$3C,$00,$0B,$08,$2B,$00,$06,$00,$62,$66,$00,$00,$0A,$45,$EA
 	dc.b	$03,$9E,$3E,$BC,$00,$0C,$4E,$B9,$00,$08,$85,$86,$60,$00,$FC,$C0
 
-EngageFight							;A/B/C during SPAfight: stop Xvel, SPA3128, count this fighter
+EngageFight							;A/B/C during SPAfight: stop Xvel, SPAfightstance, count this fighter
 									;(FightEngageCount). The second one: SetFightingMajors and GameFlags bit 5;
 									;the first: PenCntDwn $140
 	movem.l	d0-d3,-(sp)
 	clr.w	Xvel(a3)
 	addq.w	#1,(FightEngageCount).w
-	move.w	#SPA3128,d1
+	move.w	#SPAfightstance,d1
 	jsr	(SetSPA).l
 	cmpi.w	#2,(FightEngageCount).w
 	beq.w	.0
@@ -367,7 +367,7 @@ fightinput							;Controller processing for fighting
 	bmi.w	rtsfight
 	tst.w	(PenCntDwn).w
 	bmi.w	rtsfight
-	cmpi.w	#SPA3128,SPA(a3)
+	cmpi.w	#SPAfightstance,SPA(a3)
 	beq.w	rtsfight
 .2
 	cmpi.w	#2,facedir(a3)
@@ -502,13 +502,13 @@ fightinput							;Controller processing for fighting
 .26
 	btst	#2,(sflags10).w
 	bne.w	.27
-	move.w	#SPA3252,d1
+	move.w	#SPAfpunchA,d1
 	btst	#6,d2
 	bne.w	.34
-	move.w	#SPA333A,d1
+	move.w	#SPAfpunchB,d1
 	btst	#4,d2
 	bne.w	.34
-	move.w	#SPA3182,d1
+	move.w	#SPAfmash,d1
 	btst	#5,d2
 	bne.w	.29
 	bra.s	.25
@@ -521,7 +521,7 @@ fightinput							;Controller processing for fighting
 	bne.w	.28
 	bra.s	.25
 .28
-	move.w	#SPA3300,d1
+	move.w	#SPAfpunchfinal,d1
 	bra.w	.34
 .29
 	movem.l	a0,-(sp)
@@ -547,7 +547,7 @@ fightinput							;Controller processing for fighting
 	dbf	d0,.31
 .33
 	movea.l	a0,a3
-	move.w	#SPA34D0,d1
+	move.w	#SPAfmashwin,d1
 	bset	#pf2aip,pflags2(a3)
 	jsr	(SetSPA).l
 	movem.l	(sp)+,d1/a0/a3

@@ -137,10 +137,10 @@ goaliesave							;The goalie a3 makes a save of the puck crossing at a0: the sav
 	bgt.w	.2
 	cmpi.w	#$C00,(puckvz).w
 	bgt.w	.2
-	move.w	#SPA031A,d1
+	move.w	#SPAgblock,d1
 	cmpi.w	#$600,(puckvz).w
 	bgt.w	.8
-	move.w	#SPA0170,d1
+	move.w	#SPAgcatchlow,d1
 	bra.w	.8
 .2
 	cmpi.w	#$400,(puckvz).w
@@ -152,10 +152,10 @@ goaliesave							;The goalie a3 makes a save of the puck crossing at a0: the sav
 .4
 	cmp.w	#$A,d0
 	blt.w	.5
-	move.w	#SPA0074,d1
+	move.w	#SPAgglover2,d1
 	btst	#0,(jerseynum+1).w
 	beq.w	.3
-	move.w	#SPA02C0,d1
+	move.w	#SPAgglovel2,d1
 .3
 	bra.w	.8
 .5
@@ -165,7 +165,7 @@ goaliesave							;The goalie a3 makes a save of the puck crossing at a0: the sav
 	beq.w	.8
 	cmpi.b	#$B,$74(a3)
 	blt.w	.8
-	move.w	#SPA02C0,d1
+	move.w	#SPAgglovel2,d1
 .8
 	bsr.w	SetSPA
 	addi.w	#$96,(Crowdlevel).w
@@ -197,7 +197,7 @@ goaliesave							;The goalie a3 makes a save of the puck crossing at a0: the sav
 
 saveanim							;SPA per save type
 	dc.w	SPAgglover,SPAgglovel,SPAgstackr,SPAgstackl,SPAgstickr,SPAgstickl
-	dc.w	SPAgglover,SPAgglovel,SPAgstickr,SPAgstickl,SPA0074,SPA02C0
+	dc.w	SPAgglover,SPAgglovel,SPAgstickr,SPAgstickl,SPAgglover2,SPAgglovel2
 
 assgoalietopuck						;asstab entry: the goalie skates to the loose puck.
 									;Code the listing does not decode: kept as bytes

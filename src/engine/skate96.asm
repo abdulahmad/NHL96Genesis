@@ -17,13 +17,13 @@ doplayeracc							;Player acceleration toward direction d0 by his speed rating (
 	move.w	(puckc).w,d1
 	cmp.w	SCnum(a3),d1
 	bne.w	.1
-	move.w	#$856,d1
+	move.w	#SPAglide,d1
 	bra.w	.d0
 .1
-	move.w	#$856,d1
+	move.w	#SPAglide,d1
 	btst	#pfrev,pflags(a3)
 	beq.w	.d0
-	move.w	#$856,d1
+	move.w	#SPAglide,d1
 .d0
 	andi.w	#$F,d0					;pass first 4 bits of d0
 	cmp.w	#7,d0					;compare to 7
@@ -156,7 +156,7 @@ doplayeracc							;Player acceleration toward direction d0 by his speed rating (
 	beq.w	.20
 	eori.w	#$FFCE,d1
 .20
-	addi.w	#$2052,d1
+	addi.w	#SPAturnr,d1
 	bset	#pf2aip,pflags2(a3)
 .11
 	bsr.w	SetSPA
@@ -222,7 +222,7 @@ goalieacc							;Goalie movement
 	bsr.w	AdjustFacingDirection
 	movem.w	(sp)+,d0-d1
 .8
-	move.w	#$712,d1
+	move.w	#SPAgready,d1
 	btst	#pf2aip,pflags2(a3)
 	bne.w	.15
 	bsr.w	SetSPA
@@ -280,7 +280,7 @@ goalieacc							;Goalie movement
 .27
 	bra.w	playeracc
 .28
-	move.w	#$712,d1
+	move.w	#SPAgready,d1
 	btst	#pfjoycon,pflags(a3)
 	beq.w	.goalieacc2
 	btst	#pf3gctrl,pflags3(a3)
@@ -336,7 +336,7 @@ goalieacc							;Goalie movement
 	andi.w	#7,d0
 	move.w	d0,facedir(a3)
 .18
-	move.w	#$640,d1
+	move.w	#SPAgskate,d1
 	bsr.w	SetSPA
 	move.w	facedir(a3),d2
 	bra.w	playeracc
@@ -370,28 +370,28 @@ noturn0								;doplayeracc: no turn
 	move.w	(puckc).w,d1
 	cmp.w	$52(a3),d1
 	bne.w	.26
-	move.w	#$856,d1
+	move.w	#SPAglide,d1
 	bra.w	.27
 .26
-	move.w	#$856,d1
+	move.w	#SPAglide,d1
 	btst	#4,$62(a3)
 	beq.w	SetSPA
-	move.w	#$856,d1
+	move.w	#SPAglide,d1
 .27
 	bra.w	SetSPA
 .28
-	move.w	#$888,d1
+	move.w	#SPAskateback,d1
 	btst	#4,$62(a3)
 	bne.w	.9
-	move.w	#$2952,d1
+	move.w	#SPAskate,d1
 	btst	#6,$63(a3)
 	beq.w	.3
-	move.w	#$12EC,d1
+	move.w	#SPAstumble,d1
 .3
 	move.w	(puckc).w,d4
 	cmp.w	$52(a3),d4
 	bne.w	.9
-	move.w	#$744,d1
+	move.w	#SPAskatewp,d1
 .9
 	btst	#1,$63(a3)
 	bne.w	noturn
@@ -406,9 +406,9 @@ playeracc							;Player acceleration with facing d2 (doplayeracc entry used by t
 									;and input code)
 	asl.w	#2,d2
 	lea	dirtab(pc),a0
-	cmpi.w	#$2052,SPA(a3)
+	cmpi.w	#SPAturnr,SPA(a3)
 	beq.w	.0
-	cmpi.w	#$2020,SPA(a3)
+	cmpi.w	#SPAturnl,SPA(a3)
 	bne.w	.1
 .0
 	lea	dirtab2(pc),a0
@@ -593,15 +593,15 @@ dostop								;stop skating: user players and CPU players take separate paths
 	move.w	(puckc).w,d1
 	cmp.w	$52(a3),d1
 	bne.w	.1
-	move.w	#$856,d1
+	move.w	#SPAglide,d1
 	bra.w	.2
 .1
-	move.w	#$856,d1
+	move.w	#SPAglide,d1
 .2
 	btst	#4,$62(a3)
 	bne.w	.0
 	bset	#1,$63(a3)
-	move.w	#$281A,d1
+	move.w	#SPAstop,d1
 .0
 	bsr.w	SetSPA
 	tst.w	$34(a3)

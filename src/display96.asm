@@ -546,9 +546,9 @@ setsortcords						;Setup sort cord graphics: addframe for the 16 objects in OOli
 	movea.w	#(SortCords-M68K_RAM),a3	;Sort Cord struct start into a3
 	adda.w	d1,a3					;add offset to next struct
 	move.b	4(a3),-(sp)
-	cmpi.w	#$AF4,$58(a3)
+	cmpi.w	#SPAboxwallleft,$58(a3)
 	beq.w	.0
-	cmpi.w	#$2084,$58(a3)
+	cmpi.w	#SPAboardmidl,$58(a3)
 	bne.w	.1
 .0
 	bclr	#3,4(a3)

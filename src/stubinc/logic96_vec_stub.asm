@@ -16,6 +16,5 @@ HotList = $13938E					;graphics96
 SetSPA = $01A614					;skate96
 SPApflip = $2BBA					;SPA value (frames96)
 
-
 ; Main segment code
 	include	engine\logic96_vec.asm
