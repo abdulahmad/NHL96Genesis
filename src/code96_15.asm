@@ -156,15 +156,26 @@ chkFgtBit1							;Z set when $77(a2) is 2 or less (d0 kept)
 	movem.w	(sp)+,d0
 .1
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$48,$E7,$00,$80,$20,$7C,$00,$1D,$90,$D0,$30,$3C,$00,$64,$4E,$B9
-	dc.b	$00,$01,$B0,$A6,$02,$40,$00,$07,$D0,$40,$30,$30,$00,$00,$0C,$78
-	dc.b	$FF,$C0,$BF,$E2,$6E,$00,$00,$10,$0C,$78,$00,$C0,$BF,$E4,$6E,$00
-	dc.b	$00,$06,$30,$3C,$00,$06,$4C,$DF,$01,$00,$4E,$75,$00,$03,$00,$05
-	dc.b	$00,$03,$00,$01,$00,$05,$00,$02,$00,$03,$00,$03,$FF,$FF,$48,$E7
-	dc.b	$E0,$E0,$20,$7C,$FF,$FF,$C7,$26,$22,$7C,$FF,$FF,$CA,$C4,$30,$28
-	dc.b	$00,$24,$90,$69,$00,$24,$67,$00,$00,$12,$6A,$00,$00,$04,$C1,$49
-	dc.b	$0C,$68,$00,$06,$00,$28,$66,$00,$00,$02,$4C,$DF,$07,$07,$4E,$75
+	movem.l	a0,-(sp)
+	movea.l	#$1D90D0,a0
+	move.w	#$64,d0
+	jsr	(randomd0).l
+	andi.w	#7,d0
+	add.w	d0,d0
+	move.w	(a0,d0.w),d0
+	cmpi.w	#$FFC0,(fox).w
+	bgt.w	.2
+	cmpi.w	#$C0,(foy).w
+	bgt.w	.2
+	move.w	#6,d0
+.2
+	movem.l	(sp)+,a0
+	rts
+	dc.w	$0003,$0005,$0003,$0001,$0005,$0002,$0003,$0003
+	dc.w	$FFFF,$48E7,$E0E0,$207C,$FFFF,$C726,$227C,$FFFF
+	dc.w	$CAC4,$3028,$0024,$9069,$0024,$6700,$0012,$6A00
+	dc.w	$0004,$C149,$0C68,$0006,$0028,$6600,$0002,$4CDF
+	dc.w	$0707,$4E75
 
 HiScoreScreen						;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up to $50 * 4
 									;frames or a button (waitx)
@@ -226,9 +237,12 @@ HiScoreScreen						;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up t
 	jsr	(forceblack).l
 	move	#$2700,sr
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$24,$7C,$FF,$FF,$C7,$26,$B4,$6A,$00,$28,$67,$00,$00,$08,$24,$7C
-	dc.b	$FF,$FF,$CA,$C4,$4E,$75
+	movea.l	#tmstruct,a2
+	cmp.w	Xvel(a2),d2
+	beq.w	.1
+	movea.l	#AwShots,a2
+.1
+	rts
 
 PrepShotPass						;Called before setpassmode / SetShotMode. Loads TempWord1 to d1 when the
 									;clock is running, then the movem restores d1 so it has no effect.
@@ -239,20 +253,26 @@ PrepShotPass						;Called before setpassmode / SetShotMode. Loads TempWord1 to d
 .0
 	movem.l	(sp)+,d1-d7/a0
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$48,$E7,$FF,$FE,$22,$7C,$FF,$FF,$DC,$AE,$4E,$B9,$00,$1E,$6B,$24
-	dc.b	$30,$38,$D3,$C0,$13,$BC,$00,$00,$00,$00,$52,$40,$02,$40,$FF,$FE
-	dc.b	$33,$40,$FF,$FE,$4C,$DF,$7F,$FF,$4E,$75,$48,$E7,$FF,$BE,$30,$38
-	dc.b	$D2,$48,$4A,$40,$67,$00,$00,$80,$22,$7C,$FF,$FF,$D3,$AE,$31,$C0
-	dc.b	$D3,$C2,$4E,$B9,$00,$1E,$6B,$24,$D2,$F8,$D3,$C0,$12,$BC,$00,$00
-	dc.b	$52,$78,$D3,$C0,$02,$78,$FF,$FE,$D3,$C0,$54,$78,$D3,$C0,$31,$F8
-	dc.b	$D3,$C0,$D3,$AC,$22,$7C,$FF,$FF,$D3,$AC,$2F,$09,$26,$7C,$FF,$FF
-	dc.b	$BF,$54,$22,$7C,$00,$1D,$92,$C8,$61,$00,$E7,$F4,$22,$5F,$26,$7C
-	dc.b	$FF,$FF,$BF,$54,$4E,$B9,$00,$01,$BE,$80,$26,$7C,$FF,$FF,$BF,$54
-	dc.b	$4E,$B9,$00,$01,$BE,$78,$00,$04,$29,$00,$22,$7C,$FF,$FF,$BF,$54
-	dc.b	$4C,$DF,$7D,$FF,$4E,$75,$00,$0E,$28,$70,$6C,$61,$79,$65,$64,$20
-	dc.b	$62,$79,$20,$00,$00,$02,$22,$7C,$00,$1D,$92,$D6,$60,$E2,$48,$E7
-	dc.b	$FF,$BE,$30,$38,$D2,$4A,$60,$00,$FF,$6A
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	#OptPad+8,a1
+	jsr	(GetLogName).l
+	move.w	(NameEntryLen).w,d0
+	move.b	#0,(a1,d0.w)
+	addq.w	#1,d0
+	andi.w	#$FFFE,d0
+	move.w	d0,-$2(a1)
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+	dc.w	$48E7,$FFBE,$3038,$D248,$4A40,$6700,$0080,$227C
+	dc.w	$FFFF,$D3AE,$31C0,$D3C2,$4EB9,$001E,$6B24,$D2F8
+	dc.w	$D3C0,$12BC,$0000,$5278,$D3C0,$0278,$FFFE,$D3C0
+	dc.w	$5478,$D3C0,$31F8,$D3C0,$D3AC,$227C,$FFFF,$D3AC
+	dc.w	$2F09,$267C,$FFFF,$BF54,$227C,$001D,$92C8,$6100
+	dc.w	$E7F4,$225F,$267C,$FFFF,$BF54,$4EB9,$0001,$BE80
+	dc.w	$267C,$FFFF,$BF54,$4EB9,$0001,$BE78,$0004,$2900
+	dc.w	$227C,$FFFF,$BF54,$4CDF,$7DFF,$4E75,$000E,$2870
+	dc.w	$6C61,$7965,$6420,$6279,$2000,$0002,$227C,$001D
+	dc.w	$92D6,$60E2,$48E7,$FFBE,$3038,$D24A,$6000,$FF6A
 
 SetSflags8Bit1						;Always sets sflags8 bit 1 (the bclr is skipped)
 	bra.w	.0
@@ -260,12 +280,31 @@ SetSflags8Bit1						;Always sets sflags8 bit 1 (the bclr is skipped)
 .0
 	bset	#1,(sflags8).w
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$B0,$7C,$00,$50,$6C,$00,$00,$08,$E2,$40,$06,$40,$00,$28,$4E,$75
-	dc.b	$48,$A7,$C0,$00,$30,$38,$B7,$5E,$90,$53,$B0,$7C,$00,$1E,$6E,$00
-	dc.b	$00,$2A,$32,$38,$B7,$86,$B3,$40,$02,$40,$80,$00,$67,$00,$00,$1C
-	dc.b	$30,$38,$B7,$72,$90,$6B,$00,$14,$B0,$7C,$00,$1E,$6E,$00,$00,$0C
-	dc.b	$32,$38,$B7,$88,$B3,$40,$02,$40,$80,$00,$4C,$9F,$00,$03,$4E,$75
+	cmp.w	#$50,d0
+	bge.w	.exit
+	asr.w	#1,d0
+	addi.w	#$28,d0
+.exit
+	rts
+	movem.w	d0-d1,-(sp)
+	move.w	(puckx).w,d0
+	sub.w	(a3),d0
+	cmp.w	#$1E,d0
+	bgt.w	.next
+	move.w	(puckvx).w,d1
+	eor.w	d1,d0
+	andi.w	#$8000,d0
+	beq.w	.next
+	move.w	(pucky).w,d0
+	sub.w	Ypos(a3),d0
+	cmp.w	#$1E,d0
+	bgt.w	.next
+	move.w	(puckvy).w,d1
+	eor.w	d1,d0
+	andi.w	#$8000,d0
+.next
+	movem.w	(sp)+,d0-d1
+	rts
 
 ReadGoaliePulled					;Z clear when the team of a3 pulled its goalie ($26 of the team struct).
 									;Called from doshot, assdefo asspuckc

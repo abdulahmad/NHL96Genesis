@@ -280,16 +280,44 @@ EndShootout							;Shootout over: LockScroll, then the 5 skaters of player slots
 	dbf	d2,.loop
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$48,$E7,$FF,$80,$3E,$2B,$00,$34,$53,$47,$20,$7C,$00,$1D,$84,$B4
-	dc.b	$08,$2B,$00,$07,$00,$62,$67,$00,$00,$08,$20,$7C,$00,$1D,$84,$C4
-	dc.b	$DE,$47,$30,$30,$70,$00,$B0,$6B,$00,$44,$6D,$00,$00,$06,$37,$40
-	dc.b	$00,$44,$30,$30,$70,$02,$B0,$6B,$00,$44,$6E,$00,$00,$06,$37,$40
-	dc.b	$00,$44,$30,$30,$70,$04,$B0,$6B,$00,$46,$6D,$00,$00,$06,$37,$40
-	dc.b	$00,$46,$30,$30,$70,$06,$B0,$6B,$00,$46,$6E,$00,$00,$06,$37,$40
-	dc.b	$00,$46,$4C,$DF,$01,$FF,$4E,$75,$FF,$B5,$00,$00,$00,$00,$01,$1E
-	dc.b	$00,$00,$00,$4B,$00,$00,$01,$1E,$FF,$B5,$00,$00,$FE,$E2,$00,$00
-	dc.b	$00,$00,$00,$4B,$FE,$E2,$00,$00
+	movem.l	d0-d7/a0,-(sp)
+	move.w	position(a3),d7
+	subq.w	#1,d7					;position 1 is entry 0
+	movea.l	#$1D84B4,a0
+	btst	#pfgoal,pflags(a3)		;which net?
+	beq.w	.3
+	movea.l	#$1D84C4,a0
+	;position boxes for his end
+.3
+	add.w	d7,d7					;word per position
+	move.w	(a0,d7.w),d0			;X min of the box
+	cmp.w	temp3(a3),d0
+	blt.w	.4
+	move.w	d0,temp3(a3)			;clamp to the left
+	;X not left of the box
+.4
+	move.w	2(a0,d7.w),d0			;X max of the box
+	cmp.w	temp3(a3),d0
+	bgt.w	.5
+	move.w	d0,temp3(a3)			;clamp to the right
+	;X inside the box
+.5
+	move.w	4(a0,d7.w),d0			;Y min of the box
+	cmp.w	temp4(a3),d0
+	blt.w	.6
+	move.w	d0,temp4(a3)			;clamp to the bottom
+	;Y not below the box
+.6
+	move.w	6(a0,d7.w),d0			;Y max of the box
+	cmp.w	temp4(a3),d0
+	bgt.w	.7
+	move.w	d0,temp4(a3)			;clamp to the top
+	;exit: restore the registers
+.7
+	movem.l	(sp)+,d0-d7/a0
+	rts
+	dc.w	$FFB5,$0000,$0000,$011E,$0000,$004B,$0000,$011E
+	dc.w	$FFB5,$0000,$FEE2,$0000,$0000,$004B,$FEE2,$0000
 
 AddArenaAnimSprite					;Add the arena animation sprites; disabled in 96: the rts comes first and
 									;the body after it is dead
@@ -390,11 +418,16 @@ updatePPTeamTime					;Power play time of the teams, once a second. Called from u
 	addq.w	#1,$38C(a2)
 .x
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$48,$E7,$7F,$FE,$30,$2A,$00,$28,$20,$7C,$00,$1D,$86,$5A,$42,$41
-	dc.b	$12,$30,$00,$00,$30,$01,$4C,$DF,$7F,$FE,$4E,$75,$33,$4C,$49,$4B
-	dc.b	$4E,$43,$4B,$43,$34,$42,$4A,$49,$44,$42,$4A,$37,$45,$4B,$47,$38
-	dc.b	$45,$38,$48,$47,$48,$46,$5B,$59
+	movem.l	d1-d7/a0-a6,-(sp)
+	move.w	Xvel(a2),d0
+	movea.l	#$1D865A,a0
+	clr.w	d1
+	move.b	(a0,d0.w),d1
+	move.w	d1,d0
+	movem.l	(sp)+,d1-d7/a0-a6
+	rts
+	dc.w	$334C,$494B,$4E43,$4B43,$3442,$4A49,$4442,$4A37
+	dc.w	$454B,$4738,$4538,$4847,$4846,$5B59
 
 ShortenMsgTimer						;Cap the message timer at 2, unless a second pad is on and a3 is not the
 									;puck carrier
@@ -530,10 +563,15 @@ RunArenaAnim						;Run the arena animation (load its frames and tiles, step the 
 
 StartArenaAnim						;Start arena animation d0; disabled in 96 by the leading rts
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$48,$E7,$FF,$FE,$31,$C0,$D4,$74,$21,$FC,$00,$00,$00,$00,$D4,$76
-	dc.b	$21,$FC,$00,$00,$00,$00,$D4,$7A,$31,$FC,$00,$01,$D4,$6E,$42,$78
-	dc.b	$D4,$70,$50,$F8,$D4,$7E,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	move.w	d0,(arenaanim).w
+	move.l	#$0,(arenaanim+2).w		;RunArenaAnim loads the lists
+	move.l	#$0,(arenaanim+6).w
+	move.w	#1,($FFFFD46E).w		;first frame
+	clr.w	($FFFFD470).w
+	st	(faceoffanim).w				;no faceoff animation queued
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 SetFaceoffAnim						;Set the faceoff animation d0 (sflags7 bit 0)
 	bset	#0,(sflags7).w

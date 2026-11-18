@@ -93,20 +93,47 @@ puckfaceoff							;Puck assignment: the faceoff set up
 	dc.b	$9D,$0C,$60,$00,$00,$9C
 
 SetFaceoffComputerLine				;Line changes on and team d0 not on a pad: CompLine, SetPersonel
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$4A,$78,$D2,$64,$66,$00,$00,$44,$08,$38,$00,$04,$C3,$4A,$66,$00
-	dc.b	$00,$22,$B0,$78,$C3,$90,$67,$00,$00,$32,$B0,$78,$C3,$92,$67,$00
-	dc.b	$00,$2A,$B0,$78,$C3,$94,$67,$00,$00,$22,$B0,$78,$C3,$96,$67,$00
-	dc.b	$00,$1A,$4E,$B9,$00,$01,$98,$68,$4E,$B9,$00,$01,$FB,$52,$4E,$B9
-	dc.b	$00,$01,$D0,$62,$31,$FC,$27,$10,$C3,$68,$4E,$75
+	tst.w	(OptLine).w
+	bne.w	.2
+	btst	#4,(sflags7).w
+	bne.w	.1
+	cmp.w	(cont1team).w,d0
+	beq.w	.2
+	cmp.w	(cont2team).w,d0
+	beq.w	.2
+	cmp.w	(cont3team).w,d0
+	beq.w	.2
+	cmp.w	(cont4team).w,d0
+	beq.w	.2
+.1
+	jsr	(CompLine).l
+	jsr	(setpersonel).l
+	jsr	(printscores1).l
+	move.w	#$2710,(crowdnoisedelay).w
+.2
+	rts
 
 StartFaceoffLineChange				;Player d0 (sort object) opens the line change box
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$C5,$4B,$EF,$40,$36,$7C,$B0,$5E,$D6,$C0,$08,$AB,$00,$03,$00,$63
-	dc.b	$2F,$0A,$4E,$B9,$00,$00,$EC,$30,$24,$5F,$08,$2B,$00,$03,$00,$63
-	dc.b	$67,$00,$00,$28,$08,$2B,$00,$06,$00,$62,$67,$00,$00,$12,$35,$7C
-	dc.b	$01,$68,$00,$42,$35,$6B,$00,$52,$00,$46,$60,$00,$00,$0E,$35,$7C
-	dc.b	$02,$58,$00,$40,$35,$6B,$00,$52,$00,$44,$C5,$4B
+	exg	a2,a3
+	asl.w	#7,d0
+	movea.w	#(SortCords-M68K_RAM),a3
+	adda.w	d0,a3
+	bclr	#pf2lcm,pflags2(a3)
+	move.l	a2,-(sp)
+	jsr	(SetLCmode).l
+	movea.l	(sp)+,a2
+	btst	#pf2lcm,pflags2(a3)
+	beq.w	.2
+	btst	#pfteam,pflags(a3)
+	beq.w	.1
+	move.w	#$168,temp2(a2)
+	move.w	SCnum(a3),temp4(a2)
+	bra.w	.2
+.1
+	move.w	#$258,temp1(a2)
+	move.w	SCnum(a3),temp3(a2)
+.2
+	exg	a2,a3
 
 rtsfaceoff							;The shared rts of the faceoff routines
 	dc.b	$4E,$75
@@ -130,73 +157,276 @@ UpdateFaceoffLineChangeTimer		;Line change timer d0 (temp1 / temp2 of the puck)
 	dc.b	$4E,$F9,$00,$02,$15,$DC,$4E,$F9,$00,$01,$C7,$84
 
 puckfaceoff2						;Puck assignment: the faceoff
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$08,$AB,$00,$01,$00,$62,$67,$00,$03,$DE,$08,$B8,$00,$01,$C3,$56
-	dc.b	$08,$B8,$00,$02,$C3,$40,$08,$B8,$00,$05,$C3,$40,$08,$B8,$00,$00
-	dc.b	$C3,$42,$08,$B8,$00,$01,$C3,$42,$08,$B8,$00,$00,$C3,$4E,$08,$B8
-	dc.b	$00,$01,$C3,$4E,$08,$B8,$00,$02,$C3,$4E,$48,$E7,$FF,$FE,$4E,$B9
-	dc.b	$00,$01,$AF,$52,$08,$38,$00,$00,$BF,$B2,$66,$F8,$08,$B8,$00,$00
-	dc.b	$C3,$5A,$40,$E7,$31,$FC,$00,$3C,$D2,$E0,$4A,$78,$BF,$E2,$66,$00
-	dc.b	$00,$14,$4A,$78,$BF,$E4,$66,$00,$00,$0C,$31,$FC,$FF,$FF,$D4,$7E
-	dc.b	$60,$00,$00,$06,$46,$FC,$27,$00,$0C,$78,$02,$58,$B8,$B2,$63,$00
-	dc.b	$00,$08,$31,$FC,$02,$58,$B8,$B2,$08,$F8,$00,$03,$BF,$B2,$08,$B8
-	dc.b	$00,$00,$C3,$3A,$08,$B8,$00,$00,$C3,$3E,$31,$FC,$03,$E8,$BF,$16
-	dc.b	$31,$FC,$03,$E8,$BF,$14,$42,$38,$BF,$BA,$50,$F8,$C4,$46,$50,$F8
-	dc.b	$BF,$1C,$50,$F8,$BF,$20,$08,$B8,$00,$01,$C3,$3C,$08,$F8,$00,$00
-	dc.b	$C3,$3C,$08,$F8,$00,$02,$C3,$3C,$50,$F8,$BF,$12,$50,$F8,$BF,$A6
-	dc.b	$08,$F8,$00,$04,$BF,$B2,$08,$B8,$00,$04,$C3,$4E,$4E,$B9,$00,$01
-	dc.b	$D0,$1E,$31,$FC,$27,$10,$C3,$68,$42,$78,$BD,$2E,$42,$78,$BD,$32
-	dc.b	$31,$F8,$BF,$E2,$B7,$5E,$31,$F8,$BF,$E4,$B7,$72,$50,$F8,$B7,$76
-	dc.b	$42,$78,$B7,$86,$42,$78,$B7,$88,$42,$78,$B7,$8A,$50,$F8,$B7,$BE
-	dc.b	$30,$7C,$B6,$5E,$42,$68,$00,$28,$42,$68,$00,$2A,$42,$50,$31,$7C
-	dc.b	$01,$22,$00,$14,$D0,$FC,$00,$80,$42,$68,$00,$28,$42,$68,$00,$2A
-	dc.b	$42,$50,$31,$7C,$FE,$DE,$00,$14,$30,$7C,$B7,$DE,$31,$7C,$02,$99
-	dc.b	$00,$06,$42,$68,$00,$58,$42,$68,$00,$04,$42,$78,$B7,$62,$08,$B8
-	dc.b	$00,$06,$C3,$3A,$78,$64,$4E,$B9,$00,$01,$67,$9A,$51,$CC,$FF,$F8
-	dc.b	$31,$FC,$00,$3C,$BF,$E0,$4E,$B9,$00,$01,$FD,$F4,$34,$7C,$C7,$26
-	dc.b	$4E,$B9,$00,$01,$FB,$52,$4E,$B9,$00,$01,$FD,$82,$D4,$FC,$03,$9E
-	dc.b	$4E,$B9,$00,$01,$FB,$52,$4E,$B9,$00,$01,$FD,$82,$4E,$B9,$00,$02
-	dc.b	$14,$30,$2F,$0B,$36,$7C,$B0,$5E,$74,$0B,$36,$BC,$FF,$10,$42,$6B
-	dc.b	$00,$14,$42,$6B,$00,$06,$32,$2B,$00,$34,$6B,$00,$00,$FE,$67,$00
-	dc.b	$00,$4C,$20,$3C,$00,$00,$00,$16,$B2,$7C,$00,$04,$66,$00,$00,$38
-	dc.b	$34,$7C,$C7,$26,$08,$2B,$00,$06,$00,$62,$67,$00,$00,$06,$D4,$FC
-	dc.b	$03,$9E,$42,$6A,$00,$18,$15,$6B,$00,$67,$00,$19,$08,$B8,$00,$07
-	dc.b	$C3,$4C,$50,$EA,$00,$1A,$50,$EA,$00,$1C,$08,$AA,$00,$03,$00,$30
-	dc.b	$20,$3C,$00,$00,$00,$17,$4E,$B9,$00,$01,$A3,$D0,$38,$38,$C7,$4A
-	dc.b	$08,$2B,$00,$06,$00,$62,$67,$00,$00,$06,$38,$38,$CA,$E8,$44,$44
-	dc.b	$5C,$44,$E7,$44,$22,$7C,$00,$00,$A2,$6C,$D2,$C4,$18,$31,$10,$00
-	dc.b	$E5,$44,$22,$7C,$00,$00,$A2,$84,$30,$31,$40,$00,$32,$31,$40,$02
-	dc.b	$08,$2B,$00,$07,$00,$62,$66,$00,$00,$06,$44,$40,$44,$41,$4A,$6B
-	dc.b	$00,$34,$67,$00,$00,$2C,$B8,$7C,$00,$08,$6E,$00,$00,$1C,$36,$38
-	dc.b	$BF,$E2,$B1,$43,$6A,$00,$00,$0A,$36,$38,$BF,$E4,$E6,$43,$92,$43
-	dc.b	$36,$38,$BF,$E2,$E4,$43,$90,$43,$D0,$78,$BF,$E2,$D2,$78,$BF,$E4
-	dc.b	$36,$80,$37,$41,$00,$14,$42,$6B,$00,$28,$42,$6B,$00,$2A,$90,$78
-	dc.b	$B7,$5E,$92,$78,$B7,$72,$44,$40,$44,$41,$4E,$B9,$00,$01,$A3,$EE
-	dc.b	$37,$40,$00,$54,$08,$AB,$00,$02,$00,$63,$08,$AB,$00,$05,$00,$62
-	dc.b	$32,$3C,$08,$56,$4E,$B9,$00,$01,$A6,$14,$D6,$FC,$00,$80,$51,$CA
-	dc.b	$FE,$EA,$4E,$B9,$00,$02,$13,$AE,$26,$5F,$4E,$B9,$00,$01,$99,$66
-	dc.b	$38,$38,$B0,$3A,$24,$7C,$00,$09,$1D,$4E,$4E,$B9,$00,$01,$B7,$30
-	dc.b	$31,$C4,$B0,$26,$24,$7C,$00,$13,$BC,$B8,$4E,$B9,$00,$01,$B7,$30
-	dc.b	$31,$FC,$FF,$FF,$D4,$74,$08,$38,$00,$00,$C3,$4A,$67,$00,$00,$10
-	dc.b	$30,$38,$D4,$7E,$6B,$00,$00,$08,$4E,$B9,$00,$1D,$8A,$86,$61,$00
-	dc.b	$01,$4E,$30,$3C,$00,$78,$4E,$B9,$00,$01,$B0,$A6,$06,$40,$01,$2C
-	dc.b	$0C,$78,$00,$00,$D4,$74,$67,$00,$00,$2A,$0C,$78,$00,$01,$D4,$74
-	dc.b	$67,$00,$00,$20,$0C,$78,$00,$05,$D4,$74,$67,$00,$00,$16,$0C,$78
-	dc.b	$00,$04,$D4,$74,$67,$00,$00,$0C,$0C,$78,$00,$02,$D4,$74,$66,$00
-	dc.b	$00,$0E,$B0,$7C,$01,$86,$6E,$00,$00,$06,$30,$3C,$01,$86,$37,$40
-	dc.b	$00,$40,$31,$FC,$00,$18,$BD,$3C,$20,$7C,$FF,$FF,$BD,$BE,$30,$BC
-	dc.b	$00,$01,$31,$7C,$80,$00,$00,$02,$31,$7C,$00,$04,$00,$04,$31,$7C
-	dc.b	$A8,$00,$00,$06,$31,$7C,$00,$07,$00,$08,$31,$7C,$80,$00,$00,$0A
-	dc.b	$08,$38,$00,$01,$C3,$38,$66,$00,$00,$0E,$0A,$68,$08,$00,$00,$02
-	dc.b	$0A,$68,$08,$00,$00,$06,$31,$FC,$FF,$FF,$BF,$E6,$31,$FC,$FF,$FF
-	dc.b	$BF,$E8,$4E,$B9,$00,$1D,$97,$48,$08,$B8,$00,$06,$C3,$4C,$66,$00
-	dc.b	$00,$0C,$08,$B8,$00,$04,$C3,$4C,$67,$00,$00,$12,$08,$B8,$00,$04
-	dc.b	$C3,$4C,$3F,$38,$D4,$8A,$4E,$B9,$00,$08,$85,$86,$31,$FC,$00,$78
-	dc.b	$C3,$A4,$4E,$B9,$00,$1E,$78,$C4,$31,$FC,$00,$18,$BD,$3C,$46,$DF
-	dc.b	$4C,$DF,$7F,$FF,$4E,$75,$53,$78,$C3,$A4,$66,$00,$00,$14,$4E,$B9
-	dc.b	$00,$1E,$7A,$78,$08,$B8,$00,$02,$C3,$56,$08,$F8,$00,$03,$C3,$56
-	dc.b	$53,$6B,$00,$40,$6A,$00,$00,$0E,$4E,$B9,$00,$1D,$8A,$C0,$4E,$F9
-	dc.b	$00,$00,$A3,$DC,$4E,$F9,$00,$01,$9B,$16
+	bclr	#pfna,pflags(a3)
+	beq.w	.19
+	bclr	#1,(sflags12).w
+	bclr	#2,(BA_PS_flags).w
+	bclr	#5,(BA_PS_flags).w
+	bclr	#0,(sflags4).w
+	bclr	#1,(sflags4).w
+	bclr	#0,(sflags9).w
+	bclr	#1,(sflags9).w
+	bclr	#2,(sflags9).w
+	movem.l	d0-d7/a0-a6,-(sp)
+	jsr	(forceblack).l
+	;loop
+.loop
+	btst	#dfok,(disflags).w
+	bne.s	.loop
+	bclr	#0,(sflags14).w
+	move.w	sr,-(sp)
+	move.w	#$3C,(holdreset).w
+	tst.w	(fox).w
+	bne.w	.1
+	tst.w	(foy).w
+	bne.w	.1
+	move.w	#$FFFF,(faceoffanim).w
+	bra.w	.2
+.1
+	move.w	#$2700,sr
+	;cap the crowd level
+.2
+	cmpi.w	#$258,(Crowdlevel).w
+	bls.w	.3
+	move.w	#$258,(Crowdlevel).w	;limit crowd level
+	;crowd level set
+.3
+	bset	#dfclock,(disflags).w	;stop clock
+	bclr	#sfpz,(sflags).w		;no pause
+	bclr	#sf3llcs,(sflags3).w	;no line changes
+	move.w	#$3E8,(glovecords+2).w
+	move.w	#$3E8,(glovecords).w
+	clr.b	(lty+2).w				;no icing
+	st	(RefCnt).w					;no refs
+	st	(puckcross2).w				;no goalie moves
+	st	(puckcross6).w
+	bclr	#sf2refref,(sflags2).w	;no ref refresh
+	bset	#sf2faceoff,(sflags2).w	;face off in progress
+	bset	#sf2drec,(sflags2).w	;dont record yet
+	st	(passplayer).w
+	st	(onetimerplayer).w
+	bset	#dffaceoff,(disflags).w
+	bclr	#4,(sflags9).w
+	jsr	(ClrHor).l					;vertical ice rink
+	move.w	#$2710,(crowdnoisedelay).w
+	clr.w	(Vpos).w				;clear h/v pos
+	clr.w	(Hpos).w
+	move.w	(fox).w,(puckx).w		;puck on the face off spot (fox/foy)
+	move.w	(foy).w,(pucky).w
+	st	(puckz).w					;no visible puck
+	clr.w	(puckvx).w
+	clr.w	(puckvy).w
+	clr.w	(puckvz).w
+	st	(puckc).w					;nobody carries it
+	movea.w	#(SortCords+(12*SCstruct)-M68K_RAM),a0	;reposition goal nets
+	clr.w	$28(a0)					;Xvel
+	clr.w	$2A(a0)					;Yvel
+	clr.w	(a0)					;Xpos
+	move.w	#$122,$14(a0)
+	adda.w	#SCstruct,a0			;add SCstruct to move to next goal net
+	clr.w	$28(a0)
+	clr.w	$2A(a0)
+	clr.w	(a0)
+	move.w	#$FEDE,$14(a0)
+	movea.w	#(SortCords+((puckscnum+1)*SCstruct)-M68K_RAM),a0	;move to puck shadow SCnum
+	move.w	#$299,6(a0)
+	clr.w	$58(a0)					;SPA
+	clr.w	4(a0)					;attribute
+	clr.w	(puckx+4).w				;clear puck SCnum attribute
+	bclr	#sfslock,(sflags).w		;free up scrolling
+	moveq	#$64,d4					;run the scroll window 101 times so it settles
+	;run the scroll window 101 times so it settles
+.loop2
+	jsr	(checkwindow).l				;scroll to faceoff spot
+	dbf	d4,.loop2
+	move.w	#$3C,(yleader).w
+	jsr	(ResetBench).l
+	movea.w	#(tmstruct-M68K_RAM),a2	;set personnel and player data for both teams
+	jsr	(setpersonel).l
+	jsr	(forcepldata).l
+	adda.w	#$39E,a2
+	jsr	(setpersonel).l
+	jsr	(forcepldata).l
+	jsr	(resetplstuff).l
+	move.l	a3,-(sp)				;keep the puck pointer
+	movea.w	#(SortCords-M68K_RAM),a3
+	moveq	#$B,d2					;loop over the 12 players
+	;loop over the 12 players: park them off ice, then set the faceoff spots
+.loop3
+	move.w	#$FF10,(a3)				;-240, Xpos
+	clr.w	Ypos(a3)				;Ypos
+	clr.w	frame(a3)				;frame
+	move.w	position(a3),d1			;position
+	bmi.w	.12						;absent
+	beq.w	.6						;goalie: no assignment change
+	move.l	#$16,d0					;#afaceoff - assignment faceoff
+	cmp.w	#4,d1					;find the center (position 4)
+	bne.w	.5
+	movea.w	#(tmstruct-M68K_RAM),a2
+	btst	#pfteam,pflags(a3)		;#pfgoal - what goal to score on
+	beq.w	.4
+	adda.w	#$39E,a2
+	;clear the touches
+.4
+	clr.w	Zpos(a2)
+	move.b	weight(a3),$19(a2)
+	bclr	#7,(sflags8).w
+	st	$1A(a2)						;clear last player to touch puck (assist 1)
+	st	OldXpos(a2)					;clear second last player to touch puck (assist 2)
+	bclr	#3,limpact(a2)
+	move.l	#$17,d0					;#afaceoffpl - faceoff player assignment
+	;player position
+.5
+	jsr	(assinsert).l
+	;d4 = active players of this player's team
+.6
+	move.w	($FFFFC74A).w,d4		;tmap = active players on ice (4-6). (tmap).w
+	btst	#pfteam,pflags(a3)		;#pfteam - 0=home 1=away
+	beq.w	.7
+	move.w	($FFFFCAE8).w,d4		;(tmsize).w
+	;players to place
+.7
+	neg.w	d4						;d4 = 6 - active players: formation row
+	addq.w	#6,d4					;6 - active players
+	asl.w	#3,d4					;8 bytes per row of .apl
+	movea.l	#$A26C,a1
+	adda.w	d4,a1					;row for this team size ...
+	move.b	(a1,d1.w),d4
+	asl.w	#2,d4
+	movea.l	#$A284,a1
+	move.w	(a1,d4.w),d0
+	move.w	2(a1,d4.w),d1
+	btst	#pfgoal,pflags(a3)		;#pfgoal - 0=bottom, 1=top
+	bne.w	.8
+	neg.w	d0						;mirror for the team shooting the other way
+	neg.w	d1
+	;coordinates for his end
+.8
+	tst.w	position(a3)			;check for goalie
+	beq.w	.11
+	cmp.w	#8,d4
+	bgt.w	.10						;slots above 2 are not shifted by the spot
+	move.w	(fox).w,d3
+	eor.w	d0,d3
+	bpl.w	.9						;fox and slot x on the same side
+	move.w	(foy).w,d3
+	asr.w	#3,d3
+	sub.w	d3,d1					;opposite side: also pull y toward the spot
+	;pull the slot x toward the faceoff spot
+.9
+	move.w	(fox).w,d3				;pull x toward the spot by fox/4
+	asr.w	#2,d3
+	sub.w	d3,d0
+	;set the position
+.10
+	add.w	(fox).w,d0
+	add.w	(foy).w,d1
+	;place the player at the slot plus the spot
+.11
+	move.w	d0,(a3)					;Xpos
+	move.w	d1,Ypos(a3)				;Ypos
+	clr.w	Xvel(a3)				;Xvel
+	clr.w	Yvel(a3)				;Yvel
+	sub.w	(puckx).w,d0
+	sub.w	(pucky).w,d1
+	neg.w	d0
+	neg.w	d1
+	jsr	(vtoa).l					;face the direction from the puck to the player
+	move.w	d0,facedir(a3)			;facedir
+	bclr	#pf2unav,pflags2(a3)	;#pf2unav
+	bclr	#pfalock,pflags(a3)		;#pfalock
+	move.w	#SPAglide,d1
+	jsr	(SetSPA).l					;glide animation
+	;next player
+.12
+	adda.w	#$80,a3					;#Scstruct
+	dbf	d2,.loop3
+	jsr	(SprSort).l
+	movea.l	(sp)+,a3
+	jsr	(AssignPads).l
+	move.w	(ExtraChars).w,d4
+	movea.l	#$91D4E,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.w	d4,(faceoffvrcset).w
+	movea.l	#$13BCB8,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.w	#$FFFF,(arenaanim).w
+	btst	#0,(sflags7).w
+	beq.w	.13
+	move.w	(faceoffanim).w,d0
+	bmi.w	.13
+	jsr	(StartArenaAnim).l
+	;draw the faceoff window
+.13
+	bsr.w	DrawFaceoffWindow
+	;drop time
+	move.w	#$78,d0					;random time before the puck drop
+	jsr	(randomd0).l				;0-$77
+	addi.w	#$12C,d0
+	cmpi.w	#0,(arenaanim).w
+	beq.w	.14
+	cmpi.w	#1,(arenaanim).w
+	beq.w	.14
+	cmpi.w	#5,(arenaanim).w
+	beq.w	.14
+	cmpi.w	#4,(arenaanim).w
+	beq.w	.14
+	cmpi.w	#2,(arenaanim).w
+	bne.w	.15
+.14
+	cmp.w	#$186,d0
+	bgt.w	.15
+	move.w	#$186,d0
+	;set the drop time
+.15
+	move.w	d0,temp1(a3)			;time for puck drop
+	move.w	#$18,(palcount).w
+	movea.l	#fofdata2,a0			;second half of the big face off sprite data
+	move.w	#1,(a0)
+	move.w	#$8000,2(a0)
+	move.w	#4,4(a0)
+	move.w	#$A800,6(a0)
+	move.w	#7,8(a0)				;frame of ref
+	move.w	#$8000,$A(a0)
+	btst	#gmdir,(gmode).w		;#gmdir - 0 = home team goes up
+	bne.w	.16
+	eori.w	#$800,2(a0)				;flip attribute bit $800 (two of the sprites) when gmdir is clear
+	eori.w	#$800,6(a0)
+	;draw the faceoff sprites
+.16
+	move.w	#$FFFF,(fodir1).w		;-1
+	move.w	#$FFFF,(fodir2).w		;-1
+	jsr	(LeadSong).l
+	bclr	#6,(sflags8).w
+	bne.w	.17
+	bclr	#4,(sflags8).w
+	beq.w	.18
+	;play the queued song
+.17
+	bclr	#4,(sflags8).w
+	move.w	(SongNum).w,-(sp)
+	jsr	(song).l
+.18
+	move.w	#$78,(VisTeam+2).w
+	jsr	(ShowBigScore).l
+	move.w	#$18,(palcount).w
+	move.w	(sp)+,sr
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+.19
+	subq.w	#1,(VisTeam+2).w
+	bne.w	.20
+	jsr	(ClearBigScore).l
+	bclr	#2,(sflags12).w
+	bset	#3,(sflags12).w
+	;pfna was clear
+.20
+	subq.w	#1,temp1(a3)
+	bpl.w	.21
+	jsr	(EndArenaAnim).l
+	jmp	(Endfaceoff).l
+.21
+	jmp	(updatefaceoff).l
 .apl								;Faceoff positions of the players by line slot
 	dc.b	0,1,2,3,4,5,6,0
 	dc.b	0,1,5,3,4,2,0,0

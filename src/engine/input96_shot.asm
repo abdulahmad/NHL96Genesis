@@ -902,13 +902,31 @@ RoleTable							;Longs indexed by (role<<2)|puck X zone. Each long is a 6-byte r
 GetRoleAss							;d0 = the defensive assignment for a3's role, or 0 when OptSkill is
 									;rookie or the current assignment is already the offensive or
 									;defensive one for that role. Called from the asstab bodies.
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$48,$E7,$70,$80,$0C,$78,$00,$02,$D2,$68,$67,$00,$00,$44,$4A,$6B
-	dc.b	$00,$34,$6B,$00,$00,$3C,$42,$40,$10,$2B,$00,$65,$6A,$00,$00,$06
-	dc.b	$30,$2B,$00,$34,$32,$2B,$00,$36,$12,$33,$10,$38,$20,$7C,$00,$00
-	dc.b	$FF,$C2,$B2,$30,$00,$00,$67,$00,$00,$18,$20,$7C,$00,$00,$FF,$C9
-	dc.b	$B2,$30,$00,$00,$67,$00,$00,$0A,$10,$30,$00,$00,$60,$00,$00,$06
-	dc.b	$30,$3C,$00,$00,$4C,$DF,$01,$0E,$4E,$75
+	movem.l	d1-d3/a0,-(sp)
+	cmpi.w	#2,(OptSkill).w
+	beq.w	.2
+	tst.w	position(a3)
+	bmi.w	.2
+	clr.w	d0
+	move.b	glitch(a3),d0
+	bpl.w	.1
+	move.w	position(a3),d0
+.1
+	move.w	assnum(a3),d1
+	move.b	$38(a3,d1.w),d1
+	movea.l	#RoleAssOff,a0
+	cmp.b	(a0,d0.w),d1
+	beq.w	.2
+	movea.l	#$FFC9,a0
+	cmp.b	(a0,d0.w),d1
+	beq.w	.2
+	move.b	(a0,d0.w),d0
+	bra.w	.3
+.2
+	move.w	#0,d0
+.3
+	movem.l	(sp)+,d1-d3/a0
+	rts
 RoleAssOff							;Assignment numbers for roles 0-6: 7 offensive, then 7 defensive
 	dc.b	$00,$01,$01,$04,$06,$04,$06,$00,$02,$02,$03,$05,$03,$05
 
