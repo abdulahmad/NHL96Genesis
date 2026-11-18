@@ -34,6 +34,8 @@ SPAboardmidr = $24C4				;SPA value (frames96)
 SPAboardtop = $22AE					;SPA value (frames96)
 SPAglide = $856						;SPA value (frames96)
 vtoa = $01A3EE						;collide96_stub
+GetLogName = $1E6B24				;records96
+randomd0 = $01B0A6					;playoff96_stub
 
 
 ; Main segment code

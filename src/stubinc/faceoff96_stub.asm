@@ -29,6 +29,28 @@ DecompressGraphicsPlain = $01B730	;pause96_return_stub
 dirtab = $01AE60					;input96_shot_stub
 randomd0 = $01B0A6					;playoff96_stub
 sfx = $088470						;collide96_stub
+AssignPads = $019966				;shootout96_stub
+assinsert = $01A3D0					;collide96_stub
+checkwindow = $01679A				;control96
+ClearBigScore = $1E7A78				;goal96_box_stub
+ClrHor = $01D01E					;pause96_stub
+CompLine = $019868					;logic96_pull
+EndArenaAnim = $1D8AC0				;shootout96_path
+forceblack = $01AF52				;pause96_stub
+forcepldata = $01FD82				;players96
+LeadSong = $1D9748					;code96_15
+printscores1 = $01D062				;collide96_stub
+ResetBench = $01FDF4				;lines96_bar_stub
+resetplstuff = $021430				;display96
+SetLCmode = $00EC30					;input96_stub
+setpersonel = $01FB52				;shootout96_stub
+ShowBigScore = $1E78C4				;goal96_box_stub
+song = $088586						;goal96_box_stub
+SPAglide = $856						;frames96
+SprSort = $0213AE					;display96
+StartArenaAnim = $1D8A86			;goal96_box_stub
+updatefaceoff = $019B16				;logic96_pull
+vtoa = $01A3EE						;collide96_stub
 
 
 ; Main segment code

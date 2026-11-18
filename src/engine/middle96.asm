@@ -145,9 +145,10 @@ FormatPlayerNameLast				;FormatPlayerNameShort without the leading space ("Last"
 
 FormatPlayerNameShort				;a1 = mesarea string " Last" for player d0 of team a2, space padded to 12
 									;characters.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$F0,$A0,$4E,$B9,$00,$01,$01,$C6,$32,$7C,$BF,$F4,$12,$FC
-	dc.b	$00,$20
+	movem.l	d0-d3/a0/a2,-(sp)
+	jsr	(GetPlayerNamePointer).l
+	movea.w	#(TextBuffer-M68K_RAM),a1
+	move.b	#$20,(a1)+
 
 FormatLastName						;Skip the first name, copy the last name, pad; branched to from
 									;FormatPlayerNameLast.

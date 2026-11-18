@@ -350,21 +350,61 @@ a2offsides							;Offsides on a2 when his team is offside and the puck is past t
 
 a2touchpuck							;Player a2 touched the puck: last touch, scorer / assist slots, offsides,
 									;icing
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$31,$D2,$BF,$B6,$31,$EA,$00,$14,$BF,$B8
-	dc.b	$31,$EA,$00,$52,$BF,$B4,$30,$7C,$C7,$26,$08,$2A,$00,$06,$00,$62
-	dc.b	$67,$00,$00,$06,$41,$E8,$03,$9E,$42,$40,$10,$2A,$00,$67,$08,$2A
-	dc.b	$00,$03,$00,$64,$67,$00,$00,$08,$08,$F8,$00,$07,$C3,$4C,$B0,$68
-	dc.b	$00,$18,$67,$00,$00,$28,$08,$A8,$00,$03,$00,$30,$66,$00,$00,$0E
-	dc.b	$31,$68,$00,$1A,$00,$1C,$31,$68,$00,$18,$00,$1A,$31,$40,$00,$18
-	dc.b	$B0,$68,$00,$1C,$66,$00,$00,$06,$50,$E8,$00,$1C,$08,$B8,$00,$04
-	dc.b	$C3,$3C,$61,$00,$FF,$3C,$08,$38,$00,$02,$BF,$BA,$67,$00,$00,$4E
-	dc.b	$08,$38,$00,$00,$BF,$BA,$67,$00,$00,$44,$4A,$6A,$00,$34,$67,$00
-	dc.b	$00,$3C,$08,$38,$00,$01,$BF,$BA,$66,$00,$00,$2A,$08,$2A,$00,$07
-	dc.b	$00,$62,$67,$00,$00,$28,$42,$40,$10,$38,$BF,$BB,$EF,$40,$2F,$0B
-	dc.b	$36,$7C,$B0,$5E,$D6,$C0,$30,$3C,$00,$0C,$4E,$B9,$00,$01,$C1,$92
-	dc.b	$26,$5F,$4E,$75,$08,$2A,$00,$07,$00,$62,$67,$DA,$61,$00,$00,$04
-	dc.b	$4E,$75
+	move.w	(a2),(ltx).w			;move Xpos to last touch X
+	move.w	Ypos(a2),(lty).w		;move Ypos to last touch Y
+	move.w	SCnum(a2),(ltplayer).w	;move SCnum to last touch player
+	movea.w	#(tmstruct-M68K_RAM),a0	;move Home Shots into a0
+	btst	#pfteam,pflags(a2)		;check if home or away
+	beq.w	.1						;branch if home
+	lea	$39E(a0),a0
+.1
+	clr.w	d0
+	move.b	weight(a2),d0
+	btst	#pf3onetimer,pflags3(a2)	;check if one timer
+	beq.w	.2						;branch if not
+	bset	#7,(sflags8).w			;set if one timer
+.2
+	cmp.w	$18(a0),d0				;compare value in C6E6 (home) to d0
+	beq.w	.4						;branch if equal
+	bclr	#3,$30(a0)				;clear bit 3
+	bne.w	.3						;branch if not cleared before
+	move.w	$1A(a0),$1C(a0)			;move current player to assist slot
+	move.w	$18(a0),$1A(a0)			;move current player to last player slot
+.3
+	move.w	d0,$18(a0)				;move pnum into current player
+	cmp.w	$1C(a0),d0				;compare if same player as assist slot
+	bne.w	.4						;branch if not
+	st	$1C(a0)						;set FFFF to assist slot
+.4
+	bclr	#sf2shot,(sflags2).w	;clear shot taken
+	bsr.w	a2offsides
+	btst	#ifok,(lty+2).w			;check if icing
+	beq.w	.6						;branch if not
+	btst	#ifcgl,(lty+2).w		;test if crossed goalline
+	beq.w	.6						;branch if not
+	tst.w	position(a2)			;check if goalie
+	beq.w	.6						;branch if so
+	btst	#ifdir,(lty+2).w		;check if must cross top line
+	bne.w	.5						;branch if so
+	btst	#pfgoal,pflags(a2)		;check if top or bottom shooting goal
+	beq.w	.6						;branch if bottom
+.loop
+	clr.w	d0
+	move.b	(lty+3).w,d0			;move iflags+1 into d0
+	asl.w	#7,d0
+	move.l	a3,-(sp)				;push on stack
+	movea.w	#(SortCords-M68K_RAM),a3
+	adda.w	d0,a3					;a3 now player struct
+	move.w	#PenIcing,d0
+	jsr	(AddPenalty).l
+	movea.l	(sp)+,a3
+	rts
+.5
+	btst	#pfgoal,pflags(a2)		;check top or bottom shooting goal
+	beq.s	.loop					;branch if bottom
+.6
+	bsr.w	ArmIcing
+	rts
 
 ArmIcing							;Icing start for a2: iflags cleared, icingPlayer, direction; bit 2 when
 									;shot from his own half and not short
