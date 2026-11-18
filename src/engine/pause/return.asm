@@ -85,7 +85,7 @@ RestoreGameScreen					;Rebuild the game screen: the vdp maps, palettes, vram, fr
 	movea.l	#EnergyBarMap+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	move.w	(animchars).w,d4
-	movea.l	#Crowdframelist+8,a2
+	movea.l	#CrowdSprites+8,a2
 	jsr	(DecompressGraphicsPlain).l
 	jsr	(setupEASNmap).l
 	jsr	(DumpPadSprites).l
@@ -108,10 +108,10 @@ RestoreGameScreen					;Rebuild the game screen: the vdp maps, palettes, vram, fr
 	movea.l	#ReplayBannerMap+8,a2
 	bra.w	.load
 .2
-	movea.l	#RefTiles+8,a2
+	movea.l	#RefsMap+8,a2
 	btst	#4,(sflags9).w
 	beq.w	.load
-	movea.l	#RefTilesHor+8,a2
+	movea.l	#RefMap2+8,a2
 .load
 	jsr	(DecompressGraphicsPlain).l
 .rink

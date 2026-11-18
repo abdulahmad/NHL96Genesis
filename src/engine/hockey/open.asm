@@ -301,7 +301,7 @@ EASportsScreen						;Called from Begin. Show the EA Sports screen until a button
 	bsr.w	setVram_0
 	bsr.w	printz
 	String	CC_Font2,$00,$00
-	movea.l	#EASportsMap,a2
+	movea.l	#EASportsSplashMap,a2
 	movea.l	a2,a0
 	movea.l	a2,a1
 	adda.l	(a2)+,a0

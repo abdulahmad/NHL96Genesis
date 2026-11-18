@@ -5,25 +5,25 @@ NHLShieldMap						;The NHL shield logo on the trademark and credits pages (Credi
 	incbin	..\Extracted\NHL96\Graphics\NHLShieldMap.map.jim
 
 NHLPALogoMap						;The NHLPA logo on the trademark and credits pages (CreditsScreen)
-	incbin	..\Extracted\NHL96\Graphics\NHLPALogoMap.map.jim
+	incbin	..\Extracted\NHL96\Graphics\NHLPALogo.map.jim
 
 CreditsBgMap						;The background of the trademark and credits pages (CreditsScreen)
 	incbin	..\Extracted\NHL96\Graphics\CreditsBgMap.map.jim
 
 FramerMap							;The FramerMap map (Framer); +8 the framer tiles
-	incbin	..\Extracted\NHL96\Graphics\FramerMap.map.jim
+	incbin	..\Extracted\NHL96\Graphics\Framer.map.jim
 
 FaceOffMap							;The face-off map; +8 the tiles
-	incbin	..\Extracted\NHL96\Graphics\FaceOffMap.map.jim
+	incbin	..\Extracted\NHL96\Graphics\FaceOff.map.jim
 
 Rinktilelist						;The ice rink map; Rinktilelist+8 = the rink tiles
-	incbin	..\Extracted\NHL96\Graphics\Rinktilelist.map.jim
+	incbin	..\Extracted\NHL96\Graphics\IceRink96.map.jim
 
-RefTiles							;The RefTiles map (the ref window)
-	incbin	..\Extracted\NHL96\Graphics\RefTiles.map.jim
+RefsMap							;The RefsMap map (the ref window)
+	incbin	..\Extracted\NHL96\Graphics\Refs.map.jim
 
-RefTilesHor							;The RefTilesHor map (the ref window, horizontal rink)
-	incbin	..\Extracted\NHL96\Graphics\RefTilesHor.map.jim
+RefMap2							;The RefMap2 map (the ref window, horizontal rink)
+	incbin	..\Extracted\NHL96\Graphics\Refs2.map.jim
 
 Sprites								;The sprite header: the offsets of the palette and of frameSprData
 									;(data96_06), then the tile count
@@ -44,23 +44,23 @@ HotList								;The hot spot byte pair of each frame (GetHot)
 HotList2							;The hot spot list of the GetHot variants
 	incbin	..\Extracted\NHL96\Graphics\HotList2.bin
 
-Crowdframelist						;The crowd sprite frames (showcrowd); +8 the crowd tiles (animchars)
-	incbin	..\Extracted\NHL96\Graphics\Crowdframelist.map.jim
+CrowdSprites						;The crowd sprite frames (showcrowd); +8 the crowd tiles (animchars)
+	incbin	..\Extracted\NHL96\Graphics\Crowd.anim
 
 FaceOffSprites						;The face-off sprites (checkfo); +8 the tiles
-	incbin	..\Extracted\NHL96\Graphics\FaceOffSprites.map.jim
+	incbin	..\Extracted\NHL96\Graphics\FaceOff.anim
 
 EnergyBarMap						;The EnergyBarMap map
-	incbin	..\Extracted\NHL96\Graphics\EnergyBarMap.map.jim
+	incbin	..\Extracted\NHL96\Graphics\EnergyBar.map.jim
 
 EASNmap								;The EASN logo map (EASNLogo); +8 the tiles
-	incbin	..\Extracted\NHL96\Graphics\EASNmap.map.jim
+	incbin	..\Extracted\NHL96\Graphics\EASN.map.jim
 
-EASportsMap							;The EA Sports screen map (EASportsScreen)
+EASportsSplashMap							;The EA Sports screen map (EASportsScreen)
 	incbin	..\Extracted\NHL96\Graphics\EASportsSplash.map.jim
 
 RevRinkTilelist						;The ice rink map rows of a reverse angle replay (updatescroll)
-	incbin	..\Extracted\NHL96\Graphics\RevRinkTilelist.bin
+	incbin	..\Extracted\NHL96\Graphics\IceRink96Reverse.map.jim
 
 ReplayIconMap						;The replay icon map (ShowReplayIcon); continued in data96_07
 	incbin	..\Extracted\NHL96\Graphics\ReplayIconMap.map.jim
@@ -319,19 +319,19 @@ ControllerBgMap						;The controller setup screen background map (ControllerSetu
 	incbin	..\Extracted\NHL96\Graphics\ControllerBgMap.map.jim
 
 RosterFont							;The roster font map (smallfontptr); +8 the tiles
-	incbin	..\Extracted\NHL96\Graphics\RosterFont.bin
+	incbin	..\Extracted\NHL96\Graphics\SmallFont.map.jim
 
 SmallFontMap						;The small font map (print); +8 the tiles (LoadSmallFont)
-	incbin	..\Extracted\NHL96\Graphics\SmallFontMap.map.jim
+	incbin	..\Extracted\NHL96\Graphics\SmallFont96.map.jim
 
 SmallFontMap2						;The second small font map; +8 the tiles
-	incbin	..\Extracted\NHL96\Graphics\SmallFontMap2.map.jim
+	incbin	..\Extracted\NHL96\Graphics\SmallFont96-2.map.jim
 
 BigFontMap2							;The big font map (printbig, bigfontptr); +8 the tiles
-	incbin	..\Extracted\NHL96\Graphics\BigFontMap2.map.jim
+	incbin	..\Extracted\NHL96\Graphics\BigFont96-2.map.jim
 
 BigFontMap4							;The big font map printbig takes with sflags11 bit 2; +8 the tiles
-	incbin	..\Extracted\NHL96\Graphics\BigFontMap4.map.jim
+	incbin	..\Extracted\NHL96\Graphics\BigFont96-4.map.jim
 
 PStatsPal							;A 16-colour palette (PStatsPalette, PStatsPalette2, SaveTeamLine copy
 									;it) for the player-stats screens
@@ -599,11 +599,11 @@ ControllerFrameMap					;The controller setup screen frame on map 1 (ControllerSe
 
 BigFontMap							;The big font map of printbig1 (chars bigfont1chars); +8 the tiles
 									;(LoadBigFonts)
-	incbin	..\Extracted\NHL96\Graphics\BigFontMap.map.jim
+	incbin	..\Extracted\NHL96\Graphics\BigFont96.map.jim
 
 BigFontMap3							;The big font map of printbig2 (chars BigFontchars); +8 the tiles
 									;(LoadBigFonts)
-	incbin	..\Extracted\NHL96\Graphics\BigFontMap3.map.jim
+	incbin	..\Extracted\NHL96\Graphics\BigFont96-3.map.jim
 
 DigitFontMap						;The big digit font printbig uses in mode 3; +8
 									;the tiles (the pause screen)
@@ -656,4 +656,4 @@ CupCelebrationMap					;A picture CupCelebrationSetup draws at 6,$C
 
 revframetbl							;One word per sprite frame: the frame for a reverse angle replay
 									;(RevReplayAdj)
-	incbin	..\Extracted\NHL96\Graphics\revframetbl.map.jim
+	incbin	..\Extracted\NHL96\Graphics\revframetbl.bin

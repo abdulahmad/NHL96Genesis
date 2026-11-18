@@ -353,7 +353,7 @@ showcrowd							;Crowd sprites: the penalty box frames per PBnum nibble (ShowCro
 									;then the Crowdframe frame
 	btst	#4,(sflags4).w			;check if reverse angle replay
 	bne.w	rtsShowCrowd
-	movea.l	#Crowdframelist,a1
+	movea.l	#CrowdSprites,a1
 	adda.l	4(a1),a1
 	move.w	(Hpos).w,d4
 	move.w	(Vpos).w,d5
@@ -1206,19 +1206,19 @@ LoadEnergyBarTiles					;Decompress EnergyBarMap at energybarchars
 	movea.l	#EnergyBarMap+8,a2
 	bra.w	DecompressGraphicsPlain
 
-LoadCrowdFrames						;Decompress Crowdframelist at animchars
+LoadCrowdFrames						;Decompress CrowdSprites at animchars
 	move.w	(animchars).w,d4
-	movea.l	#Crowdframelist+8,a2
+	movea.l	#CrowdSprites+8,a2
 	bra.w	DecompressGraphicsPlain
 
-LoadRefTilesHor						;Decompress RefTilesHor at ExtraChars
+LoadRefTilesHor						;Decompress RefMap2 at ExtraChars
 	move.w	(ExtraChars).w,d4
-	movea.l	#RefTilesHor+8,a2
+	movea.l	#RefMap2+8,a2
 	bra.w	DecompressGraphicsPlain
 
-LoadRefTiles						;Decompress RefTiles at ExtraChars
+LoadRefTiles						;Decompress RefsMap at ExtraChars
 	move.w	(ExtraChars).w,d4
-	movea.l	#RefTiles+8,a2
+	movea.l	#RefsMap+8,a2
 	bra.w	DecompressGraphicsPlain
 
 LoadFaceOffSprites					;Decompress FaceOffSprites at faceoffvrcset
