@@ -16,6 +16,19 @@ ReadJoy1 = $01B348					;video96
 ReadJoy2 = $01B360					;video96
 ReadJoy3 = $01B378					;video96
 ReadJoy4 = $01B390					;video96
+dobitmap = $01B692					;lines96_bar_stub
+eraser = $01B976					;goal96_box_stub
+forceblack = $01AF52				;pause96_stub
+printz = $01BB8E					;goal96_box_stub
+ReplayIconMap = $140AFE				;graphics96
+RestoreGameScreen = $1E2742			;pause96_return
+revframetbl = $1D579E				;graphics96
+setvideo = $02034A					;display96
+SoundBanks = $027026				;pause96_stub
+SoundCmd = $08839E					;pause96_stub
+SprSort = $0213AE					;display96
+stop_current_song = $0885FC			;collide96_stub
+Z80Program = $025500				;pause96_stub
 
 
 ; Main segment code

@@ -36,6 +36,11 @@ SetMenuPadSide = $1D9844			;code96_15
 ReturnToGame = $1E2688				;pause96_return
 TimeoutMenu = $015570				;pause96_menu
 SelectGoalieMenu = $015604			;pause96_menu
+ClrHor = $01D01E					;penalty96
+KillCrowd = $020E28					;display96
+PauseScreenDraw = $1E2970			;pause96_return
+printscores1 = $01D062				;collide96_stub
+setvideo = $02034A					;display96
 
 
 ; Main segment code

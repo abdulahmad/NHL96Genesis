@@ -79,27 +79,90 @@ TakeTopStarScore					;Take the highest star score at ThreeStars (home team first
 
 CalcStarScores						;Star score for every roster slot of both teams to ThreeStars (home team
 									;first).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$38,$7C,$D1,$30,$4E,$B9,$00,$01,$48,$A2,$3A,$00,$DA,$42,$34,$7C
-	dc.b	$C7,$26,$47,$EA,$03,$9E,$61,$00,$00,$48,$34,$4B,$47,$EA,$FC,$62
-	dc.b	$61,$00,$00,$3E,$0C,$78,$00,$03,$C4,$BC,$66,$00,$00,$32,$4A,$43
-	dc.b	$67,$00,$00,$2C,$30,$7C,$C4,$C6,$D0,$F8,$C4,$CA,$42,$40,$08,$28
-	dc.b	$00,$07,$00,$02,$67,$00,$00,$06,$06,$40,$00,$1C,$D0,$28,$00,$03
-	dc.b	$E5,$40,$30,$7C,$D1,$30,$21,$BC,$7F,$FF,$FF,$FF,$00,$00,$4E,$75
+	movea.w	#(ThreeStars-M68K_RAM),a4
+	jsr	(GetPeriodTime).l
+	move.w	d0,d5
+	add.w	d2,d5
+	movea.w	#(tmstruct-M68K_RAM),a2
+	lea	$39E(a2),a3
+	bsr.w	CalcTeamStarScores		;home
+	movea.w	a3,a2
+	lea	-$39E(a2),a3
+	bsr.w	CalcTeamStarScores		;away (d3 = away - home score)
+	cmpi.w	#3,(gsp).w
+	bne.w	.2
+	tst.w	d3
+	beq.w	.2
+	movea.w	#(ChkCnt2-M68K_RAM),a0
+	adda.w	(ScoreSumbytes).w,a0
+	clr.w	d0
+	btst	#7,2(a0)
+	beq.w	.1
+	addi.w	#$1C,d0
+.1
+	add.b	3(a0),d0
+	asl.w	#2,d0
+	movea.w	#(ThreeStars-M68K_RAM),a0
+	move.l	#$7FFFFFFF,(a0,d0.w)
+.2
+	rts
 
 CalcTeamStarScores					;Star scores of team a2 (a3 = other team) to (a4)+, one long per roster
 									;slot.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$32,$4A,$36,$2A,$00,$0C,$96,$6B,$00,$0C,$48,$C3,$78,$1B,$4E,$B9
-	dc.b	$00,$01,$57,$A2,$44,$40,$D0,$44,$28,$83,$B8,$40,$62,$00,$00,$3C
-	dc.b	$42,$41,$12,$2A,$00,$C0,$C2,$FC,$2A,$F8,$D3,$94,$42,$41,$12,$2A
-	dc.b	$00,$DC,$C2,$FC,$27,$74,$D3,$94,$42,$41,$12,$2A,$00,$F8,$C2,$FC
-	dc.b	$00,$0A,$4A,$43,$66,$00,$00,$0E,$C2,$FC,$00,$64,$D3,$94,$42,$81
-	dc.b	$D2,$69,$01,$4C,$D3,$94,$60,$00,$00,$3A,$BA,$69,$01,$4C,$62,$00
-	dc.b	$00,$32,$42,$41,$12,$2A,$00,$C0,$C2,$FC,$00,$64,$42,$42,$14,$2A
-	dc.b	$00,$F8,$67,$00,$00,$1E,$82,$C2,$B2,$7C,$00,$04,$62,$00,$00,$14
-	dc.b	$06,$94,$00,$00,$7D,$00,$4A,$41,$66,$00,$00,$08,$06,$94,$00,$01
-	dc.b	$24,$F8,$54,$49,$52,$4A,$58,$4C,$51,$CC,$FF,$7E,$4E,$75
+	movea.w	a2,a1
+	move.w	$C(a2),d3
+	sub.w	$C(a3),d3
+	ext.l	d3
+	moveq	#$1B,d4
+	jsr	(GetGoalieCount).l
+	neg.w	d0
+	add.w	d4,d0
+.loop
+	move.l	d3,(a4)
+	cmp.w	d0,d4
+	bhi.w	.2
+	clr.w	d1
+	move.b	$C0(a2),d1
+	mulu.w	#$2AF8,d1				;goals * 11000
+	add.l	d1,(a4)
+	clr.w	d1
+	move.b	$DC(a2),d1
+	mulu.w	#$2774,d1				;assists * 10100
+	add.l	d1,(a4)
+	clr.w	d1
+	move.b	$F8(a2),d1
+	mulu.w	#$A,d1
+	tst.w	d3
+	bne.w	.1
+	mulu.w	#$64,d1					;tied: shots * 1000
+	add.l	d1,(a4)
+	clr.l	d1
+	add.w	$14C(a1),d1
+.1
+	add.l	d1,(a4)
+	bra.w	.3
+.2
+	cmp.w	$14C(a1),d5
+	bhi.w	.3
+	clr.w	d1
+	move.b	$C0(a2),d1
+	mulu.w	#$64,d1
+	clr.w	d2
+	move.b	$F8(a2),d2
+	beq.w	.3
+	divu.w	d2,d1
+	cmp.w	#4,d1
+	bhi.w	.3
+	addi.l	#$7D00,(a4)				;32000
+	tst.w	d1
+	bne.w	.3
+	addi.l	#$124F8,(a4)			;75000 for a shutout
+.3
+	addq.w	#2,a1
+	addq.w	#1,a2
+	addq.w	#4,a4
+	dbf	d4,.loop
+	rts
 
 ShowInjuryBox						;The injury message (CheckInjury): "Injured player", "Out for period",
 									;"game" or n "games", then the player

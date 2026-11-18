@@ -23,6 +23,8 @@ PAttribOverallMask = $023456		;setup96_attr
 GAttribOverallMask = $0235B8		;setup96_attr
 ReadSRAM = $0241E8					;sram96
 CalcAttrib = $1D7DF8				;code96_14
+MakeSRAMChecksum = $0241AA			;sram96
+WriteSRAM = $024188					;sram96
 
 
 ; Main segment code

@@ -40,6 +40,7 @@ OneTimerPass = $1D66AC				;logic96_timer
 OneTimerTarget = $1D6718			;logic96_timer
 PSandSOpassdir = $1D8B26			;shootout96_path
 ReadGoaliePulled = $1D9352			;code96_15
+assreplace = $01A3DA				;collide96_stub
 
 
 ; Main segment code

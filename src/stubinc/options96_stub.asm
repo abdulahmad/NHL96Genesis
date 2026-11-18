@@ -46,6 +46,7 @@ ShootoutInit = $1D8180				;shootout96_path
 PStatsPalette = $1DBB92				;season96_menu
 PlayoffMenuScreen = $1DBBB2			;season96_menu
 ZeroLong = $000772					;main96
+SkipStrings = $01D7F2				;hockey96_inter
 
 
 ; Main segment code

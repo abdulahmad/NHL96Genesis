@@ -53,11 +53,28 @@ getlinee							;d0 = line number, a2 = team struct. Return d0 = energy level of 
 	rts
 
 AvgCline							;Average energy of the current line.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$70,$80,$42,$80,$42,$41,$74,$05,$30,$6A,$00,$22,$4A,$68
-	dc.b	$00,$34,$6F,$00,$00,$10,$42,$43,$16,$28,$00,$67,$D6,$43,$D0,$72
-	dc.b	$30,$34,$52,$41,$D0,$FC,$00,$80,$51,$CA,$FF,$E4,$4A,$41,$67,$00
-	dc.b	$00,$04,$80,$C1,$4C,$DF,$01,$0E,$4E,$75
+	movem.l	d1-d3/a0,-(sp)
+	clr.l	d0
+	clr.w	d1
+	moveq	#5,d2
+	movea.w	$22(a2),a0
+.loop
+	tst.w	$34(a0)
+	ble.w	.1
+	clr.w	d3
+	move.b	$67(a0),d3
+	add.w	d3,d3
+	add.w	$34(a2,d3.w),d0
+	addq.w	#1,d1
+.1
+	adda.w	#SCstruct,a0
+	dbf	d2,.loop
+	tst.w	d1
+	beq.w	.2
+	divu.w	d1,d0
+.2
+	movem.l	(sp)+,d1-d3/a0
+	rts
 
 ChkShotStat							;Determine if a shot was taken and add it to the stats (crowd, team,
 									;shooter and goalie)
@@ -169,10 +186,19 @@ SetupTeamLine						;The line of team a3 back on the ice (reenergizeteam first)
 	rts
 
 RestoreTeamEnergy					;Restore the energy of team a2.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$70,$36,$0C,$72,$FF,$FD,$00,$6C,$66,$00,$00,$10,$0C,$72,$FF,$FC
-	dc.b	$00,$6C,$66,$00,$00,$06,$60,$00,$00,$08,$35,$BC,$10,$00,$00,$34
-	dc.b	$55,$40,$6A,$DE,$4E,$75
+	moveq	#$36,d0
+.loop
+	cmpi.w	#$FFFD,$6C(a2,d0.w)
+	bne.w	.1
+	cmpi.w	#$FFFC,$6C(a2,d0.w)
+	bne.w	.1
+	bra.w	.2
+.1
+	move.w	#$1000,$34(a2,d0.w)
+.2
+	subq.w	#2,d0
+	bpl.s	.loop
+	rts
 
 reenergizeteam						;a2 = team: energy $1000 for every player not out for the game (-4); out
 									;for the period (-3) back to the bench

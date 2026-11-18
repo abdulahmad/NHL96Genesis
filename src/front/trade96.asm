@@ -61,8 +61,11 @@ DefaultRosters
 	blt.w	.team
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
-	;Not decoded in the listing and not referenced from it: kept as bytes
-	dc.b	$48,$E7,$F1,$A0,$61,$00,$00,$4E,$22,$48,$4C,$DF,$05,$8F,$4E,$75
+	movem.l	d0-d3/d7/a0/a2,-(sp)
+	bsr.w	getplayernameD7
+	movea.l	a0,a1
+	movem.l	(sp)+,d0-d3/d7/a0/a2
+	rts
 
 FormatPlayerNameD7					;formats the name of roster player d7 for printing
 	movem.l	d0-d3/d7-a0/a2,-(sp)
@@ -227,14 +230,38 @@ GetJerseyNumber						;The jersey number byte of player d0 of team d7
 .2
 	movem.l	(sp)+,d0-d1/a0-a1
 	rts
-	;Not decoded in the listing: kept as bytes. The trade screen calls into it
-	dc.b	$48,$E7,$C0,$00,$30,$07,$72,$36,$C0,$C1,$06,$80,$00,$00,$15,$50
-	dc.b	$4E,$B9,$00,$02,$41,$E8,$4C,$DF,$00,$03,$4E,$75,$48,$E7,$C0,$00
-	dc.b	$30,$07,$72,$36,$C0,$C1,$06,$80,$00,$00,$15,$50,$4E,$B9,$00,$02
-	dc.b	$41,$88,$4E,$B9,$00,$02,$41,$AA,$4C,$DF,$00,$03,$4E,$75,$08,$38
-	dc.b	$00,$04,$C3,$54,$66,$00,$00,$28,$48,$E7,$81,$80,$E5,$40,$48,$C0
-	dc.b	$20,$7C,$00,$20,$2A,$A0,$CE,$FC,$00,$02,$DE,$87,$DE,$80,$30,$30
-	dc.b	$78,$00,$02,$40,$00,$1F,$B0,$7C,$00,$1E,$4C,$DF,$01,$81,$4E,$75
+	movem.l	d0-d1,-(sp)
+	move.w	d7,d0
+	moveq	#$36,d1
+	mulu.w	d1,d0
+	addi.l	#$1550,d0
+	jsr	(ReadSRAM).l
+	movem.l	(sp)+,d0-d1
+	rts
+	movem.l	d0-d1,-(sp)
+	move.w	d7,d0
+	moveq	#$36,d1
+	mulu.w	d1,d0
+	addi.l	#$1550,d0
+	jsr	(WriteSRAM).l
+	jsr	(MakeSRAMChecksum).l
+	movem.l	(sp)+,d0-d1
+	rts
+	btst	#4,(sflags11).w
+	bne.w	.3
+	movem.l	d0/d7/a0,-(sp)
+	asl.w	#2,d0
+	ext.l	d0
+	movea.l	#$202AA0,a0
+	mulu.w	#2,d7
+	add.l	d7,d7
+	add.l	d0,d7
+	move.w	(a0,d7.l),d0
+	andi.w	#$1F,d0
+	cmp.w	#$1E,d0
+	movem.l	(sp)+,d0/d7/a0
+.3
+	rts
 
 GetPositionSlot						;d0 = the position slot (0 G, 1 LD, 2 RD, 3 LW, 4 C, 5 RW) of player d0 of
 									;team d7; season roster aware, created players from their record
@@ -324,12 +351,23 @@ GetPositionSlot						;d0 = the position slot (0 G, 1 LD, 2 RD, 3 LW, 4 C, 5 RW) 
 .5
 	movem.l	(sp)+,d1/d6-d7/a0-a1
 	rts
-	;Not decoded in the listing: kept as bytes. ExtractTradedPlayer and InsertTradedPlayer call into it
-	dc.b	$48,$E7,$C0,$00,$30,$07,$C0,$FC,$00,$36,$06,$80,$00,$00,$15,$50
-	dc.b	$72,$36,$4E,$B9,$00,$02,$41,$E8,$4C,$DF,$00,$03,$4E,$75,$48,$E7
-	dc.b	$C0,$00,$30,$07,$C0,$FC,$00,$36,$06,$80,$00,$00,$15,$50,$72,$36
-	dc.b	$4E,$B9,$00,$02,$41,$88,$4E,$B9,$00,$02,$41,$AA,$4C,$DF,$00,$03
-	dc.b	$4E,$75
+	movem.l	d0-d1,-(sp)
+	move.w	d7,d0
+	mulu.w	#$36,d0
+	addi.l	#$1550,d0
+	moveq	#$36,d1
+	jsr	(ReadSRAM).l
+	movem.l	(sp)+,d0-d1
+	rts
+	movem.l	d0-d1,-(sp)
+	move.w	d7,d0
+	mulu.w	#$36,d0
+	addi.l	#$1550,d0
+	moveq	#$36,d1
+	jsr	(WriteSRAM).l
+	jsr	(MakeSRAMChecksum).l
+	movem.l	(sp)+,d0-d1
+	rts
 
 GetSeasonRosterId					;(a0) = the season roster id word of player d0 of team d7, from save RAM
 	movem.l	d0/d7-a1,-(sp)

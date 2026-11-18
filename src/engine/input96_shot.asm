@@ -84,10 +84,22 @@ shotdirmath							;shot direction math: puck offset in d3/d4, scaled by d0
 	sub.l	d3,d4
 	divs.w	d2,d4
 	rts
-	;Not decoded in the listing and not referenced from it: kept as bytes
-	dc.b	$58,$4F,$30,$38,$B7,$72,$08,$2B,$00,$07,$00,$62,$66,$00,$00,$04
-	dc.b	$44,$40,$32,$3C,$01,$1E,$92,$40,$E6,$49,$B2,$7C,$00,$14,$6D,$00
-	dc.b	$00,$04,$72,$14,$37,$41,$00,$42,$70,$12,$4E,$F9,$00,$01,$A3,$DA
+	addq.w	#4,sp
+	move.w	(pucky).w,d0
+	btst	#pfgoal,pflags(a3)
+	bne.w	.1
+	neg.w	d0
+.1
+	move.w	#$11E,d1
+	sub.w	d0,d1
+	lsr.w	#3,d1
+	cmp.w	#$14,d1
+	blt.w	.2
+	moveq	#$14,d1
+.2
+	move.w	d1,temp2(a3)
+	moveq	#$12,d0
+	jmp	(assreplace).l
 
 SetShotMode							;Start the shot mode (C button)
 	btst	#2,(BA_PS_flags).w		;check for PS or SO

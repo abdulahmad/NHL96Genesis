@@ -2,10 +2,19 @@
 ;	them.
 
 VBlank_SetOptions					;The vertical blank handler of the setup screens.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$14,$08,$B8
-	dc.b	$00,$00,$BF,$B2,$67,$00,$00,$06,$61,$00,$E7,$7E,$61,$00,$94,$66
-	dc.b	$52,$78,$B0,$52,$4E,$B9,$00,$02,$44,$86,$4C,$DF,$7F,$FF,$4E,$73
+	movem.l	d0-d7/a0-a6,-(sp)
+	btst	#dfng,(disflags).w
+	bne.w	.2
+	bclr	#dfok,(disflags).w
+	beq.w	.1
+	bsr.w	DumpSprites2
+.1
+	bsr.w	cramfade
+.2
+	addq.w	#1,(Vcount).w
+	jsr	(p_music_vblank).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rte
 
 DefaultMenus						;Set the default menu choices (defmenuoptions)
 	st	(demoflag).w

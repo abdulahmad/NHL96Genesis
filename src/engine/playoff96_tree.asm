@@ -324,15 +324,25 @@ DrawTeamBlocks						;Draw team block d1 at printx / printy; the user's team gets
 	rts
 
 VBlank_Playoff						;The PlayoffScreen vblank handler (VBint)
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$20,$30,$38
-	dc.b	$B0,$00,$4E,$B9,$00,$01,$B6,$78,$30,$3C,$FE,$C0,$D0,$78,$D0,$30
-	dc.b	$30,$80,$31,$40,$00,$02,$4E,$B9,$00,$01,$AF,$D6,$52,$78,$B0,$52
-	dc.b	$4E,$B9,$00,$02,$44,$86,$4C,$DF,$7F,$FF,$4E,$73,$00,$0A,$50,$6C
-	dc.b	$61,$79,$6F,$66,$66,$73,$00,$10,$51,$75,$61,$72,$74,$65,$72,$66
-	dc.b	$69,$6E,$61,$6C,$73,$00,$00,$0C,$53,$65,$6D,$69,$66,$69,$6E,$61
-	dc.b	$6C,$73,$00,$08,$46,$69,$6E,$61,$6C,$73,$00,$0C,$43,$68,$61,$6D
-	dc.b	$70,$69,$6F,$6E,$73,$00
+	movem.l	d0-d7/a0-a6,-(sp)
+	btst	#2,(disflags).w
+	bne.w	.1
+	move.w	(VSCRLPM).w,d0
+	jsr	(Vmaddr).l
+	move.w	#$FEC0,d0
+	add.w	(DispAttribCtr).w,d0
+	move.w	d0,(a0)
+	move.w	d0,2(a0)
+	jsr	(cramfade).l
+.1
+	addq.w	#1,(Vcount).w
+	jsr	(p_music_vblank).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rte
+	dc.w	$000A,$506C,$6179,$6F66,$6673,$0010,$5175,$6172
+	dc.w	$7465,$7266,$696E,$616C,$7300,$000C,$5365,$6D69
+	dc.w	$6669,$6E61,$6C73,$0008,$4669,$6E61,$6C73,$000C
+	dc.w	$4368,$616D,$7069,$6F6E,$7300
 
 PlayoffTreeSetup					;Playoff tree layout by gamelevel. Used by PlayoffScreen
 	dc.b	$00,$0A,$00,$41,$00,$84,$00,$CF,$01,$1C,$0F,$01,$02,$01,$04,$01

@@ -82,8 +82,8 @@ SRAMWaitVblank						;Wait for the next vblank. Called from InitSaveRAM
 	rts
 
 VBcount								;VBint handler while InitSaveRAM runs: Vcount + 1 only.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$52,$78,$B0,$52,$4E,$73
+	addq.w	#1,(Vcount).w
+	rte
 
 ValidateSRAM						;Check the save RAM copy in M68K_RAM: byte $1FFF must be the sum of bytes
 									;0-$1FFD and byte $1FFE its complement. ValidSRAM = 0 if they match, -1 if

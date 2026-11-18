@@ -12,6 +12,7 @@
 	include	macros\genesis.mac		;String
 
 ; External addresses outside, read from lst/nhl96.bin.
+SoundCmd = $08839E					;pause96_stub
 
 
 ; Main segment code

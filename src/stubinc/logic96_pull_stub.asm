@@ -14,6 +14,16 @@
 ; External addresses outside, read from lst/nhl96.bin.
 rtss2 = $01F84A						;collide96
 setpersonel = $01FB52				;players96
+AddPenalty = $01C192				;collide96_stub
+chgplayer = $016A46					;control96
+eraser = $01B976					;goal96_box_stub
+FindGoalie = $0168B8				;control96
+getlinee = $01D19C					;lines96_bar
+printz = $01BB8E					;goal96_box_stub
+setc1player = $016C52				;control96
+setc2player = $016C5C				;control96
+setc3player = $016C68				;control96
+setc4player = $016C74				;control96
 
 
 ; Main segment code

@@ -2,115 +2,443 @@
 ;	the face-off. EndPenaltyShotPlay ends the play and counts the goals.
 
 puckshootout						;asstab entry: start a penalty shot or shootout attempt.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$AB,$00,$01,$00,$62,$67,$00,$01,$00,$08,$B8,$00,$04,$C3,$4E
-	dc.b	$08,$F8,$00,$07,$C3,$4A,$42,$B8,$BE,$AE,$42,$B8,$BE,$B2,$42,$B8
-	dc.b	$BE,$B6,$08,$B8,$00,$07,$C3,$48,$08,$38,$00,$00,$C3,$48,$67,$00
-	dc.b	$00,$0C,$4E,$B9,$00,$1D,$81,$B2,$60,$00,$00,$24,$4E,$B9,$00,$1D
-	dc.b	$8B,$60,$2F,$0A,$24,$7C,$FF,$FF,$C7,$26,$4A,$78,$D2,$D2,$67,$00
-	dc.b	$00,$08,$24,$7C,$FF,$FF,$CA,$C4,$52,$6A,$03,$9A,$24,$5F,$08,$B8
-	dc.b	$00,$02,$C3,$40,$08,$B8,$00,$04,$C3,$40,$08,$B8,$00,$05,$C3,$40
-	dc.b	$08,$B8,$00,$06,$C3,$40,$08,$F8,$00,$01,$C3,$46,$08,$38,$00,$03
-	dc.b	$C3,$38,$67,$00,$00,$08,$4E,$F9,$00,$01,$C7,$84,$08,$AB,$00,$01
-	dc.b	$00,$62,$08,$38,$00,$00,$C3,$48,$67,$00,$00,$2C,$4A,$78,$D4,$54
-	dc.b	$66,$00,$00,$40,$4A,$78,$D4,$46,$66,$00,$00,$38,$31,$F8,$C3,$A0
-	dc.b	$D4,$8C,$31,$FC,$00,$02,$D4,$8E,$4E,$B9,$00,$08,$86,$88,$3F,$38
-	dc.b	$D4,$8A,$60,$00,$00,$18,$31,$F8,$C3,$A0,$D4,$8C,$31,$FC,$00,$02
-	dc.b	$D4,$8E,$4E,$B9,$00,$08,$86,$88,$3F,$38,$D4,$8A,$4E,$B9,$00,$08
-	dc.b	$85,$86,$08,$F8,$00,$00,$C3,$38,$08,$F8,$00,$01,$C3,$48,$42,$78
-	dc.b	$B7,$86,$42,$78,$B7,$88,$31,$FC,$00,$0F,$D3,$26,$61,$00,$06,$D4
-	dc.b	$50,$EB,$00,$40,$50,$EB,$00,$42,$08,$F8,$00,$02,$C3,$40,$48,$A7
-	dc.b	$60,$00,$08,$38,$00,$00,$C3,$48,$67,$00,$00,$0C,$4E,$B9,$00,$01
-	dc.b	$91,$D2,$6B,$00,$00,$0A,$4C,$9F,$00,$06,$60,$00,$00,$16,$4C,$9F
-	dc.b	$00,$06,$08,$B8,$00,$02,$C3,$40,$30,$3C,$00,$1B,$61,$00,$12,$84
-	dc.b	$4E,$75,$48,$A7,$60,$00,$30,$38,$D2,$D6,$24,$7C,$FF,$FF,$B0,$5E
-	dc.b	$EF,$40,$D4,$C0,$4A,$6A,$00,$34,$66,$00,$00,$0C,$08,$2A,$00,$02
-	dc.b	$00,$63,$67,$00,$00,$46,$30,$38,$D2,$D6,$34,$3C,$00,$06,$53,$42
-	dc.b	$6B,$BC,$53,$40,$6A,$00,$00,$0A,$30,$3C,$00,$05,$60,$00,$00,$0E
-	dc.b	$B0,$7C,$00,$05,$66,$00,$00,$06,$30,$3C,$00,$0B,$24,$7C,$FF,$FF
-	dc.b	$B0,$5E,$32,$00,$EF,$41,$D4,$C1,$4A,$6A,$00,$34,$66,$D0,$08,$2A
-	dc.b	$00,$02,$00,$63,$66,$C8,$31,$C0,$D2,$D6,$4C,$9F,$00,$06,$34,$7C
-	dc.b	$C7,$26,$30,$3C,$00,$1F,$60,$00,$12,$0A
+	bclr	#pfna,pflags(a3)
+	beq.w	.8
+	bclr	#4,(sflags9).w
+	bset	#7,(sflags7).w
+	clr.l	(padcont).w
+	clr.l	(padcont+4).w
+	clr.l	(padcont+8).w
+	bclr	#7,(gmode2).w
+	btst	#0,(gmode2).w
+	beq.w	.1
+	jsr	(NextShooter).l
+	bra.w	.3
+.1
+	jsr	(StartShootoutPath).l
+	move.l	a2,-(sp)
+	movea.l	#tmstruct,a2
+	tst.w	(BA_Team).w
+	beq.w	.2
+	movea.l	#AwShots,a2
+.2
+	addq.w	#1,$39A(a2)
+	movea.l	(sp)+,a2
+.3
+	bclr	#2,(BA_PS_flags).w
+	bclr	#4,(BA_PS_flags).w
+	bclr	#5,(BA_PS_flags).w
+	bclr	#6,(BA_PS_flags).w
+	bset	#1,(sflags6).w
+	btst	#gmpendel,(gmode).w
+	beq.w	.4
+	jmp	(Stop4Pen).l
+.4
+	bclr	#pfna,pflags(a3)
+	btst	#0,(gmode2).w
+	beq.w	.5
+	tst.w	(shootoutteam).w
+	bne.w	.7
+	tst.w	(homeshootnum).w
+	bne.w	.7
+	move.w	(HomeTeam).w,(HmTeam).w
+	move.w	#2,(SongIndex).w
+	jsr	(ChooseSong).l
+	move.w	(SongNum).w,-(sp)
+	bra.w	.6
+.5
+	move.w	(HomeTeam).w,(HmTeam).w
+	move.w	#2,(SongIndex).w
+	jsr	(ChooseSong).l
+	move.w	(SongNum).w,-(sp)
+.6
+	jsr	(song).l
+.7
+	bset	#gmclock,(gmode).w
+	bset	#1,(gmode2).w
+	clr.w	(puckvx).w
+	clr.w	(puckvy).w
+	move.w	#$F,(shootoutclock).w
+	bsr.w	ReturnGoalies
+	st	temp1(a3)
+	st	temp2(a3)
+.8
+	bset	#2,(BA_PS_flags).w
+	movem.w	d1-d2,-(sp)
+	btst	#0,(gmode2).w
+	beq.w	.9
+	jsr	(SelectPenaltyShotSkater).l
+	bmi.w	.loop
+.9
+	movem.w	(sp)+,d1-d2
+	bra.w	.10
+.loop
+	movem.w	(sp)+,d1-d2
+	bclr	#2,(BA_PS_flags).w
+	move.w	#$1B,d0
+	bsr.w	assreplace
+	rts
+.10
+	movem.w	d1-d2,-(sp)
+	move.w	(BA_Goalie_SCnum).w,d0
+	movea.l	#SortCords,a2
+	asl.w	#7,d0
+	adda.w	d0,a2
+	tst.w	position(a2)
+	bne.w	.11
+	btst	#pf2unav,pflags2(a2)
+	beq.w	.14
+.11
+	move.w	(BA_Goalie_SCnum).w,d0
+	move.w	#6,d2
+.loop2
+	subq.w	#1,d2
+	bmi.s	.loop
+	subq.w	#1,d0
+	bpl.w	.12
+	move.w	#5,d0
+	bra.w	.13
+.12
+	cmp.w	#5,d0
+	bne.w	.13
+	move.w	#$B,d0
+.13
+	movea.l	#SortCords,a2
+	move.w	d0,d1
+	asl.w	#7,d1
+	adda.w	d1,a2
+	tst.w	position(a2)
+	bne.s	.loop2
+	btst	#pf2unav,pflags2(a2)
+	bne.s	.loop2
+	move.w	d0,(BA_Goalie_SCnum).w
+.14
+	movem.w	(sp)+,d1-d2
+	movea.w	#(tmstruct-M68K_RAM),a2
+	move.w	#$1F,d0
+	bra.w	assreplace
 
 SelectPenaltyShotSkater				;The best rated free skater of the shooting team.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$C7,$26,$4A,$78,$D2,$D2,$67,$00
-	dc.b	$00,$08,$20,$7C,$FF,$FF,$CA,$C4,$32,$3C,$00,$00,$3C,$3C,$FF,$FF
-	dc.b	$3A,$3C,$FF,$FF,$3E,$28,$00,$28,$4E,$B9,$00,$01,$57,$B2,$53,$40
-	dc.b	$31,$C0,$B8,$C4,$4A,$78,$B8,$C4,$6B,$00,$00,$D4,$48,$E7,$C0,$40
-	dc.b	$3E,$28,$00,$28,$30,$01,$4E,$B9,$00,$01,$01,$E6,$24,$49,$4C,$DF
-	dc.b	$02,$03,$D4,$D2,$3E,$01,$E3,$47,$10,$2A,$00,$04,$02,$40,$00,$F0
-	dc.b	$67,$00,$00,$A2,$08,$38,$00,$00,$C3,$48,$66,$00,$00,$AC,$0C,$70
-	dc.b	$FF,$FE,$70,$6C,$67,$00,$00,$0C,$0C,$70,$FF,$FF,$70,$6C,$66,$00
-	dc.b	$00,$84,$42,$43,$42,$40,$10,$2A,$00,$01,$02,$40,$00,$0F,$D6,$40
-	dc.b	$10,$2A,$00,$02,$02,$40,$00,$0F,$D6,$40,$10,$2A,$00,$02,$02,$40
-	dc.b	$00,$F0,$E8,$48,$D6,$40,$10,$2A,$00,$03,$02,$40,$00,$0F,$D6,$40
-	dc.b	$10,$2A,$00,$03,$02,$40,$00,$F0,$E8,$48,$D6,$40,$10,$2A,$00,$05
-	dc.b	$02,$40,$00,$0F,$D6,$40,$10,$2A,$00,$05,$02,$40,$00,$F0,$E8,$48
-	dc.b	$D6,$40,$10,$2A,$00,$06,$02,$40,$00,$F0,$E8,$48,$D6,$40,$10,$2A
-	dc.b	$00,$07,$02,$40,$00,$F0,$E8,$48,$D6,$40,$B2,$78,$D2,$D8,$66,$00
-	dc.b	$00,$06,$36,$3C,$7F,$FF,$B6,$46,$6D,$00,$00,$0A,$3C,$03,$3A,$01
-	dc.b	$60,$00,$00,$02,$52,$41,$53,$78,$B8,$C4,$60,$00,$FF,$28,$4A,$45
-	dc.b	$6B,$00,$00,$30,$31,$C5,$D2,$D8,$31,$FC,$00,$00,$D2,$D4,$4A,$78
-	dc.b	$D2,$D2,$67,$00,$00,$08,$31,$FC,$00,$06,$D2,$D4,$30,$38,$D2,$D4
-	dc.b	$EF,$40,$26,$7C,$FF,$FF,$B0,$5E,$D6,$C0,$36,$38,$D2,$D8,$60,$00
-	dc.b	$00,$0A,$30,$3C,$FF,$FF,$60,$00,$00,$06,$30,$3C,$00,$01,$4C,$DF
-	dc.b	$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	#tmstruct,a0
+	tst.w	(BA_Team).w
+	beq.w	.1
+	movea.l	#AwShots,a0
+.1
+	move.w	#0,d1
+	move.w	#$FFFF,d6
+	move.w	#$FFFF,d5
+	move.w	$28(a0),d7
+	jsr	(GetPlayerCountD7).l
+	subq.w	#1,d0
+	move.w	d0,(puckanimchars).w
+.loop
+	tst.w	(puckanimchars).w
+	bmi.w	.5
+	movem.l	d0-d1/a1,-(sp)
+	move.w	$28(a0),d7
+	move.w	d1,d0
+	jsr	(GetRosterName).l
+	movea.l	a1,a2
+	movem.l	(sp)+,d0-d1/a1
+	adda.w	(a2),a2
+	move.w	d1,d7
+	asl.w	#1,d7
+	move.b	attribute(a2),d0
+	andi.w	#$F0,d0
+	beq.w	.4
+	btst	#0,(gmode2).w
+	bne.w	.6
+	cmpi.w	#$FFFE,$6C(a0,d7.w)
+	beq.w	.2
+	cmpi.w	#$FFFF,$6C(a0,d7.w)
+	bne.w	.4
+.2
+	clr.w	d3
+	clr.w	d0
+	move.b	1(a2),d0
+	andi.w	#$F,d0
+	add.w	d0,d3
+	move.b	2(a2),d0
+	andi.w	#$F,d0
+	add.w	d0,d3
+	move.b	2(a2),d0
+	andi.w	#$F0,d0
+	lsr.w	#4,d0
+	add.w	d0,d3
+	move.b	3(a2),d0
+	andi.w	#$F,d0
+	add.w	d0,d3
+	move.b	3(a2),d0
+	andi.w	#$F0,d0
+	lsr.w	#4,d0
+	add.w	d0,d3
+	move.b	5(a2),d0
+	andi.w	#$F,d0
+	add.w	d0,d3
+	move.b	5(a2),d0
+	andi.w	#$F0,d0
+	lsr.w	#4,d0
+	add.w	d0,d3
+	move.b	frame(a2),d0
+	andi.w	#$F0,d0
+	lsr.w	#4,d0
+	add.w	d0,d3
+	move.b	7(a2),d0
+	andi.w	#$F0,d0
+	lsr.w	#4,d0
+	add.w	d0,d3
+	cmp.w	(BA_Skater_Offset).w,d1
+	bne.w	.3
+	move.w	#$7FFF,d3
+.3
+	cmp.w	d6,d3
+	blt.w	.4
+	move.w	d3,d6
+	move.w	d1,d5
+	bra.w	.4
+.4
+	addq.w	#1,d1
+	subq.w	#1,(puckanimchars).w
+	bra.w	.loop
+.5
+	tst.w	d5
+	bmi.w	.8
+	move.w	d5,(BA_Skater_Offset).w
+.6
+	move.w	#0,(BA_Sktr_SCnum).w
+	tst.w	(BA_Team).w
+	beq.w	.7
+	move.w	#6,(BA_Sktr_SCnum).w
+.7
+	move.w	(BA_Sktr_SCnum).w,d0
+	asl.w	#7,d0
+	movea.l	#SortCords,a3
+	adda.w	d0,a3
+	move.w	(BA_Skater_Offset).w,d3
+	bra.w	.9
+.8
+	move.w	#$FFFF,d0
+	bra.w	.10
+.9
+	move.w	#1,d0
+.10
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 puckpenshot							;asstab entry: the penalty shot / shootout face-off.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$AB,$00,$01,$00,$62,$67,$00,$03,$18,$48,$E7,$FF,$FE,$61,$00
-	dc.b	$1C,$1C,$08,$38,$00,$00,$BF,$B2,$66,$F8,$0C,$78,$02,$58,$B8,$B2
-	dc.b	$63,$00,$00,$0E,$31,$FC,$02,$58,$B8,$B2,$06,$78,$00,$14,$B8,$B8
-	dc.b	$38,$38,$B0,$3A,$24,$7C,$00,$09,$7E,$7A,$4E,$B9,$00,$01,$B7,$30
-	dc.b	$08,$F8,$00,$03,$BF,$B2,$08,$B8,$00,$00,$C3,$3A,$08,$B8,$00,$00
-	dc.b	$C3,$3E,$31,$FC,$03,$E8,$BF,$16,$31,$FC,$03,$E8,$BF,$14,$42,$38
-	dc.b	$BF,$BA,$50,$F8,$C4,$46,$08,$B8,$00,$01,$C3,$3C,$50,$F8,$BF,$12
-	dc.b	$61,$00,$3C,$86,$42,$78,$BD,$2E,$42,$78,$BD,$32,$31,$FC,$00,$00
-	dc.b	$B7,$5E,$31,$FC,$00,$00,$B7,$72,$42,$78,$B7,$76,$42,$78,$B7,$86
-	dc.b	$42,$78,$B7,$88,$42,$78,$B7,$8A,$50,$F8,$B7,$BE,$30,$7C,$B6,$5E
-	dc.b	$42,$68,$00,$28,$42,$68,$00,$2A,$42,$50,$31,$7C,$01,$22,$00,$14
-	dc.b	$D0,$FC,$00,$80,$42,$68,$00,$28,$42,$68,$00,$2A,$42,$50,$31,$7C
-	dc.b	$FE,$DE,$00,$14,$30,$7C,$B7,$DE,$31,$7C,$02,$99,$00,$06,$42,$68
-	dc.b	$00,$58,$42,$68,$00,$04,$42,$78,$B7,$62,$08,$B8,$00,$06,$C3,$3A
-	dc.b	$78,$64,$61,$00,$D3,$90,$51,$CC,$FF,$FA,$31,$FC,$00,$3C,$BF,$E0
-	dc.b	$61,$00,$69,$DC,$34,$7C,$C7,$26,$61,$00,$67,$32,$61,$00,$68,$E2
-	dc.b	$D4,$FC,$03,$9E,$61,$00,$67,$26,$61,$00,$68,$D6,$4E,$B9,$00,$02
-	dc.b	$14,$30,$2F,$0B,$26,$7C,$FF,$FF,$B5,$DE,$34,$3C,$00,$0B,$B4,$78
-	dc.b	$D2,$D4,$67,$00,$00,$22,$B4,$78,$D2,$D6,$67,$00,$00,$9A,$36,$BC
-	dc.b	$FF,$10,$42,$6B,$00,$14,$42,$6B,$00,$06,$30,$3C,$00,$20,$61,$00
-	dc.b	$0F,$6A,$60,$00,$01,$2E,$4A,$6B,$00,$34,$6A,$00,$00,$2E,$08,$AB
-	dc.b	$00,$02,$00,$63,$67,$00,$00,$24,$48,$E7,$FF,$FE,$42,$43,$16,$2B
-	dc.b	$00,$67,$4E,$B9,$00,$01,$FE,$A0,$4C,$DF,$7F,$FF,$4A,$6B,$00,$34
-	dc.b	$67,$00,$00,$06,$6A,$00,$00,$04,$4E,$71,$30,$38,$B7,$5E,$04,$40
-	dc.b	$00,$00,$36,$80,$30,$38,$B7,$72,$08,$2B,$00,$07,$00,$62,$66,$00
-	dc.b	$00,$10,$06,$40,$00,$10,$37,$7C,$00,$04,$00,$54,$60,$00,$00,$0C
-	dc.b	$06,$40,$FF,$F0,$37,$7C,$00,$00,$00,$54,$37,$40,$00,$14,$42,$6B
-	dc.b	$00,$28,$42,$6B,$00,$2A,$42,$6B,$00,$2C,$30,$3C,$00,$11,$61,$00
-	dc.b	$0E,$EA,$60,$00,$00,$AE,$08,$38,$00,$00,$C3,$48,$67,$00,$00,$1A
-	dc.b	$17,$78,$D4,$53,$00,$67,$4A,$78,$D4,$54,$67,$00,$00,$1E,$17,$78
-	dc.b	$D4,$45,$00,$67,$60,$00,$00,$14,$4A,$6B,$00,$34,$6A,$00,$00,$2E
-	dc.b	$08,$AB,$00,$02,$00,$63,$67,$00,$00,$24,$48,$E7,$FF,$FE,$42,$43
-	dc.b	$16,$2B,$00,$67,$4E,$B9,$00,$01,$FE,$A0,$4C,$DF,$7F,$FF,$4A,$6B
-	dc.b	$00,$34,$66,$00,$00,$06,$6A,$00,$00,$04,$4E,$71,$08,$AB,$00,$02
-	dc.b	$00,$63,$30,$3C,$00,$00,$32,$3C,$00,$E5,$08,$2B,$00,$07,$00,$62
-	dc.b	$66,$00,$00,$06,$32,$3C,$FF,$1B,$36,$80,$37,$41,$00,$14,$42,$6B
-	dc.b	$00,$28,$42,$6B,$00,$2A,$42,$6B,$00,$18,$90,$78,$B7,$5E,$92,$78
-	dc.b	$B7,$72,$44,$40,$44,$41,$61,$00,$0E,$70,$37,$40,$00,$54,$08,$AB
-	dc.b	$00,$02,$00,$63,$08,$AB,$00,$05,$00,$62,$32,$3C,$08,$56,$61,$00
-	dc.b	$10,$7E,$97,$FC,$00,$00,$00,$80,$51,$CA,$FE,$A4,$4E,$B9,$00,$02
-	dc.b	$13,$AE,$26,$5F,$61,$00,$03,$BA,$30,$38,$D2,$D6,$EF,$40,$36,$7C
-	dc.b	$B0,$5E,$D6,$C0,$36,$BC,$00,$00,$37,$7C,$FF,$06,$00,$14,$08,$2B
-	dc.b	$00,$07,$00,$62,$66,$00,$00,$08,$37,$7C,$00,$FA,$00,$14,$30,$38
-	dc.b	$D2,$D6,$32,$3C,$00,$01,$08,$2B,$00,$06,$00,$62,$67,$00,$00,$06
-	dc.b	$32,$3C,$00,$02,$B2,$78,$C3,$90,$66,$00,$00,$0C,$4E,$B9,$00,$01
-	dc.b	$6C,$52,$60,$00,$00,$10,$B2,$78,$C3,$92,$66,$00,$00,$08,$4E,$B9
-	dc.b	$00,$01,$6C,$5C,$30,$3C,$00,$0E,$61,$00,$0D,$CA,$08,$F8,$00,$07
-	dc.b	$C3,$40,$08,$F8,$00,$02,$C3,$3C,$31,$FC,$01,$90,$C3,$7E,$4A,$78
-	dc.b	$C3,$90,$66,$00,$00,$10,$4A,$78,$C3,$92,$66,$00,$00,$08,$31,$FC
-	dc.b	$00,$64,$C3,$7E,$31,$FC,$00,$18,$BD,$3C,$4C,$DF,$7F,$FF,$4E,$75
-	dc.b	$08,$F8,$00,$02,$C3,$48,$30,$3C,$00,$18,$61,$00,$0D,$88,$42,$6B
-	dc.b	$00,$28,$42,$6B,$00,$2A,$4E,$75
+	bclr	#pfna,pflags(a3)
+	beq.w	.19
+	movem.l	d0-d7/a0-a6,-(sp)
+	bsr.w	forceblack
+.loop
+	btst	#dfok,(disflags).w
+	bne.s	.loop
+	cmpi.w	#$258,(Crowdlevel).w
+	bls.w	.1
+	move.w	#$258,(Crowdlevel).w
+	addi.w	#$14,(CwdExciteLvl).w
+.1
+	move.w	(ExtraChars).w,d4
+	movea.l	#$97E7A,a2
+	jsr	(DecompressGraphicsPlain).l
+	bset	#dfclock,(disflags).w
+	bclr	#sfpz,(sflags).w
+	bclr	#0,(sflags3).w
+	move.w	#$3E8,(glovecords+2).w
+	move.w	#$3E8,(glovecords).w
+	clr.b	(lty+2).w
+	st	(RefCnt).w
+	bclr	#1,(sflags2).w
+	st	(passplayer).w
+	bsr.w	ClrHor
+	clr.w	(Vpos).w
+	clr.w	(Hpos).w
+	move.w	#0,(puckx).w
+	move.w	#0,(pucky).w
+	clr.w	(puckz).w
+	clr.w	(puckvx).w
+	clr.w	(puckvy).w
+	clr.w	(puckvz).w
+	st	(puckc).w
+	movea.w	#(SortCords+(12*SCstruct)-M68K_RAM),a0	;goal net SCstruct
+	clr.w	$28(a0)
+	clr.w	$2A(a0)
+	clr.w	(a0)
+	move.w	#$122,$14(a0)
+	adda.w	#SCstruct,a0
+	clr.w	$28(a0)
+	clr.w	$2A(a0)
+	clr.w	(a0)
+	move.w	#$FEDE,$14(a0)
+	movea.w	#(SortCords+((puckscnum+1)*SCstruct)-M68K_RAM),a0	;puck shadow SCstruct
+	move.w	#$299,6(a0)
+	clr.w	$58(a0)
+	clr.w	4(a0)
+	clr.w	(puckx+4).w
+	bclr	#sfslock,(sflags).w
+	moveq	#$64,d4
+.loop2
+	bsr.w	checkwindow
+	dbf	d4,.loop2
+	move.w	#$3C,(yleader).w
+	bsr.w	ResetBench
+	movea.w	#(tmstruct-M68K_RAM),a2
+	bsr.w	setpersonel
+	bsr.w	SetupPenaltyShot
+	adda.w	#$39E,a2
+	bsr.w	setpersonel
+	bsr.w	SetupPenaltyShot
+	jsr	(resetplstuff).l
+	move.l	a3,-(sp)
+	movea.l	#SortCords+(11*SCstruct),a3	;away goalie SCstruct
+	move.w	#$B,d2					;11 = # of player SCstructs
+.loop3
+	cmp.w	(BA_Sktr_SCnum).w,d2
+	beq.w	.2
+	cmp.w	(BA_Goalie_SCnum).w,d2
+	beq.w	.7
+	move.w	#$FF10,(a3)
+	clr.w	Ypos(a3)
+	clr.w	frame(a3)
+	move.w	#$20,d0
+	bsr.w	assinsert
+	bra.w	.13
+.2
+	tst.w	position(a3)
+	bpl.w	.4
+	bclr	#pf2unav,pflags2(a3)
+	beq.w	.4
+	movem.l	d0-d7/a0-a6,-(sp)
+	clr.w	d3
+	move.b	weight(a3),d3
+	jsr	(setplayer).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	tst.w	position(a3)
+	beq.w	.3
+	bpl.w	.4
+.3
+	nop
+.4
+	move.w	(puckx).w,d0
+	subi.w	#0,d0
+	move.w	d0,(a3)
+	move.w	(pucky).w,d0
+	btst	#pfgoal,pflags(a3)
+	bne.w	.5
+	addi.w	#$10,d0
+	move.w	#4,facedir(a3)
+	bra.w	.6
+.5
+	addi.w	#$FFF0,d0
+	move.w	#0,facedir(a3)
+.6
+	move.w	d0,Ypos(a3)
+	clr.w	Xvel(a3)
+	clr.w	Yvel(a3)
+	clr.w	Zvel(a3)
+	move.w	#$11,d0
+	bsr.w	assinsert
+	bra.w	.13
+.7
+	btst	#0,(gmode2).w
+	beq.w	.8
+	move.b	($FFFFD453).w,weight(a3)
+	tst.w	(shootoutteam).w
+	beq.w	.9
+	move.b	($FFFFD445).w,weight(a3)
+	bra.w	.9
+.8
+	tst.w	position(a3)
+	bpl.w	.11
+	bclr	#pf2unav,pflags2(a3)
+	beq.w	.11
+.9
+	movem.l	d0-d7/a0-a6,-(sp)
+	clr.w	d3
+	move.b	weight(a3),d3
+	jsr	(setplayer).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	tst.w	position(a3)
+	bne.w	.10
+	bpl.w	.11
+.10
+	nop
+.11
+	bclr	#pf2unav,pflags2(a3)
+	move.w	#0,d0
+	move.w	#$E5,d1
+	btst	#pfgoal,pflags(a3)
+	bne.w	.12
+	move.w	#$FF1B,d1
+.12
+	move.w	d0,(a3)
+	move.w	d1,Ypos(a3)
+	clr.w	Xvel(a3)
+	clr.w	Yvel(a3)
+	clr.w	Zpos(a3)
+	sub.w	(puckx).w,d0
+	sub.w	(pucky).w,d1
+	neg.w	d0
+	neg.w	d1
+	bsr.w	vtoa
+	move.w	d0,facedir(a3)
+	bclr	#pf2unav,pflags2(a3)
+	bclr	#pfalock,pflags(a3)
+	move.w	#SPAglide,d1
+	bsr.w	SetSPA
+.13
+	suba.l	#SCstruct,a3
+	dbf	d2,.loop3
+	jsr	(SprSort).l
+	movea.l	(sp)+,a3
+	bsr.w	AssignPads
+	move.w	(BA_Goalie_SCnum).w,d0
+	asl.w	#7,d0
+	movea.w	#(SortCords-M68K_RAM),a3
+	adda.w	d0,a3
+	move.w	#0,(a3)
+	move.w	#$FF06,Ypos(a3)
+	btst	#pfgoal,pflags(a3)
+	bne.w	.14
+	move.w	#$FA,Ypos(a3)
+.14
+	move.w	(BA_Goalie_SCnum).w,d0
+	move.w	#1,d1
+	btst	#pfteam,pflags(a3)
+	beq.w	.15
+	move.w	#2,d1
+.15
+	cmp.w	(cont1team).w,d1
+	bne.w	.16
+	jsr	(setc1player).l
+	bra.w	.17
+.16
+	cmp.w	(cont2team).w,d1
+	bne.w	.17
+	jsr	(setc2player).l
+.17
+	move.w	#$E,d0
+	bsr.w	assreplace
+	bset	#7,(BA_PS_flags).w
+	bset	#sf2drec,(sflags2).w
+	move.w	#$190,(msgtimer).w
+	tst.w	(cont1team).w
+	bne.w	.18
+	tst.w	(cont2team).w
+	bne.w	.18
+	move.w	#$64,(msgtimer).w
+.18
+	move.w	#$18,(palcount).w
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+.19
+	bset	#2,(gmode2).w
+	move.w	#$18,d0
+	bsr.w	assreplace
+	clr.w	Xvel(a3)
+	clr.w	Yvel(a3)
+	rts
 
 PenShotTable						;Penalty shot data
 	dc.b	0,1,2,3,4,5,6,0,0,1,5,3,4,2,0,0

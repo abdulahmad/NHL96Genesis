@@ -3,12 +3,22 @@
 
 PeriodOver							;End of period: next period, overtime or game over (gsp 4); forceblack,
 									;then into IntermissionStart
-									;Code the listing does not decode: kept as bytes
-	dc.b	$52,$78,$C4,$BC,$08,$78,$00,$01,$C3,$38,$0C,$78,$00,$03,$C4,$BC
-	dc.b	$6D,$00,$00,$2C,$67,$00,$00,$16,$31,$FC,$00,$03,$C4,$BC,$4A,$78
-	dc.b	$D2,$54,$66,$00,$00,$08,$31,$FC,$00,$04,$C4,$BC,$30,$38,$C7,$32
-	dc.b	$90,$78,$CA,$D0,$67,$00,$00,$08,$31,$FC,$00,$04,$C4,$BC,$61,$00
-	dc.b	$99,$36
+	addq.w	#1,(gsp).w
+	bchg	#gmdir,(gmode).w
+	cmpi.w	#3,(gsp).w
+	blt.w	.2
+	beq.w	.1
+	move.w	#3,(gsp).w
+	tst.w	(OptPlayMode).w
+	bne.w	.1
+	move.w	#4,(gsp).w
+.1
+	move.w	(HmGoals).w,d0
+	sub.w	(AwGoals).w,d0
+	beq.w	.2
+	move.w	#4,(gsp).w
+.2
+	bsr.w	forceblack
 
 IntermissionStart					;The end of a period: ResetClock, restart the sound driver, Intermission,
 									;then GameOver or StartPer
@@ -265,9 +275,11 @@ OpeningClear						;Reset the stack and clear the game variables (keeping the sea
 	bra.w	Opening2
 
 AbortGame							;The "ABORT GAME" menu item: back to the title (Opening2).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$B8,$00,$04,$C3,$3A,$31,$FC,$FF,$FF,$C0,$64,$21,$FC,$FF,$FF
-	dc.b	$00,$00,$B0,$4E,$50,$F8,$D2,$76,$4E,$F9,$00,$02,$17,$4A
+	bclr	#4,(sflags).w
+	move.w	#$FFFF,(lastsfx).w
+	move.l	#$FFFF0000,(recbpr).w
+	st	(demoflag).w
+	jmp	(Opening2).l
 
 EASportsScreen						;Called from Begin. Show the EA Sports screen until a button or a time out
 	move.l	#vb2,(VBint).w			;vblank handler

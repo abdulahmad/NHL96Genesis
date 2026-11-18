@@ -23,6 +23,12 @@ print = $01BBA0						;video96
 SkipStrings = $01D7F2				;hockey96_inter
 linelist = $023342					;lines96_list
 FaceOffMap = $091D46				;graphics96
+assexit = $01A3BE					;code96_15_stub
+assreplace = $01A3DA				;collide96_stub
+DecompressGraphicsPlain = $01B730	;pause96_return_stub
+dirtab = $01AE60					;input96_shot_stub
+randomd0 = $01B0A6					;playoff96_stub
+sfx = $088470						;collide96_stub
 
 
 ; Main segment code

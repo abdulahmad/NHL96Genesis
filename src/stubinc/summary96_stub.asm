@@ -15,6 +15,14 @@
 DumpSpriteTable = $02031C			;display96
 cramfade = $01AFD6					;video96
 p_music_vblank = $024486			;sound96
+AppendUserName = $1D7D62			;code96_14
+GAttribOverall = $0235A6			;setup96_attr
+GetNameandAttrib = $0151FA			;stats96_stub
+PAttribOverall = $023444			;setup96_attr
+printbig = $01BEEC					;stats96_stub
+printsmallz = $01BA2E				;pause96_stub
+printz = $01BB8E					;goal96_box_stub
+ReadSRAM = $0241E8					;sram96
 
 
 ; Main segment code

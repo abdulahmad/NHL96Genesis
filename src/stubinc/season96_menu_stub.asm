@@ -74,6 +74,7 @@ MenuSignFreeAgents = $1DC148		;trade96_edit
 MenuReleasePlayer = $1DC150			;trade96_edit
 TradePlayers = $1DC158				;trade96_edit
 TeamRosterScreen = $1E2EFC			;summary96
+SPAturnl = $2020					;frames96
 
 
 ; Main segment code

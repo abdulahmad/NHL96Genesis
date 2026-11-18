@@ -27,6 +27,13 @@ prefmes = $01C9FA					;penalty96
 setplayer = $01FEA0					;players96
 FormatPlayerNumInitial = $022F44	;middle96
 TeamList = $00077E					;teamdata96
+ExitToOpening = $0216EE				;hockey96_open
+MakeSRAMChecksum = $0241AA			;sram96
+randomd0 = $01B0A6					;playoff96_stub
+setc1player = $016C52				;control96
+setc2player = $016C5C				;control96
+SetMenuPadSide = $1D9844			;code96_15
+WriteSRAM = $024188					;sram96
 
 
 ; Main segment code

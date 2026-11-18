@@ -213,38 +213,123 @@ assgoalietopuck						;asstab entry: the goalie skates to the loose puck.
 	dc.b	$24,$B0,$60,$00,$23,$38
 
 breakaway							;Breakaway for the carrier.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$F8,$00,$02,$C3,$44,$08,$AB,$00,$01,$00,$62,$67,$00,$00,$3A
-	dc.b	$3F,$3C,$00,$01,$4E,$B9,$00,$08,$84,$70,$48,$E7,$00,$20,$24,$7C
-	dc.b	$FF,$FF,$C7,$26,$08,$2B,$00,$06,$00,$62,$67,$00,$00,$08,$24,$7C
-	dc.b	$FF,$FF,$CA,$C4,$52,$6A,$03,$92,$06,$78,$00,$14,$B8,$B8,$06,$78
-	dc.b	$00,$C8,$B8,$B2,$4C,$DF,$04,$00,$48,$A7,$40,$00,$30,$2B,$00,$14
-	dc.b	$32,$2B,$00,$2A,$67,$00,$00,$0A,$B3,$40,$4C,$9F,$00,$02,$4E,$75
-	dc.b	$32,$3C,$FF,$FF,$60,$F4
+	bset	#2,(sflags5).w
+	bclr	#pfna,pflags(a3)		;pfna - clear new assignment
+	beq.w	.2						;jump if no new assignment
+	move.w	#SFXbeep1,-(sp)			;ding SFX
+	jsr	(sfx).l
+	movem.l	a2,-(sp)
+	movea.l	#tmstruct,a2			;move Home Team Struct into a2
+	btst	#pfteam,pflags(a3)		;pfteam - check if home or away
+	beq.w	.1						;jump if home
+	movea.l	#AwShots,a2				;move Away Team Struct into a2
+.1
+	addq.w	#1,$392(a2)
+	addi.w	#$14,(CwdExciteLvl).w	;add to CwdExcite
+	addi.w	#$C8,(Crowdlevel).w		;add to Crowdlevel
+	movem.l	(sp)+,a2
+.2
+	movem.w	d1,-(sp)
+	move.w	Ypos(a3),d0				;move Ypos into d0
+	move.w	Yvel(a3),d1				;move Yvel into d1
+	beq.w	.3						;jump if Yvel = 0
+	eor.w	d1,d0					;EOR d1 with d0. d0 will be negative if skating opposite direction of net
+.loop
+	movem.w	(sp)+,d1
+	rts
+.3
+	move.w	#$FFFF,d1
+	bra.s	.loop
 
 BreakawayOffsidesFlagSet			;The breakaway / offsides flags of a3.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$01,$00,$62,$67,$00,$00,$0E,$08,$AB,$00,$00,$00,$64
-	dc.b	$08,$AB,$00,$01,$00,$64,$48,$A7,$C0,$80,$30,$3C,$01,$1E,$32,$2B
-	dc.b	$00,$14,$6A,$00,$00,$04,$44,$41,$B2,$40,$6C,$00,$00,$A0,$30,$3C
-	dc.b	$00,$76,$32,$2B,$00,$14,$08,$2B,$00,$07,$00,$62,$66,$00,$00,$0E
-	dc.b	$44,$41,$B0,$41,$6E,$00,$00,$0C,$60,$00,$00,$12,$B0,$41,$6D,$00
-	dc.b	$00,$0C,$08,$EB,$00,$00,$00,$64,$60,$00,$00,$72,$08,$AB,$00,$00
-	dc.b	$00,$64,$67,$00,$00,$68,$30,$2B,$00,$14,$08,$2B,$00,$07,$00,$62
-	dc.b	$66,$00,$00,$04,$44,$40,$04,$40,$00,$76,$6A,$00,$00,$04,$44,$40
-	dc.b	$B0,$7C,$00,$23,$6D,$00,$00,$06,$60,$00,$00,$42,$32,$2B,$00,$14
-	dc.b	$20,$7C,$FF,$FF,$B5,$DE,$30,$3C,$00,$0B,$4A,$41,$6B,$00,$00,$34
-	dc.b	$B2,$68,$00,$14,$6C,$00,$00,$0E,$4A,$68,$00,$34,$67,$00,$00,$06
-	dc.b	$60,$00,$00,$1A,$90,$FC,$00,$80,$51,$C8,$FF,$E6,$08,$EB,$00,$01
-	dc.b	$00,$64,$30,$3C,$00,$01,$4C,$9F,$01,$03,$4E,$75,$30,$3C,$00,$00
-	dc.b	$60,$F4,$B2,$68,$00,$14,$6F,$00,$00,$0C,$4A,$68,$00,$34,$67,$00
-	dc.b	$00,$04,$60,$E8,$90,$FC,$00,$80,$51,$C8,$FF,$E8,$60,$CE
+	btst	#pfna,pflags(a3)		;check for new assignment
+	beq.w	.1						;branch if no new assignment
+	bclr	#pf3oside,pflags3(a3)	;clear player offsides flag
+	bclr	#pf3break,pflags3(a3)	;clear player breakaway flag
+.1
+	movem.w	d0-d1/a0,-(sp)
+	move.w	#$11E,d0
+	move.w	Ypos(a3),d1				;Ypos
+	bpl.w	.2						;branch if Ypos is positive
+	neg.w	d1						;negate d1
+.2
+	cmp.w	d0,d1					;compare position to top goal line
+	bge.w	.loop4					;Branch if above it
+	move.w	#$76,d0
+	move.w	Ypos(a3),d1				;Ypos
+	btst	#pfgoal,pflags(a3)		;check goal to shoot on (0=bottom, 1=top)
+	bne.w	.3						;branch if top goal
+	neg.w	d1						;bottom goal, so negate d0
+	cmp.w	d1,d0					;compare Ypos to blue line Y
+	bgt.w	.4
+	bra.w	.5						;branch if in attack zone
+.3
+	cmp.w	d1,d0					;compare Ypos to blue line Y
+	blt.w	.5						;branch if in offensive zone
+.4
+	bset	#pf3oside,pflags3(a3)	;set offsides flag
+	bra.w	.loop4
+.5
+	bclr	#pf3oside,pflags3(a3)	;clear offside bit
+	beq.w	.loop4					;branch if on the blue line
+	move.w	Ypos(a3),d0
+	btst	#pfgoal,pflags(a3)
+	bne.w	.6
+	neg.w	d0
+.6
+	subi.w	#$76,d0
+	bpl.w	.7
+	neg.w	d0
+.7
+	cmp.w	#$23,d0
+	blt.w	.8
+	bra.w	.loop4
+.8
+	move.w	Ypos(a3),d1
+	movea.l	#SortCords+(11*SCstruct),a0	;loads last SCScruct player struct (Away pos #6)
+	move.w	#$B,d0					;B = # of player structs to check (12)
+	tst.w	d1						;checks if d1 is negative (determines what zone to check)
+	bmi.w	.loop5
+.loop
+	cmp.w	$14(a0),d1				;compare Ypos of a0 player to d1 (Ypos puckc)
+	bge.w	.9						;branch if d1 greater than or equal
+	tst.w	$34(a0)					;check if goalie
+	beq.w	.9						;branch if goalie
+	bra.w	.loop4
+.9
+	suba.w	#SCstruct,a0
+	dbf	d0,.loop
+.loop2
+	bset	#pf3break,pflags3(a3)	;set breakaway bit
+	move.w	#1,d0					;moves 1 into d0 (used by returned subroutine)
+.loop3
+	movem.w	(sp)+,d0-d1/a0
+	rts
+.loop4
+	move.w	#0,d0					;move 0 into d0 (used on return to subroutine)
+	bra.s	.loop3
+.loop5
+	cmp.w	$14(a0),d1				;check Ypos with d1 (d1 = blue line Y)
+	ble.w	.10
+	tst.w	$34(a0)					;checks if goalie (who would be below blue line)
+	beq.w	.10
+	bra.s	.loop4
+.10
+	suba.w	#SCstruct,a0			;back one sort object
+	dbf	d0,.loop5
+	bra.s	.loop2
 
 chkpuckc							;asstab entry: breakaway carrier check, then asspuckc.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$38,$00,$00,$C3,$48,$66,$00,$00,$14,$08,$38,$00,$02,$C3,$40
-	dc.b	$66,$00,$00,$0A,$61,$00,$FE,$96,$6A,$00,$00,$10,$08,$AB,$00,$01
-	dc.b	$00,$64,$30,$3C,$00,$10,$61,$00,$23,$4A
+	btst	#0,(gmode2).w
+	bne.w	.1
+	btst	#2,(BA_PS_flags).w
+	bne.w	.1
+	bsr.w	breakaway
+	bpl.w	asspuckc				;currently skating towards net in Y
+.1
+	bclr	#pf3break,pflags3(a3)	;clear breakaway bit
+	move.w	#$10,d0
+	bsr.w	assreplace
 
 asspuckc							;asstab entry: the puck carrier.
 									;Code the listing does not decode: kept as bytes
@@ -374,17 +459,50 @@ chkpk2								;Z set when a3's team is on the power play (sflags2 bit 6 against 
 
 EvadePC								;skateto extra routine: steer around the puck carrier (its address is
 									;passed in a0).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$4A,$78,$B7,$BE,$6B,$00,$71,$0A,$14,$2B,$00,$28,$94,$38,$B7,$86
-	dc.b	$48,$82,$D4,$53,$94,$78,$B7,$5E,$B4,$7C,$00,$28,$6E,$00,$70,$F2
-	dc.b	$B4,$7C,$FF,$D8,$6D,$00,$70,$EA,$12,$2B,$00,$2A,$92,$38,$B7,$88
-	dc.b	$48,$81,$D2,$6B,$00,$14,$92,$78,$B7,$72,$B2,$7C,$00,$28,$6E,$00
-	dc.b	$70,$D0,$B2,$7C,$FF,$D8,$6D,$00,$70,$C8,$30,$13,$90,$78,$B7,$5E
-	dc.b	$32,$2B,$00,$14,$92,$78,$B7,$72,$61,$00,$1C,$5A,$08,$38,$00,$05
-	dc.b	$C3,$38,$67,$00,$00,$34,$32,$2B,$00,$14,$08,$2B,$00,$07,$00,$62
-	dc.b	$66,$00,$00,$04,$44,$41,$04,$41,$00,$76,$B2,$7C,$00,$0A,$6E,$00
-	dc.b	$00,$18,$B2,$7C,$FF,$CE,$6D,$00,$00,$10,$70,$02,$32,$13,$B2,$78
-	dc.b	$B7,$5E,$6E,$00,$00,$04,$70,$06,$4E,$75
+	tst.w	(puckc).w
+	bmi.w	rtss2					;no puck carrier
+	move.b	Xvel(a3),d2				;Xvel
+	sub.b	(puckvx).w,d2			;sub puckvx from Xvel
+	ext.w	d2
+	add.w	(a3),d2					;add Xpos
+	sub.w	(puckx).w,d2			;Sub puckx
+	cmp.w	#$28,d2					;'('   ; compare to 40 decimal
+	bgt.w	rtss2					;exit if greater than 40
+	cmp.w	#$FFD8,d2				;compare to -40
+	blt.w	rtss2					;exit if less than -40
+	move.b	Yvel(a3),d1				;Yvel
+	sub.b	(puckvy).w,d1			;sub puckvy from Yvel
+	ext.w	d1
+	add.w	Ypos(a3),d1				;add Ypos to d1
+	sub.w	(pucky).w,d1			;Sub pucky
+	cmp.w	#$28,d1					;'('   ; compare to 40 dec
+	bgt.w	rtss2					;exit if greater than
+	cmp.w	#$FFD8,d1				;compare to -40 dec
+	blt.w	rtss2					;exit if less than
+	move.w	(a3),d0					;Xpos
+	sub.w	(puckx).w,d0			;Sub puckx from Xpos
+	move.w	Ypos(a3),d1				;Ypos
+	sub.w	(pucky).w,d1			;Sub pucky from Ypos
+	bsr.w	vtoa					;find direction and convert to 0-7
+	btst	#gmoffs,(gmode).w		;check if offsides is on
+	beq.w	.2						;exit if not
+	move.w	Ypos(a3),d1				;Ypos
+	btst	#pfgoal,pflags(a3)		;check what net shooting at
+	bne.w	.1						;branch if top
+	neg.w	d1						;negate d1 (Ypos)
+.1
+	subi.w	#$76,d1
+	cmp.w	#$A,d1					;compare to 10 decimal
+	bgt.w	.2						;exit if greater
+	cmp.w	#$FFCE,d1
+	blt.w	.2						;branch if less than
+	moveq	#2,d0
+	move.w	(a3),d1					;Xpos
+	cmp.w	(puckx).w,d1			;compare puckx with Ypos difference
+	bgt.w	.2						;exit if greater
+	moveq	#6,d0
+.2
+	rts
 
 checkob								;Offside watch (gmode bit 5): with a player of the attacking side past the
 									;blue line ahead of the puck set sflags2 bit 7 (and the referee, PushRef),
@@ -444,10 +562,17 @@ checkob								;Offside watch (gmode bit 5): with a player of the attacking side
 	bra.s	.3
 
 assbreakaway						;asstab entry: breakaway; falls into assnearest.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$30,$2B,$00,$52,$B0,$78,$B7,$BE,$67,$00,$00,$14,$08,$AB,$00,$01
-	dc.b	$00,$64,$30,$3C,$00,$11,$61,$00,$1B,$4E,$60,$00,$00,$0A,$4E,$B9
-	dc.b	$00,$01,$7F,$14,$6B,$E6
+	move.w	SCnum(a3),d0			;Move SCnum into d0
+	cmp.w	(puckc).w,d0			;compare puck carrier SCnum with d0
+	beq.w	.1						;branch if puck carrier
+.loop
+	bclr	#pf3break,pflags3(a3)	;clear breakaway bit
+	move.w	#$11,d0
+	bsr.w	assreplace
+	bra.w	assnearest
+.1
+	jsr	(breakaway).l
+	bmi.s	.loop
 
 assnearest							;asstab entry: the player nearest the puck without it.
 									;Code the listing does not decode: kept as bytes
@@ -556,30 +681,93 @@ check4check							;Check an opponent in front of a3.
 	dc.b	$00,$80,$51,$CA,$FF,$6C,$4E,$75
 
 asspassrec							;asstab entry: catch a pass.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$69,$78,$08,$38,$00,$00,$C3,$38
-	dc.b	$66,$00,$E4,$42,$08,$2B,$00,$03,$00,$62,$66,$00,$14,$D8,$08,$AB
-	dc.b	$00,$01,$00,$62,$67,$00,$00,$18,$08,$EB,$00,$00,$00,$62,$17,$7C
-	dc.b	$00,$08,$00,$43,$42,$2B,$00,$42,$37,$7C,$FF,$FE,$00,$46,$4A,$78
-	dc.b	$B7,$BE,$6A,$00,$00,$B8,$52,$6B,$00,$46,$67,$00,$00,$06,$6A,$00
-	dc.b	$00,$A4,$4A,$78,$BF,$A6,$6A,$00,$00,$9C,$4A,$6B,$00,$34,$67,$00
-	dc.b	$00,$94,$3F,$00,$42,$6B,$00,$46,$30,$3C,$00,$01,$08,$2B,$00,$06
-	dc.b	$00,$62,$67,$00,$00,$06,$30,$3C,$00,$02,$B0,$78,$C3,$90,$67,$00
-	dc.b	$00,$72,$B0,$78,$C3,$92,$67,$00,$00,$6A,$B0,$78,$C3,$94,$67,$00
-	dc.b	$00,$62,$B0,$78,$C3,$96,$67,$00,$00,$5A,$4E,$B9,$00,$1D,$6B,$66
-	dc.b	$67,$00,$00,$50,$30,$2B,$00,$14,$08,$2B,$00,$07,$00,$62,$66,$00
-	dc.b	$00,$04,$44,$40,$B0,$7C,$00,$76,$6D,$00,$00,$0E,$B0,$7C,$01,$1E
-	dc.b	$6E,$00,$00,$06,$60,$00,$00,$14,$30,$3C,$00,$64,$4E,$B9,$00,$01
-	dc.b	$B0,$A6,$B0,$7C,$00,$32,$6E,$00,$00,$1A,$30,$1F,$31,$FC,$FF,$FF
-	dc.b	$DC,$CC,$08,$B8,$00,$03,$C3,$50,$30,$3C,$00,$23,$4E,$F9,$00,$01
-	dc.b	$A3,$DA,$30,$1F,$9F,$2B,$00,$40,$6A,$00,$68,$86,$08,$AB,$00,$00
-	dc.b	$00,$62,$60,$00,$13,$F0,$30,$2B,$00,$44,$32,$2B,$00,$46,$41,$FA
-	dc.b	$68,$70,$60,$00,$10,$72
+	btst	#pfalock,pflags(a3)		;pfalock - animation lock
+	bne.w	rtss2					;exit if locked
+	btst	#gmclock,(gmode).w		;gmclock - check if clock running
+	bne.w	donothing				;exit if clock stopped
+	btst	#pfjoycon,pflags(a3)	;pfjoycon - joystick controlled?
+	bne.w	assexit					;exit if controlled
+	bclr	#pfna,pflags(a3)		;#pfna - clear new assignment
+	beq.w	.nna
+	bset	#pfdoff,pflags(a3)		;#pfdoff - set decceleration off
+	move.b	#8,$43(a3)				;move into temp2+1
+	clr.b	temp2(a3)				;clear temp2 byte
+	move.w	#$FFFE,temp4(a3)		;move into temp4
+.nna
+	tst.w	(puckc).w				;check if there is a puck carrier
+	bpl.w	.exit					;exit if puck still in possession
+	addq.w	#1,temp4(a3)			;add to temp4
+	beq.w	.2						;branch if temp4 is zero
+	bpl.w	.ex2					;branch if temp4 is positive
+.2
+	tst.w	(onetimerplayer).w
+	bpl.w	.ex2
+	tst.w	position(a3)			;test if goalie
+	beq.w	.ex2					;exit if goalie
+	move.w	d0,-(sp)				;push d0 on stack
+	clr.w	temp4(a3)				;clear temp4
+	move.w	#1,d0
+	btst	#pfteam,pflags(a3)		;check if home or away
+	beq.w	.3
+	move.w	#2,d0					;away team
+.3
+	cmp.w	(cont1team).w,d0
+	beq.w	.pop
+	cmp.w	(cont2team).w,d0
+	beq.w	.pop					;branch if so
+	cmp.w	(cont3team).w,d0
+	beq.w	.pop
+	cmp.w	(cont4team).w,d0
+	beq.w	.pop
+	jsr	(PuckOnAttackHalf).l
+	beq.w	.pop
+	move.w	Ypos(a3),d0				;Ypos
+	btst	#pfgoal,pflags(a3)		;pfgoal
+	bne.w	.4						;branch if shooting at top
+	neg.w	d0
+.4
+	cmp.w	#$76,d0
+	blt.w	.5
+	cmp.w	#$11E,d0
+	bgt.w	.5
+	bra.w	.6
+.5
+	move.w	#$64,d0
+	jsr	(randomd0).l
+	cmp.w	#$32,d0
+	bgt.w	.pop
+.6
+	move.w	(sp)+,d0
+	move.w	#$FFFF,(inputjoy).w
+	bclr	#3,(GameFlags).w
+	move.w	#$23,d0
+	jmp	(assreplace).l
+.pop
+	move.w	(sp)+,d0
+.ex2
+	sub.b	d7,temp1(a3)
+	bpl.w	rtss2
+.exit
+	bclr	#pfdoff,pflags(a3)
+	bra.w	assexit
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
+	lea	rtss2(pc),a0
+	bra.w	skateto
 
 assshoot							;asstab entry: computer shooting.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$68,$62,$08,$AB,$00,$01,$00,$62
-	dc.b	$67,$00,$00,$08,$4E,$F9,$00,$00,$F4,$96,$08,$38,$00,$03,$C3,$3A
-	dc.b	$67,$00,$13,$BC,$42,$42,$9F,$6B,$00,$42,$6A,$00,$00,$06,$08,$C2
-	dc.b	$00,$05,$4E,$F9,$00,$00,$F5,$30
+	btst	#pfalock,pflags(a3)		;pfalock - animation locked
+	bne.w	rtss2
+	bclr	#pfna,pflags(a3)		;clear pfna
+	beq.w	.1
+	jmp	(SetShotMode).l				;95 jmp (94 bra)
+.1
+	btst	#sfssdir,(sflags).w		;#sfssdir
+	beq.w	assexit
+	clr.w	d2
+	sub.w	d7,temp2(a3)
+	bpl.w	.2						;the bra.w ShotMode is now a shared jmp
+	bset	#cbut,d2				;#cbut
+.2
+	jmp	(ShotMode).l
 

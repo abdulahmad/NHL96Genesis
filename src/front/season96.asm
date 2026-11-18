@@ -763,11 +763,24 @@ ReadStandings						;Read the wins, ties and losses of every team (3 bytes a team
 	dbf	d7,.0
 	movem.l	(sp)+,d0-d7/a0
 	rts
-	;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$80,$80,$42,$40,$20,$7C,$FF,$FF,$CF,$D2,$BE,$18,$67,$00
-	dc.b	$00,$06,$52,$40,$60,$F6,$3E,$00,$4C,$DF,$01,$01,$4E,$75,$48,$E7
-	dc.b	$00,$80,$42,$40,$20,$7C,$FF,$FF,$CF,$D2,$1E,$30,$70,$00,$4C,$DF
-	dc.b	$01,$00,$4E,$75
+	movem.l	d0/a0,-(sp)
+	clr.w	d0
+	movea.l	#potree,a0
+.loop
+	cmp.b	(a0)+,d7
+	beq.w	.1
+	addq.w	#1,d0
+	bra.s	.loop
+.1
+	move.w	d0,d7
+	movem.l	(sp)+,d0/a0
+	rts
+	movem.l	a0,-(sp)
+	clr.w	d0
+	movea.l	#potree,a0
+	move.b	(a0,d7.w),d7
+	movem.l	(sp)+,a0
+	rts
 
 SetupSeasonGame						;Set up the user's season game a2: the season options (LoadSeasonOptions)
 									;and the home and visiting teams
@@ -777,29 +790,83 @@ SetupSeasonGame						;Set up the user's season game a2: the season options (Load
 	move.b	1(a2),(Opt2team+1).w
 	move.w	(Opt2team).w,(VisTeam).w
 	rts
-	;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$BE,$30,$38,$DD,$7E,$42,$41,$20,$7C,$00,$01,$18,$0C
-	dc.b	$42,$42,$14,$30,$10,$00,$B0,$42,$6F,$00,$00,$0A,$52,$41,$90,$42
-	dc.b	$53,$40,$60,$EE,$22,$7C,$00,$01,$17,$9C,$60,$00,$00,$04,$D2,$D1
-	dc.b	$51,$C9,$FF,$FC,$3F,$00,$26,$7C,$FF,$FF,$BF,$54,$30,$11,$53,$40
-	dc.b	$16,$D9,$51,$C8,$FF,$FC,$30,$1F,$52,$40,$B0,$7C,$00,$09,$6F,$00
-	dc.b	$00,$0A,$32,$3C,$00,$03,$60,$00,$00,$06,$32,$3C,$00,$02,$3F,$00
-	dc.b	$4E,$B9,$00,$01,$BE,$1C,$26,$7C,$FF,$FF,$BF,$54,$4E,$B9,$00,$01
-	dc.b	$BE,$80,$22,$7C,$00,$01,$17,$8C,$30,$1F,$48,$C0,$B0,$7C,$00,$0A
-	dc.b	$6D,$00,$00,$0A,$B0,$7C,$00,$15,$6D,$00,$00,$3A,$81,$FC,$00,$0A
-	dc.b	$48,$40,$B0,$7C,$00,$01,$66,$00,$00,$0C,$22,$7C,$00,$01,$17,$90
-	dc.b	$60,$00,$00,$22,$B0,$7C,$00,$02,$66,$00,$00,$0C,$22,$7C,$00,$01
-	dc.b	$17,$94,$60,$00,$00,$10,$B0,$7C,$00,$03,$66,$00,$00,$08,$22,$7C
-	dc.b	$00,$01,$17,$98,$4E,$B9,$00,$01,$BE,$80,$22,$4B,$4C,$DF,$7D,$FF
-	dc.b	$4E,$75,$00,$04,$54,$48,$00,$04,$53,$54,$00,$04,$4E,$44,$00,$04
-	dc.b	$52,$44,$00,$0A,$4F,$43,$54,$4F,$42,$45,$52,$00,$00,$0A,$4E,$4F
-	dc.b	$56,$45,$4D,$42,$45,$52,$00,$0A,$44,$45,$43,$45,$4D,$42,$45,$52
-	dc.b	$00,$0A,$4A,$41,$4E,$55,$41,$52,$59,$00,$00,$0A,$46,$45,$42,$52
-	dc.b	$55,$41,$52,$59,$00,$08,$4D,$41,$52,$43,$48,$00,$00,$08,$41,$50
-	dc.b	$52,$49,$4C,$00,$48,$E7,$3F,$80,$42,$40,$10,$38,$DD,$7E,$58,$40
-	dc.b	$42,$41,$20,$7C,$00,$01,$18,$0C,$42,$42,$14,$30,$10,$00,$B0,$42
-	dc.b	$6F,$00,$00,$0A,$52,$41,$90,$42,$53,$40,$60,$EE,$4C,$DF,$01,$FC
-	dc.b	$4E,$75,$1E,$1D,$1E,$1E,$1B,$1E,$1D,$FF
+	movem.l	d0-d7/a0/a2-a6,-(sp)
+	move.w	(SeasonDay).w,d0
+	clr.w	d1
+	movea.l	#$1180C,a0
+	clr.w	d2
+.loop
+	move.b	(a0,d1.w),d2
+	cmp.w	d2,d0
+	ble.w	.1
+	addq.w	#1,d1
+	sub.w	d2,d0
+	subq.w	#1,d0
+	bra.s	.loop
+.1
+	movea.l	#$1179C,a1
+	bra.w	.2
+.loop2
+	adda.w	(a1),a1
+.2
+	dbf	d1,.loop2
+	move.w	d0,-(sp)
+	movea.l	#TempLegSpd+2,a3
+	move.w	(a1),d0
+	subq.w	#1,d0
+.loop3
+	move.b	(a1)+,(a3)+
+	dbf	d0,.loop3
+	move.w	(sp)+,d0
+	addq.w	#1,d0
+	cmp.w	#9,d0
+	ble.w	.3
+	move.w	#3,d1
+	bra.w	.4
+.3
+	move.w	#2,d1
+.4
+	move.w	d0,-(sp)
+	jsr	(PushNumberWidth).l
+	movea.l	#TempLegSpd+2,a3
+	jsr	(appstring).l
+	movea.l	#$1178C,a1
+	move.w	(sp)+,d0
+	ext.l	d0
+	cmp.w	#$A,d0
+	blt.w	.5
+	cmp.w	#$15,d0
+	blt.w	.8
+.5
+	divs.w	#$A,d0
+	swap	d0
+	cmp.w	#1,d0
+	bne.w	.6
+	movea.l	#$11790,a1
+	bra.w	.8
+.6
+	cmp.w	#2,d0
+	bne.w	.7
+	movea.l	#$11794,a1
+	bra.w	.8
+.7
+	cmp.w	#3,d0
+	bne.w	.8
+	movea.l	#$11798,a1
+.8
+	jsr	(appstring).l
+	movea.l	a3,a1
+	movem.l	(sp)+,d0-d7/a0/a2-a6
+	rts
+	dc.w	$0004,$5448,$0004,$5354,$0004,$4E44,$0004,$5244
+	dc.w	$000A,$4F43,$544F,$4245,$5200,$000A,$4E4F,$5645
+	dc.w	$4D42,$4552,$000A,$4445,$4345,$4D42,$4552,$000A
+	dc.w	$4A41,$4E55,$4152,$5900,$000A,$4645,$4252,$5541
+	dc.w	$5259,$0008,$4D41,$5243,$4800,$0008,$4150,$5249
+	dc.w	$4C00,$48E7,$3F80,$4240,$1038,$DD7E,$5840,$4241
+	dc.w	$207C,$0001,$180C,$4242,$1430,$1000,$B042,$6F00
+	dc.w	$000A,$5241,$9042,$5340,$60EE,$4CDF,$01FC,$4E75
+	dc.w	$1E1D,$1E1E,$1B1E,$1DFF
 
 TeamSelectScreen					;Team select: up / down change the team, left / right pick home or
 									;visitors, with the team ranks; in a season
@@ -1490,90 +1557,190 @@ SetMenuScroll						;Write the vertical scroll: plane A 0, plane B the menu backg
 	move.w	(homegoalies).w,d0
 	move.w	d0,(a0)
 	rts
-	;Code the listing does not decode: kept as bytes
-	dc.b	$23,$FC,$00,$01,$2D,$46,$FF,$FF,$D2,$44,$08,$B8,$00,$00,$BF,$B2
-	dc.b	$08,$F8,$00,$02,$BF,$B2,$08,$B8,$00,$01,$BF,$B2,$31,$FC,$00,$00
-	dc.b	$B0,$00,$31,$FC,$B4,$00,$B0,$02,$31,$FC,$B8,$00,$B0,$0C,$31,$FC
-	dc.b	$00,$05,$B0,$0E,$31,$FC,$C0,$00,$B0,$08,$31,$FC,$00,$06,$B0,$0A
-	dc.b	$31,$FC,$E0,$00,$B0,$04,$31,$FC,$00,$06,$B0,$06,$30,$3C,$00,$00
-	dc.b	$08,$F8,$00,$05,$BF,$B2,$4E,$B9,$00,$01,$B5,$7E,$08,$B8,$00,$05
-	dc.b	$BF,$B2,$4E,$B9,$00,$01,$B2,$C4,$38,$3C,$00,$01,$22,$7C,$00,$17
-	dc.b	$E3,$FC,$4E,$B9,$00,$01,$21,$7A,$31,$C4,$B0,$1C,$24,$7C,$00,$17
-	dc.b	$91,$70,$4E,$B9,$00,$01,$B7,$30,$31,$C4,$B0,$1E,$24,$7C,$00,$17
-	dc.b	$A1,$6C,$4E,$B9,$00,$01,$B7,$30,$23,$FC,$00,$17,$91,$68,$FF,$FF
-	dc.b	$BF,$8A,$31,$C4,$B0,$14,$24,$7C,$00,$17,$AA,$7A,$4E,$B9,$00,$01
-	dc.b	$B7,$30,$08,$B8,$00,$02,$C3,$54,$33,$C4,$FF,$FF,$27,$16,$06,$44
-	dc.b	$00,$19,$33,$C4,$FF,$FF,$27,$18,$06,$44,$00,$19,$33,$C4,$FF,$FF
-	dc.b	$27,$1A,$06,$44,$00,$19,$33,$C4,$FF,$FF,$27,$1C,$06,$44,$00,$19
-	dc.b	$33,$C4,$FF,$FF,$27,$1E,$06,$44,$00,$19,$3F,$04,$26,$7C,$00,$01
-	dc.b	$2C,$DE,$22,$7C,$FF,$FF,$27,$16,$30,$39,$FF,$FF,$27,$22,$55,$40
-	dc.b	$6A,$00,$00,$0E,$54,$49,$52,$40,$6A,$00,$00,$06,$54,$49,$52,$40
-	dc.b	$E7,$40,$20,$7C,$FF,$FF,$27,$26,$1E,$30,$00,$00,$BE,$38,$DD,$84
-	dc.b	$66,$00,$00,$06,$1E,$30,$00,$01,$BE,$7C,$00,$1A,$6C,$00,$00,$2A
-	dc.b	$48,$87,$E5,$47,$24,$73,$70,$00,$50,$4A,$38,$11,$4E,$B9,$00,$01
-	dc.b	$B7,$30,$B3,$FC,$FF,$FF,$27,$1E,$67,$00,$00,$0E,$E6,$40,$54,$49
-	dc.b	$52,$40,$B0,$7C,$00,$53,$6F,$B8,$38,$1F,$33,$C4,$FF,$FF,$27,$12
-	dc.b	$06,$44,$00,$20,$33,$C4,$FF,$FF,$27,$14,$06,$44,$00,$20,$4E,$B9
-	dc.b	$00,$01,$BA,$2E,$00,$08,$FF,$01,$FD,$00,$FC,$00,$70,$28,$72,$1C
-	dc.b	$34,$3C,$07,$FF,$4E,$B9,$00,$01,$B9,$76,$4E,$B9,$00,$01,$BB,$8E
-	dc.b	$00,$06,$BF,$00,$00,$00,$20,$7C,$00,$17,$C2,$CE,$22,$48,$24,$48
-	dc.b	$D1,$DA,$D3,$DA,$42,$40,$42,$41,$74,$28,$76,$1C,$7A,$08,$4E,$B9
-	dc.b	$00,$01,$B6,$92,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$0B,$01,$00
-	dc.b	$20,$7C,$00,$17,$DB,$DC,$22,$48,$24,$48,$D1,$DA,$D3,$DA,$42,$40
-	dc.b	$42,$41,$34,$11,$36,$29,$00,$02,$7A,$08,$4E,$B9,$00,$01,$B6,$92
-	dc.b	$3F,$38,$B0,$1C,$31,$F8,$B0,$1E,$B0,$1C,$4E,$B9,$00,$01,$BC,$72
-	dc.b	$00,$24,$8F,$0C,$19,$7B,$7D,$2D,$4D,$45,$4E,$55,$20,$4F,$50,$54
-	dc.b	$49,$4F,$4E,$53,$8F,$0C,$1A,$5B,$5D,$2D,$43,$48,$41,$4E,$47,$45
-	dc.b	$20,$44,$41,$59,$31,$DF,$B0,$1C,$4E,$B9,$00,$01,$BB,$8E,$00,$06
-	dc.b	$BF,$01,$04,$00,$42,$47,$1E,$38,$DD,$84,$7A,$02,$61,$00,$03,$2E
-	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$FE,$00,$00,$00,$20,$7C,$00,$17
-	dc.b	$0B,$0C,$22,$48,$24,$48,$D1,$DA,$D3,$DA,$42,$40,$42,$41,$74,$40
-	dc.b	$76,$1C,$7A,$01,$4E,$B9,$00,$01,$B6,$92,$46,$FC,$25,$00,$4E,$75
-	dc.b	$3F,$38,$DD,$7E,$4A,$79,$FF,$FF,$27,$22,$67,$00,$00,$10,$4E,$B9
-	dc.b	$00,$01,$BE,$D6,$00,$08,$F8,$04,$01,$0D,$14,$5B,$08,$38,$00,$02
-	dc.b	$DD,$80,$67,$00,$00,$24,$4E,$B9,$00,$01,$BE,$D6,$00,$08,$F8,$04
-	dc.b	$01,$0E,$14,$00,$4E,$B9,$00,$01,$BE,$D6,$00,$0A,$50,$4C,$41,$59
-	dc.b	$4F,$46,$46,$53,$60,$00,$00,$22,$31,$F9,$FF,$FF,$27,$20,$DD,$7E
-	dc.b	$4E,$B9,$00,$01,$16,$BA,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$0E
-	dc.b	$14,$00,$4E,$B9,$00,$01,$BE,$EC,$30,$39,$FF,$FF,$27,$22,$52,$40
-	dc.b	$B0,$79,$FF,$FF,$27,$24,$6C,$00,$00,$0C,$4E,$B9,$00,$01,$BE,$D6
-	dc.b	$00,$04,$5D,$00,$31,$DF,$DD,$7E,$4E,$75,$42,$40,$10,$38,$DD,$85
-	dc.b	$67,$00,$00,$64,$53,$40,$B0,$79,$FF,$FF,$27,$22,$6D,$00,$00,$58
-	dc.b	$30,$39,$FF,$FF,$27,$22,$E7,$40,$20,$7C,$FF,$FF,$27,$26,$48,$E7
-	dc.b	$80,$80,$30,$30,$00,$04,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C
-	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$1F,$14,$00,$4E,$B9,$00,$01
-	dc.b	$BE,$EC,$4C,$DF,$01,$01,$30,$30,$00,$06,$32,$3C,$00,$02,$4E,$B9
-	dc.b	$00,$01,$BE,$1C,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$08,$14,$00
-	dc.b	$4E,$B9,$00,$01,$BE,$EC,$4E,$75,$4E,$B9,$00,$01,$BE,$D6,$00,$22
-	dc.b	$F8,$04,$01,$08,$14,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$30,$39,$FF,$FF,$27,$22,$E7,$40,$20,$7C,$FF,$FF,$27,$26,$33,$F0
-	dc.b	$00,$02,$FF,$FF,$27,$20,$48,$E7,$80,$80,$61,$00,$FE,$C4,$61,$00
-	dc.b	$FF,$4A,$30,$38,$B0,$52,$B0,$78,$B0,$52,$67,$FA,$4C,$D7,$01,$01
-	dc.b	$42,$47,$1E,$30,$00,$00,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$17
-	dc.b	$16,$00,$38,$39,$FF,$FF,$27,$12,$61,$00,$01,$64,$1E,$30,$00,$01
-	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$01,$16,$00,$38,$39,$FF,$FF
-	dc.b	$27,$14,$61,$00,$01,$4A,$30,$38,$B0,$52,$B0,$78,$B0,$52,$67,$FA
-	dc.b	$4C,$D7,$01,$01,$61,$00,$00,$08,$4C,$DF,$01,$01,$4E,$75,$3C,$3C
-	dc.b	$00,$04,$24,$7C,$FF,$FF,$27,$1E,$3A,$39,$FF,$FF,$27,$22,$54,$45
-	dc.b	$08,$F8,$00,$00,$C3,$46,$30,$39,$FF,$FF,$27,$24,$53,$40,$BA,$40
-	dc.b	$6F,$00,$00,$0A,$61,$00,$00,$D4,$60,$00,$00,$BA,$4A,$45,$6A,$00
-	dc.b	$00,$0A,$61,$00,$00,$C6,$60,$00,$00,$AC,$38,$12,$4E,$B9,$00,$01
-	dc.b	$BB,$8E,$00,$06,$BF,$00,$0E,$00,$20,$7C,$00,$01,$2B,$4A,$11,$F0
-	dc.b	$60,$00,$B0,$41,$30,$05,$E7,$40,$20,$7C,$FF,$FF,$27,$26,$12,$30
-	dc.b	$00,$00,$B2,$38,$DD,$84,$66,$00,$00,$06,$12,$30,$00,$01,$20,$7C
-	dc.b	$00,$01,$2C,$DE,$48,$81,$E5,$41,$20,$70,$10,$00,$08,$F8,$00,$00
-	dc.b	$C3,$46,$BC,$7C,$00,$04,$66,$00,$00,$14,$08,$B9,$00,$02,$FF,$FF
-	dc.b	$27,$10,$67,$00,$00,$08,$08,$B8,$00,$00,$C3,$46,$4A,$46,$66,$00
-	dc.b	$00,$14,$08,$B9,$00,$01,$FF,$FF,$27,$10,$67,$00,$00,$08,$08,$B8
-	dc.b	$00,$00,$C3,$46,$08,$38,$00,$02,$C3,$44,$67,$00,$00,$08,$08,$B8
-	dc.b	$00,$00,$C3,$46,$48,$E7,$FF,$FE,$22,$48,$24,$48,$D1,$DA,$D3,$DA
-	dc.b	$42,$40,$42,$41,$74,$05,$76,$05,$7A,$04,$4E,$B9,$00,$01,$B6,$92
-	dc.b	$4C,$DF,$7F,$FF,$55,$8A,$53,$45,$51,$CE,$FF,$2C,$08,$B8,$00,$00
-	dc.b	$C3,$46,$4E,$75,$02,$0A,$12,$1A,$22,$FF,$48,$E7,$FF,$FE,$4E,$B9
-	dc.b	$00,$01,$BB,$8E,$00,$06,$BF,$00,$0E,$00,$20,$7C,$00,$01,$2B,$4A
-	dc.b	$11,$F0,$60,$00,$B0,$41,$70,$05,$72,$05,$34,$3C,$07,$FF,$00,$42
-	dc.b	$80,$00,$4E,$B9,$00,$01,$B9,$76,$4C,$DF,$7F,$FF,$4E,$75
+	move.l	#$12D46,(VBint).l
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
+	move.w	#0,(VSCRLPM).w
+	move.w	#$B400,(VSPRITES).w
+	move.w	#$B800,(VmMAP3).w
+	move.w	#5,(Map3col1).w
+	move.w	#$C000,(VmMAP2).w
+	move.w	#6,(Map2col1).w
+	move.w	#$E000,(VmMAP1).w
+	move.w	#6,(Map1col1).w
+	move.w	#0,d0
+	bset	#5,(disflags).w
+	jsr	(setVram).l
+	bclr	#5,(disflags).w
+	jsr	(orjoy).l
+	move.w	#1,d4
+	movea.l	#LeagueOptionsSprites,a1
+	jsr	(LoadScreenSprite).l
+	move.w	d4,(smallfontchars).w
+	movea.l	#$179170,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.w	d4,(smallfont2chars).w
+	movea.l	#$17A16C,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.l	#$179168,(smallfontptr).l
+	move.w	d4,(printbigchars).w
+	movea.l	#$17AA7A,a2
+	jsr	(DecompressGraphicsPlain).l
+	bclr	#2,(sflags11).w
+	move.w	d4,(homelogochars).l
+	addi.w	#$19,d4
+	move.w	d4,(vislogochars).l
+	addi.w	#$19,d4
+	move.w	d4,(vislogochars+2).l
+	addi.w	#$19,d4
+	move.w	d4,(vislogochars+4).l
+	addi.w	#$19,d4
+	move.w	d4,(vislogochars+6).l
+	addi.w	#$19,d4
+	move.w	d4,-(sp)
+	movea.l	#SmallLogoPtrs,a3
+	movea.l	#homelogochars,a1
+	move.w	(TeamSelectHome+2).l,d0
+	subq.w	#2,d0
+	bpl.w	.loop
+	addq.w	#2,a1
+	addq.w	#1,d0
+	bpl.w	.loop
+	addq.w	#2,a1
+	addq.w	#1,d0
+.loop
+	asl.w	#3,d0
+	movea.l	#TeamSelectHome+6,a0
+	move.b	(a0,d0.w),d7
+	cmp.b	(SeasonTeam).w,d7
+	bne.w	.1
+	move.b	1(a0,d0.w),d7
+.1
+	cmp.w	#$1A,d7
+	bge.w	.2
+	ext.w	d7
+	asl.w	#2,d7
+	movea.l	(a3,d7.w),a2
+	addq.w	#8,a2
+	move.w	(a1),d4
+	jsr	(DecompressGraphicsPlain).l
+	cmpa.l	#$FFFF271E,a1
+	beq.w	.2
+	asr.w	#3,d0
+	addq.w	#2,a1
+	addq.w	#1,d0
+	cmp.w	#$53,d0
+	ble.s	.loop
+.2
+	move.w	(sp)+,d4
+	move.w	d4,(pstatsblockchars).l
+	addi.w	#$20,d4
+	move.w	d4,(pstatscount).l
+	addi.w	#$20,d4
+	jsr	(printsmallz).l
+	String	$FF,1,$FD,0,$FC
+	moveq	#$28,d0
+	moveq	#$1C,d1
+	move.w	#$7FF,d2
+	jsr	(eraser).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),0,0
+	movea.l	#LeagueOptionsBgMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#$28,d2
+	moveq	#$1C,d3
+	moveq	#8,d5
+	jsr	(dobitmap).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$B,1
+	movea.l	#LeagueOptionsTitleMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	move.w	(a1),d2
+	move.w	2(a1),d3
+	moveq	#8,d5
+	jsr	(dobitmap).l
+	move.w	(smallfontchars).w,-(sp)
+	move.w	(smallfont2chars).w,(smallfontchars).w
+	jsr	(printcurz).l
+	String	$8F,$C,$19,'{}-MENU OPTIONS',$8F,$C,$1A,'[]-CHANGE DAY'
+	move.w	(sp)+,(smallfontchars).w
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),1,4
+	clr.w	d7
+	move.b	(SeasonTeam).w,d7
+	moveq	#2,d5
+	bsr.w	DrawTeamLogoD7
+	jsr	(printz).l
+	String	$FE,0,0
+	movea.l	#IceBgMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#$40,d2
+	moveq	#$1C,d3
+	moveq	#1,d5
+	jsr	(dobitmap).l
+	move.w	#$2500,sr
+	rts
+	dc.w	$3F38,$DD7E,$4A79,$FFFF,$2722,$6700,$0010,$4EB9
+	dc.w	$0001,$BED6,$0008,$F804,$010D,$145B,$0838,$0002
+	dc.w	$DD80,$6700,$0024,$4EB9,$0001,$BED6,$0008,$F804
+	dc.w	$010E,$1400,$4EB9,$0001,$BED6,$000A,$504C,$4159
+	dc.w	$4F46,$4653,$6000,$0022,$31F9,$FFFF,$2720,$DD7E
+	dc.w	$4EB9,$0001,$16BA,$4EB9,$0001,$BB8E,$0006,$BF0E
+	dc.w	$1400,$4EB9,$0001,$BEEC,$3039,$FFFF,$2722,$5240
+	dc.w	$B079,$FFFF,$2724,$6C00,$000C,$4EB9,$0001,$BED6
+	dc.w	$0004,$5D00,$31DF,$DD7E,$4E75,$4240,$1038,$DD85
+	dc.w	$6700,$0064,$5340,$B079,$FFFF,$2722,$6D00,$0058
+	dc.w	$3039,$FFFF,$2722,$E740,$207C,$FFFF,$2726,$48E7
+	dc.w	$8080,$3030,$0004,$323C,$0002,$4EB9,$0001,$BE1C
+	dc.w	$4EB9,$0001,$BB8E,$0006,$BF1F,$1400,$4EB9,$0001
+	dc.w	$BEEC,$4CDF,$0101,$3030,$0006,$323C,$0002,$4EB9
+	dc.w	$0001,$BE1C,$4EB9,$0001,$BB8E,$0006,$BF08,$1400
+	dc.w	$4EB9,$0001,$BEEC,$4E75,$4EB9,$0001,$BED6,$0022
+	dc.w	$F804,$0108,$1420,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl
+	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl
+	dc.w	$3039,$FFFF,$2722,$E740,$207C,$FFFF,$2726,$33F0
+	dc.w	$0002,$FFFF,$2720,$48E7,$8080,$6100,$FEC4,$6100
+	dc.w	$FF4A,$3038,$B052,$B078,$B052,$67FA,$4CD7,$0101
+	dc.w	$4247,$1E30,$0000,$4EB9,$0001,$BB8E,$0006,$BF17
+	dc.w	$1600,$3839,$FFFF,$2712,$6100,$0164,$1E30,$0001
+	dc.w	$4EB9,$0001,$BB8E,$0006,$BF01,$1600,$3839,$FFFF
+	dc.w	$2714,$6100,$014A,$3038,$B052,$B078,$B052,$67FA
+	dc.w	$4CD7,$0101,$6100,$0008,$4CDF,$0101,$4E75,$3C3C
+	dc.w	$0004,$247C,$FFFF,$271E,$3A39,$FFFF,$2722,$5445
+	dc.w	$08F8,$0000,$C346,$3039,$FFFF,$2724,$5340,$BA40
+	dc.w	$6F00,$000A,$6100,$00D4,$6000,$00BA,$4A45,$6A00
+	dc.w	$000A,$6100,$00C6,$6000,$00AC,$3812,$4EB9,$0001
+	dc.w	$BB8E,$0006,$BF00,$0E00,$207C,$0001,$2B4A,$11F0
+	dc.w	$6000,$B041,$3005,$E740,$207C,$FFFF,$2726,$1230
+	dc.w	$0000,$B238,$DD84,$6600,$0006,$1230,$0001,$207C
+	dc.w	$0001,$2CDE,$4881,$E541,$2070,$1000,$08F8,$0000
+	dc.w	$C346,$BC7C,$0004,$6600,$0014,$08B9,$0002,$FFFF
+	dc.w	$2710,$6700,$0008,$08B8,$0000,$C346,$4A46,$6600
+	dc.w	$0014,$08B9,$0001,$FFFF,$2710,$6700,$0008,$08B8
+	dc.w	$0000,$C346,$0838,$0002,$C344,$6700,$0008,$08B8
+	dc.w	$0000,$C346,$48E7,$FFFE,$2248,$2448,$D1DA,$D3DA
+	dc.w	$4240,$4241,$7405,$7605,$7A04,$4EB9,$0001,$B692
+	dc.w	$4CDF,$7FFF,$558A,$5345,$51CE,$FF2C,$08B8,$0000
+	dc.w	$C346,$4E75,$020A,$121A,$22FF,$48E7,$FFFE,$4EB9
+	dc.w	$0001,$BB8E,$0006,$BF00,$0E00,$207C,$0001,$2B4A
+	dc.w	$11F0,$6000,$B041,$7005,$7205,$343C,$07FF,$0042
+	dc.w	$8000,$4EB9,$0001,$B976,$4CDF,$7FFF,$4E75
 
 DrawSetupTeamBlock					;Draw the team block (TeamBlockPtrs) of team d7 at printx / printy (the
 									;controller setup screen)

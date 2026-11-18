@@ -130,20 +130,38 @@ Pausemode							;Game is in pause mode now: restart the sound driver, run the pa
 	jsr	(SoundCmd).l
 	jmp	ReturnToGame
 	;After Pausemode: code that nothing in the listing reaches.
-	;Code the listing does not decode: kept as bytes
-	dc.b	$4E,$B9,$00,$01,$D0,$1E,$4E,$B9,$00,$08,$85,$FC,$30,$3C,$00,$09
-	dc.b	$4E,$B9,$00,$08,$83,$9E,$30,$3C,$00,$00,$32,$3C,$1B,$24,$20,$7C
-	dc.b	$00,$02,$55,$00,$4E,$B9,$00,$08,$83,$9E,$30,$3C,$00,$06,$42,$41
-	dc.b	$20,$7C,$00,$02,$70,$26,$4E,$B9,$00,$08,$83,$9E,$30,$3C,$00,$07
-	dc.b	$32,$3C,$00,$01,$4E,$B9,$00,$08,$83,$9E,$20,$7C,$00,$C0,$00,$00
-	dc.b	$31,$7C,$91,$00,$00,$04,$31,$7C,$92,$00,$00,$04,$08,$F8,$00,$03
-	dc.b	$BF,$B2,$08,$B8,$00,$00,$C3,$3A,$4E,$B9,$00,$01,$D0,$62,$4E,$B9
-	dc.b	$00,$02,$03,$4A,$31,$FC,$00,$18,$BD,$3C,$4A,$78,$BD,$3C,$6A,$FA
-	dc.b	$31,$F8,$B0,$52,$B0,$54,$4E,$75
+	jsr	(ClrHor).l
+	jsr	(stop_current_song).l
+	move.w	#9,d0
+	jsr	(SoundCmd).l
+	move.w	#0,d0
+	move.w	#$1B24,d1
+	movea.l	#Z80Program,a0
+	jsr	(SoundCmd).l
+	move.w	#6,d0
+	clr.w	d1
+	movea.l	#SoundBanks,a0
+	jsr	(SoundCmd).l
+	move.w	#7,d0
+	move.w	#1,d1
+	jsr	(SoundCmd).l
+	movea.l	#Vdata,a0				;restore the plane size registers
+	move.w	#VDPR_WINX,4(a0)
+	move.w	#VDPR_WINY,4(a0)
+	bset	#dfclock,(disflags).w	;clock needs update
+	bclr	#sfpz,(sflags).w
+	jsr	(printscores1).l
+	jsr	(setvideo).l
+	move.w	#$18,(palcount).w
+.wait
+	tst.w	(palcount).w			;wait for the palette fade to finish
+	bpl.s	.wait
+	move.w	(Vcount).w,(OldVcount).w
+	rts
 
 Pausemode_pall						;Draw routine for the pause menu: the pause screen, then KillCrowd.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$4E,$B9,$00,$1E,$29,$70,$4E,$B9,$00,$02,$0E,$28
+	jsr	(PauseScreenDraw).l
+	jsr	(KillCrowd).l
 
 seta2								;Set a2 to the team struct of the pause pad
 									;(menupadnum: cont1team ... cont4team)

@@ -66,63 +66,225 @@ CPgoalie							;See if the computer should pull its goalie: third period, behind
 	bra.w	setpersonel
 
 CompLine							;The computer picks a line for team a2 (a1 = other team).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$E0,$80,$70,$03,$32,$2A,$00,$24,$92,$69,$00,$24,$67,$00
-	dc.b	$00,$2A,$6A,$00,$00,$04,$54,$40,$3F,$00,$61,$00,$39,$18,$32,$00
-	dc.b	$30,$17,$52,$40,$61,$00,$39,$0E,$B2,$40,$6C,$00,$00,$04,$52,$57
-	dc.b	$35,$5F,$00,$16,$4C,$DF,$01,$07,$4E,$75,$B4,$FC,$C7,$26,$66,$00
-	dc.b	$00,$72,$72,$02,$41,$FA,$00,$42,$0C,$78,$00,$02,$C4,$BC,$66,$00
-	dc.b	$00,$1A,$34,$2A,$00,$0C,$B4,$69,$00,$0C,$67,$00,$00,$0E,$D0,$FC
-	dc.b	$00,$0E,$6E,$00,$00,$06,$D0,$FC,$00,$0E,$32,$29,$00,$16,$E3,$41
-	dc.b	$30,$30,$10,$00,$61,$00,$38,$BE,$B0,$7C,$0C,$00,$63,$00,$00,$34
-	dc.b	$35,$70,$10,$00,$00,$16,$60,$AC,$00,$00,$00,$01,$00,$02,$00,$00
-	dc.b	$00,$01,$00,$00,$00,$01,$00,$02,$00,$00,$00,$01,$00,$02,$00,$00
-	dc.b	$00,$02,$00,$00,$00,$00,$00,$01,$00,$00,$00,$00,$00,$01,$00,$00
-	dc.b	$00,$01,$72,$02,$41,$FA,$00,$36,$0C,$78,$00,$02,$C4,$BC,$66,$00
-	dc.b	$00,$16,$34,$2A,$00,$0C,$B4,$69,$00,$0C,$67,$00,$00,$0A,$5C,$48
-	dc.b	$6E,$00,$00,$04,$5C,$48,$30,$18,$61,$00,$38,$5A,$B0,$7C,$0C,$00
-	dc.b	$52,$C9,$FF,$F4,$35,$60,$00,$16,$60,$00,$FF,$4A,$00,$00,$00,$01
-	dc.b	$00,$02,$00,$00,$00,$02,$00,$01,$00,$00,$00,$01,$00,$00
+	movem.l	d0-d2/a0,-(sp)
+	moveq	#3,d0
+	move.w	OldZpos(a2),d1
+	sub.w	$24(a1),d1
+	beq.w	.3
+	bpl.w	.1
+	addq.w	#2,d0
+.1
+	move.w	d0,-(sp)				;find pk/pp line
+	bsr.w	getlinee
+	move.w	d0,d1
+	move.w	(sp),d0
+	addq.w	#1,d0
+	bsr.w	getlinee
+	cmp.w	d0,d1
+	bge.w	.2
+	addq.w	#1,(sp)
+.2
+	move.w	(sp)+,$16(a2)
+.loop
+	movem.l	(sp)+,d0-d2/a0
+	rts
+.3
+	cmpa.w	#(tmstruct-M68K_RAM),a2
+	bne.w	.5
+	moveq	#2,d1
+	lea	.table(pc),a0
+	cmpi.w	#2,(gsp).w
+	bne.w	.4
+	move.w	$C(a2),d2
+	cmp.w	$C(a1),d2
+	beq.w	.4
+	adda.w	#$E,a0
+	bgt.w	.4
+	adda.w	#$E,a0
+.4
+	move.w	$16(a1),d1
+	asl.w	#1,d1
+	move.w	(a0,d1.w),d0
+	bsr.w	getlinee
+	cmp.w	#$C00,d0
+	bls.w	.5
+	move.w	(a0,d1.w),$16(a2)
+	bra.s	.loop
+.table
+	dc.w	$0000,$0001,$0002,$0000,$0001,$0000,$0001,$0002
+	dc.w	$0000,$0001,$0002,$0000,$0002,$0000,$0000,$0001
+	dc.w	$0000,$0000,$0001,$0000,$0001
+.5
+	moveq	#2,d1
+	lea	.table2(pc),a0
+	cmpi.w	#2,(gsp).w
+	bne.w	.loop2
+	move.w	$C(a2),d2
+	cmp.w	$C(a1),d2
+	beq.w	.loop2
+	addq.w	#6,a0
+	bgt.w	.loop2
+	addq.w	#6,a0
+.loop2
+	move.w	(a0)+,d0
+	bsr.w	getlinee
+	cmp.w	#$C00,d0
+	dbhi	d1,.loop2
+	move.w	-(a0),$16(a2)
+	bra.w	.loop
+.table2
+	dc.w	$0000,$0001,$0002,$0000,$0002,$0001,$0000,$0001
+	dc.w	$0000
 
 AssignPads							;Give each pad on a team a player.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$31,$FC,$FF,$FF,$C3,$84,$31,$FC,$FF,$FF,$C3,$86,$31,$FC,$FF,$FF
-	dc.b	$C3,$88,$31,$FC,$FF,$FF,$C3,$8A,$4A,$78,$C3,$90,$67,$00,$00,$5E
-	dc.b	$08,$38,$00,$03,$C3,$4E,$67,$00,$00,$4C,$0C,$78,$00,$01,$C3,$90
-	dc.b	$67,$00,$00,$0E,$4A,$78,$C3,$9A,$66,$00,$00,$3A,$67,$00,$00,$0A
-	dc.b	$4A,$78,$C3,$98,$66,$00,$00,$2E,$48,$E7,$80,$90,$30,$3C,$00,$05
-	dc.b	$0C,$78,$00,$01,$C3,$90,$67,$00,$00,$06,$30,$3C,$00,$0B,$4E,$B9
-	dc.b	$00,$01,$68,$B8,$42,$44,$4E,$B9,$00,$01,$6C,$52,$4C,$DF,$09,$01
-	dc.b	$60,$00,$00,$0A,$42,$44,$4E,$B9,$00,$01,$6A,$46,$4A,$78,$C3,$92
-	dc.b	$67,$00,$00,$60,$08,$38,$00,$03,$C3,$4E,$67,$00,$00,$4E,$0C,$78
-	dc.b	$00,$02,$C3,$92,$67,$00,$00,$0E,$4A,$78,$C3,$98,$66,$00,$00,$3C
-	dc.b	$60,$00,$00,$0A,$4A,$78,$C3,$9A,$66,$00,$00,$30,$48,$E7,$80,$90
-	dc.b	$30,$3C,$00,$0B,$0C,$78,$00,$02,$C3,$92,$67,$00,$00,$06,$30,$3C
-	dc.b	$00,$05,$4E,$B9,$00,$01,$68,$B8,$38,$3C,$00,$02,$4E,$B9,$00,$01
-	dc.b	$6C,$5C,$4C,$DF,$09,$01,$60,$00,$00,$0A,$78,$02,$4E,$B9,$00,$01
-	dc.b	$6A,$46,$4A,$78,$C3,$94,$67,$00,$00,$60,$08,$38,$00,$03,$C3,$4E
-	dc.b	$67,$00,$00,$4E,$0C,$78,$00,$02,$C3,$94,$67,$00,$00,$0E,$4A,$78
-	dc.b	$C3,$98,$66,$00,$00,$3C,$60,$00,$00,$0A,$4A,$78,$C3,$9A,$66,$00
-	dc.b	$00,$30,$48,$E7,$80,$90,$30,$3C,$00,$0B,$0C,$78,$00,$02,$C3,$94
-	dc.b	$67,$00,$00,$06,$30,$3C,$00,$05,$4E,$B9,$00,$01,$68,$B8,$38,$3C
-	dc.b	$00,$04,$4E,$B9,$00,$01,$6C,$68,$4C,$DF,$09,$01,$60,$00,$00,$0A
-	dc.b	$78,$04,$4E,$B9,$00,$01,$6A,$46,$4A,$78,$C3,$96,$67,$00,$00,$60
-	dc.b	$08,$38,$00,$03,$C3,$4E,$67,$00,$00,$4E,$0C,$78,$00,$02,$C3,$96
-	dc.b	$67,$00,$00,$0E,$4A,$78,$C3,$98,$66,$00,$00,$3C,$60,$00,$00,$0A
-	dc.b	$4A,$78,$C3,$9A,$66,$00,$00,$30,$48,$E7,$80,$90,$30,$3C,$00,$0B
-	dc.b	$0C,$78,$00,$02,$C3,$96,$67,$00,$00,$06,$30,$3C,$00,$05,$4E,$B9
-	dc.b	$00,$01,$68,$B8,$38,$3C,$00,$06,$4E,$B9,$00,$01,$6C,$74,$4C,$DF
-	dc.b	$09,$01,$60,$00,$00,$0A,$78,$06,$4E,$B9,$00,$01,$6A,$46,$4E,$75
+	move.w	#$FFFF,(c1playernum).w
+	move.w	#$FFFF,(c2playernum).w
+	move.w	#$FFFF,(c3playernum).w
+	move.w	#$FFFF,(c4playernum).w
+	tst.w	(cont1team).w
+	beq.w	.5
+	btst	#3,(sflags9).w
+	beq.w	.4
+	cmpi.w	#1,(cont1team).w
+	beq.w	.1
+	tst.w	(cont4team+4).w
+	bne.w	.4
+	beq.w	.2
+.1
+	tst.w	(cont4team+2).w
+	bne.w	.4
+.2
+	movem.l	d0/a0/a3,-(sp)
+	move.w	#5,d0
+	cmpi.w	#1,(cont1team).w
+	beq.w	.3
+	move.w	#$B,d0
+.3
+	jsr	(FindGoalie).l
+	clr.w	d4
+	jsr	(setc1player).l
+	movem.l	(sp)+,d0/a0/a3
+	bra.w	.5
+.4
+	clr.w	d4
+	jsr	(chgplayer).l
+.5
+	tst.w	(cont2team).w
+	beq.w	.10
+	btst	#3,(sflags9).w
+	beq.w	.9
+	cmpi.w	#2,(cont2team).w
+	beq.w	.6
+	tst.w	(cont4team+2).w
+	bne.w	.9
+	bra.w	.7
+.6
+	tst.w	(cont4team+4).w
+	bne.w	.9
+.7
+	movem.l	d0/a0/a3,-(sp)
+	move.w	#$B,d0
+	cmpi.w	#2,(cont2team).w
+	beq.w	.8
+	move.w	#5,d0
+.8
+	jsr	(FindGoalie).l
+	move.w	#2,d4
+	jsr	(setc2player).l
+	movem.l	(sp)+,d0/a0/a3
+	bra.w	.10
+.9
+	moveq	#2,d4
+	jsr	(chgplayer).l
+.10
+	tst.w	(cont3team).w
+	beq.w	.15
+	btst	#3,(sflags9).w
+	beq.w	.14
+	cmpi.w	#2,(cont3team).w
+	beq.w	.11
+	tst.w	(cont4team+2).w
+	bne.w	.14
+	bra.w	.12
+.11
+	tst.w	(cont4team+4).w
+	bne.w	.14
+.12
+	movem.l	d0/a0/a3,-(sp)
+	move.w	#$B,d0
+	cmpi.w	#2,(cont3team).w
+	beq.w	.13
+	move.w	#5,d0
+.13
+	jsr	(FindGoalie).l
+	move.w	#4,d4
+	jsr	(setc3player).l
+	movem.l	(sp)+,d0/a0/a3
+	bra.w	.15
+.14
+	moveq	#4,d4
+	jsr	(chgplayer).l
+.15
+	tst.w	(cont4team).w
+	beq.w	.20
+	btst	#3,(sflags9).w
+	beq.w	.19
+	cmpi.w	#2,(cont4team).w
+	beq.w	.16
+	tst.w	(cont4team+2).w
+	bne.w	.19
+	bra.w	.17
+.16
+	tst.w	(cont4team+4).w
+	bne.w	.19
+.17
+	movem.l	d0/a0/a3,-(sp)
+	move.w	#$B,d0
+	cmpi.w	#2,(cont4team).w
+	beq.w	.18
+	move.w	#5,d0
+.18
+	jsr	(FindGoalie).l
+	move.w	#6,d4
+	jsr	(setc4player).l
+	movem.l	(sp)+,d0/a0/a3
+	bra.w	.20
+.19
+	moveq	#6,d4
+	jsr	(chgplayer).l
+.20
+	rts
 
 updatefaceoff						;Faceoff drop countdown: the fofdata frame from temp1; at 0 erase the
 									;faceoff box at fodropx / fodropy
-									;Code the listing does not decode: kept as bytes
-	dc.b	$30,$2B,$00,$40,$67,$00,$00,$1A,$5C,$40,$E6,$48,$B0,$7C,$00,$02
-	dc.b	$6E,$00,$5D,$22,$44,$40,$06,$40,$00,$0A,$31,$C0,$BD,$C6,$4E,$75
-	dc.b	$08,$B8,$00,$04,$BF,$B2,$61,$00,$20,$50,$00,$06,$BF,$00,$00,$00
-	dc.b	$30,$38,$B0,$4A,$04,$40,$00,$2E,$E6,$40,$31,$C0,$B0,$40,$70,$64
-	dc.b	$30,$38,$B0,$4C,$04,$40,$00,$44,$E6,$40,$31,$C0,$B0,$42,$70,$0C
-	dc.b	$72,$0D,$34,$3C,$07,$FF,$60,$00,$1E,$08
+	move.w	temp1(a3),d0			;frames left until the drop
+	beq.w	.1						;0: remove the face off box
+	addq.w	#6,d0
+	lsr.w	#3,d0					;(temp1 + 6) / 8
+	cmp.w	#2,d0
+	bgt.w	rtss2
+	neg.w	d0
+	addi.w	#$A,d0					;frame $A - d0 (8 to 10) as the drop approaches
+	move.w	d0,(fofdata2+8).w		;+8
+	rts
+	;d0 = 0
+.1
+	bclr	#dffaceoff,(disflags).w
+	bsr.w	printz
+	String	-(TXPRI+TXMAP1),0,0
+	move.w	(fodropx).w,d0
+	subi.w	#$2E,d0
+	asr.w	#3,d0
+	move.w	d0,(printx).w			;same print column as in puckfaceoff2
+	moveq	#$64,d0					;(4*8)+68, overwritten (as in 92)
+	move.w	(fodropy).w,d0
+	subi.w	#$44,d0
+	asr.w	#3,d0
+	move.w	d0,(printy).w
+	moveq	#$C,d0					;eraser: d0/d1 = x/y size, d2 = fill char word
+	moveq	#$D,d1
+	move.w	#$7FF,d2
+	bra.w	eraser
 
 pucknorm							;asstab entry: the puck: follow the carrier, icing / offsides checks.
 									;Code the listing does not decode: kept as bytes
@@ -162,13 +324,29 @@ ChkOffsides							;Offsides.
 
 a2offsides							;Offsides on a2 when his team is offside and the puck is past the blue
 									;line.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$38,$00,$05,$C3,$38,$67,$00,$5A,$F6,$30,$38,$B7,$72,$08,$2A
-	dc.b	$00,$07,$00,$62,$66,$00,$00,$04,$44,$40,$B0,$7C,$00,$86,$6D,$00
-	dc.b	$5A,$DE,$30,$7C,$C7,$26,$08,$2A,$00,$06,$00,$62,$67,$00,$00,$06
-	dc.b	$D0,$FC,$03,$9E,$08,$28,$00,$04,$00,$30,$67,$00,$5A,$C2,$08,$38
-	dc.b	$00,$04,$C3,$38,$66,$00,$5A,$B8,$C5,$4B,$70,$10,$4E,$B9,$00,$01
-	dc.b	$C1,$92,$C5,$4B,$4E,$75
+	btst	#gmoffs,(gmode).w
+	beq.w	rtss2
+	move.w	(pucky).w,d0
+	btst	#pfgoal,pflags(a2)
+	bne.w	.1
+	neg.w	d0
+.1
+	cmp.w	#$86,d0
+	blt.w	rtss2
+	movea.w	#(tmstruct-M68K_RAM),a0
+	btst	#pfteam,pflags(a2)
+	beq.w	.2
+	adda.w	#$39E,a0
+.2
+	btst	#4,$30(a0)
+	beq.w	rtss2
+	btst	#gmhl,(gmode).w
+	bne.w	rtss2
+	exg	a2,a3
+	moveq	#$10,d0
+	jsr	(AddPenalty).l
+	exg	a2,a3
+	rts
 
 a2touchpuck							;Player a2 touched the puck: last touch, scorer / assist slots, offsides,
 									;icing
@@ -190,25 +368,61 @@ a2touchpuck							;Player a2 touched the puck: last touch, scorer / assist slots
 ArmIcing							;Icing start for a2: iflags cleared, icingPlayer, direction; bit 2 when
 									;shot from his own half and not short
 									;handed
-									;Code the listing does not decode: kept as bytes
-	dc.b	$42,$38,$BF,$BA,$11,$EA,$00,$53,$BF,$BB,$30,$38,$B7,$72,$08,$2A
-	dc.b	$00,$07,$00,$62,$67,$00,$00,$0A,$08,$F8,$00,$01,$BF,$BA,$44,$40
-	dc.b	$6B,$00,$59,$BA,$30,$38,$C7,$4A,$90,$78,$CA,$E8,$08,$2A,$00,$06
-	dc.b	$00,$62,$67,$00,$00,$04,$44,$40,$6B,$00,$59,$A2,$08,$F8,$00,$02
-	dc.b	$BF,$BA,$4E,$75
+	clr.b	(lty+2).w
+	move.b	$53(a2),(lty+3).w
+	move.w	(pucky).w,d0
+	btst	#pfgoal,pflags(a2)
+	beq.w	.1
+	bset	#1,(lty+2).w
+	neg.w	d0
+.1
+	bmi.w	rtss2
+	move.w	($FFFFC74A).w,d0
+	sub.w	($FFFFCAE8).w,d0
+	btst	#pfteam,pflags(a2)
+	beq.w	.2
+	neg.w	d0
+.2
+	bmi.w	rtss2
+	bset	#2,(lty+2).w
+	rts
 
 PuckIChk							;Icing check.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$38,$00,$02,$BF,$BA,$67,$00,$59,$90,$08,$38,$00,$00,$BF,$BA
-	dc.b	$66,$00,$59,$86,$4A,$78,$B7,$BE,$6A,$00,$59,$7E,$30,$3C,$01,$1E
-	dc.b	$08,$38,$00,$01,$BF,$BA,$66,$00,$00,$0E,$44,$40,$B0,$78,$B7,$72
-	dc.b	$6E,$00,$00,$0C,$4E,$75,$B0,$78,$B7,$72,$6E,$00,$59,$5C,$0C,$78
-	dc.b	$00,$2C,$B7,$5E,$6E,$00,$00,$14,$0C,$78,$FF,$D4,$B7,$5E,$6D,$00
-	dc.b	$00,$0A,$08,$B8,$00,$02,$BF,$BA,$4E,$75,$08,$F8,$00,$00,$BF,$BA
-	dc.b	$4E,$75
+	btst	#ifok,(lty+2).w			;#ifok
+	beq.w	rtss2
+	btst	#ifcgl,(lty+2).w		;#ifcgl - if crossed goal line
+	bne.w	rtss2
+	tst.w	(puckc).w
+	bpl.w	rtss2
+	move.w	#$11E,d0
+	btst	#ifdir,(lty+2).w
+	bne.w	.1
+	neg.w	d0
+	cmp.w	(pucky).w,d0			;check other goalline
+	bgt.w	.2
+	rts
+.1
+	cmp.w	(pucky).w,d0
+	bgt.w	rtss2
+.2
+	cmpi.w	#$2C,(puckx).w			;',' ; 2C - edge of crease
+	bgt.w	.3
+	cmpi.w	#$FFD4,(puckx).w		;-$2C, the edge of the crease
+	blt.w	.3
+	bclr	#ifok,(lty+2).w			;#ifok cleared
+	rts
+.3
+	bset	#ifcgl,(lty+2).w		;#ifcgl
+	rts
 
 puckunflip							;asstab entry: stop the spinning puck.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$0C,$6B,$00,$08,$00,$5A,$6D,$00,$00,$12,$0C,$6B,$00,$18,$00,$5A
-	dc.b	$6C,$00,$00,$08,$0A,$6B,$00,$02,$00,$54,$00,$6B,$00,$04,$00,$54
-	dc.b	$42,$6B,$00,$5A,$50,$EB,$00,$5C,$4E,$75
+	cmpi.w	#8,SPAnum(a3)
+	blt.w	.1
+	cmpi.w	#$18,SPAnum(a3)
+	bge.w	.1
+	eori.w	#2,facedir(a3)			;facedir
+.1
+	ori.w	#4,facedir(a3)
+	clr.w	SPAnum(a3)				;SPAnum
+	st	SPAcnt(a3)					;SPAcnt
+	rts

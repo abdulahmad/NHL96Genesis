@@ -72,6 +72,13 @@ SPAsweepchk = $216A					;SPA value (frames96)
 AddPenalty = $01C192				;penalty96
 PenShotChk = $01C3E0				;penalty96
 DoubleMinorChk = $01C3C6			;penalty96
+a2touchpuck = $019DA2				;logic96_pull
+SPA03BC = $3BC						;frames96
+SPAcatch = $1442					;frames96
+SPAfweaveend = $3230				;frames96
+SPAgdive = $49A						;frames96
+SPAgskate = $640					;frames96
+SPAgstackr = $440					;frames96
 
 
 ; Main segment code

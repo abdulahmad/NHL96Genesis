@@ -42,6 +42,8 @@ EnergyBarMap = $13D290				;graphics96
 ReplayBannerMap = $141228			;graphics96
 LoadReplayIcon = $1D8E5C			;code96_15
 LoadHomeTeamGfx = $1D8E6C			;code96_15
+printbigcur = $01BEE8				;pause96_stub
+SkipStrings = $01D7F2				;hockey96_inter
 
 
 ; Main segment code

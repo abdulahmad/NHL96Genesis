@@ -470,21 +470,59 @@ ShootoutShooters					;The shootout shooters screen
 	dc.b	$31,$80,$20,$00,$60,$00,$FD,$A6
 
 PrintShooterList					;Shootout shooters: the player list rows
-									;Code the listing does not decode: kept as bytes
-	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$17,$02,$00,$22,$7C,$00,$02
-	dc.b	$34,$44,$0C,$78,$00,$05,$D0,$3C,$66,$00,$00,$08,$22,$7C,$00,$02
-	dc.b	$35,$A6,$30,$38,$D0,$30,$60,$00,$00,$06,$D2,$D1,$58,$49,$4A,$51
-	dc.b	$5B,$C8,$FF,$F8,$6A,$00,$00,$08,$53,$78,$D0,$30,$60,$CE,$B3,$FC
-	dc.b	$00,$02,$34,$44,$66,$00,$00,$08,$22,$7C,$00,$1E,$48,$DE,$B3,$FC
-	dc.b	$00,$02,$35,$A6,$66,$00,$00,$08,$22,$7C,$00,$1E,$48,$F4,$4E,$B9
-	dc.b	$00,$01,$BE,$EC,$28,$11,$36,$7C,$D1,$30,$34,$38,$D0,$34,$32,$38
-	dc.b	$D0,$3A,$92,$42,$B2,$7C,$00,$04,$63,$00,$00,$04,$72,$04,$31,$FC
-	dc.b	$00,$04,$B0,$42,$4E,$B9,$00,$01,$BA,$2E,$00,$24,$FE,$07,$FD,$02
-	dc.b	$FA,$01,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$FD,$02,$00,$B4,$78
-	dc.b	$D0,$32,$66,$00,$00,$0C,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$06
-	dc.b	$42,$40,$10,$33,$20,$00,$4E,$B9,$00,$01,$51,$FA,$52,$42,$51,$C9
-	dc.b	$FF,$B4,$4E,$75
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$17,2
+.loop
+	movea.l	#PAttribOverall,a1
+	cmpi.w	#5,(setupvalues).w
+	bne.w	.1
+	movea.l	#GAttribOverall,a1
+.1
+	move.w	(DispAttribCtr).w,d0
+	bra.w	.2
+.loop2
+	adda.w	(a1),a1
+	addq.w	#4,a1
+.2
+	tst.w	(a1)
+	dbmi	d0,.loop2
+	bpl.w	.3
+	subq.w	#1,(DispAttribCtr).w
+	bra.s	.loop
+.3
+	cmpa.l	#$23444,a1
+	bne.w	.4
+	movea.l	#ShooterOverallTxt,a1
+.4
+	cmpa.l	#$235A6,a1
+	bne.w	.5
+	movea.l	#ShooterOverallTxt2,a1
+.5
+	jsr	(printbig).l
+	move.l	(a1),d4
+	movea.w	#(CalTeam-M68K_RAM),a3
+	move.w	(PlayerScrollCtr).w,d2
+	move.w	(screentimer).w,d1
+	sub.w	d2,d1
+	cmp.w	#4,d1
+	bls.w	.6
+	moveq	#4,d1
+.6
+	move.w	#4,(printy).w
+.loop3
+	jsr	(printsmallz).l
+	String	$FE,7,$FD,2,$FA,1,'                         ',$FD,2
+	cmp.w	(VertLineScrolling).w,d2
+	bne.w	.7
+	jsr	(printsmallz).l
+	String	$FE,6
+.7
+	clr.w	d0
+	move.b	(a3,d2.w),d0
+	jsr	(GetNameandAttrib).l
+	addq.w	#1,d2
+	dbf	d1,.loop3
+	rts
 
 ShooterOverallTxt					;PrintShooterList heading, then the attribute long (d4)
 	dc.b	$00,$12,$20,$20,$20,$20,$4F,$76,$65,$72,$61,$6C,$6C,$20,$20,$20
@@ -660,71 +698,189 @@ RecHolderVsTxt						;" vs. "
 	String	' vs. '
 
 PrintRecordName						;Record Holders: print the row number and the user name Code the listing
-									;does not decode: kept as bytes
-	dc.b	$3F,$07,$44,$47,$5E,$47,$06,$47,$00,$30,$22,$7C,$FF,$FF,$BF,$F2
-	dc.b	$32,$BC,$00,$06,$13,$47,$00,$02,$13,$7C,$00,$2E,$00,$03,$13,$7C
-	dc.b	$00,$20,$00,$04,$13,$7C,$00,$00,$00,$05,$4E,$B9,$00,$01,$BE,$EC
-	dc.b	$3E,$1F,$14,$28,$FF,$FF,$48,$82,$22,$7C,$FF,$FF,$BF,$F2,$08,$B8
-	dc.b	$00,$07,$C3,$46,$4E,$B9,$00,$1D,$7D,$62,$13,$7C,$00,$20,$00,$0B
-	dc.b	$4E,$F9,$00,$01,$BE,$EC
+	move.w	d7,-(sp)
+	neg.w	d7
+	addq.w	#7,d7
+	addi.w	#$30,d7
+	movea.l	#mesarea,a1
+	move.w	#6,(a1)
+	move.b	d7,2(a1)
+	move.b	#$2E,3(a1)
+	move.b	#$20,4(a1)
+	move.b	#0,5(a1)
+	jsr	(printbig).l
+	move.w	(sp)+,d7
+	move.b	-$1(a0),d2
+	ext.w	d2
+	movea.l	#mesarea,a1
+	bclr	#7,(sflags6).w
+	jsr	(AppendUserName).l
+	move.b	#$20,$B(a1)
+	jmp	(printbig).l
 
 CalcWinPercents						;The win %, games and ties of the user record blocks Code the listing does
-									;not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$D1,$30,$22,$7C,$FF,$FF,$D4,$0A
-	dc.b	$2C,$7C,$FF,$FF,$D4,$12,$2A,$7C,$FF,$FF,$D4,$22,$3E,$3C,$00,$07
-	dc.b	$10,$28,$00,$08,$E1,$48,$10,$28,$00,$09,$12,$28,$00,$0A,$E1,$49
-	dc.b	$12,$28,$00,$0B,$3A,$C1,$4A,$41,$66,$00,$00,$08,$42,$40,$60,$00
-	dc.b	$00,$08,$C0,$FC,$00,$64,$80,$C1,$12,$C0,$1C,$E8,$00,$0C,$1C,$E8
-	dc.b	$00,$0D,$D0,$FC,$00,$10,$51,$CF,$FF,$C8,$22,$7C,$FF,$FF,$D4,$02
-	dc.b	$2F,$09,$30,$3C,$00,$01,$3E,$3C,$00,$06,$12,$C0,$52,$40,$51,$CF
-	dc.b	$FF,$FA,$22,$57,$20,$7C,$FF,$FF,$D4,$0A,$2C,$7C,$FF,$FF,$D4,$12
-	dc.b	$2A,$7C,$FF,$FF,$D4,$22,$22,$57,$3E,$3C,$00,$05,$42,$46,$12,$19
-	dc.b	$48,$81,$14,$11,$48,$82,$10,$30,$10,$00,$16,$30,$20,$00,$B0,$03
-	dc.b	$6E,$00,$00,$4C,$6D,$00,$00,$3A,$48,$E7,$70,$00,$D2,$41,$D4,$42
-	dc.b	$30,$36,$10,$00,$36,$36,$20,$00,$B0,$43,$4C,$DF,$00,$0E,$6E,$00
-	dc.b	$00,$2E,$6D,$00,$00,$1C,$48,$E7,$70,$00,$D2,$41,$D4,$42,$30,$35
-	dc.b	$10,$00,$36,$35,$20,$00,$B0,$43,$4C,$DF,$00,$0E,$6C,$00,$00,$10
-	dc.b	$10,$11,$12,$29,$FF,$FF,$13,$40,$FF,$FF,$12,$81,$50,$C6,$51,$CF
-	dc.b	$FF,$9E,$4A,$46,$66,$90,$22,$5F,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	#ThreeStars,a0
+	movea.l	#$FFFFD40A,a1
+	movea.l	#$FFFFD412,a6
+	movea.l	#$FFFFD422,a5
+	move.w	#7,d7
+.loop
+	move.b	8(a0),d0
+	lsl.w	#8,d0
+	move.b	9(a0),d0
+	move.b	$A(a0),d1
+	lsl.w	#8,d1
+	move.b	$B(a0),d1
+	move.w	d1,(a5)+
+	tst.w	d1
+	bne.w	.1
+	clr.w	d0
+	bra.w	.2
+.1
+	mulu.w	#$64,d0
+	divu.w	d1,d0
+.2
+	move.b	d0,(a1)+
+	move.b	$C(a0),(a6)+
+	move.b	$D(a0),(a6)+
+	adda.w	#$10,a0
+	dbf	d7,.loop
+	movea.l	#$FFFFD402,a1
+	move.l	a1,-(sp)
+	move.w	#1,d0
+	move.w	#6,d7
+.loop2
+	move.b	d0,(a1)+
+	addq.w	#1,d0
+	dbf	d7,.loop2
+	movea.l	(sp),a1
+	movea.l	#$FFFFD40A,a0
+	movea.l	#$FFFFD412,a6
+	movea.l	#$FFFFD422,a5
+.loop3
+	movea.l	(sp),a1
+	move.w	#5,d7
+	clr.w	d6
+.loop4
+	move.b	(a1)+,d1
+	ext.w	d1
+	move.b	(a1),d2
+	ext.w	d2
+	move.b	(a0,d1.w),d0
+	move.b	(a0,d2.w),d3
+	cmp.b	d3,d0
+	bgt.w	.4
+	blt.w	.3
+	movem.l	d1-d3,-(sp)
+	add.w	d1,d1
+	add.w	d2,d2
+	move.w	(a6,d1.w),d0
+	move.w	(a6,d2.w),d3
+	cmp.w	d3,d0
+	movem.l	(sp)+,d1-d3
+	bgt.w	.4
+	blt.w	.3
+	movem.l	d1-d3,-(sp)
+	add.w	d1,d1
+	add.w	d2,d2
+	move.w	(a5,d1.w),d0
+	move.w	(a5,d2.w),d3
+	cmp.w	d3,d0
+	movem.l	(sp)+,d1-d3
+	bge.w	.4
+.3
+	move.b	(a1),d0
+	move.b	-$1(a1),d1
+	move.b	d0,-$1(a1)
+	move.b	d1,(a1)
+	st	d6
+.4
+	dbf	d7,.loop4
+	tst.w	d6
+	bne.s	.loop3
+	movea.l	(sp)+,a1
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 ReadTeamRecords						;Read the records from save RAM and sort the rows Code the listing does
-									;not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$20,$3C,$00,$00,$0E,$CE,$22,$3C,$00,$00,$00,$80
-	dc.b	$20,$7C,$FF,$FF,$D1,$30,$4E,$B9,$00,$02,$41,$E8,$22,$7C,$FF,$FF
-	dc.b	$D3,$F2,$08,$38,$00,$06,$C3,$46,$67,$00,$00,$08,$22,$7C,$FF,$FF
-	dc.b	$D3,$FA,$2F,$09,$30,$3C,$00,$01,$3E,$3C,$00,$06,$12,$C0,$52,$40
-	dc.b	$51,$CF,$FF,$FA,$22,$57,$20,$7C,$FF,$FF,$D1,$30,$22,$57,$3E,$3C
-	dc.b	$00,$05,$42,$46,$12,$19,$48,$81,$14,$11,$48,$82,$E9,$41,$E9,$42
-	dc.b	$10,$30,$10,$00,$16,$30,$20,$00,$08,$38,$00,$06,$C3,$46,$67,$00
-	dc.b	$00,$0A,$10,$30,$10,$04,$16,$30,$20,$04,$B0,$03,$6C,$00,$00,$10
-	dc.b	$10,$11,$12,$29,$FF,$FF,$13,$40,$FF,$FF,$12,$81,$50,$C6,$51,$CF
-	dc.b	$FF,$C4,$4A,$46,$66,$B6,$22,$5F,$4C,$DF,$7F,$FF,$4E,$75,$2F,$0A
-	dc.b	$08,$F8,$00,$05,$C3,$56,$21,$FC,$00,$01,$2D,$46,$D2,$44,$08,$B8
-	dc.b	$00,$00,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$08,$B8,$00,$01,$BF,$B2
-	dc.b	$31,$FC,$00,$00,$B0,$00,$31,$FC,$B8,$00,$B0,$02,$31,$FC,$B8,$00
-	dc.b	$B0,$0C,$31,$FC,$00,$05,$B0,$0E,$31,$FC,$C0,$00,$B0,$08,$31,$FC
-	dc.b	$00,$06,$B0,$0A,$31,$FC,$E0,$00,$B0,$04,$31,$FC,$00,$06,$B0,$06
-	dc.b	$30,$3C,$00,$00,$08,$F8,$00,$05,$BF,$B2,$4E,$B9,$00,$01,$B5,$7E
-	dc.b	$08,$B8,$00,$05,$BF,$B2,$4E,$B9,$00,$01,$B2,$C4,$38,$3C,$00,$01
-	dc.b	$22,$7C,$00,$1A,$C3,$A0,$4E,$B9,$00,$01,$21,$7A,$31,$C4,$B0,$1E
-	dc.b	$24,$7C,$00,$17,$A1,$6C,$4E,$B9,$00,$01,$B7,$30,$21,$FC,$00,$17
-	dc.b	$91,$68,$BF,$8A,$31,$C4,$B0,$16,$24,$7C,$00,$17,$AA,$7A,$4E,$B9
-	dc.b	$00,$01,$B7,$30,$31,$F8,$B0,$16,$B0,$14,$31,$C4,$B0,$18,$24,$7C
-	dc.b	$00,$17,$B6,$88,$4E,$B9,$00,$01,$B7,$30,$08,$F8,$00,$02,$C3,$54
-	dc.b	$4E,$B9,$00,$01,$BA,$2E,$00,$08,$FF,$01,$FD,$00,$FC,$00,$70,$28
-	dc.b	$72,$1C,$34,$3C,$07,$FF,$4E,$B9,$00,$01,$B9,$76,$4E,$B9,$00,$01
-	dc.b	$BB,$8E,$00,$06,$BF,$00,$00,$00,$20,$7C,$00,$1A,$AC,$72,$22,$48
-	dc.b	$24,$48,$D1,$DA,$D3,$DA,$42,$40,$42,$41,$74,$28,$76,$1C,$7A,$08
-	dc.b	$4E,$B9,$00,$01,$B6,$92,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$0B
-	dc.b	$01,$00,$20,$7C,$00,$1A,$A4,$52,$22,$48,$24,$48,$D1,$DA,$D3,$DA
-	dc.b	$42,$40,$42,$41,$34,$11,$36,$29,$00,$02,$7A,$08,$4E,$B9,$00,$01
-	dc.b	$B6,$92,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$FE,$00,$00,$00,$20,$7C
-	dc.b	$00,$17,$3C,$7A,$22,$48,$24,$48,$D1,$DA,$D3,$DA,$42,$40,$42,$41
-	dc.b	$74,$40,$76,$1C,$7A,$01,$4E,$B9,$00,$01,$B6,$92,$3F,$38,$B0,$1C
-	dc.b	$31,$F8,$B0,$1E,$B0,$1C,$4E,$B9,$00,$01,$BC,$72,$00,$34,$8F,$07
-	dc.b	$19,$5B,$5D,$2D,$63,$68,$61,$6E,$67,$65,$20,$63,$61,$74,$65,$67
-	dc.b	$6F,$72,$79,$8F,$06,$1A,$61,$2B,$63,$2D,$63,$6C,$65,$61,$72,$20
-	dc.b	$61,$6C,$6C,$20,$77,$69,$6E,$20,$72,$65,$63,$6F,$72,$64,$73,$00
-	dc.b	$31,$DF,$B0,$1C,$20,$7C,$00,$1A,$C3,$A0,$4E,$B9,$00,$01,$21,$8A
-	dc.b	$24,$5F,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	move.l	#$ECE,d0
+	move.l	#$80,d1
+	movea.l	#ThreeStars,a0
+	jsr	(ReadSRAM).l
+	movea.l	#$FFFFD3F2,a1
+	btst	#6,(sflags6).w
+	beq.w	.1
+	movea.l	#$FFFFD3FA,a1
+.1
+	move.l	a1,-(sp)
+	move.w	#1,d0
+	move.w	#6,d7
+.loop
+	move.b	d0,(a1)+
+	addq.w	#1,d0
+	dbf	d7,.loop
+	movea.l	(sp),a1
+	movea.l	#ThreeStars,a0
+.loop2
+	movea.l	(sp),a1
+	move.w	#5,d7
+	clr.w	d6
+.loop3
+	move.b	(a1)+,d1
+	ext.w	d1
+	move.b	(a1),d2
+	ext.w	d2
+	asl.w	#4,d1
+	asl.w	#4,d2
+	move.b	(a0,d1.w),d0
+	move.b	(a0,d2.w),d3
+	btst	#6,(sflags6).w
+	beq.w	.2
+	move.b	4(a0,d1.w),d0
+	move.b	4(a0,d2.w),d3
+.2
+	cmp.b	d3,d0
+	bge.w	.3
+	move.b	(a1),d0
+	move.b	-$1(a1),d1
+	move.b	d0,-$1(a1)
+	move.b	d1,(a1)
+	st	d6
+.3
+	dbf	d7,.loop3
+	tst.w	d6
+	bne.s	.loop2
+	movea.l	(sp)+,a1
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+	dc.w	$2F0A,$08F8,$0005,$C356,$21FC,$0001,$2D46,$D244
+	dc.w	$08B8,$0000,$BFB2,$08F8,$0002,$BFB2,$08B8,$0001
+	dc.w	$BFB2,$31FC,$0000,$B000,$31FC,$B800,$B002,$31FC
+	dc.w	$B800,$B00C,$31FC,$0005,$B00E,$31FC,$C000,$B008
+	dc.w	$31FC,$0006,$B00A,$31FC,$E000,$B004,$31FC,$0006
+	dc.w	$B006,$303C,$0000,$08F8,$0005,$BFB2,$4EB9,$0001
+	dc.w	$B57E,$08B8,$0005,$BFB2,$4EB9,$0001,$B2C4,$383C
+	dc.w	$0001,$227C,$001A,$C3A0,$4EB9,$0001,$217A,$31C4
+	dc.w	$B01E,$247C,$0017,$A16C,$4EB9,$0001,$B730,$21FC
+	dc.w	$0017,$9168,$BF8A,$31C4,$B016,$247C,$0017,$AA7A
+	dc.w	$4EB9,$0001,$B730,$31F8,$B016,$B014,$31C4,$B018
+	dc.w	$247C,$0017,$B688,$4EB9,$0001,$B730,$08F8,$0002
+	dc.w	$C354,$4EB9,$0001,$BA2E,$0008,$FF01,$FD00,$FC00
+	dc.w	$7028,$721C,$343C,$07FF,$4EB9,$0001,$B976,$4EB9
+	dc.w	$0001,$BB8E,$0006,$BF00,$0000,$207C,$001A,$AC72
+	dc.w	$2248,$2448,$D1DA,$D3DA,$4240,$4241,$7428,$761C
+	dc.w	$7A08,$4EB9,$0001,$B692,$4EB9,$0001,$BB8E,$0006
+	dc.w	$BF0B,$0100,$207C,$001A,$A452,$2248,$2448,$D1DA
+	dc.w	$D3DA,$4240,$4241,$3411,$3629,$0002,$7A08,$4EB9
+	dc.w	$0001,$B692,$4EB9,$0001,$BB8E,$0006,$FE00,$0000
+	dc.w	$207C,$0017,$3C7A,$2248,$2448,$D1DA,$D3DA,$4240
+	dc.w	$4241,$7440,$761C,$7A01,$4EB9,$0001,$B692,$3F38
+	dc.w	$B01C,$31F8,$B01E,$B01C,$4EB9,$0001,$BC72,$0034
+	dc.w	$8F07,$195B,$5D2D,$6368,$616E,$6765,$2063,$6174
+	dc.w	$6567,$6F72,$798F,$061A,$612B,$632D,$636C,$6561
+	dc.w	$7220,$616C,$6C20,$7769,$6E20,$7265,$636F,$7264
+	dc.w	$7300,$31DF,$B01C,$207C,$001A,$C3A0,$4EB9,$0001
+	dc.w	$218A,$245F,$4E75
 

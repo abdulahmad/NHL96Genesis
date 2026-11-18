@@ -84,10 +84,20 @@ asspenalty							;asstab entry: player a3 goes to the penalty box.
 	dc.b	$38,$3C,$00,$06,$60,$00,$F8,$68
 
 assdopen							;asstab entry: player a3 serves his penalty.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$00,$26,$08,$AB,$00,$01,$00,$62
-	dc.b	$67,$00,$00,$1C,$70,$10,$08,$2B,$00,$06,$00,$62,$67,$00,$00,$04
-	dc.b	$70,$01,$D1,$38,$C3,$EC,$50,$EB,$00,$34,$42,$6B,$00,$06,$4E,$75
+	btst	#pfalock,pflags(a3)
+	bne.w	.2
+	bclr	#pfna,pflags(a3)
+	beq.w	.2
+	moveq	#$10,d0
+	btst	#pfteam,pflags(a3)
+	beq.w	.1
+	moveq	#1,d0
+.1
+	add.b	d0,(PBnum).w
+	st	position(a3)
+	clr.w	frame(a3)
+.2
+	rts
 
 assepen								;asstab entry: player a3 leaves the penalty box.
 									;Code the listing does not decode: kept as bytes
@@ -106,13 +116,31 @@ assepen								;asstab entry: player a3 leaves the penalty box.
 
 assgoaliebreakwait					;asstab entry: in a shootout or penalty shot park the idle goalie off the
 									;ice.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$00,$50,$08,$38,$00,$02,$C3,$40
-	dc.b	$66,$00,$00,$12,$08,$38,$00,$00,$C3,$48,$66,$00,$00,$08,$4E,$71
-	dc.b	$60,$00,$30,$DA,$42,$6B,$00,$28,$42,$6B,$00,$2A,$48,$E7,$80,$80
-	dc.b	$20,$7C,$FF,$FF,$B0,$5E,$30,$38,$D2,$D6,$EF,$40,$D0,$C0,$37,$7C
-	dc.b	$01,$91,$00,$14,$08,$28,$00,$07,$00,$62,$66,$00,$00,$08,$37,$7C
-	dc.b	$FE,$6F,$00,$14,$4C,$DF,$01,$01,$4E,$75,$4E,$75
+	btst	#pfalock,pflags(a3)		;check if animation locked
+	bne.w	.3						;exit if so
+	btst	#2,(BA_PS_flags).w		;check if pen shot
+	bne.w	.1						;branch if so
+	btst	#0,(gmode2).w			;check for shootout
+	bne.w	.1						;branch if so
+	nop
+	bra.w	assexit
+.1
+	clr.w	Xvel(a3)				;clear Xvel
+	clr.w	Yvel(a3)				;clear Yvel
+	movem.l	d0/a0,-(sp)				;push d0 and a0 on stack
+	movea.l	#SortCords,a0			;Home SC Sctruct start
+	move.w	(BA_Goalie_SCnum).w,d0	;move Goalie SCNum into d0
+	asl.w	#7,d0					;shift d0 7 bits left
+	adda.w	d0,a0					;add d0 to address a0
+	move.w	#$191,Ypos(a3)			;move 401 decimal into Ypos
+	btst	#pfgoal,$62(a0)			;check if shooting up or down (a0 is goalie being shot on)
+	bne.w	.2						;branch if shooting up
+	move.w	#$FE6F,Ypos(a3)			;move -191 decimal into Ypos (goalie not being shot on)
+.2
+	movem.l	(sp)+,d0/a0
+.3
+	rts
+	rts
 
 donothing							;Unless locked or pad controlled, player a3 just skates (jumped to from
 									;the fight and assignment code).

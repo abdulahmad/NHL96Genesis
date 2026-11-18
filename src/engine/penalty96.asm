@@ -98,8 +98,9 @@ printbig2							;printbigcur with the font map BigFontMap3 (chars BigFontchars)
 	move.w	(BigFontchars).w,(printbigchars).w
 	jmp	printbigcur
 	;After printbig2: code that nothing in the listing reaches.
-	;Code the listing does not decode: kept as bytes
-	dc.b	$31,$C4,$B0,$1C,$24,$7C,$00,$17,$9A,$7E,$60,$00,$F5,$AE
+	move.w	d4,(smallfontchars).w
+	movea.l	#$179A7E,a2
+	bra.w	DecompressGraphicsPlain
 
 AddFramer							;Load the framer tiles (FramerMap+8) at char d4, framercset = d4
 	movea.l	#FramerMap+8,a2

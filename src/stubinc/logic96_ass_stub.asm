@@ -10,6 +10,7 @@
 	include	ram96.asm				;RAM map
 	include	externs96.asm			;outside addresses still in incbin segments. Equates only
 	include	macros\genesis.mac		;String
+assexit = $01A3BE					;faceoff96_stub
 
 
 ; Main segment code

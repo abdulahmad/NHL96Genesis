@@ -36,6 +36,8 @@ FormatPlayerName = $022FB2			;middle96
 FormatPlayerNumInitial = $022F44	;middle96
 GetPlayerNumInitial = $022ED6		;middle96
 getname = $022E92					;middle96
+GetGoalieCount = $0157A2			;trade96_stub
+GetPeriodTime = $0148A2				;hockey96
 
 
 ; Main segment code

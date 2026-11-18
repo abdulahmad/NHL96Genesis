@@ -44,18 +44,47 @@ LineEditor							;The line editor screen for team a2
 
 PrintAttribHeader					;Player list column header (PAttribColumns page DispAttribCtr), then 6
 									;rows of names, selected row highlighted
-									;Code the listing does not decode: kept as bytes
-	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$17,$02,$00,$22,$7C,$00,$02
-	dc.b	$34,$2E,$30,$38,$D0,$30,$60,$00,$00,$06,$D2,$D1,$58,$49,$4A,$51
-	dc.b	$5B,$C8,$FF,$F8,$6A,$00,$00,$08,$53,$78,$D0,$30,$60,$DE,$4E,$B9
-	dc.b	$00,$01,$BE,$EC,$28,$11,$36,$7C,$D1,$30,$34,$38,$D0,$34,$32,$38
-	dc.b	$D0,$3A,$92,$42,$B2,$7C,$00,$04,$63,$00,$00,$04,$72,$04,$31,$FC
-	dc.b	$00,$04,$B0,$42,$4E,$B9,$00,$01,$BA,$2E,$00,$24,$FE,$07,$FD,$02
-	dc.b	$FA,$01,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$FD,$02,$00,$B4,$78
-	dc.b	$D0,$32,$66,$00,$00,$0C,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$06
-	dc.b	$42,$40,$10,$33,$20,$00,$4E,$B9,$00,$01,$51,$FA,$52,$42,$51,$C9
-	dc.b	$FF,$B4,$4E,$75
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$17,2
+.loop
+	movea.l	#PAttribColumns,a1
+	move.w	(DispAttribCtr).w,d0
+	bra.w	.1
+.loop2
+	adda.w	(a1),a1
+	addq.w	#4,a1
+.1
+	tst.w	(a1)
+	dbmi	d0,.loop2
+	bpl.w	.2
+	subq.w	#1,(DispAttribCtr).w
+	bra.s	.loop
+.2
+	jsr	(printbig).l
+	move.l	(a1),d4
+	movea.w	#(CalTeam-M68K_RAM),a3
+	move.w	(PlayerScrollCtr).w,d2
+	move.w	(screentimer).w,d1
+	sub.w	d2,d1
+	cmp.w	#4,d1
+	bls.w	.3
+	moveq	#4,d1
+.3
+	move.w	#4,(printy).w
+.loop3
+	jsr	(printsmallz).l
+	String	$FE,7,$FD,2,$FA,1,'                         ',$FD,2
+	cmp.w	(VertLineScrolling).w,d2
+	bne.w	.4
+	jsr	(printsmallz).l
+	String	$FE,6
+.4
+	clr.w	d0
+	move.b	(a3,d2.w),d0
+	jsr	(GetNameandAttrib).l
+	addq.w	#1,d2
+	dbf	d1,.loop3
+	rts
 
 DrawLineIcons						;Draw the line icons for the cursor's line, then the selected player box
 									;Code the listing does not decode: kept as bytes
@@ -107,13 +136,18 @@ DrawLineIcons						;Draw the line icons for the cursor's line, then the selected
 	dc.b	$07,$3F,$4E,$75
 
 ClearLineEditorTop					;Erase the top of map 2
-									;Code the listing does not decode: kept as bytes
-	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$00,$00,$00,$70,$28,$72,$0E
-	dc.b	$34,$3C,$07,$FF,$4E,$F9,$00,$01,$B9,$76
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),0,0
+	moveq	#$28,d0
+	moveq	#$E,d1
+	move.w	#$7FF,d2
+	jmp	(eraser).l
 
 ClearMenuFlags						;Clear palfadenew+$5A and palfadenew+$7A
-									;Code the listing does not decode: kept as bytes
-	dc.b	$42,$78,$BD,$98,$42,$78,$BD,$B8,$4E,$75,$00,$10,$00,$12,$00,$04
+	clr.w	($FFFFBD98).w
+	clr.w	($FFFFBDB8).w
+	rts
+	dc.w	$0010,$0012,$0004
 
 LineIconPosTable					;Line icons x, y, slot count - 1
 	dc.b	$00,$05,$00,$12,$00,$04,$00,$10,$00,$12,$00,$04,$00,$1B,$00,$12
@@ -148,75 +182,155 @@ LineCursorTable						;The slot after a cursor move, indexed by slot + 8
 	dc.b	$4E,$B9,$00,$1E,$23,$9E,$4E,$F9,$00,$01,$54,$D4
 
 SetLineSlot							;Put player d0 in line slot d2 of team a2 (swap if already in that line)
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$E0,$C0,$41,$EA,$01,$84,$32,$02,$02,$41,$FF,$F8,$43,$F0
-	dc.b	$10,$00,$72,$05,$B0,$31,$10,$01,$57,$C9,$FF,$FA,$66,$00,$00,$08
-	dc.b	$13,$B0,$20,$00,$10,$01,$11,$80,$20,$00,$4C,$DF,$03,$07,$4E,$75
+	movem.l	d0-d2/a0-a1,-(sp)
+	lea	$184(a2),a0
+	move.w	d2,d1
+	andi.w	#$FFF8,d1
+	lea	(a0,d1.w),a1
+	moveq	#5,d1
+.loop
+	cmp.b	1(a1,d1.w),d0
+	dbeq	d1,.loop
+	bne.w	.1
+	move.b	(a0,d2.w),1(a1,d1.w)
+.1
+	move.b	d0,(a0,d2.w)
+	movem.l	(sp)+,d0-d2/a0-a1
+	rts
 
 LoadTeamLine						;Line editor menu item Load Team Line
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$4A,$78,$D2,$64,$67,$00,$00,$54,$20,$7C,$00,$20
-	dc.b	$00,$00,$54,$48,$43,$EA,$01,$84,$12,$E8,$00,$01,$12,$E8,$00,$03
-	dc.b	$12,$E8,$00,$05,$12,$E8,$00,$07,$12,$E8,$00,$09,$12,$E8,$00,$0B
-	dc.b	$12,$E8,$00,$0D,$12,$E8,$00,$0F,$D0,$FC,$00,$10,$D0,$FC,$00,$10
-	dc.b	$30,$3C,$00,$0B,$12,$E8,$00,$01,$12,$E8,$00,$03,$12,$E8,$00,$05
-	dc.b	$12,$E8,$00,$07,$50,$48,$51,$C8,$FF,$EC,$60,$00,$00,$2C,$30,$3C
-	dc.b	$00,$0D,$20,$7C,$00,$20,$00,$00,$54,$48,$D0,$FC,$00,$10,$43,$EA
-	dc.b	$01,$84,$12,$E8,$00,$01,$12,$E8,$00,$03,$12,$E8,$00,$05,$12,$E8
-	dc.b	$00,$07,$50,$48,$51,$C8,$FF,$EC,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	tst.w	(OptLine).w
+	beq.w	.1
+	movea.l	#$200000,a0
+	addq.w	#2,a0
+	lea	$184(a2),a1
+	move.b	1(a0),(a1)+
+	move.b	3(a0),(a1)+
+	move.b	5(a0),(a1)+
+	move.b	7(a0),(a1)+
+	move.b	9(a0),(a1)+
+	move.b	$B(a0),(a1)+
+	move.b	$D(a0),(a1)+
+	move.b	$F(a0),(a1)+
+	adda.w	#$10,a0
+	adda.w	#$10,a0
+	move.w	#$B,d0
+.loop
+	move.b	1(a0),(a1)+
+	move.b	3(a0),(a1)+
+	move.b	5(a0),(a1)+
+	move.b	7(a0),(a1)+
+	addq.w	#8,a0
+	dbf	d0,.loop
+	bra.w	.2
+.1
+	move.w	#$D,d0
+	movea.l	#$200000,a0
+	addq.w	#2,a0
+	adda.w	#$10,a0
+	lea	$184(a2),a1
+.loop2
+	move.b	1(a0),(a1)+
+	move.b	3(a0),(a1)+
+	move.b	5(a0),(a1)+
+	move.b	7(a0),(a1)+
+	addq.w	#8,a0
+	dbf	d0,.loop2
+.2
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 SaveTeamLine						;Line editor menu item Save Team Line
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$20,$7C,$00,$20,$00,$00,$3E,$2A,$00,$28,$52,$47
-	dc.b	$30,$C7,$43,$EA,$01,$84,$11,$59,$00,$01,$11,$59,$00,$03,$11,$59
-	dc.b	$00,$05,$11,$59,$00,$07,$11,$59,$00,$09,$11,$59,$00,$0B,$11,$59
-	dc.b	$00,$0D,$11,$59,$00,$0F,$D0,$FC,$00,$10,$43,$EA,$01,$84,$30,$3C
-	dc.b	$00,$0D,$11,$59,$00,$01,$11,$59,$00,$03,$11,$59,$00,$05,$11,$59
-	dc.b	$00,$07,$50,$48,$51,$C8,$FF,$EC,$08,$B8,$00,$06,$C3,$50,$4E,$B9
-	dc.b	$00,$02,$41,$AA,$4C,$DF,$7F,$FF,$4E,$75,$4E,$75,$01,$02,$03,$04
-	dc.b	$05,$09,$0A,$0B,$0C,$0D,$11,$12,$13,$14,$15,$19,$1A,$1B,$1C,$1D
-	dc.b	$21,$22,$23,$24,$25,$29,$2A,$2B,$2C,$31,$32,$33,$34,$FF,$2F,$0A
-	dc.b	$08,$F8,$00,$05,$C3,$56,$21,$FC,$00,$01,$2D,$46,$D2,$44,$08,$B8
-	dc.b	$00,$00,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$08,$B8,$00,$01,$BF,$B2
-	dc.b	$31,$FC,$00,$00,$B0,$00,$31,$FC,$B8,$00,$B0,$02,$31,$FC,$B8,$00
-	dc.b	$B0,$0C,$31,$FC,$00,$05,$B0,$0E,$31,$FC,$C0,$00,$B0,$08,$31,$FC
-	dc.b	$00,$06,$B0,$0A,$31,$FC,$E0,$00,$B0,$04,$31,$FC,$00,$06,$B0,$06
-	dc.b	$30,$3C,$00,$00,$08,$F8,$00,$05,$BF,$B2,$4E,$B9,$00,$01,$B5,$7E
-	dc.b	$08,$B8,$00,$05,$BF,$B2,$4E,$B9,$00,$01,$B2,$C4,$38,$3C,$00,$01
-	dc.b	$22,$7C,$00,$1A,$02,$44,$4E,$B9,$00,$01,$21,$7A,$38,$3C,$00,$1E
-	dc.b	$31,$C4,$B0,$1C,$24,$7C,$00,$17,$91,$70,$4E,$B9,$00,$01,$B7,$30
-	dc.b	$31,$C4,$B0,$1E,$24,$7C,$00,$17,$A1,$6C,$4E,$B9,$00,$01,$B7,$30
-	dc.b	$21,$FC,$00,$17,$91,$68,$BF,$8A,$31,$C4,$B0,$18,$24,$7C,$00,$17
-	dc.b	$B6,$88,$4E,$B9,$00,$01,$B7,$30,$08,$F8,$00,$02,$C3,$54,$4E,$B9
-	dc.b	$00,$01,$BA,$2E,$00,$08,$FF,$01,$FD,$00,$FC,$00,$70,$28,$72,$1C
-	dc.b	$34,$3C,$07,$FF,$4E,$B9,$00,$01,$B9,$76,$31,$C4,$B0,$32,$4E,$B9
-	dc.b	$00,$01,$BB,$8E,$00,$06,$BF,$00,$00,$00,$20,$7C,$00,$19,$CE,$08
-	dc.b	$22,$48,$24,$48,$D1,$DA,$D3,$DA,$42,$40,$42,$41,$74,$28,$76,$1C
-	dc.b	$7A,$08,$4E,$B9,$00,$01,$B6,$92,$31,$C4,$B0,$34,$24,$7C,$00,$19
-	dc.b	$E7,$FE,$4E,$B9,$00,$01,$B7,$30,$31,$C4,$B0,$2C,$4E,$B9,$00,$01
-	dc.b	$BB,$8E,$00,$06,$BF,$01,$04,$00,$24,$57,$3E,$2A,$00,$28,$7A,$02
-	dc.b	$4E,$B9,$00,$01,$2B,$B2,$31,$C4,$B0,$36,$4E,$B9,$00,$01,$BB,$8E
-	dc.b	$00,$06,$BF,$0B,$01,$00,$20,$7C,$00,$19,$C6,$28,$22,$48,$24,$48
-	dc.b	$D1,$DA,$D3,$DA,$42,$40,$42,$41,$34,$11,$36,$29,$00,$02,$7A,$08
-	dc.b	$4E,$B9,$00,$01,$B6,$92,$61,$00,$00,$44,$4E,$B9,$00,$01,$BB,$8E
-	dc.b	$00,$06,$FE,$00,$00,$00,$20,$7C,$00,$17,$0B,$0C,$22,$48,$24,$48
-	dc.b	$D1,$DA,$D3,$DA,$42,$40,$42,$41,$74,$40,$76,$1C,$7A,$01,$4E,$B9
-	dc.b	$00,$01,$B6,$92,$20,$7C,$00,$1A,$02,$44,$4E,$B9,$00,$01,$21,$8A
-	dc.b	$61,$00,$00,$54,$46,$FC,$25,$00,$24,$5F,$4E,$75,$3F,$38,$B0,$1C
-	dc.b	$31,$F8,$B0,$1E,$B0,$1C,$4E,$B9,$00,$01,$BC,$72,$00,$34,$8F,$04
-	dc.b	$19,$7B,$7D,$5B,$5D,$2D,$68,$69,$67,$68,$6C,$69,$67,$68,$74,$20
-	dc.b	$70,$6C,$61,$79,$65,$72,$8F,$07,$1A,$63,$2D,$73,$65,$6C,$65,$63
-	dc.b	$74,$20,$70,$6C,$61,$79,$65,$72,$20,$74,$6F,$20,$65,$64,$69,$74
-	dc.b	$31,$DF,$B0,$1C,$4E,$75,$48,$E7,$00,$C0,$20,$7C,$00,$17,$C2,$AE
-	dc.b	$22,$7C,$FF,$FF,$BD,$7E,$30,$3C,$00,$07,$22,$D8,$51,$C8,$FF,$FC
-	dc.b	$4C,$DF,$03,$00,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	#$200000,a0
+	move.w	Xvel(a2),d7
+	addq.w	#1,d7
+	move.w	d7,(a0)+
+	lea	$184(a2),a1
+	move.b	(a1)+,1(a0)
+	move.b	(a1)+,3(a0)
+	move.b	(a1)+,5(a0)
+	move.b	(a1)+,7(a0)
+	move.b	(a1)+,9(a0)
+	move.b	(a1)+,$B(a0)
+	move.b	(a1)+,$D(a0)
+	move.b	(a1)+,$F(a0)
+	adda.w	#$10,a0
+	lea	$184(a2),a1
+	move.w	#$D,d0
+.loop
+	move.b	(a1)+,1(a0)
+	move.b	(a1)+,3(a0)
+	move.b	(a1)+,5(a0)
+	move.b	(a1)+,7(a0)
+	addq.w	#8,a0
+	dbf	d0,.loop
+	bclr	#6,(GameFlags).w
+	jsr	(MakeSRAMChecksum).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+	dc.w	$4E75,$0102,$0304,$0509,$0A0B,$0C0D,$1112,$1314
+	dc.w	$1519,$1A1B,$1C1D,$2122,$2324,$2529,$2A2B,$2C31
+	dc.w	$3233,$34FF,$2F0A,$08F8,$0005,$C356,$21FC,$0001
+	dc.w	$2D46,$D244,$08B8,$0000,$BFB2,$08F8,$0002,$BFB2
+	dc.w	$08B8,$0001,$BFB2,$31FC,$0000,$B000,$31FC,$B800
+	dc.w	$B002,$31FC,$B800,$B00C,$31FC,$0005,$B00E,$31FC
+	dc.w	$C000,$B008,$31FC,$0006,$B00A,$31FC,$E000,$B004
+	dc.w	$31FC,$0006,$B006,$303C,$0000,$08F8,$0005,$BFB2
+	dc.w	$4EB9,$0001,$B57E,$08B8,$0005,$BFB2,$4EB9,$0001
+	dc.w	$B2C4,$383C,$0001,$227C,$001A,$0244,$4EB9,$0001
+	dc.w	$217A,$383C,$001E,$31C4,$B01C,$247C,$0017,$9170
+	dc.w	$4EB9,$0001,$B730,$31C4,$B01E,$247C,$0017,$A16C
+	dc.w	$4EB9,$0001,$B730,$21FC,$0017,$9168,$BF8A,$31C4
+	dc.w	$B018,$247C,$0017,$B688,$4EB9,$0001,$B730,$08F8
+	dc.w	$0002,$C354,$4EB9,$0001,$BA2E,$0008,$FF01,$FD00
+	dc.w	$FC00,$7028,$721C,$343C,$07FF,$4EB9,$0001,$B976
+	dc.w	$31C4,$B032,$4EB9,$0001,$BB8E,$0006,$BF00,$0000
+	dc.w	$207C,$0019,$CE08,$2248,$2448,$D1DA,$D3DA,$4240
+	dc.w	$4241,$7428,$761C,$7A08,$4EB9,$0001,$B692,$31C4
+	dc.w	$B034,$247C,$0019,$E7FE,$4EB9,$0001,$B730,$31C4
+	dc.w	$B02C,$4EB9,$0001,$BB8E,$0006,$BF01,$0400,$2457
+	dc.w	$3E2A,$0028,$7A02,$4EB9,$0001,$2BB2,$31C4,$B036
+	dc.w	$4EB9,$0001,$BB8E,$0006,$BF0B,$0100,$207C,$0019
+	dc.w	$C628,$2248,$2448,$D1DA,$D3DA,$4240,$4241,$3411
+	dc.w	$3629,$0002,$7A08,$4EB9,$0001,$B692,$6100,$0044
+	dc.w	$4EB9,$0001,$BB8E,$0006,$FE00,$0000,$207C,$0017
+	dc.w	$0B0C,$2248,$2448,$D1DA,$D3DA,$4240,$4241,$7440
+	dc.w	$761C,$7A01,$4EB9,$0001,$B692,$207C,$001A,$0244
+	dc.w	$4EB9,$0001,$218A,$6100,$0054,$46FC,$2500,$245F
+	dc.w	$4E75,$3F38,$B01C,$31F8,$B01E,$B01C,$4EB9,$0001
+	dc.w	$BC72,$0034,$8F04,$197B,$7D5B,$5D2D,$6869,$6768
+	dc.w	$6C69,$6768,$7420,$706C,$6179,$6572,$8F07,$1A63
+	dc.w	$2D73,$656C,$6563,$7420,$706C,$6179,$6572,$2074
+	dc.w	$6F20,$6564,$6974,$31DF,$B01C,$4E75,$48E7,$00C0
+	dc.w	$207C,$0017,$C2AE,$227C,$FFFF,$BD7E,$303C,$0007
+	dc.w	$22D8,$51C8,$FFFC,$4CDF,$0300,$4E75
 
 FormatLineName						;a1 = mesarea " Last" for player d0 of team a2, space padded, for the line
 									;editor slots
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$F0,$A0,$4E,$B9,$00,$01,$01,$C6,$32,$7C,$BF,$F4,$12,$FC
-	dc.b	$00,$20,$30,$18,$45,$F0,$00,$FE,$0C,$18,$00,$20,$66,$FA,$12,$D8
-	dc.b	$B5,$C8,$67,$00,$00,$0E,$4A,$10,$66,$F4,$60,$00,$00,$06,$12,$FC
-	dc.b	$00,$20,$B2,$FC,$BF,$FF,$6D,$F6,$4E,$B9,$00,$02,$30,$AA,$4C,$DF
-	dc.b	$05,$0F,$4E,$75
+	movem.l	d0-d3/a0/a2,-(sp)
+	jsr	(GetPlayerNamePointer).l
+	movea.w	#(TextBuffer-M68K_RAM),a1
+	move.b	#$20,(a1)+				;' '
+	move.w	(a0)+,d0				;string length
+	lea	-$2(a0,d0.w),a2				;end of the name
+.skip
+	cmpi.b	#$20,(a0)+				;skip the first name
+	bne.s	.skip
+.copy
+	move.b	(a0)+,(a1)+				;last name
+	cmpa.l	a0,a2
+	beq.w	.1
+	tst.b	(a0)
+	bne.s	.copy
+	bra.w	.1
+.pad
+	move.b	#$20,(a1)+				;pad with spaces
+.1
+	cmpa.w	#$BFFF,a1
+	blt.s	.pad
+	jsr	(FinalizeTextBuffer).l
+	movem.l	(sp)+,d0-d3/a0/a2
+	rts
 

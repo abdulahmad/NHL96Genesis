@@ -448,12 +448,26 @@ FindGoalie							;d0 = SCnum of the goalie of the team of player d0 (the first p
 	movem.l	(sp)+,d1/a0
 	rts
 	;The burst code again; nothing reaches this copy.
-	;Code the listing does not decode: kept as bytes
-	dc.b	$4E,$B9,$00,$01,$FB,$24,$4A,$78,$D2,$64,$66,$00,$00,$1A,$04,$40
-	dc.b	$00,$BA,$4E,$B9,$00,$01,$FB,$44,$08,$38,$00,$04,$C3,$4A,$67,$00
-	dc.b	$00,$06,$30,$3C,$10,$00,$EE,$48,$32,$00,$34,$2B,$00,$54,$E5,$42
-	dc.b	$20,$7C,$00,$01,$AE,$60,$C1,$F0,$20,$00,$C3,$F0,$20,$02,$D1,$6B
-	dc.b	$00,$28,$D3,$6B,$00,$2A,$4E,$75
+	jsr	(getpde).l					;get players energy
+	tst.w	(OptLine).w
+	bne.w	.2
+	subi.w	#$BA,d0
+	jsr	(setpde).l					;decrease players energy
+	btst	#4,(sflags7).w
+	beq.w	.2
+	move.w	#$1000,d0
+	;energy drain for the line time
+.2
+	lsr.w	#7,d0					;d0 will be $1000 with lines off
+	move.w	d0,d1					;energy = speed increase (check violence)
+	move.w	facedir(a3),d2			;facedir
+	asl.w	#2,d2
+	movea.l	#dirtab,a0
+	muls.w	(a0,d2.w),d0
+	muls.w	2(a0,d2.w),d1
+	add.w	d0,Xvel(a3)				;add to X Vel
+	add.w	d1,Yvel(a3)				;add to Y Vel
+	rts
 
 burst								;C button speed burst: take $BA energy unless OptLine is set, add a
 									;facedir push to Xvel / Yvel and set

@@ -15,6 +15,18 @@
 ReadTeamStats = $0225E0				;playoff96
 SeasonPlayoffStats = $1DB020		;season96_menu
 PlayerStatsList = $1E55BC			;stats96_list
+AddFramer = $01C184					;pause96_return_stub
+DecompressGraphicsPlain = $01B730	;pause96_return_stub
+forceblack = $01AF52				;pause96_stub
+LoadCrowdFrames = $0210D0			;display96
+LoadEnergyBarTiles = $0210C2		;display96
+LoadHomeTeamGfx = $1D8E6C			;code96_15
+LoadReplayIcon = $1D8E5C			;code96_15
+LoadSmallFont = $0243A0				;pause96_return_stub
+setplayercolors = $0215B2			;control96_team
+setupEASNmap = $0210B0				;display96
+setupIceRinkPal = $02109A			;display96
+Vmaddr = $01B678					;season96_stub
 
 
 ; Main segment code
