@@ -70,6 +70,7 @@ ReadSRAMBits						;d0 = the d2-bit value at bit d1 of the save RAM (see WriteSRA
 	lsr.l	d6,d0
 	movem.l	(sp)+,d1-d6/a0
 	rts
+ReadSRAMBitsSkip1	equ	*			;Entry after the register save when the bit field is skipped (low confidence)
 	movem.l	d0/d2-d4/d6-d7/a1-a2/a4-a6,-(sp)
 	move.w	d3,d7
 	ext.l	d5
@@ -113,6 +114,7 @@ ReadSRAMBits						;d0 = the d2-bit value at bit d1 of the save RAM (see WriteSRA
 	dbf	d7,.loop
 	movem.l	(sp)+,d0/d2-d4/d6-d7/a1-a2/a4-a6
 	rts
+ReadSRAMBitsSkip2	equ	*			;Second skip entry of ReadSRAMBits (low confidence)
 	movem.l	d0/d2-d4/d6-d7/a1-a2/a4-a6,-(sp)
 	move.w	d3,d7
 	ext.l	d5
@@ -193,6 +195,7 @@ ReadSRAMBits						;d0 = the d2-bit value at bit d1 of the save RAM (see WriteSRA
 	dbf	d7,.loop2
 	movem.l	(sp)+,d0/d2-d4/d6-d7/a1-a2/a4-a6
 	rts
+ReadSRAMBitsSkip3	equ	*			;Third skip entry of ReadSRAMBits (low confidence)
 	movem.l	d0/d2-d3/d6-d7/a1-a2/a4-a6,-(sp)
 	move.w	d3,d7
 	ext.l	d5

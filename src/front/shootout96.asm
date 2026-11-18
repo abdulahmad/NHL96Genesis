@@ -447,17 +447,42 @@ PenShotTable						;Penalty shot data
 
 UpdatePenaltyShotEnd				;The shot ends (BA_PS_flags bit 4) when the goalie has the puck, the loose
 									;puck timer or the clock runs out. Runs on into EndPenaltyShotPlay
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$48,$A7,$80,$00
-	dc.b	$30,$38,$B7,$BE,$B0,$78,$D2,$D6,$4C,$9F,$00,$01,$67,$00,$00,$3C
-	dc.b	$08,$38,$00,$05,$C3,$40,$67,$00,$00,$38,$08,$38,$00,$05,$C3,$48
-	dc.b	$66,$00,$00,$10,$4A,$78,$B7,$BE,$6A,$00,$00,$10,$08,$F8,$00,$05
-	dc.b	$C3,$48,$4A,$78,$B7,$BE,$6A,$00,$00,$12,$4A,$78,$C3,$80,$6B,$00
-	dc.b	$00,$0A,$53,$78,$C3,$80,$60,$00,$00,$08,$08,$F8,$00,$04,$C3,$40
-	dc.b	$4A,$78,$D3,$26,$66,$00,$00,$08,$08,$F8,$00,$04,$C3,$40,$08,$38
-	dc.b	$00,$04,$C3,$40,$66,$00,$00,$04,$4E,$75,$08,$38,$00,$06,$C3,$40
-	dc.b	$66,$00,$00,$78,$08,$F8,$00,$06,$C3,$40,$30,$3C,$00,$0A,$4E,$B9
-	dc.b	$00,$01,$C1,$D2
+	movem.w	d0,-(sp)
+	move.w	(puckc).w,d0
+	cmp.w	(BA_Goalie_SCnum).w,d0
+	movem.w	(sp)+,d0
+	beq.w	.3
+	btst	#5,(BA_PS_flags).w
+	beq.w	.4
+	btst	#5,(gmode2).w
+	bne.w	.1
+	tst.w	(puckc).w
+	bpl.w	.2
+	bset	#5,(gmode2).w
+.1
+	tst.w	(puckc).w
+	bpl.w	.3
+.2
+	tst.w	(passmodetimer).w
+	bmi.w	.3
+	subq.w	#1,(passmodetimer).w
+	bra.w	.4
+.3
+	bset	#4,(BA_PS_flags).w
+.4
+	tst.w	(shootoutclock).w
+	bne.w	.5
+	bset	#4,(BA_PS_flags).w
+.5
+	btst	#4,(BA_PS_flags).w
+	bne.w	.6
+	rts
+.6
+	btst	#6,(BA_PS_flags).w
+	bne.w	EndPenaltyShotPlayExit
+	bset	#6,(BA_PS_flags).w
+	move.w	#$A,d0
+	jsr	(AddPenalty2).l
 
 EndPenaltyShotPlay					;LockScroll, end the penalty shot play (the BA flags), the shooter newpnum
 									;back, then CountShootoutGoals
@@ -481,5 +506,6 @@ EndPenaltyShotPlay					;LockScroll, end the penalty shot play (the BA flags), th
 	move.b	(savednewpnum).w,$61(a0,d0.w)
 	movem.l	(sp)+,d0/a0
 	jsr	(CountShootoutGoals).l
+EndPenaltyShotPlayExit	equ	*			;Shared return of EndPenaltyShotPlay
 	rts
 

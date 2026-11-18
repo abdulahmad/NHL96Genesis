@@ -24,6 +24,11 @@ setc1player = $016C52				;control96
 setc2player = $016C5C				;control96
 setc3player = $016C68				;control96
 setc4player = $016C74				;control96
+AddPenalty2 = $01C1D2				;collide96_stub
+GetHot = $01A458				;collide96_stub
+UpdatePenaltyShotEnd = $019692				;shootout96
+findpc = $019FCE				;logic96_vec
+wallcollcheck = $01EFFA				;collide96
 
 
 ; Main segment code

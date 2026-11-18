@@ -1,46 +1,178 @@
 ;	The line editor.
 
 LineEditor							;The line editor screen for team a2
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$EA,$00,$00,$00,$30,$61,$00,$09,$0C,$31,$FC,$00,$18,$BD,$3C
-	dc.b	$08,$B8,$00,$02,$BF,$B2,$42,$78,$D0,$30,$42,$78,$D0,$34,$31,$FC
-	dc.b	$00,$01,$D0,$3C,$4E,$B9,$00,$01,$BA,$2E,$00,$0A,$FE,$04,$FF,$01
-	dc.b	$FD,$00,$FC,$00,$70,$28,$72,$0E,$34,$3C,$07,$FF,$4E,$B9,$00,$01
-	dc.b	$B9,$76,$50,$F8,$C0,$60,$61,$00,$04,$B8,$61,$00,$02,$C6,$46,$FC
-	dc.b	$25,$00,$4E,$B9,$00,$01,$51,$E0,$4E,$B9,$00,$01,$26,$40,$4E,$B9
-	dc.b	$00,$01,$5C,$D8,$4E,$B9,$00,$01,$B3,$20,$08,$01,$00,$07,$66,$00
-	dc.b	$06,$14,$08,$01,$00,$05,$66,$00,$00,$54,$70,$01,$08,$01,$00,$01
-	dc.b	$66,$00,$00,$1E,$70,$FF,$08,$01,$00,$00,$66,$00,$00,$14,$70,$08
-	dc.b	$08,$01,$00,$03,$66,$00,$00,$0A,$70,$F8,$08,$01,$00,$02,$67,$B2
-	dc.b	$D0,$78,$D0,$3C,$4A,$78,$D2,$64,$67,$00,$00,$0E,$B0,$7C,$00,$01
-	dc.b	$6D,$A0,$B0,$7C,$00,$05,$6E,$9A,$41,$FA,$05,$82,$11,$F0,$00,$08
-	dc.b	$D0,$3D,$40,$E7,$61,$00,$02,$4C,$46,$DF,$60,$86,$4E,$B9,$00,$01
-	dc.b	$57,$A2,$32,$00,$4E,$B9,$00,$01,$57,$F4,$90,$41,$53,$40,$31,$C0
-	dc.b	$D0,$3A,$42,$78,$D0,$34,$42,$78,$D0,$32,$30,$7C,$D1,$30,$42,$42
-	dc.b	$11,$81,$20,$00,$BC,$41,$66,$00,$00,$06,$31,$C2,$D0,$32,$52,$41
-	dc.b	$52,$42,$51,$C8,$FF,$EC,$40,$E7,$2F,$0A,$61,$00,$04,$DA,$38,$3C
-	dc.b	$00,$01,$22,$7C,$00,$1A,$06,$32,$4E,$B9,$00,$01,$21,$7A,$20,$7C
-	dc.b	$00,$1A,$06,$32,$4E,$B9,$00,$01,$21,$8A,$4E,$B9,$00,$01,$BB,$8E
-	dc.b	$00,$06,$BF,$00,$00,$00,$22,$7C,$00,$19,$E7,$F6,$D3,$E9,$00,$04
-	dc.b	$24,$7C,$00,$00,$07,$72,$42,$40,$42,$41,$34,$3C,$00,$28,$36,$3C
-	dc.b	$00,$0E,$38,$38,$B0,$34,$7A,$00,$4E,$B9,$00,$01,$B6,$92,$4E,$B9
-	dc.b	$00,$01,$BB,$8E,$00,$06,$BF,$0A,$0B,$00,$20,$7C,$00,$19,$C6,$28
-	dc.b	$22,$48,$24,$48,$D1,$DA,$D3,$DA,$42,$40,$42,$41,$24,$7C,$00,$00
-	dc.b	$07,$72,$34,$11,$36,$29,$00,$02,$7A,$00,$38,$38,$B0,$36,$4E,$B9
-	dc.b	$00,$01,$B6,$92,$24,$5F,$4E,$B9,$00,$01,$BE,$D6,$00,$16,$F8,$04
-	dc.b	$01,$03,$02,$28,$73,$65,$6C,$65,$63,$74,$20,$70,$6C,$61,$79,$65
-	dc.b	$72,$29,$42,$40,$61,$00,$00,$6C,$46,$DF,$46,$FC,$25,$00,$4E,$B9
-	dc.b	$00,$01,$51,$E0,$4E,$B9,$00,$01,$26,$40,$4E,$B9,$00,$01,$5C,$D8
-	dc.b	$4E,$B9,$00,$01,$B3,$20,$08,$01,$00,$07,$66,$00,$FE,$6A,$08,$01
-	dc.b	$00,$05,$66,$00,$00,$72,$70,$01,$08,$01,$00,$01,$66,$00,$00,$2E
-	dc.b	$08,$01,$00,$03,$66,$00,$00,$16,$70,$FF,$08,$01,$00,$00,$66,$00
-	dc.b	$00,$1C,$08,$01,$00,$02,$66,$00,$00,$04,$60,$AE,$D0,$78,$D0,$30
-	dc.b	$6B,$A8,$31,$C0,$D0,$30,$61,$00,$00,$56,$60,$9E,$61,$00,$00,$04
-	dc.b	$60,$98,$D0,$78,$D0,$32,$6B,$00,$00,$2C,$B0,$78,$D0,$3A,$6E,$00
-	dc.b	$00,$24,$31,$C0,$D0,$32,$B0,$78,$D0,$34,$6E,$00,$00,$06,$31,$C0
-	dc.b	$D0,$34,$59,$40,$B0,$78,$D0,$34,$6F,$00,$00,$06,$31,$C0,$D0,$34
-	dc.b	$60,$00,$00,$1C,$4E,$75,$36,$7C,$D1,$30,$D6,$F8,$D0,$32,$10,$13
-	dc.b	$52,$00,$34,$38,$D0,$3C,$61,$00,$05,$60,$60,$00,$FD,$DA
+	bset	#0,$30(a2)
+	bsr.w	SetupLineEditorVideo
+	move.w	#$18,(palcount).w
+	bclr	#2,(disflags).w
+	clr.w	(DispAttribCtr).w
+	clr.w	(PlayerScrollCtr).w
+	move.w	#1,(setupvalues).w
+LineEditorHelp	equ	*	;Print the help line of the line editor
+	jsr	(printsmallz).l
+	String	$FE,4,$FF,1,$FD,0,$FC
+	moveq	#$28,d0
+	moveq	#$E,d1
+	move.w	#$7FF,d2
+	jsr	(eraser).l
+	st	(PushWidthBuf2+8).w
+LineEditorLoop	equ	*	;Line editor main loop: draw the screen and read the pad
+	bsr.w	DrawLineEditorBackdrop
+	bsr.w	DrawLineIcons
+	move.w	#$2500,sr
+.loop
+	jsr	(vcountwait).l				;per frame: d1 = pressed buttons with auto repeat (Rev B has no wrapper)
+	jsr	(SetMenuScroll).l			;per frame: d1 = pressed buttons with auto repeat
+	jsr	(ReadMenuJoy).l
+	jsr	(ProcessInputWithRepeat).l
+	btst	#7,d1					;start: exit menu
+	bne.w	LineCursorHelp
+	btst	#5,d1					;C: pick a player for this slot
+	bne.w	.3
+	moveq	#1,d0					;down: next slot
+	btst	#1,d1
+	bne.w	.move
+	moveq	#-$1,d0					;up: previous slot
+	btst	#0,d1
+	bne.w	.move
+	moveq	#8,d0					;right: next line (8 slots per line)
+	btst	#3,d1
+	bne.w	.move
+	moveq	#-$8,d0					;left: previous line
+	btst	#2,d1
+	beq.s	.loop
+.move
+	add.w	(setupvalues).w,d0		;d0 = tentative new slot
+	tst.w	(OptLine).w
+	beq.w	.set
+	cmp.w	#1,d0
+	blt.s	.loop					;OptLine set: only slots 1-5
+	cmp.w	#5,d0
+	bgt.s	.loop
+.set
+	lea	LineCursorTable(pc),a0		;table is indexed by slot + 8
+	move.b	8(a0,d0.w),(setupvalues+1).w	;wrap/skip through the table
+	move.w	sr,-(sp)
+	bsr.w	DrawLineIcons
+	move.w	(sp)+,sr
+	bra.s	.loop
+.3
+	jsr	(GetGoalieCount).l
+	move.w	d0,d1
+	jsr	(GetPlayerCount).l
+	sub.w	d1,d0					;d0 = candidates, d1 = first roster index
+	subq.w	#1,d0					;count - 1 for dbf
+	move.w	d0,(screentimer).w		;last candidate row (also the dbf count)
+	clr.w	(PlayerScrollCtr).w
+	clr.w	(VertLineScrolling).w
+	movea.w	#(CalTeam-M68K_RAM),a0
+	clr.w	d2
+.fill
+	move.b	d1,(a0,d2.w)			;Satt[d2] = roster index d1
+	cmp.w	d1,d6					;player now in the slot?
+	bne.w	.nc
+	move.w	d2,(VertLineScrolling).w	;start the cursor on him
+.nc
+	addq.w	#1,d1					;next candidate
+	addq.w	#1,d2
+	dbf	d0,.fill
+	move.w	sr,-(sp)
+	move.l	a2,-(sp)
+	bsr.w	ClearLineEditorTop
+	move.w	#1,d4
+	movea.l	#LineEditorSprites,a1
+	jsr	(LoadScreenSprite).l
+	movea.l	#LineEditorSprites,a0
+	jsr	(DrawScreenSprite).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),0,0
+	movea.l	#LineEditorBgMap,a1
+	adda.l	4(a1),a1
+	movea.l	#$772,a2
+	clr.w	d0
+	clr.w	d1
+	move.w	#$28,d2
+	move.w	#$E,d3
+	move.w	(ReplayIconChars+4).w,d4
+	moveq	#0,d5
+	jsr	(dobitmap).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$A,$B
+	movea.l	#EditLinesTitleMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	movea.l	#$772,a2
+	move.w	(a1),d2
+	move.w	2(a1),d3
+	moveq	#0,d5
+	move.w	(ReplayIconChars+6).w,d4
+	jsr	(dobitmap).l
+	movea.l	(sp)+,a2
+	jsr	(printbigz).l
+	String	$F8,4,1,3,2,'(select player)'
+	clr.w	d0
+	bsr.w	LineEditorMoveCursor
+	move.w	(sp)+,sr
+.loop3
+	move.w	#$2500,sr
+	jsr	(vcountwait).l				;picker input loop
+	jsr	(SetMenuScroll).l			;picker input loop
+	jsr	(ReadMenuJoy).l
+	jsr	(ProcessInputWithRepeat).l
+	btst	#7,d1					;start: back to slot cursor
+	bne.w	LineEditorLoop
+	btst	#5,d1					;C: take this player
+	bne.w	LineEditorSetSlot
+	moveq	#1,d0
+	btst	#1,d1					;down
+	bne.w	.6
+	btst	#3,d1					;right: next attribute page
+	bne.w	.horz
+	moveq	#-$1,d0
+	btst	#0,d1					;up
+	bne.w	.6
+	btst	#2,d1					;left: previous attribute page
+	bne.w	.horz
+	bra.s	.loop3
+.horz
+	add.w	(DispAttribCtr).w,d0	;change attribute page (not below 0)
+	bmi.s	.loop3
+	move.w	d0,(DispAttribCtr).w
+	bsr.w	PrintAttribHeader
+	bra.s	.loop3
+.6
+	bsr.w	LineEditorMoveCursor
+	bra.s	.loop3
+LineEditorMoveCursor				;Line editor: move the cursor row by d0 and rescroll the player list
+	add.w	(VertLineScrolling).w,d0	;Cursor row 0..screentimer
+	bmi.w	.3
+	cmp.w	(screentimer).w,d0
+	bgt.w	.3
+	move.w	d0,(VertLineScrolling).w
+	cmp.w	(PlayerScrollCtr).w,d0	;PlayerScrollCtr = first shown row
+	bgt.w	.1
+	move.w	d0,(PlayerScrollCtr).w	;Cursor above the window
+.1
+	subq.w	#4,d0
+	cmp.w	(PlayerScrollCtr).w,d0
+	ble.w	.2
+	move.w	d0,(PlayerScrollCtr).w
+.2
+	bra.w	PrintAttribHeader
+.3
+	rts
+LineEditorSetSlot	equ	*	;Line editor: put the chosen player into the line slot and redraw
+	movea.w	#(CalTeam-M68K_RAM),a3
+	adda.w	(VertLineScrolling).w,a3
+	move.b	(a3),d0
+	addq.b	#1,d0					;SetLineSlot wants 1 based
+	move.w	(setupvalues).w,d2
+	bsr.w	SetLineSlot
+	bra.w	LineEditorLoop
 
 PrintAttribHeader					;Player list column header (PAttribColumns page DispAttribCtr), then 6
 									;rows of names, selected row highlighted
@@ -87,53 +219,162 @@ PrintAttribHeader					;Player list column header (PAttribColumns page DispAttrib
 	rts
 
 DrawLineIcons						;Draw the line icons for the cursor's line, then the selected player box
-									;Code the listing does not decode: kept as bytes
-	dc.b	$7A,$06,$41,$FA,$00,$79,$30,$38,$D0,$3C,$E6,$48,$D0,$C0,$4A,$78
-	dc.b	$D2,$64,$67,$00,$00,$04,$53,$48,$10,$10,$B0,$38,$C0,$60,$67,$00
-	dc.b	$00,$0A,$11,$C0,$C0,$60,$61,$00,$01,$2C,$0B,$38,$C0,$60,$67,$00
-	dc.b	$00,$06,$61,$00,$00,$50,$51,$CD,$FF,$F2,$4E,$B9,$00,$01,$BE,$D6
-	dc.b	$00,$18,$F8,$04,$01,$15,$0C,$20,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$00,$4E,$B9,$00,$01,$BB,$8E,$00,$06
-	dc.b	$BF,$1E,$0C,$00,$30,$06,$4E,$B9,$00,$02,$2F,$B2,$30,$11,$E2,$48
-	dc.b	$91,$78,$B0,$40,$4E,$B9,$00,$01,$BE,$EC,$4E,$75,$01,$07,$07,$07
-	dc.b	$18,$18,$60,$60,$70,$06,$C0,$C5,$41,$FA,$02,$74,$D0,$C0,$4A,$78
-	dc.b	$D2,$64,$67,$00,$00,$04,$5D,$48,$4E,$B9,$00,$01,$BB,$8E,$00,$06
-	dc.b	$BF,$00,$00,$00,$31,$D0,$B0,$40,$31,$E8,$00,$02,$B0,$42,$57,$78
-	dc.b	$B0,$42,$54,$78,$B0,$40,$30,$05,$22,$7C,$00,$02,$33,$42,$4E,$B9
-	dc.b	$00,$01,$D7,$F2,$08,$F8,$00,$02,$C3,$54,$4E,$B9,$00,$01,$BE,$EC
-	dc.b	$4E,$B9,$00,$01,$BE,$D6,$00,$08,$20,$4C,$69,$6E,$65,$00,$4E,$B9
-	dc.b	$00,$01,$BA,$2E,$00,$06,$FE,$07,$FF,$01,$31,$D0,$B0,$40,$38,$05
-	dc.b	$E7,$44,$52,$44,$31,$E8,$00,$02,$B0,$42,$53,$78,$B0,$42,$36,$28
-	dc.b	$00,$04,$47,$EA,$01,$84,$31,$D0,$B0,$40,$4E,$B9,$00,$01,$BA,$2E
-	dc.b	$00,$06,$FA,$01,$FE,$07,$42,$40,$10,$33,$40,$00,$53,$40,$4E,$B9
-	dc.b	$00,$1E,$26,$44,$B8,$78,$D0,$3C,$66,$00,$00,$12,$3C,$00,$3E,$38
-	dc.b	$B0,$44,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$06,$4E,$B9,$00,$01
-	dc.b	$BA,$40,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$07,$52,$44,$51,$CB
-	dc.b	$FF,$B6,$4E,$75,$4E,$B9,$00,$01,$BA,$2E,$00,$08,$FF,$01,$FD,$02
-	dc.b	$FC,$11,$70,$24,$72,$07,$34,$3C,$07,$FF,$4E,$B9,$00,$01,$B9,$76
-	dc.b	$4E,$B9,$00,$01,$BE,$D6,$00,$28,$F8,$04,$01,$05,$0F,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$00,$33,$F9
-	dc.b	$00,$1E,$21,$2A,$FF,$FF,$B0,$42,$33,$F9,$00,$1E,$21,$28,$FF,$FF
-	dc.b	$B0,$40,$4A,$78,$D2,$64,$67,$00,$00,$0C,$33,$F9,$00,$1E,$21,$22
-	dc.b	$FF,$FF,$B0,$40,$4E,$B9,$00,$01,$BA,$2E,$00,$22,$FE,$07,$FB,$FD
-	dc.b	$FA,$00,$4C,$44,$FB,$FE,$FA,$01,$52,$44,$FB,$FE,$FA,$01,$4C,$57
-	dc.b	$FB,$FE,$FA,$01,$43,$20,$FB,$FE,$FA,$01,$52,$57,$4E,$75,$61,$00
-	dc.b	$00,$E4,$48,$E7,$FC,$E0,$2F,$0A,$4E,$B9,$00,$01,$BB,$8E,$00,$06
-	dc.b	$BF,$00,$00,$00,$22,$7C,$00,$19,$CE,$08,$D3,$E9,$00,$04,$24,$7C
-	dc.b	$00,$00,$07,$72,$42,$40,$42,$41,$34,$3C,$00,$28,$36,$3C,$00,$0E
-	dc.b	$38,$38,$B0,$32,$7A,$00,$4E,$B9,$00,$01,$B6,$92,$38,$38,$B0,$36
-	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$0B,$01,$00,$20,$7C,$00,$19
-	dc.b	$C6,$28,$22,$48,$24,$48,$D1,$DA,$D3,$DA,$42,$40,$42,$41,$24,$7C
-	dc.b	$00,$00,$07,$72,$34,$11,$36,$29,$00,$02,$7A,$00,$4E,$B9,$00,$01
-	dc.b	$B6,$92,$38,$38,$B0,$2C,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$01
-	dc.b	$04,$00,$24,$57,$3E,$2A,$00,$28,$7A,$02,$4E,$B9,$00,$01,$2B,$B2
-	dc.b	$38,$3C,$00,$01,$22,$7C,$00,$1A,$02,$44,$4E,$B9,$00,$01,$21,$7A
-	dc.b	$20,$7C,$00,$1A,$02,$44,$4E,$B9,$00,$01,$21,$8A,$0C,$78,$00,$01
-	dc.b	$D2,$64,$67,$00,$00,$28,$4E,$B9,$00,$01,$BC,$72,$00,$20,$8F,$18
-	dc.b	$07,$73,$74,$61,$72,$74,$2D,$65,$78,$69,$74,$8F,$16,$08,$5B,$5D
-	dc.b	$2D,$73,$65,$6C,$65,$63,$74,$20,$6C,$69,$6E,$65,$24,$5F,$4C,$DF
-	dc.b	$07,$3F,$4E,$75
+	moveq	#6,d5
+	lea	LineIconSlotTable(pc),a0
+	move.w	(setupvalues).w,d0
+	lsr.w	#3,d0
+	adda.w	d0,a0
+	tst.w	(OptLine).w
+	beq.w	.1
+	subq.w	#1,a0
+.1
+	move.b	(a0),d0
+	cmp.b	(PushWidthBuf2+8).w,d0
+	beq.w	.loop
+	move.b	d0,(PushWidthBuf2+8).w
+	bsr.w	DrawLineIconLabel
+.loop
+	btst	d5,(PushWidthBuf2+8).w
+	beq.w	.2
+	bsr.w	DrawLineIcon
+.2
+	dbf	d5,.loop
+	jsr	(printbigz).l
+	String	$F8,4,1,$15,$C,'                '
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$1E,$C
+	move.w	d6,d0
+	jsr	(FormatPlayerName).l
+	move.w	(a1),d0
+	lsr.w	#1,d0
+	sub.w	d0,(printx).w
+	jsr	(printbig).l
+	rts
+	dc.b	$01
+LineIconSlotTable	equ	*	;Table of one byte per line slot, indexed from the line editor cursor (OptLine moves the index by one)
+	dc.b	$07,$07,$07,$18,$18,$60,$60
+DrawLineIcon						;Draw the icon of line d5 at its LineIconPosTable position
+	moveq	#6,d0
+	mulu.w	d5,d0
+	lea	LineIconPosTable(pc),a0
+	adda.w	d0,a0
+	tst.w	(OptLine).w
+	beq.w	.1
+	subq.w	#6,a0
+.1
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),0,0
+	move.w	(a0),(printx).w
+	move.w	2(a0),(printy).w
+	subq.w	#3,(printy).w
+	addq.w	#2,(printx).w
+	move.w	d5,d0
+	movea.l	#linelist,a1
+	jsr	(SkipStrings).l
+	bset	#2,(sflags11).w
+	jsr	(printbig).l
+	jsr	(printbigz).l
+	String	' Line'
+	jsr	(printsmallz).l
+	String	$FE,7,$FF,1
+	move.w	(a0),(printx).w
+	move.w	d5,d4
+	asl.w	#3,d4
+	addq.w	#1,d4
+	move.w	2(a0),(printy).w
+	subq.w	#1,(printy).w
+	move.w	4(a0),d3
+	lea	$184(a2),a3
+.loop
+	move.w	(a0),(printx).w
+	jsr	(printsmallz).l
+	String	$FA,1,$FE,7
+	clr.w	d0
+	move.b	(a3,d4.w),d0
+	subq.w	#1,d0
+	jsr	(FormatLineName).l
+	cmp.w	(setupvalues).w,d4
+	bne.w	.2
+	move.w	d0,d6
+	move.w	(printa).w,d7
+	jsr	(printsmallz).l
+	String	$FE,6
+.2
+	jsr	(printsmall).l
+	jsr	(printsmallz).l
+	String	$FE,7
+	addq.w	#1,d4
+	dbf	d3,.loop
+	rts
+DrawLineIconLabel					;Print the label under a line icon
+	jsr	(printsmallz).l
+	String	$FF,1,$FD,2,$FC,$11
+	moveq	#$24,d0
+	moveq	#7,d1
+	move.w	#$7FF,d2
+	jsr	(eraser).l
+	jsr	(printbigz).l
+	String	$F8,4,1,5,$F,'                                '
+	move.w	(LineIconPosTable+2).l,(printy).l
+	move.w	(LineIconPosTable).l,(printx).l
+	tst.w	(OptLine).w
+	beq.w	.1
+	move.w	(LineIconPlayerBoxPos).l,(printx).l
+.1
+	jsr	(printsmallz).l
+	String	$FE,7,$FB,$FD,$FA,0,'LD',$FB,$FE,$FA,1,'RD',$FB,$FE,$FA,1,'LW',$FB,$FE,$FA,1,'C ',$FB,$FE,$FA,1,'RW'
+	rts
+DrawLineEditorBackdrop	equ	*	;Clear the top of the line editor and draw its background map
+	bsr.w	ClearLineEditorTop
+	movem.l	d0-d5/a0-a2,-(sp)
+	move.l	a2,-(sp)
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),0,0
+	movea.l	#LineEditorBgMap2,a1
+	adda.l	4(a1),a1
+	movea.l	#$772,a2
+	clr.w	d0
+	clr.w	d1
+	move.w	#$28,d2
+	move.w	#$E,d3
+	move.w	(ReplayIconChars+2).w,d4
+	moveq	#0,d5
+	jsr	(dobitmap).l
+	move.w	(ReplayIconChars+6).w,d4
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$B,1
+	movea.l	#EditLinesTitleMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	movea.l	#$772,a2
+	move.w	(a1),d2
+	move.w	2(a1),d3
+	moveq	#0,d5
+	jsr	(dobitmap).l
+	move.w	(awardlogochars).w,d4
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),1,4
+	movea.l	(sp),a2
+	move.w	$28(a2),d7
+	moveq	#2,d5
+	jsr	(DrawTeamLogoD7).l
+	move.w	#1,d4
+	movea.l	#LineEditorSprites2,a1
+	jsr	(LoadScreenSprite).l
+	movea.l	#LineEditorSprites2,a0
+	jsr	(DrawScreenSprite).l
+	cmpi.w	#1,(OptLine).w
+	beq.w	.2
+	jsr	(printcurz).l
+	String	$8F,$18,7,'start-exit',$8F,$16,8,'[]-select line'
+.2
+	movea.l	(sp)+,a2
+	movem.l	(sp)+,d0-d5/a0-a2
+	rts
 
 ClearLineEditorTop					;Erase the top of map 2
 	jsr	(printz).l
@@ -147,6 +388,7 @@ ClearMenuFlags						;Clear palfadenew+$5A and palfadenew+$7A
 	clr.w	($FFFFBD98).w
 	clr.w	($FFFFBDB8).w
 	rts
+LineIconPlayerBoxPos			;Position of the player box of each line icon (x, y, count)
 	dc.w	$0010,$0012,$0004
 
 LineIconPosTable					;Line icons x, y, slot count - 1
@@ -159,27 +401,58 @@ LineCursorTable						;The slot after a cursor move, indexed by slot + 8
 	dc.b	$09,$09,$0A,$0B,$0C,$0D,$21,$01,$11,$11,$12,$13,$14,$15,$21,$01
 	dc.b	$05,$19,$1A,$1B,$1C,$1D,$29,$01,$0D,$21,$22,$23,$24,$25,$31,$01
 	dc.b	$1D,$29,$2A,$2B,$2C,$2C,$01,$01,$25,$31,$32,$33,$34,$34,$01,$01
-	dc.b	$25,$31,$32,$33,$34,$34,$01,$01,$31,$FC,$00,$18,$BD,$3C,$26,$7C
-	dc.b	$00,$20,$00,$00,$30,$2A,$00,$28,$52,$40,$B0,$2B,$00,$01,$67,$00
-	dc.b	$00,$90,$4E,$B9,$00,$01,$BC,$72,$00,$46,$8F,$18,$06,$73,$74,$61
-	dc.b	$72,$74,$2D,$65,$78,$69,$74,$8F,$16,$07,$61,$2D,$64,$65,$66,$61
-	dc.b	$75,$6C,$74,$20,$6C,$69,$6E,$65,$8F,$16,$08,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$8F,$16,$09,$63
-	dc.b	$2D,$73,$61,$76,$65,$20,$6C,$69,$6E,$65,$20,$20,$20,$00,$4E,$B9
-	dc.b	$00,$01,$51,$E0,$4E,$B9,$00,$01,$26,$40,$4E,$B9,$00,$01,$5C,$D8
-	dc.b	$08,$01,$00,$07,$67,$00,$00,$08,$4E,$F9,$00,$01,$54,$D4,$08,$01
-	dc.b	$00,$06,$67,$00,$00,$0C,$4E,$B9,$00,$02,$15,$4E,$60,$00,$F9,$0A
-	dc.b	$08,$01,$00,$05,$67,$C8,$4E,$B9,$00,$1E,$23,$9E,$60,$00,$F8,$FA
-	dc.b	$4E,$B9,$00,$01,$BC,$72,$00,$46,$8F,$18,$06,$73,$74,$61,$72,$74
-	dc.b	$2D,$65,$78,$69,$74,$8F,$16,$07,$61,$2D,$64,$65,$66,$61,$75,$6C
-	dc.b	$74,$20,$6C,$69,$6E,$65,$8F,$16,$08,$62,$2D,$6C,$6F,$61,$64,$20
-	dc.b	$73,$61,$76,$65,$64,$20,$6C,$69,$6E,$65,$8F,$16,$09,$63,$2D,$73
-	dc.b	$61,$76,$65,$20,$6C,$69,$6E,$65,$20,$20,$20,$00,$4E,$B9,$00,$01
-	dc.b	$51,$E0,$4E,$B9,$00,$01,$26,$40,$4E,$B9,$00,$01,$5C,$D8,$08,$01
-	dc.b	$00,$07,$67,$00,$00,$04,$4E,$75,$08,$01,$00,$06,$67,$00,$00,$0C
-	dc.b	$4E,$B9,$00,$02,$15,$4E,$60,$00,$F8,$80,$08,$01,$00,$04,$67,$00
-	dc.b	$00,$0A,$61,$00,$00,$48,$60,$00,$F8,$70,$08,$01,$00,$05,$67,$BC
-	dc.b	$4E,$B9,$00,$1E,$23,$9E,$4E,$F9,$00,$01,$54,$D4
+	dc.b	$25,$31,$32,$33,$34,$34,$01,$01
+LineCursorHelp	equ	*	;Line cursor help text
+	move.w	#$18,(palcount).w
+	movea.l	#$200000,a3
+	move.w	$28(a2),d0
+	addq.w	#1,d0
+	cmp.b	1(a3),d0
+	beq.w	.3
+	jsr	(printcurz).l
+	String	$8F,$18,6,'start-exit',$8F,$16,7,'a-default line',$8F,$16,8,'                 ',$8F,$16,9,'c-save line   '
+.loop
+	jsr	(vcountwait).l
+	jsr	(SetMenuScroll).l
+	jsr	(ReadMenuJoy).l
+	btst	#7,d1
+	beq.w	.1
+	jmp	(ExitStatsScreen).l
+.1
+	btst	#6,d1
+	beq.w	.2
+	jsr	(SetOriginalLines).l
+	bra.w	LineEditorHelp
+.2
+	btst	#5,d1
+	beq.s	.loop
+	jsr	(SaveTeamLine).l
+	bra.w	LineEditorHelp
+.3
+	jsr	(printcurz).l
+	String	$8F,$18,6,'start-exit',$8F,$16,7,'a-default line',$8F,$16,8,'b-load saved line',$8F,$16,9,'c-save line   '
+.loop2
+	jsr	(vcountwait).l
+	jsr	(SetMenuScroll).l
+	jsr	(ReadMenuJoy).l
+	btst	#7,d1
+	beq.w	.4
+	rts
+.4
+	btst	#6,d1
+	beq.w	.5
+	jsr	(SetOriginalLines).l
+	bra.w	LineEditorHelp
+.5
+	btst	#4,d1
+	beq.w	.6
+	bsr.w	LoadTeamLine
+	bra.w	LineEditorHelp
+.6
+	btst	#5,d1
+	beq.s	.loop2
+	jsr	(SaveTeamLine).l
+	jmp	(ExitStatsScreen).l
 
 SetLineSlot							;Put player d0 in line slot d2 of team a2 (swap if already in that line)
 	movem.l	d0-d2/a0-a1,-(sp)
@@ -270,42 +543,125 @@ SaveTeamLine						;Line editor menu item Save Team Line
 	jsr	(MakeSRAMChecksum).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
-	dc.w	$4E75,$0102,$0304,$0509,$0A0B,$0C0D,$1112,$1314
-	dc.w	$1519,$1A1B,$1C1D,$2122,$2324,$2529,$2A2B,$2C31
-	dc.w	$3233,$34FF,$2F0A,$08F8,$0005,$C356,$21FC,$0001
-	dc.w	$2D46,$D244,$08B8,$0000,$BFB2,$08F8,$0002,$BFB2
-	dc.w	$08B8,$0001,$BFB2,$31FC,$0000,$B000,$31FC,$B800
-	dc.w	$B002,$31FC,$B800,$B00C,$31FC,$0005,$B00E,$31FC
-	dc.w	$C000,$B008,$31FC,$0006,$B00A,$31FC,$E000,$B004
-	dc.w	$31FC,$0006,$B006,$303C,$0000,$08F8,$0005,$BFB2
-	dc.w	$4EB9,$0001,$B57E,$08B8,$0005,$BFB2,$4EB9,$0001
-	dc.w	$B2C4,$383C,$0001,$227C,$001A,$0244,$4EB9,$0001
-	dc.w	$217A,$383C,$001E,$31C4,$B01C,$247C,$0017,$9170
-	dc.w	$4EB9,$0001,$B730,$31C4,$B01E,$247C,$0017,$A16C
-	dc.w	$4EB9,$0001,$B730,$21FC,$0017,$9168,$BF8A,$31C4
-	dc.w	$B018,$247C,$0017,$B688,$4EB9,$0001,$B730,$08F8
-	dc.w	$0002,$C354,$4EB9,$0001,$BA2E,$0008,$FF01,$FD00
-	dc.w	$FC00,$7028,$721C,$343C,$07FF,$4EB9,$0001,$B976
-	dc.w	$31C4,$B032,$4EB9,$0001,$BB8E,$0006,$BF00,$0000
-	dc.w	$207C,$0019,$CE08,$2248,$2448,$D1DA,$D3DA,$4240
-	dc.w	$4241,$7428,$761C,$7A08,$4EB9,$0001,$B692,$31C4
-	dc.w	$B034,$247C,$0019,$E7FE,$4EB9,$0001,$B730,$31C4
-	dc.w	$B02C,$4EB9,$0001,$BB8E,$0006,$BF01,$0400,$2457
-	dc.w	$3E2A,$0028,$7A02,$4EB9,$0001,$2BB2,$31C4,$B036
-	dc.w	$4EB9,$0001,$BB8E,$0006,$BF0B,$0100,$207C,$0019
-	dc.w	$C628,$2248,$2448,$D1DA,$D3DA,$4240,$4241,$3411
-	dc.w	$3629,$0002,$7A08,$4EB9,$0001,$B692,$6100,$0044
-	dc.w	$4EB9,$0001,$BB8E,$0006,$FE00,$0000,$207C,$0017
-	dc.w	$0B0C,$2248,$2448,$D1DA,$D3DA,$4240,$4241,$7440
-	dc.w	$761C,$7A01,$4EB9,$0001,$B692,$207C,$001A,$0244
-	dc.w	$4EB9,$0001,$218A,$6100,$0054,$46FC,$2500,$245F
-	dc.w	$4E75,$3F38,$B01C,$31F8,$B01E,$B01C,$4EB9,$0001
-	dc.w	$BC72,$0034,$8F04,$197B,$7D5B,$5D2D,$6869,$6768
-	dc.w	$6C69,$6768,$7420,$706C,$6179,$6572,$8F07,$1A63
-	dc.w	$2D73,$656C,$6563,$7420,$706C,$6179,$6572,$2074
-	dc.w	$6F20,$6564,$6974,$31DF,$B01C,$4E75,$48E7,$00C0
-	dc.w	$207C,$0017,$C2AE,$227C,$FFFF,$BD7E,$303C,$0007
-	dc.w	$22D8,$51C8,$FFFC,$4CDF,$0300,$4E75
+	dc.b	$4E,$75,$01,$02,$03,$04,$05,$09,$0A,$0B,$0C,$0D,$11,$12,$13,$14
+	dc.b	$15,$19,$1A,$1B,$1C,$1D,$21,$22,$23,$24,$25,$29,$2A,$2B,$2C,$31
+	dc.b	$32,$33,$34,$FF
+SetupLineEditorVideo	equ	*	;Set the VBint handler, scroll and map addresses for the line editor and load its graphics
+	move.l	a2,-(sp)
+	bset	#5,(sflags12).w
+	move.l	#VBlank_Menus,(VBint).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
+	move.w	#0,(VSCRLPM).w
+	move.w	#$B800,(VSPRITES).w
+	move.w	#$B800,(VmMAP3).w
+	move.w	#5,(Map3col1).w
+	move.w	#$C000,(VmMAP2).w
+	move.w	#6,(Map2col1).w
+	move.w	#$E000,(VmMAP1).w
+	move.w	#6,(Map1col1).w
+	move.w	#0,d0					;fade to color
+	bset	#5,(disflags).w
+	jsr	(setVram).l
+	bclr	#5,(disflags).w
+	jsr	(orjoy).l
+	move.w	#1,d4
+	movea.l	#LineEditorSprites2,a1
+	jsr	(LoadScreenSprite).l
+	move.w	#$1E,d4
+	move.w	d4,(smallfontchars).w
+	movea.l	#RosterFont+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.w	d4,(smallfont2chars).w
+	movea.l	#SmallFontMap2+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.l	#RosterFont,(smallfontptr).w
+	move.w	d4,(BigFontchars).w
+	movea.l	#BigFontMap4+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	bset	#2,(sflags11).w
+	jsr	(printsmallz).l
+	String	$FF,1,$FD,0,$FC
+	moveq	#$28,d0
+	moveq	#$1C,d1
+	move.w	#$7FF,d2
+	jsr	(eraser).l
+	move.w	d4,(ReplayIconChars+2).w
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),0,0
+	movea.l	#LineEditorBgMap2,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#$28,d2
+	moveq	#$1C,d3
+	moveq	#8,d5
+	jsr	(dobitmap).l
+	move.w	d4,(ReplayIconChars+4).w
+	movea.l	#LineEditorBgMap+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.w	d4,(awardlogochars).w
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),1,4
+	movea.l	(sp),a2
+	move.w	$28(a2),d7
+	moveq	#2,d5
+	jsr	(DrawTeamLogoD7).l
+	move.w	d4,(ReplayIconChars+6).w
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$B,1
+	movea.l	#EditLinesTitleMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	move.w	(a1),d2
+	move.w	2(a1),d3
+	moveq	#8,d5
+	jsr	(dobitmap).l
+	bsr.w	SaveTeamLineLabel
+	jsr	(printz).l
+	String	$FE,0,0
+	movea.l	#IceBgMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#$40,d2
+	moveq	#$1C,d3
+	moveq	#1,d5
+	jsr	(dobitmap).l
+	movea.l	#LineEditorSprites2,a0
+	jsr	(DrawScreenSprite).l
+	bsr.w	CopyStatsPalette
+	move.w	#$2500,sr
+	movea.l	(sp)+,a2
+	rts
+SaveTeamLineLabel	equ	*	;Print the label of a saved team line with the second small font
+	move.w	(smallfontchars).w,-(sp)
+	move.w	(smallfont2chars).w,(smallfontchars).w
+	jsr	(printcurz).l
+	String	$8F,4,$19,'{}[]-highlight player',$8F,7,$1A,'c-select player to edit'
+	move.w	(sp)+,(smallfontchars).w
+	rts
+CopyStatsPalette	equ	*	;Copy PStatsPal to the palette buffer
+	movem.l	a0-a1,-(sp)
+	movea.l	#PStatsPal,a0
+	movea.l	#$FFFFBD7E,a1
+	move.w	#7,d0
+.loop2
+	move.l	(a0)+,(a1)+
+	dbf	d0,.loop2
+	movem.l	(sp)+,a0-a1
+	rts
 
 FormatLineName						;a1 = mesarea " Last" for player d0 of team a2, space padded, for the line
 									;editor slots

@@ -53,23 +53,78 @@ PutBigTile							;Write tile d3 + d6 at column d4, row d5 of the map at VmMAP1 +
 
 BigControlCodeJumpTable				;printbigtext control codes indexed by -byte (as ControlCodeJumpTable);
 									;the handlers follow
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$00,$01,$F8,$4A,$00,$01,$C0,$50,$00,$01,$C0,$62,$00,$01,$C0,$88
-	dc.b	$00,$01,$C0,$9A,$00,$01,$C0,$AC,$00,$01,$C0,$BE,$00,$01,$C0,$D0
-	dc.b	$00,$01,$C0,$40,$61,$00,$00,$20,$61,$00,$00,$0A,$61,$00,$00,$3E
-	dc.b	$60,$00,$00,$4C,$10,$19,$53,$43,$02,$40,$00,$03,$E5,$40,$59,$40
-	dc.b	$31,$C0,$B0,$46,$4E,$75,$1C,$19,$02,$46,$00,$07,$53,$43,$E6,$5E
-	dc.b	$31,$C6,$B0,$44,$08,$38,$00,$02,$C3,$54,$66,$00,$00,$0A,$DC,$78
-	dc.b	$B0,$14,$60,$00,$00,$06,$DC,$78,$B0,$18,$4E,$75,$42,$40,$10,$19
-	dc.b	$53,$43,$31,$C0,$B0,$40,$38,$38,$B0,$40,$60,$00,$F8,$B2,$42,$40
-	dc.b	$10,$19,$53,$43,$31,$C0,$B0,$42,$3A,$38,$B0,$42,$60,$00,$F8,$A0
-	dc.b	$10,$19,$48,$80,$53,$43,$D1,$78,$B0,$40,$38,$38,$B0,$40,$60,$00
-	dc.b	$F8,$8E,$10,$19,$48,$80,$53,$43,$D1,$78,$B0,$42,$3A,$38,$B0,$42
-	dc.b	$60,$00,$F8,$7C,$42,$40,$10,$19,$53,$43,$31,$F8,$B0,$16,$B0,$14
-	dc.b	$23,$FC,$00,$1B,$89,$C8,$FF,$FF,$B0,$10,$B0,$7C,$00,$02,$67,$00
-	dc.b	$00,$1C,$B0,$7C,$00,$03,$66,$00,$00,$12,$31,$F8,$B0,$1A,$B0,$14
-	dc.b	$23,$FC,$00,$1B,$9E,$D8,$FF,$FF,$B0,$10,$4E,$75,$31,$F8,$B0,$18
-	dc.b	$B0,$14,$23,$FC,$00,$1B,$94,$16,$FF,$FF,$B0,$10,$4E,$75
+	dc.w	$0001,$F84A,$0001,$C050,$0001,$C062,$0001,$C088
+	dc.w	$0001,$C09A,$0001,$C0AC,$0001,$C0BE,$0001,$C0D0
+	dc.w	$0001,$C040
+	bsr.w	BigControlCodeSetAttrib
+	bsr.w	BigControlCodeSetMap
+	bsr.w	BigControlCodeSetXPos
+	bra.w	BigControlCodeSetYPos
+BigControlCodeSetMap				;Big font control code: set the map shift printm from the next byte
+	move.b	(a1)+,d0
+	subq.w	#1,d3
+	andi.w	#3,d0
+	asl.w	#2,d0
+	subq.w	#4,d0
+	move.w	d0,(printm).w
+	rts
+BigControlCodeSetAttrib				;Big font control code: set the attribute printa from the next byte
+	move.b	(a1)+,d6
+	andi.w	#7,d6
+	subq.w	#1,d3
+	ror.w	#3,d6
+	move.w	d6,(printa).w
+	btst	#2,(sflags11).w
+	bne.w	.1
+	add.w	(printbigchars).w,d6
+	bra.w	.2
+.1
+	add.w	(BigFontchars).w,d6
+.2
+	rts
+BigControlCodeSetXPos				;Big font control code: set printx from the next byte
+	clr.w	d0
+	move.b	(a1)+,d0
+	subq.w	#1,d3
+	move.w	d0,(printx).w
+	move.w	(printx).w,d4
+	bra.w	xyVmMap
+BigControlCodeSetYPos	equ	*	;Big font control code: set printy from the next byte and jump to xyVmMap
+	clr.w	d0
+	move.b	(a1)+,d0
+	subq.w	#1,d3
+	move.w	d0,(printy).w
+	move.w	(printy).w,d5
+	bra.w	xyVmMap
+	move.b	(a1)+,d0
+	ext.w	d0
+	subq.w	#1,d3
+	add.w	d0,(printx).w
+	move.w	(printx).w,d4
+	bra.w	xyVmMap
+	move.b	(a1)+,d0
+	ext.w	d0
+	subq.w	#1,d3
+	add.w	d0,(printy).w
+	move.w	(printy).w,d5
+	bra.w	xyVmMap
+	clr.w	d0
+	move.b	(a1)+,d0
+	subq.w	#1,d3
+	move.w	(bigfont1chars).w,(printbigchars).w
+	move.l	#BigFontMap,(bigfontptr).l
+	cmp.w	#2,d0
+	beq.w	.2
+	cmp.w	#3,d0
+	bne.w	.1
+	move.w	(BigFontchars+2).w,(printbigchars).w
+	move.l	#DigitFontMap,(bigfontptr).l
+.1
+	rts
+.2
+	move.w	(BigFontchars).w,(printbigchars).w
+	move.l	#BigFontMap3,(bigfontptr).l
+	rts
 
 printbigz1							;printbig1 with the String after the call
 	move.l	a1,-(sp)
@@ -1217,12 +1272,24 @@ DrawPowerPlayBox					;Draw the power play box frame (Framer)
 
 ClrHor								;Back to the vertical rink: reload the rink graphics, SprSort, clear the
 									;screen unless paused
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$08,$B8,$00,$07,$C3,$3A,$31,$FC,$03,$E8,$BD,$30
-	dc.b	$4E,$B9,$00,$01,$54,$D8,$61,$00,$43,$78,$08,$38,$00,$00,$C3,$3A
-	dc.b	$66,$00,$00,$1C,$61,$00,$EB,$4A,$00,$06,$FF,$00,$00,$00,$70,$20
-	dc.b	$72,$1C,$34,$3C,$07,$FF,$61,$00,$E9,$20,$61,$00,$00,$08,$4C,$DF
-	dc.b	$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	bclr	#7,(sflags).w
+	move.w	#$3E8,(Oldrow).w
+	jsr	(ExitStatsScreenReload).l
+	bsr.w	SprSort
+	btst	#sfpz,(sflags).w		;sfpz
+	bne.w	.1
+	bsr.w	printz
+	String	$FF,0,0
+	moveq	#$20,d0					;32
+	moveq	#$1C,d1					;28
+	move.w	#$7FF,d2				;blank tile
+	bsr.w	eraser					;blank the 32x28 area
+	bsr.w	printscores1			;redraw the score board
+	;exit: restore the registers
+.1
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 printscores1						;The scoreboard redraw: an empty rts in 96
 	rts
@@ -1241,17 +1308,66 @@ EASNLogo							;Draw the EASN logo
 	clr.w	d5
 	bra.w	dobitmap
 	;The rest of EASNLogo.
-	;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$F0,$08,$F8,$00,$03,$BF,$B2,$61,$C6,$61,$00,$EA,$F0
-	dc.b	$00,$06,$BE,$14,$08,$00,$34,$7C,$C7,$26,$61,$00,$00,$1A,$61,$00
-	dc.b	$EA,$DE,$00,$06,$BE,$05,$08,$00,$34,$7C,$CA,$C4,$61,$00,$00,$08
-	dc.b	$4C,$DF,$0F,$FF,$4E,$75,$41,$EA,$00,$A4,$42,$40,$10,$18,$6B,$00
-	dc.b	$00,$10,$08,$32,$00,$06,$00,$6C,$66,$F0,$61,$00,$00,$1E,$60,$EA
-	dc.b	$41,$EA,$00,$A4,$42,$40,$10,$18,$6B,$00,$27,$60,$08,$32,$00,$06
-	dc.b	$00,$6C,$67,$F0,$61,$00,$00,$04,$60,$EA,$0C,$78,$00,$0A,$B0,$42
-	dc.b	$62,$00,$27,$48,$34,$32,$00,$6C,$02,$42,$07,$FF,$3E,$2A,$00,$28
-	dc.b	$E2,$48,$4E,$B9,$00,$01,$01,$E6,$D2,$D1,$50,$49,$42,$40,$10,$29
-	dc.b	$FF,$F8,$3F,$38,$B0,$40,$32,$7C,$BF,$F4,$61,$00,$5F,$98,$32,$7C
-	dc.b	$BF,$F2,$32,$BC,$00,$04,$61,$00,$EA,$68,$30,$02,$61,$00,$EC,$46
-	dc.b	$61,$00,$EA,$5E,$31,$DF,$B0,$40,$52,$78,$B0,$42,$4E,$75
+	movem.l	d0-d7/a0-a3,-(sp)
+	bset	#dfclock,(disflags).w	;dfclock
+	bsr.s	printscores1
+	bsr.w	printz
+	String	$BE,$14,8
+	movea.w	#(tmstruct-M68K_RAM),a2
+	bsr.w	PrintPenaltyBoxPlayers
+	bsr.w	printz
+	String	$BE,5,8
+	movea.w	#(AwShots-M68K_RAM),a2	;visitors
+	bsr.w	PrintPenaltyBoxPlayers
+	movem.l	(sp)+,d0-d7/a0-a3
+	rts
+PrintPenaltyBoxPlayers				;Penalty box list of team a2: the players without a coincidental penalty
+	;penalty box list of team a2: the players without a coincidental penalty
+	lea	$A4(a2),a0
+	;loop
+.loop
+	clr.w	d0						;pass 1: players with bit 14 (coincidental) clear
+	move.b	(a0)+,d0
+	bmi.w	.1						;end of list
+	btst	#6,$6C(a2,d0.w)			;coincidental (tmpdst high byte bit 6)
+	bne.s	.loop
+	bsr.w	pplpen
+	bra.s	.loop
+	;d0 negative
+.1
+	lea	$A4(a2),a0
+	;loop
+.loop2
+	clr.w	d0
+	move.b	(a0)+,d0
+	bmi.w	rtss2
+	btst	#6,$6C(a2,d0.w)
+	beq.s	.loop2
+	bsr.w	pplpen
+	bra.s	.loop2
+pplpen								;Print one penalty box line: player number and time remaining (a2 = team,
+									;d0 = roster offset)
+	cmpi.w	#$A,(printy).w
+	bhi.w	rtss2					;no room for more rows
+	move.w	$6C(a2,d0.w),d2
+	andi.w	#$7FF,d2				;penalty time
+	move.w	$28(a2),d7
+	lsr.w	#1,d0
+	jsr	(GetRosterName).l
+	adda.w	(a1),a1
+	addq.w	#8,a1
+	clr.w	d0
+	move.b	-$8(a1),d0				;player number (BCD)
+	move.w	(printx).w,-(sp)
+	movea.w	#(TextBuffer-M68K_RAM),a1	;mesarea+2
+	bsr.w	ConvertByteToDigits		;two digits to TextBuffer
+	movea.w	#(mesarea-M68K_RAM),a1
+	move.w	#4,(a1)					;string length: 2 digits
+	bsr.w	print					;print the number
+	move.w	d2,d0
+	bsr.w	PushTime				;m:ss string
+	bsr.w	print					;print the time next to it
+	move.w	(sp)+,(printx).w
+	addq.w	#1,(printy).w			;next row
+	rts
 

@@ -370,6 +370,7 @@ clockcont							;At the end of the period clock (gameclock 0): the horn, then th
 	move.w	#4,-(sp)
 	jsr	(sfx).l
 	bsr.w	LockScroll
+clockcontPuckAssignments	equ	*
 	movea.w	#(puckx-M68K_RAM),a3
 	moveq	#$18,d0
 	jsr	(assinsert).l

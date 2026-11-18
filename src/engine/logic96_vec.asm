@@ -46,72 +46,316 @@ puckshadow							;asstab entry: the puck shadow.
 	rts
 
 findpc								;Where and when the puck crosses each goal line (puckcross).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$F8,$60,$32,$7C,$BF,$1A,$32,$3C,$00,$96,$38,$3C,$01,$1E
-	dc.b	$61,$00,$00,$0E,$44,$44,$61,$00,$00,$08,$4C,$DF,$06,$1F,$4E,$75
-	dc.b	$30,$04,$90,$78,$B7,$72,$4A,$78,$B7,$88,$67,$00,$00,$4C,$34,$00
-	dc.b	$48,$42,$42,$42,$E8,$82,$85,$F8,$B7,$88,$6B,$00,$00,$3C,$33,$42
-	dc.b	$00,$02,$C1,$F8,$B7,$86,$81,$F8,$B7,$88,$69,$00,$00,$2C,$D0,$78
-	dc.b	$B7,$5E,$B0,$41,$6D,$00,$00,$0A,$44,$40,$D0,$41,$D0,$41,$D0,$41
-	dc.b	$44,$41,$B0,$41,$6E,$00,$00,$0A,$44,$40,$D0,$41,$D0,$41,$D0,$41
-	dc.b	$44,$41,$32,$80,$60,$00,$00,$08,$33,$7C,$FF,$FF,$00,$02,$58,$49
-	dc.b	$4E,$75
+	movem.l	d0-d4/a1-a2,-(sp)
+	movea.w	#(puckcross-M68K_RAM),a1
+	move.w	#$96,d1
+	move.w	#$11E,d4
+	bsr.w	PuckPathAtLine
+	neg.w	d4						;make d4 negative to check bottom goal line
+	bsr.w	PuckPathAtLine
+	movem.l	(sp)+,d0-d4/a1-a2
+	rts
+PuckPathAtLine						;Where the puck path crosses the line d4 (uses the puck velocity)
+	move.w	d4,d0					;move goaline into d0
+	sub.w	(pucky).w,d0			;sub pucky from d0
+	tst.w	(puckvy).w				;check puckvy
+	beq.w	.3						;branch if 0
+	move.w	d0,d2					;move d0 into d2
+	swap	d2						;swap upper and lower word of d2
+	clr.w	d2						;clear bottom word of d2
+	asr.l	#4,d2					;shift 4 bits right (divide by 16)
+	divs.w	(puckvy).w,d2			;divide puckvy into d2
+	bmi.w	.3						;branch if negative
+	move.w	d2,2(a1)				;time until crossing in frames (puckcross y)
+	muls.w	(puckvx).w,d0			;mult puckvx with d0
+	divs.w	(puckvy).w,d0			;divide puckvy into d0
+	bvs.w	.3						;branch if overflow set
+	add.w	(puckx).w,d0			;add puckx to d0
+	cmp.w	d1,d0					;compare d1 (sideline) to d0
+	blt.w	.1						;branch if less than (in play)
+	neg.w	d0						;negate d0
+	add.w	d1,d0					;add d1 3 times to d0
+	add.w	d1,d0
+	add.w	d1,d0
+.1
+	neg.w	d1						;negate d1
+	cmp.w	d1,d0					;compare d1 (other sideline) to d0
+	bgt.w	.2						;branch if greater than (in play)
+	neg.w	d0						;negate d0
+	add.w	d1,d0					;add d1 to d0 3 times
+	add.w	d1,d0
+	add.w	d1,d0
+.2
+	neg.w	d1						;negate d1
+	move.w	d0,(a1)					;move d0 into puckcross
+	bra.w	.4
+.3
+	move.w	#$FFFF,2(a1)			;move -1 into puckcross y
+.4
+	addq.w	#4,a1					;add 4 to puckcross (to move to the other goal line)
+	rts
 
 skateto								;Skate a3 to d0 / d1, a0 = an extra collision routine (EvadePC); every 12
 									;frames, then doplayeracc
-									;Code the listing does not decode: kept as bytes
-	dc.b	$9F,$2B,$00,$42,$6A,$00,$00,$B0,$06,$2B,$00,$0C,$00,$42,$61,$00
-	dc.b	$00,$B0,$48,$A7,$C0,$00,$30,$2B,$00,$28,$E0,$40,$44,$40,$D0,$5F
-	dc.b	$90,$53,$32,$2B,$00,$2A,$E0,$41,$44,$41,$D2,$5F,$92,$6B,$00,$14
-	dc.b	$B0,$7C,$00,$0C,$6E,$00,$00,$20,$B0,$7C,$FF,$F4,$6D,$00,$00,$18
-	dc.b	$B2,$7C,$00,$0C,$6E,$00,$00,$10,$B2,$7C,$FF,$F4,$6D,$00,$00,$08
-	dc.b	$70,$09,$60,$00,$00,$06,$61,$00,$03,$46,$4E,$90,$17,$40,$00,$43
-	dc.b	$B0,$7C,$00,$07,$6F,$00,$00,$50,$30,$2B,$00,$28,$80,$6B,$00,$2A
-	dc.b	$66,$00,$00,$44,$30,$38,$B7,$5E,$32,$38,$B7,$72,$08,$38,$00,$00
-	dc.b	$B7,$C1,$67,$00,$00,$0A,$30,$38,$BF,$DC,$32,$38,$BF,$DE,$90,$53
-	dc.b	$92,$6B,$00,$14,$61,$00,$03,$08,$90,$6B,$00,$54,$67,$00,$00,$18
-	dc.b	$44,$40,$02,$40,$00,$04,$E2,$48,$53,$40,$D0,$6B,$00,$54,$02,$40
-	dc.b	$00,$07,$37,$40,$00,$54,$42,$40,$10,$2B,$00,$43,$60,$00,$05,$1C
-	dc.b	$42,$78,$BF,$EA,$42,$78,$BF,$EC,$4A,$6B,$00,$34,$67,$00,$57,$2C
-	dc.b	$34,$13,$B1,$42,$6A,$00,$00,$80,$34,$01,$94,$6B,$00,$14,$36,$13
-	dc.b	$C5,$C3,$96,$40,$85,$C3,$D4,$6B,$00,$14,$B4,$7C,$01,$37,$6E,$00
-	dc.b	$00,$66,$B4,$7C,$00,$F1,$6D,$00,$00,$2A,$36,$3C,$01,$5A,$B4,$7C
-	dc.b	$01,$14,$6E,$00,$00,$14,$6D,$00,$00,$0C,$0C,$6B,$01,$14,$00,$14
-	dc.b	$6E,$00,$00,$06,$36,$3C,$00,$CE,$96,$42,$31,$C3,$BF,$EC,$60,$00
-	dc.b	$00,$36,$B4,$7C,$FF,$0F,$6E,$00,$00,$2E,$B4,$7C,$FE,$C9,$6D,$00
-	dc.b	$00,$26,$36,$3C,$FF,$32,$B4,$7C,$FE,$EC,$6E,$00,$00,$14,$6D,$00
-	dc.b	$00,$0C,$0C,$6B,$FE,$EC,$00,$14,$6E,$00,$00,$06,$36,$3C,$FE,$A6
-	dc.b	$96,$42,$31,$C3,$BF,$EC,$36,$01,$04,$43,$01,$14,$34,$2B,$00,$14
-	dc.b	$04,$42,$01,$14,$61,$00,$00,$1E,$36,$01,$06,$43,$01,$14,$34,$2B
-	dc.b	$00,$14,$06,$42,$01,$14,$61,$00,$00,$0C,$D0,$78,$BF,$EA,$D2,$78
-	dc.b	$BF,$EC,$4E,$75,$38,$03,$B5,$44,$6A,$00,$56,$70,$38,$00,$98,$53
-	dc.b	$C9,$C2,$94,$43,$89,$C2,$D8,$53,$B8,$7C,$00,$50,$6E,$00,$56,$5C
-	dc.b	$B8,$7C,$FF,$B0,$6D,$00,$56,$54,$76,$50,$4A,$44,$66,$00,$00,$04
-	dc.b	$4A,$53,$6A,$00,$00,$04,$44,$43,$96,$44,$31,$C3,$BF,$EA,$4E,$75
-	dc.b	$08,$2B,$00,$04,$00,$62,$66,$00,$00,$18,$30,$38,$B7,$86,$E0,$40
-	dc.b	$D0,$78,$B7,$5E,$32,$38,$B7,$88,$E0,$41,$D2,$78,$B7,$72,$4E,$75
-	dc.b	$10,$38,$B7,$86,$E2,$00,$48,$80,$D0,$78,$B7,$5E,$12,$38,$B7,$88
-	dc.b	$E2,$01,$48,$81,$D2,$78,$B7,$72,$4E,$75,$4A,$6B,$00,$34,$66,$00
-	dc.b	$00,$04,$4E,$71,$61,$BA,$9F,$2B,$00,$42,$6A,$00,$01,$02,$06,$2B
-	dc.b	$00,$0A,$00,$42,$61,$00,$FE,$AA,$48,$A7,$C0,$00,$2F,$0B,$61,$00
-	dc.b	$01,$E8,$44,$00,$44,$01,$90,$2B,$00,$28,$48,$80,$D0,$5F,$90,$53
-	dc.b	$92,$2B,$00,$2A,$48,$81,$D2,$5F,$92,$6B,$00,$14,$61,$00,$01,$60
-	dc.b	$17,$40,$00,$43,$4A,$6B,$00,$34,$67,$00,$00,$C4,$30,$38,$B7,$86
-	dc.b	$32,$38,$B7,$88,$61,$00,$01,$48,$0A,$40,$00,$04,$B0,$6B,$00,$54
-	dc.b	$67,$00,$00,$AC,$30,$38,$B7,$5E,$90,$53,$32,$38,$B7,$72,$92,$6B
-	dc.b	$00,$14,$48,$A7,$C0,$00,$61,$00,$01,$26,$B0,$6B,$00,$54,$4C,$9F
-	dc.b	$00,$03,$66,$00,$00,$8A,$C1,$C0,$C3,$C1,$D0,$81,$B0,$BC,$00,$00
-	dc.b	$04,$00,$63,$00,$00,$7A,$4A,$6B,$00,$34,$67,$00,$00,$68,$48,$A7
-	dc.b	$80,$00,$30,$2B,$00,$14,$08,$2B,$00,$07,$00,$62,$67,$00,$00,$04
-	dc.b	$44,$40,$B0,$7C,$00,$76,$6D,$00,$00,$20,$30,$2B,$00,$2A,$08,$2B
-	dc.b	$00,$07,$00,$62,$67,$00,$00,$04,$44,$40,$4A,$40,$6A,$00,$00,$0A
-	dc.b	$4C,$9F,$00,$01,$60,$00,$00,$2E,$30,$3C,$00,$64,$61,$00,$0D,$78
-	dc.b	$B0,$7C,$00,$4B,$4C,$9F,$00,$01,$6D,$00,$00,$1A,$B0,$BC,$00,$00
-	dc.b	$09,$C4,$63,$00,$00,$10,$08,$2B,$00,$05,$00,$62,$66,$00,$00,$06
-	dc.b	$61,$00,$C5,$9A,$B0,$BC,$00,$00,$05,$A4,$63,$00,$C9,$26,$10,$2B
-	dc.b	$00,$43,$48,$80,$B0,$7C,$00,$07,$6E,$00,$00,$16,$B0,$6B,$00,$54
-	dc.b	$67,$00,$00,$0E,$4A,$6B,$00,$34,$67,$00,$00,$06,$61,$00,$00,$06
-	dc.b	$60,$00,$02,$A8
+	sub.b	d7,$42(a3)				;sub d7 from temp2
+	bpl.w	.4						;exit if not 0 or less
+	addi.b	#$C,$42(a3)				;add 12 - only execute every 12 frames
+	bsr.w	avdgoal					;avoid the goal nets
+	movem.w	d0-d1,-(sp)
+	move.w	$28(a3),d0				;Xvel
+	asr.w	#8,d0					;divide by 256
+	neg.w	d0						;make negative
+	add.w	(sp)+,d0				;add new x coord from stack
+	sub.w	(a3),d0					;sub Xpos
+	move.w	$2A(a3),d1				;Yvel
+	asr.w	#8,d1					;divide by 256
+	neg.w	d1						;make negative
+	add.w	(sp)+,d1				;add new y coord from stack
+	sub.w	$14(a3),d1				;sub Ypos
+	cmp.w	#$C,d0					;compare 12 to d0
+	bgt.w	.1
+	cmp.w	#$FFF4,d0				;cmp -12
+	blt.w	.1
+	cmp.w	#$C,d1					;compare 12 to d1
+	bgt.w	.1
+	cmp.w	#$FFF4,d1				;cmp -12
+	blt.w	.1
+	moveq	#9,d0
+	bra.w	.2
+.1
+	bsr.w	vtoa
+.2
+	jsr	(a0)						;extra collision routine
+	move.b	d0,$43(a3)				;move d0 into temp2+1
+	cmp.w	#7,d0					;compare to 7
+	ble.w	.4
+	move.w	$28(a3),d0				;Xvel
+	or.w	$2A(a3),d0				;Yvel
+	bne.w	.4
+	move.w	(puckx).w,d0			;move puckx into d0
+	move.w	(pucky).w,d1			;move pucky into d1
+	btst	#pf2fight,(puck_pflags2).w	;#pf2fight, puckx+pflags2
+	beq.w	.3
+	move.w	(xc1).w,d0				;scroll lock x coord
+	move.w	(yc1).w,d1				;scroll lock y coord
+.3
+	sub.w	(a3),d0					;Xpos
+	sub.w	$14(a3),d1				;Ypos - face towards puck
+	bsr.w	vtoa
+	sub.w	$54(a3),d0				;facedir
+	beq.w	.4
+	neg.w	d0
+	andi.w	#4,d0
+	lsr.w	#1,d0					;divide by 2
+	subq.w	#1,d0
+	add.w	$54(a3),d0				;facedir
+	andi.w	#7,d0
+	move.w	d0,$54(a3)				;facedir
+.4
+	clr.w	d0
+	move.b	$43(a3),d0				;temp2+1
+	bra.w	doplayeracc
+avdgoal								;Skate target adjusted to stay out of the goalie crease (clears fodir2,
+									;steers around the goal)
+	clr.w	(fodir2+2).w
+	clr.w	(fodir2+4).w
+	tst.w	$34(a3)					;goalie? If so, quit
+	beq.w	rtss2
+	move.w	(a3),d2					;Xpos
+	eor.w	d0,d2
+	bpl.w	.6
+	move.w	d1,d2
+	sub.w	$14(a3),d2				;Ypos
+	move.w	(a3),d3					;Xpos
+	muls.w	d3,d2
+	sub.w	d0,d3
+	divs.w	d3,d2
+	add.w	$14(a3),d2				;Ypos
+	cmp.w	#$137,d2
+	bgt.w	.6
+	cmp.w	#$F1,d2
+	blt.w	.3
+	move.w	#$15A,d3
+	cmp.w	#$114,d2
+	bgt.w	.2
+	blt.w	.1
+	cmpi.w	#$114,$14(a3)
+	bgt.w	.2
+.1
+	move.w	#$CE,d3
+.2
+	sub.w	d2,d3
+	move.w	d3,(fodir2+4).w
+	bra.w	.6
+.3
+	cmp.w	#$FF0F,d2
+	bgt.w	.6
+	cmp.w	#$FEC9,d2
+	blt.w	.6
+	move.w	#$FF32,d3
+	cmp.w	#$FEEC,d2
+	bgt.w	.5
+	blt.w	.4
+	cmpi.w	#$FEEC,$14(a3)
+	bgt.w	.5
+.4
+	move.w	#$FEA6,d3
+.5
+	sub.w	d2,d3
+	move.w	d3,(fodir2+4).w
+.6
+	move.w	d1,d3
+	subi.w	#$114,d3
+	move.w	$14(a3),d2
+	subi.w	#$114,d2
+	bsr.w	avdgoalcrease
+	move.w	d1,d3
+	addi.w	#$114,d3
+	move.w	$14(a3),d2
+	addi.w	#$114,d2
+	bsr.w	avdgoalcrease
+	add.w	(fodir2+2).w,d0
+	add.w	(fodir2+4).w,d1
+	rts
+avdgoalcrease						;Second half of avdgoal: keep the target inside the crease width ($50) on
+									;the far side
+	move.w	d3,d4
+	eor.w	d2,d4
+	bpl.w	rtss2
+	move.w	d0,d4
+	sub.w	(a3),d4					;Xpos
+	muls.w	d2,d4
+	sub.w	d3,d2
+	divs.w	d2,d4
+	add.w	(a3),d4					;Xpos
+	cmp.w	#$50,d4					;'P'   ; #.xr
+	bgt.w	rtss2
+	cmp.w	#$FFB0,d4				;#-.xr
+	blt.w	rtss2
+	moveq	#$50,d3					;'P'   ; #.xr
+	tst.w	d4
+	bne.w	.1
+	tst.w	(a3)					;Xpos
+.1
+	bpl.w	.2
+	neg.w	d3
+.2
+	sub.w	d4,d3
+	move.w	d3,(fodir2+2).w
+	rts
+PuckLeadPosition					;d0/d1 = puck position plus its velocity (puck lead point for skating to
+									;the puck)
+	btst	#pfrev,pflags(a3)
+	bne.w	.1
+	move.w	(puckvx).w,d0
+	asr.w	#8,d0
+	add.w	(puckx).w,d0
+	move.w	(puckvy).w,d1
+	asr.w	#8,d1
+	add.w	(pucky).w,d1
+	rts
+.1
+	move.b	(puckvx).w,d0
+	asr.b	#1,d0
+	ext.w	d0
+	add.w	(puckx).w,d0
+	move.b	(puckvy).w,d1
+	asr.b	#1,d1
+	ext.w	d1
+	add.w	(pucky).w,d1
+	rts
+skatetoIntercept	equ	*
+	tst.w	$34(a3)
+	bne.w	.2
+	nop
+.2
+	bsr.s	PuckLeadPosition
+	sub.b	d7,$42(a3)				;temp2
+	bpl.w	.7
+	addi.b	#$A,$42(a3)				;temp2
+	bsr.w	avdgoal
+	movem.w	d0-d1,-(sp)
+	move.l	a3,-(sp)
+	bsr.w	GetHot
+	neg.b	d0
+	neg.b	d1
+	sub.b	$28(a3),d0				;Xvel
+	ext.w	d0
+	add.w	(sp)+,d0
+	sub.w	(a3),d0					;Xpos
+	sub.b	$2A(a3),d1				;Yvel
+	ext.w	d1
+	add.w	(sp)+,d1
+	sub.w	$14(a3),d1				;Ypos
+	bsr.w	vtoa
+	move.b	d0,$43(a3)				;temp2 lower byte
+	tst.w	$34(a3)
+	beq.w	.7
+	move.w	(puckvx).w,d0
+	move.w	(puckvy).w,d1
+	bsr.w	vtoa
+	eori.w	#4,d0
+	cmp.w	$54(a3),d0				;facedir
+	beq.w	.7
+	move.w	(puckx).w,d0
+	sub.w	(a3),d0					;Xpos
+	move.w	(pucky).w,d1
+	sub.w	$14(a3),d1				;Ypos
+	movem.w	d0-d1,-(sp)
+	bsr.w	vtoa
+	cmp.w	$54(a3),d0				;$54 = facedir
+	movem.w	(sp)+,d0-d1
+	bne.w	.7
+	muls.w	d0,d0
+	muls.w	d1,d1
+	add.l	d1,d0
+	cmp.l	#$400,d0
+	bls.w	.7
+	tst.w	$34(a3)
+	beq.w	.6
+	movem.w	d0,-(sp)
+	move.w	$14(a3),d0
+	btst	#pfgoal,pflags(a3)
+	beq.w	.3
+	neg.w	d0
+.3
+	cmp.w	#$76,d0
+	blt.w	.5
+	move.w	$2A(a3),d0
+	btst	#pfgoal,pflags(a3)
+	beq.w	.4
+	neg.w	d0
+.4
+	tst.w	d0
+	bpl.w	.5
+	movem.w	(sp)+,d0
+	bra.w	.6
+.5
+	move.w	#$64,d0
+	bsr.w	randomd0
+	cmp.w	#$4B,d0
+	movem.w	(sp)+,d0
+	blt.w	.6
+	cmp.l	#$9C4,d0
+	bls.w	.6
+	btst	#pfalock,pflags(a3)
+	bne.w	.6
+	bsr.w	FindGoalieAimOffset
+.6
+	cmp.l	#$5A4,d0
+	bls.w	Sweepcheck
+.7
+	move.b	$43(a3),d0
+	ext.w	d0
+	cmp.w	#7,d0
+	bgt.w	.8
+	cmp.w	$54(a3),d0
+	beq.w	.8
+	tst.w	$34(a3)
+	beq.w	.8
+	bsr.w	FacePuck
+.8
+	bra.w	doplayeracc
 
 FacePuck							;Turn a3's facedir one step toward the puck (vtoa); d0 / d1 kept Code the
 	movem.w	d0-d1,-(sp)

@@ -197,29 +197,80 @@ sctab								;Weights for 0, 1, 2, 3 goals, 8 rows
 	btst	#2,$E(a0)				;gsfso
 	bne.s	.loop					;don't show if the series is over for this game
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.w	$4A43,$6B00,$21BA,$6100,$012A,$6100,$E318,$5278
-	dc.w	$B040,$5978,$B042,$3F38,$B040,$6100,$4E3A,$31FC
-	dc.w	$A000,$B044,$6100,$E4DC,$001A,SPAturnl,SPAturnl,SPAturnl
-	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl
-	dc.w	SPAturnl,$31D7,$B040,$7001,$D078,$CFCA,$4A78,$D254
-	dc.w	$6600,$0004,$4240,$43FA,$007E,$6100,$0102,$3028
-	dc.w	$0008,$5340,$227C,$0002,$3384,$6100,$00FA,$3011
-	dc.w	$E248,$4440,$D057,SPAgskate,$0017,$31C0,$B040,$6100
-	dc.w	$E494,$31FC,$8000,$B044,$3028,$0002,$3228,$000C
-	dc.w	$6100,$0010,$3010,$3228,$000A,$6100,$0006,$544F
-	dc.w	$4E75,$31EF,$0004,$B040,$5278,$B042,$327C,$077E
-	dc.w	$E540,$2271,$0000,$D2E9,$0004,$6100,$E458,$31EF
-	dc.w	$0004,$B040,$0678,$0015,$B040,$3001,$7202,$6100
-	dc.w	$E6C0,$6000,$E440,$0012,$4541,$2048,$6F63,$6B65
-	dc.w	$7920,$4E69,$6768,$7400,$0018,$5374,$616E,$6C65
-	dc.w	$7920,$4375,$7020,$5175,$616C,$6966,$6965,$7200
-	dc.w	$000E,$5175,$6172,$7465,$7266,$696E,$616C,$0018
-	dc.w	$5374,$616E,$6C65,$7920,$4375,$7020,$5365,$6D69
-	dc.w	$6669,$6E61,$6C00,$6100,$000A,$343C,$07FF,$6000
-	dc.w	$E1BA,$6100,$E3CE,$0006,$BD03,$1700,$0838,$0000
-	dc.w	$C33A,$6600,$000C,$6100,$E3BA,$0006,$BF03,$1700
-	dc.w	$701A,$7205,$4E75
+	tst.w	d3
+	bmi.w	rtss2
+	bsr.w	sctabPrintHeader		;d0/d1 = box size
+	bsr.w	Framer					;draw the ticker box
+	addq.w	#1,(printx).w			;inside the frame, top row
+	subq.w	#4,(printy).w
+	move.w	(printx).w,-(sp)		;box x: .tn reads it at 4(sp), above its return address
+	bsr.w	GetShifter
+	move.w	#$A000,(printa).w
+	bsr.w	printz
+	String	'                        '
+	move.w	(sp),(printx).w
+	moveq	#1,d0
+	add.w	(gamelevel).w,d0		;playoffs: label 1 + round
+	tst.w	(OptPlayMode).w
+	bne.w	.1
+	clr.w	d0						;not playoffs: 'EA Hockey Night'
+	;ticker title index chosen
+.1
+	lea	.table(pc),a1				;a1 = ticker title list
+	bsr.w	PrintSmallListItem		;print the ticker title
+	move.w	8(a0),d0				;gsper
+	subq.w	#1,d0
+	movea.l	#PerLabels,a1
+	bsr.w	SkipStrings
+	move.w	(a1),d0					;period name centered on x+$17
+	lsr.w	#1,d0
+	neg.w	d0
+	add.w	(sp),d0
+	addi.w	#$17,d0
+	move.w	d0,(printx).w
+	bsr.w	print
+	move.w	#$8000,(printa).w
+	move.w	2(a0),d0				;gst2
+	move.w	$C(a0),d1				;gss2
+	bsr.w	sctabPrintTeam			;team 2 on the first row
+	move.w	(a0),d0					;gst1
+	move.w	$A(a0),d1				;gss1
+	bsr.w	sctabPrintTeam			;team 1 on the second row
+	addq.w	#2,sp					;drop the saved printx
+	rts
+sctabPrintTeam	equ	*	;Print the team name of a scoreboard line
+	;print team d0 name and score d1 on the next row
+	move.w	4(sp),(printx).w		;print team d0 name and score d1 on the next row
+	addq.w	#1,(printy).w
+	movea.w	#$77E,a1				;team address table
+	asl.w	#2,d0
+	movea.l	(a1,d0.w),a1
+	adda.w	4(a1),a1				;team name
+	bsr.w	print
+	move.w	4(sp),(printx).w
+	addi.w	#$15,(printx).w			;92 23
+	move.w	d1,d0
+	moveq	#2,d1
+	bsr.w	PushNumberWidth
+	bra.w	print
+.table
+	dc.w	$0012,$4541,$2048,$6F63,$6B65,$7920,$4E69,$6768
+	dc.w	$7400,$0018,$5374,$616E,$6C65,$7920,$4375,$7020
+	dc.w	$5175,$616C,$6966,$6965,$7200,$000E,$5175,$6172
+	dc.w	$7465,$7266,$696E,$616C,$0018,$5374,$616E,$6C65
+	dc.w	$7920,$4375,$7020,$5365,$6D69,$6669,$6E61,$6C00
+	dc.w	$6100,$000A,$343C,$07FF,$6000,$E1BA
+sctabPrintHeader	equ	*	;Print the scoreboard header
+	bsr.w	printz
+	String	$BD,3,$17
+	btst	#0,(sflags).w
+	bne.w	.2
+	bsr.w	printz
+	String	-(TXPRI+TXMAP1),3,$17
+.2
+	moveq	#$1A,d0
+	moveq	#5,d1
+	rts
 
 PrintBigListItem					;printbig String d0 of the String list a1 (SkipStrings).
 	bsr.w	SkipStrings

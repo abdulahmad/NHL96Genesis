@@ -22,6 +22,7 @@ PushNumber = $01BDE8				;video96
 PushNumberWidth = $01BE1C			;goal96_box_stub
 PushTime = $01BD84					;penalty96_stub
 SkipStrings = $01D7F2				;hockey96_inter
+SoftClampCoord = $1D9302				;code96_15
 
 
 ; Main segment code

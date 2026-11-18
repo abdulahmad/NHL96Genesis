@@ -45,6 +45,9 @@ CreditsBgMap = $0911B8				;graphics96
 CupCelebrationSpr = $1CCEE8			;graphics96
 CupCelebrationMap = $1D5420			;graphics96
 TeamList = $00077E					;teamdata96
+DoDMA = $01B3EC				;display96_stub
+cramfade = $01AFD6				;setup96_menu_stub
+p_music_vblank = $024486				;setup96_menu_stub
 
 
 ; Main segment code

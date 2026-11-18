@@ -36,11 +36,21 @@ ChkGoalies							;A computer team down with its goalie in: pull him on a delayed
 	bra.w	CPgoalie
 
 ReturnGoalies						;If the computer pulled its goalie, see if it should return him.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$34,$7C,$C7,$26,$43,$EA,$03,$9E,$70,$01,$61,$00,$00,$06,$70,$02
-	dc.b	$C3,$4A,$0C,$6A,$FF,$FF,$00,$26,$67,$00,$60,$46,$42,$2A,$00,$26
-	dc.b	$B0,$78,$C3,$90,$67,$00,$60,$3A,$B0,$78,$C3,$92,$67,$00,$60,$32
-	dc.b	$32,$38,$BF,$E4
+	movea.w	#(tmstruct-M68K_RAM),a2
+	lea	$39E(a2),a1
+	moveq	#1,d0
+	bsr.w	ReturnGoaliesTeam
+	moveq	#2,d0
+	exg	a1,a2
+ReturnGoaliesTeam
+	cmpi.w	#$FFFF,$26(a2)
+	beq.w	rtss2					;still no goalie
+	clr.b	$26(a2)					;clear for goalie return
+	cmp.w	(cont1team).w,d0
+	beq.w	rtss2					;exit if team is joy controlled
+	cmp.w	(cont2team).w,d0
+	beq.w	rtss2					;exit if team is joy controlled
+	move.w	(foy).w,d1
 
 CPgoalie							;See if the computer should pull its goalie: third period, behind by 1, a
 									;minute left, the puck in the other end
@@ -287,40 +297,146 @@ updatefaceoff						;Faceoff drop countdown: the fofdata frame from temp1; at 0 e
 	bra.w	eraser
 
 pucknorm							;asstab entry: the puck: follow the carrier, icing / offsides checks.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$38,$00,$02,$C3,$40,$67,$00,$00,$06,$61,$00,$FB,$16,$08,$AB
-	dc.b	$00,$01,$00,$62,$67,$00,$00,$0C,$42,$6B,$00,$40,$37,$7C,$00,$78
-	dc.b	$00,$42,$32,$7C,$BF,$1A,$9F,$69,$00,$02,$9F,$69,$00,$06,$9F,$6B
-	dc.b	$00,$40,$6A,$00,$00,$0A,$5A,$6B,$00,$40,$61,$00,$04,$22,$30,$38
-	dc.b	$B7,$BE,$6B,$00,$00,$36,$EF,$40,$34,$7C,$B0,$5E,$D4,$C0,$61,$00
-	dc.b	$01,$E2,$2F,$0A,$61,$00,$08,$92,$D0,$52,$90,$53,$E4,$40,$D1,$53
-	dc.b	$D2,$6A,$00,$14,$92,$6B,$00,$14,$E4,$41,$D3,$6B,$00,$14,$37,$6A
-	dc.b	$00,$28,$00,$28,$37,$6A,$00,$2A,$00,$2A,$4E,$B9,$00,$01,$9E,$B2
-	dc.b	$4E,$B9,$00,$01,$9C,$50,$08,$38,$00,$00,$C3,$38,$66,$00,$00,$3A
-	dc.b	$4A,$78,$B7,$BE,$6A,$00,$00,$2C,$30,$13,$B0,$6B,$00,$1C,$66,$00
-	dc.b	$00,$22,$30,$2B,$00,$14,$B0,$6B,$00,$20,$66,$00,$00,$16,$70,$06
-	dc.b	$53,$6B,$00,$42,$6A,$00,$00,$08,$4E,$B9,$00,$01,$C1,$D2,$60,$00
-	dc.b	$00,$08,$37,$7C,$00,$78,$00,$42,$4A,$2B,$00,$2C,$66,$00,$53,$BC
-	dc.b	$4A,$6B,$00,$18,$66,$00,$53,$B4,$61,$00,$02,$CA,$60,$00,$53,$AC
+	btst	#2,(BA_PS_flags).w		;check if flag is clear (normal play)
+	beq.w	.1
+	bsr.w	UpdatePenaltyShotEnd
+.1
+	bclr	#pfna,$62(a3)			;#pfna clear
+	beq.w	.2
+	clr.w	$40(a3)					;temp1
+	move.w	#$78,$42(a3)			;'x' ; temp2
+.2
+	movea.w	#(puckcross-M68K_RAM),a1	;table for puck crossing lines
+	sub.w	d7,2(a1)				;sub elapse frames from time til crossing
+	sub.w	d7,6(a1)
+	sub.w	d7,$40(a3)				;temp1
+	bpl.w	.3
+	addq.w	#5,$40(a3)
+	bsr.w	findpc
+.3
+	move.w	(puckc).w,d0
+	bmi.w	.4
+	asl.w	#scsize,d0				;#scsize
+	movea.w	#(SortCords-M68K_RAM),a2
+	adda.w	d0,a2
+	bsr.w	a2touchpuck
+	move.l	a2,-(sp)
+	bsr.w	GetHot
+	add.w	(a2),d0					;Xpos - bungie the puck towards the hot spot on player a2
+	sub.w	(a3),d0
+	asr.w	#2,d0
+	add.w	d0,(a3)
+	add.w	$14(a2),d1				;Ypos
+	sub.w	$14(a3),d1
+	asr.w	#2,d1
+	add.w	d1,$14(a3)
+	move.w	$28(a2),$28(a3)			;Xvel
+	move.w	$2A(a2),$2A(a3)			;Yvel
+.4
+	jsr	(PuckIChk).l
+	jsr	(ChkOffsides).l
+	btst	#gmclock,(gmode).w		;check for play stoppage
+	bne.w	.7
+	tst.w	(puckc).w
+	bpl.w	.6
+	move.w	(a3),d0					;Xpos
+	cmp.w	$1C(a3),d0				;oldXpos
+	bne.w	.6
+	move.w	$14(a3),d0				;Ypos
+	cmp.w	$20(a3),d0				;oldYpos
+	bne.w	.6
+	moveq	#6,d0
+	subq.w	#1,$42(a3)				;temp3
+	bpl.w	.5
+	jsr	(AddPenalty2).l
+.5
+	bra.w	.7
+.6
+	move.w	#$78,$42(a3)			;'x' ; move 78 hex into temp2
+.7
+	tst.b	$2C(a3)					;Zvel
+	bne.w	wallcollcheck
+	tst.w	$18(a3)					;Zpos
+	bne.w	wallcollcheck
+	bsr.w	puckunflip
+	bra.w	wallcollcheck
 
 ChkOffsides							;Offsides.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$38,$00,$05,$C3,$38,$67,$00,$5B,$F2,$08,$38,$00,$02,$C3,$40
-	dc.b	$66,$00,$5B,$E8,$32,$7C,$C7,$26,$45,$E9,$03,$9E,$61,$00,$00,$9E
-	dc.b	$C3,$4A,$61,$00,$00,$98,$30,$3C,$00,$72,$B0,$6B,$00,$14,$6E,$00
-	dc.b	$00,$42,$B0,$6B,$00,$20,$6F,$00,$5B,$C2,$06,$40,$00,$0A,$08,$38
-	dc.b	$00,$01,$C3,$38,$67,$00,$00,$04,$C5,$49,$74,$05,$30,$6A,$00,$22
-	dc.b	$4A,$68,$00,$34,$6B,$00,$00,$12,$B0,$68,$00,$14,$6C,$00,$00,$0A
-	dc.b	$08,$EA,$00,$04,$00,$30,$4E,$75,$D0,$FC,$00,$80,$51,$CA,$FF,$E2
-	dc.b	$4E,$75,$44,$40,$B0,$6B,$00,$14,$6D,$00,$5B,$80,$B0,$6B,$00,$20
-	dc.b	$6C,$00,$5B,$78,$04,$40,$00,$0A,$08,$38,$00,$01,$C3,$38,$66,$00
-	dc.b	$00,$04,$C5,$49,$74,$05,$30,$6A,$00,$22,$4A,$68,$00,$34,$6B,$00
-	dc.b	$00,$12,$B0,$68,$00,$14,$6F,$00,$00,$0A,$08,$EA,$00,$04,$00,$30
-	dc.b	$4E,$75,$D0,$FC,$00,$80,$51,$CA,$FF,$E2,$4E,$75,$08,$2A,$00,$04
-	dc.b	$00,$30,$67,$00,$5B,$36,$30,$6A,$00,$22,$72,$05,$4A,$68,$00,$34
-	dc.b	$6B,$00,$00,$12,$30,$28,$00,$14,$08,$28,$00,$07,$00,$62,$66,$00
-	dc.b	$00,$04,$44,$40,$D0,$FC,$00,$80,$B0,$7C,$00,$76,$5E,$C9,$FF,$DE
-	dc.b	$6E,$00,$5B,$08,$08,$AA,$00,$04,$00,$30,$4E,$75
+	btst	#gmoffs,(gmode).w
+	beq.w	rtss2
+	btst	#2,(BA_PS_flags).w
+	bne.w	rtss2
+	movea.w	#(tmstruct-M68K_RAM),a1
+	lea	$39E(a1),a2
+	bsr.w	CheckAttackersOffside
+	exg	a1,a2
+	bsr.w	CheckAttackersOffside
+	move.w	#$72,d0
+	cmp.w	$14(a3),d0
+	bgt.w	.3
+	cmp.w	$20(a3),d0
+	ble.w	rtss2
+	addi.w	#$A,d0
+	btst	#gmdir,(gmode).w
+	beq.w	.1
+	exg	a2,a1
+.1
+	moveq	#5,d2
+	movea.w	$22(a2),a0
+.loop
+	tst.w	$34(a0)
+	bmi.w	.2
+	cmp.w	$14(a0),d0
+	bge.w	.2
+	bset	#4,$30(a2)
+	rts
+.2
+	adda.w	#SCstruct,a0
+	dbf	d2,.loop
+	rts
+.3
+	neg.w	d0
+	cmp.w	$14(a3),d0
+	blt.w	rtss2
+	cmp.w	$20(a3),d0
+	bge.w	rtss2
+	subi.w	#$A,d0
+	btst	#gmdir,(gmode).w
+	bne.w	.4
+	exg	a2,a1
+.4
+	moveq	#5,d2
+	movea.w	$22(a2),a0
+.loop2
+	tst.w	$34(a0)
+	bmi.w	.5
+	cmp.w	$14(a0),d0
+	ble.w	.5
+	bset	#4,$30(a2)
+	rts
+.5
+	adda.w	#SCstruct,a0
+	dbf	d2,.loop2
+	rts
+CheckAttackersOffside				;Team a2: offside bit for the attackers beyond the blue line
+	btst	#4,$30(a2)
+	beq.w	rtss2
+	movea.w	$22(a2),a0
+	moveq	#5,d1
+.loop
+	tst.w	$34(a0)
+	bmi.w	.1
+	move.w	$14(a0),d0
+	btst	#pfgoal,$62(a0)
+	bne.w	.1
+	neg.w	d0
+.1
+	adda.w	#SCstruct,a0
+	cmp.w	#$76,d0
+	dbgt	d1,.loop
+	bgt.w	rtss2
+	bclr	#4,$30(a2)
+	rts
 
 a2offsides							;Offsides on a2 when his team is offside and the puck is past the blue
 									;line.

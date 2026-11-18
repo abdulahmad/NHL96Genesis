@@ -653,13 +653,25 @@ ReadSeasonHeader					;Read the season header (SeasonDay ...) from save RAM
 	jsr	(ReadSRAM).l
 	movem.l	(sp)+,d0-d1/a0
 	rts
-	;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$61,$00,$00,$26,$4E,$B9,$00,$1E,$1A,$5E,$4E,$B9
-	dc.b	$00,$1E,$1A,$66,$4E,$B9,$00,$1E,$1A,$8E,$4E,$B9,$00,$1E,$1A,$A8
-	dc.b	$4E,$B9,$00,$1E,$1A,$3C,$4C,$DF,$7F,$FF,$4E,$75,$11,$F8,$DD,$81
-	dc.b	$D2,$5D,$11,$F8,$DD,$82,$D2,$63,$11,$F8,$DD,$83,$D2,$65,$11,$F8
-	dc.b	$DD,$86,$D2,$67,$11,$F8,$DD,$87,$D2,$69,$11,$F8,$DD,$88,$D2,$5F
-	dc.b	$11,$F8,$DD,$89,$D2,$61,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	bsr.w	SeasonHeaderToOptions
+	jsr	(FlipUserRec).l
+	jsr	(SetLineOption).l
+	jsr	(SetPenOption).l
+	jsr	(SetSkillLevel).l
+	jsr	(SetGoalieModes).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+SeasonHeaderToOptions				;Copy the option bytes of the season header (SeasonDay, SeasonPen,
+									;SeasonTeam ...) into the Opt* words
+	move.b	(SeasonDay+3).w,(Optperlen+1).w
+	move.b	(SeasonPen).w,(OptPen+1).w
+	move.b	(SeasonPen+1).w,(OptLine+1).w
+	move.b	(SeasonTeam+2).w,(OptFighting+1).w
+	move.b	(SeasonTeam+3).w,(OptSkill+1).w
+	move.b	(SeasonTeam+4).w,(OptGoalie+1).w
+	move.b	(SeasonTeam+5).w,(OptUserRec+1).w
+	rts
 
 FindUserGame						;a2 = the user team's game in today's game list, or 0
 	movem.l	d0-d2/a0,-(sp)
@@ -790,6 +802,7 @@ SetupSeasonGame						;Set up the user's season game a2: the season options (Load
 	move.b	1(a2),(Opt2team+1).w
 	move.w	(Opt2team).w,(VisTeam).w
 	rts
+SetupSeasonGameLookup	equ	*			;Look up the day in the schedule table to find the game
 	movem.l	d0-d7/a0/a2-a6,-(sp)
 	move.w	(SeasonDay).w,d0
 	clr.w	d1
@@ -1340,21 +1353,62 @@ OrdinalSuffix						;TH, ST, ND, RD
 	String	'ND'
 	String	'RD'
 	;The team rank lookups TeamRankPtrs points to: d0 = the rank of team d0 from a byte table
-	dc.b	$2F,$08,$48,$80,$20,$7C,$00,$01,$20,$16,$10,$30,$00,$00,$48,$80
-	dc.b	$20,$5F,$4E,$75,$13,$0A,$11,$07,$08,$0B,$02,$19,$0E,$0C,$16,$12
-	dc.b	$05,$10,$0D,$1A,$06,$04,$03,$17,$01,$14,$15,$09,$0F,$18,$01,$01
-	dc.b	$2F,$08,$48,$80,$20,$7C,$00,$01,$20,$46,$10,$30,$00,$00,$48,$80
-	dc.b	$20,$5F,$4E,$75,$1A,$04,$0B,$0C,$01,$13,$03,$11,$18,$0D,$0E,$10
-	dc.b	$17,$14,$05,$15,$08,$09,$02,$19,$12,$16,$0F,$07,$06,$0A,$01,$01
-	dc.b	$2F,$08,$48,$80,$20,$7C,$00,$01,$20,$76,$10,$30,$00,$00,$48,$80
-	dc.b	$20,$5F,$4E,$75,$1A,$02,$04,$05,$07,$08,$01,$19,$0D,$14,$0F,$15
-	dc.b	$12,$18,$0A,$16,$13,$17,$10,$0E,$11,$09,$03,$0B,$06,$0C,$01,$01
-	dc.b	$2F,$08,$48,$80,$20,$7C,$00,$01,$20,$A6,$10,$30,$00,$00,$48,$80
-	dc.b	$20,$5F,$4E,$75,$16,$07,$03,$09,$01,$0A,$02,$1A,$06,$0E,$17,$12
-	dc.b	$05,$14,$0D,$18,$08,$13,$0B,$15,$0C,$0F,$11,$10,$04,$19,$01,$01
-	dc.b	$2F,$08,$48,$80,$20,$7C,$00,$01,$20,$D6,$10,$30,$00,$00,$48,$80
-	dc.b	$20,$5F,$4E,$75,$18,$06,$0B,$07,$08,$10,$01,$16,$11,$12,$14,$13
-	dc.b	$09,$19,$0E,$1A,$05,$03,$02,$0F,$04,$17,$0C,$0D,$0A,$15,$01,$01
+TeamRankEvenStrength				;Team select rank lookup: the even strength rank of team d0
+	move.l	a0,-(sp)
+	ext.w	d0
+	movea.l	#TeamRankEvenStrengthTable,a0
+	move.b	(a0,d0.w),d0
+	ext.w	d0
+	movea.l	(sp)+,a0
+	rts
+TeamRankEvenStrengthTable			;Even strength rank of each team
+	dc.w	$130A,$1107,$080B,$0219,$0E0C,$1612,$0510,$0D1A
+	dc.w	$0604,$0317,$0114,$1509,$0F18,$0101
+TeamRankPowerPlay					;Team select rank lookup: the power play rank of team d0
+	move.l	a0,-(sp)
+	ext.w	d0
+	movea.l	#TeamRankPowerPlayTable,a0
+	move.b	(a0,d0.w),d0
+	ext.w	d0
+	movea.l	(sp)+,a0
+	rts
+TeamRankPowerPlayTable				;Power play rank of each team
+	dc.w	$1A04,$0B0C,$0113,$0311,$180D,$0E10,$1714,$0515
+	dc.w	$0809,$0219,$1216,$0F07,$060A,$0101
+TeamRankPenaltyKilling				;Team select rank lookup: the penalty killing rank of team d0
+	move.l	a0,-(sp)
+	ext.w	d0
+	movea.l	#TeamRankPenaltyKillingTable,a0
+	move.b	(a0,d0.w),d0
+	ext.w	d0
+	movea.l	(sp)+,a0
+	rts
+TeamRankPenaltyKillingTable			;Penalty killing rank of each team
+	dc.w	$1A02,$0405,$0708,$0119,$0D14,$0F15,$1218,$0A16
+	dc.w	$1317,$100E,$1109,$030B,$060C,$0101
+TeamRankGoaltending					;Team select rank lookup: the goaltending rank of team d0
+	move.l	a0,-(sp)
+	ext.w	d0
+	movea.l	#TeamRankGoaltendingTable,a0
+	move.b	(a0,d0.w),d0
+	ext.w	d0
+	movea.l	(sp)+,a0
+	rts
+TeamRankGoaltendingTable			;Goaltending rank of each team
+	dc.w	$1607,$0309,$010A,$021A,$060E,$1712,$0514,$0D18
+	dc.w	$0813,$0B15,$0C0F,$1110,$0419,$0101
+TeamRankOverall						;Team select rank lookup: the rank of team d0 in the overall standings (a
+									;byte table)
+	move.l	a0,-(sp)
+	ext.w	d0
+	movea.l	#TeamRankOverallTable,a0
+	move.b	(a0,d0.w),d0
+	ext.w	d0
+	movea.l	(sp)+,a0
+	rts
+TeamRankOverallTable				;Overall rank of each team (one byte per team, 1 = best)
+	dc.w	$1806,$0B07,$0810,$0116,$1112,$1413,$0919,$0E1A
+	dc.w	$0503,$020F,$0417,$0C0D,$0A15,$0101
 
 TeamRankPtrs						;The team rank lookups, one long each: overall, goaltending, penalty
 									;killing, power play, even strength
@@ -1489,65 +1543,244 @@ RunSeasonMenu						;Run the season screens: call the routine in NextScreenPtr
 SeasonMenuScreen					;Season menu: Play Game, Simulate Game, Standings ... Exit Season (up /
 									;down); [] changes the day, start runs
 									;the item
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$42,$78,$D3,$12,$61,$00,$02,$54,$42,$40,$10,$38
-	dc.b	$DD,$85,$33,$C0,$FF,$FF,$27,$22,$67,$00,$00,$08,$53,$79,$FF,$FF
-	dc.b	$27,$22,$B0,$79,$FF,$FF,$27,$24,$6D,$00,$00,$12,$33,$F9,$FF,$FF
-	dc.b	$27,$24,$FF,$FF,$27,$22,$53,$79,$FF,$FF,$27,$22,$61,$00,$0A,$9C
-	dc.b	$08,$F8,$00,$05,$C3,$56,$61,$00,$03,$6A,$20,$7C,$00,$17,$E3,$FC
-	dc.b	$4E,$B9,$00,$01,$21,$8A,$31,$FC,$00,$18,$BD,$3C,$08,$B8,$00,$02
-	dc.b	$BF,$B2,$08,$F8,$00,$02,$C3,$44,$61,$00,$06,$A0,$08,$B8,$00,$02
-	dc.b	$C3,$44,$30,$38,$B0,$52,$B0,$78,$B0,$52,$67,$FA,$61,$00,$0A,$CE
-	dc.b	$42,$79,$FF,$FF,$27,$10,$30,$38,$B0,$52,$B0,$78,$B0,$52,$67,$FA
-	dc.b	$4E,$B9,$00,$01,$26,$40,$08,$B9,$00,$00,$FF,$FF,$27,$10,$67,$00
-	dc.b	$00,$0C,$61,$00,$06,$66,$4E,$B9,$00,$01,$26,$40,$0C,$78,$54,$60
-	dc.b	$D3,$12,$4E,$B9,$00,$01,$B2,$82,$4E,$B9,$00,$01,$B3,$20,$4A,$41
-	dc.b	$67,$00,$00,$06,$42,$78,$D3,$12,$08,$01,$00,$07,$66,$00,$01,$84
-	dc.b	$08,$01,$00,$05,$66,$00,$01,$7C,$08,$01,$00,$00,$67,$00,$00,$0C
-	dc.b	$53,$78,$CF,$FE,$61,$00,$0A,$66,$60,$9C,$08,$01,$00,$01,$67,$00
-	dc.b	$00,$0C,$52,$78,$CF,$FE,$61,$00,$0A,$54,$60,$8A,$08,$01,$00,$02
-	dc.b	$67,$00,$00,$9C,$4A,$79,$FF,$FF,$27,$22,$67,$00,$FF,$7A,$0C,$79
-	dc.b	$00,$02,$FF,$FF,$27,$22,$6F,$00,$00,$0A,$08,$F9,$00,$01,$FF,$FF
-	dc.b	$27,$10,$3F,$39,$FF,$FF,$27,$1E,$33,$F9,$FF,$FF,$27,$1C,$FF,$FF
-	dc.b	$27,$1E,$33,$F9,$FF,$FF,$27,$1A,$FF,$FF,$27,$1C,$33,$F9,$FF,$FF
-	dc.b	$27,$18,$FF,$FF,$27,$1A,$33,$F9,$FF,$FF,$27,$16,$FF,$FF,$27,$18
-	dc.b	$33,$DF,$FF,$FF,$27,$16,$53,$79,$FF,$FF,$27,$22,$08,$F9,$00,$00
-	dc.b	$FF,$FF,$27,$10,$30,$39,$FF,$FF,$27,$22,$52,$40,$B0,$38,$DD,$85
-	dc.b	$66,$00,$00,$0E,$42,$78,$D0,$00,$42,$78,$CF,$FE,$61,$00,$09,$CE
-	dc.b	$30,$39,$FF,$FF,$27,$22,$B0,$38,$DD,$85,$66,$00,$FE,$FA,$42,$78
-	dc.b	$D0,$00,$42,$78,$CF,$FE,$61,$00,$09,$B4,$60,$00,$FE,$EA,$08,$01
-	dc.b	$00,$03,$67,$00,$00,$AA,$30,$39,$FF,$FF,$27,$24,$53,$40,$B0,$79
-	dc.b	$FF,$FF,$27,$22,$6F,$00,$FE,$D0,$30,$39,$FF,$FF,$27,$24,$57,$40
-	dc.b	$B0,$79,$FF,$FF,$27,$22,$6D,$00,$00,$0A,$08,$F9,$00,$02,$FF,$FF
-	dc.b	$27,$10,$3F,$39,$FF,$FF,$27,$16,$33,$F9,$FF,$FF,$27,$18,$FF,$FF
-	dc.b	$27,$16,$33,$F9,$FF,$FF,$27,$1A,$FF,$FF,$27,$18,$33,$F9,$FF,$FF
-	dc.b	$27,$1C,$FF,$FF,$27,$1A,$33,$F9,$FF,$FF,$27,$1E,$FF,$FF,$27,$1C
-	dc.b	$33,$DF,$FF,$FF,$27,$1E,$52,$79,$FF,$FF,$27,$22,$08,$F9,$00,$00
-	dc.b	$FF,$FF,$27,$10,$30,$39,$FF,$FF,$27,$22,$53,$40,$B0,$38,$DD,$85
-	dc.b	$66,$00,$00,$0E,$42,$78,$D0,$00,$42,$78,$CF,$FE,$61,$00,$09,$1E
-	dc.b	$30,$39,$FF,$FF,$27,$22,$B0,$38,$DD,$85,$66,$00,$FE,$4A,$42,$78
-	dc.b	$D0,$00,$42,$78,$CF,$FE,$61,$00,$09,$04,$60,$00,$FE,$3A,$60,$00
-	dc.b	$FE,$36,$20,$78,$D0,$0C,$4E,$90,$4C,$DF,$7F,$FF,$4E,$75,$08,$38
-	dc.b	$00,$02,$DD,$80,$66,$00,$00,$7A,$42,$79,$FF,$FF,$27,$24,$20,$7C
-	dc.b	$FF,$FF,$27,$26,$22,$7C,$00,$01,$35,$58,$12,$38,$DD,$84,$42,$43
-	dc.b	$16,$19,$42,$44,$60,$00,$00,$54,$42,$42,$14,$19,$60,$00,$00,$46
-	dc.b	$B2,$11,$67,$00,$00,$0A,$B2,$29,$00,$01,$66,$00,$00,$36,$52,$79
-	dc.b	$FF,$FF,$27,$24,$10,$D1,$10,$E9,$00,$01,$30,$C4,$26,$7C,$00,$20
-	dc.b	$19,$7E,$28,$7C,$00,$20,$1A,$26,$30,$39,$FF,$FF,$27,$24,$53,$40
-	dc.b	$D0,$40,$42,$58,$11,$73,$00,$01,$FF,$FF,$42,$58,$11,$74,$00,$01
-	dc.b	$FF,$FF,$54,$49,$51,$CA,$FF,$BA,$52,$44,$51,$CB,$FF,$AC,$4E,$75
-	dc.b	$42,$79,$FF,$FF,$27,$24,$20,$7C,$FF,$FF,$27,$26,$22,$7C,$00,$20
-	dc.b	$0E,$68,$26,$7C,$00,$20,$19,$7E,$28,$7C,$00,$20,$1A,$26,$12,$38
-	dc.b	$DD,$84,$42,$43,$16,$38,$DD,$85,$42,$44,$60,$00,$00,$3C,$30,$19
-	dc.b	$08,$00,$00,$07,$66,$00,$00,$10,$02,$40,$00,$7F,$10,$F8,$DD,$84
-	dc.b	$10,$C0,$60,$00,$00,$0C,$02,$40,$00,$7F,$10,$C0,$10,$F8,$DD,$84
-	dc.b	$30,$C4,$30,$1B,$02,$40,$00,$FF,$30,$C0,$30,$1C,$02,$40,$00,$FF
-	dc.b	$30,$C0,$52,$79,$FF,$FF,$27,$24,$51,$CB,$FF,$C4,$4E,$B9,$00,$01
-	dc.b	$15,$10,$B5,$FC,$00,$00,$00,$00,$67,$00,$00,$1C,$08,$38,$00,$01
-	dc.b	$DD,$80,$66,$00,$00,$12,$10,$D2,$10,$EA,$00,$01,$30,$F8,$DD,$7E
-	dc.b	$52,$79,$FF,$FF,$27,$24,$4E,$75,$08,$38,$00,$05,$C3,$56,$66,$00
-	dc.b	$00,$16,$30,$38,$B0,$00,$4E,$B9,$00,$01,$B6,$78,$30,$BC,$00,$00
-	dc.b	$30,$38,$D3,$1A,$30,$80,$52,$78,$D3,$1A,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	clr.w	(carddelay).w
+	bsr.w	BuildSeasonMenuTeamList
+	clr.w	d0
+	move.b	(SeasonTeam+1).w,d0
+	move.w	d0,(TeamSelectHome+2).l
+	beq.w	.1
+	subq.w	#1,(TeamSelectHome+2).l
+.1
+	cmp.w	(TeamSelectHome+4).l,d0
+	blt.w	.2
+	move.w	(TeamSelectHome+4).l,(TeamSelectHome+2).l
+	subq.w	#1,(TeamSelectHome+2).l
+.2
+	bsr.w	SeasonMenuListByDay
+	bset	#5,(sflags12).w
+	bsr.w	SetupLeagueOptionsScreen
+	movea.l	#LeagueOptionsSprites,a0
+	jsr	(DrawScreenSprite).l
+	move.w	#$18,(palcount).w
+	bclr	#2,(disflags).w
+	bset	#2,(sflags5).w
+	bsr.w	DrawSeasonTeamSelect
+	bclr	#2,(sflags5).w
+	move.w	(Vcount).w,d0			;frame counter
+	;loop
+.loop
+	cmp.w	(Vcount).w,d0
+	beq.s	.loop					;wait for a new frame
+	bsr.w	SeasonMenuListSixRows	;read the pads
+	clr.w	(TeamSelectRedraw).l
+.loop2
+	move.w	(Vcount).w,d0
+.loop3
+	cmp.w	(Vcount).w,d0
+	beq.s	.loop3
+	jsr	(SetMenuScroll).l
+	bclr	#0,(TeamSelectRedraw).l
+	beq.w	.3
+	bsr.w	DrawSeasonTeamSelect
+	jsr	(SetMenuScroll).l
+.3
+	cmpi.w	#$5460,(carddelay).w
+	jsr	(FindHeldMenuPad).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.4
+	clr.w	(carddelay).w
+.4
+	btst	#7,d1
+	bne.w	.13
+	btst	#5,d1
+	bne.w	.13
+	btst	#0,d1
+	beq.w	.5
+	subq.w	#1,(menuitem).w
+	bsr.w	SeasonMenuListSixRows
+	bra.s	.loop2
+.5
+	btst	#1,d1
+	beq.w	.6
+	addq.w	#1,(menuitem).w
+	bsr.w	SeasonMenuListSixRows
+	bra.s	.loop2
+.6
+	btst	#2,d1
+	beq.w	.9
+	tst.w	(TeamSelectHome+2).l
+	beq.w	.loop2
+	cmpi.w	#2,(TeamSelectHome+2).l
+	ble.w	.7
+	bset	#1,(TeamSelectRedraw).l
+.7
+	move.w	(vislogochars+6).l,-(sp)
+	move.w	(vislogochars+4).l,(vislogochars+6).l
+	move.w	(vislogochars+2).l,(vislogochars+4).l
+	move.w	(vislogochars).l,(vislogochars+2).l
+	move.w	(homelogochars).l,(vislogochars).l
+	move.w	(sp)+,(homelogochars).l
+	subq.w	#1,(TeamSelectHome+2).l
+	bset	#0,(TeamSelectRedraw).l
+	move.w	(TeamSelectHome+2).l,d0
+	addq.w	#1,d0
+	cmp.b	(SeasonTeam+1).w,d0
+	bne.w	.8
+	clr.w	(menuitem+2).w
+	clr.w	(menuitem).w
+	bsr.w	SeasonMenuListSixRows
+.8
+	move.w	(TeamSelectHome+2).l,d0
+	cmp.b	(SeasonTeam+1).w,d0
+	bne.w	.loop2
+	clr.w	(menuitem+2).w
+	clr.w	(menuitem).w
+	bsr.w	SeasonMenuListSixRows
+	bra.w	.loop2
+.9
+	btst	#3,d1
+	beq.w	.12
+	move.w	(TeamSelectHome+4).l,d0
+	subq.w	#1,d0
+	cmp.w	(TeamSelectHome+2).l,d0
+	ble.w	.loop2
+	move.w	(TeamSelectHome+4).l,d0
+	subq.w	#3,d0
+	cmp.w	(TeamSelectHome+2).l,d0
+	blt.w	.10
+	bset	#2,(TeamSelectRedraw).l
+.10
+	move.w	(homelogochars).l,-(sp)
+	move.w	(vislogochars).l,(homelogochars).l
+	move.w	(vislogochars+2).l,(vislogochars).l
+	move.w	(vislogochars+4).l,(vislogochars+2).l
+	move.w	(vislogochars+6).l,(vislogochars+4).l
+	move.w	(sp)+,(vislogochars+6).l
+	addq.w	#1,(TeamSelectHome+2).l
+	bset	#0,(TeamSelectRedraw).l
+	move.w	(TeamSelectHome+2).l,d0
+	subq.w	#1,d0
+	cmp.b	(SeasonTeam+1).w,d0
+	bne.w	.11
+	clr.w	(menuitem+2).w
+	clr.w	(menuitem).w
+	bsr.w	SeasonMenuListSixRows
+.11
+	move.w	(TeamSelectHome+2).l,d0
+	cmp.b	(SeasonTeam+1).w,d0
+	bne.w	.loop2
+	clr.w	(menuitem+2).w
+	clr.w	(menuitem).w
+	bsr.w	SeasonMenuListSixRows
+	bra.w	.loop2
+.12
+	bra.w	.loop2
+.13
+	movea.l	(menurows+2).w,a0
+	jsr	(a0)
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+BuildSeasonMenuTeamList				;Season menu: build the team select list TeamSelectHome+6 from
+									;SeasonSchedule (or leave it for the playoffs)
+	btst	#2,(SeasonDay+2).w
+	bne.w	.5
+	clr.w	(TeamSelectHome+4).l
+	movea.l	#TeamSelectHome+6,a0
+	movea.l	#SeasonSchedule,a1
+	move.b	(SeasonTeam).w,d1
+	clr.w	d3
+	move.b	(a1)+,d3
+	clr.w	d4
+	bra.w	.4
+.loop
+	clr.w	d2
+	move.b	(a1)+,d2
+	bra.w	.3
+.loop2
+	cmp.b	(a1),d1
+	beq.w	.1
+	cmp.b	1(a1),d1
+	bne.w	.2
+.1
+	addq.w	#1,(TeamSelectHome+4).l
+	move.b	(a1),(a0)+
+	move.b	1(a1),(a0)+
+	move.w	d4,(a0)+
+	movea.l	#$20197E,a3
+	movea.l	#$201A26,a4
+	move.w	(TeamSelectHome+4).l,d0
+	subq.w	#1,d0
+	add.w	d0,d0
+	clr.w	(a0)+
+	move.b	1(a3,d0.w),-$1(a0)
+	clr.w	(a0)+
+	move.b	1(a4,d0.w),-$1(a0)
+.2
+	addq.w	#2,a1
+.3
+	dbf	d2,.loop2
+	addq.w	#1,d4
+.4
+	dbf	d3,.loop
+	rts
+.5
+	clr.w	(TeamSelectHome+4).l
+	movea.l	#TeamSelectHome+6,a0
+	movea.l	#$200E68,a1
+	movea.l	#$20197E,a3
+	movea.l	#$201A26,a4
+	move.b	(SeasonTeam).w,d1
+	clr.w	d3
+	move.b	(SeasonTeam+1).w,d3
+	clr.w	d4
+	bra.w	.8
+.loop3
+	move.w	(a1)+,d0
+	btst	#7,d0
+	bne.w	.6
+	andi.w	#$7F,d0
+	move.b	(SeasonTeam).w,(a0)+
+	move.b	d0,(a0)+
+	bra.w	.7
+.6
+	andi.w	#$7F,d0
+	move.b	d0,(a0)+
+	move.b	(SeasonTeam).w,(a0)+
+.7
+	move.w	d4,(a0)+
+	move.w	(a3)+,d0
+	andi.w	#$FF,d0
+	move.w	d0,(a0)+
+	move.w	(a4)+,d0
+	andi.w	#$FF,d0
+	move.w	d0,(a0)+
+	addq.w	#1,(TeamSelectHome+4).l
+.8
+	dbf	d3,.loop3
+	jsr	(FindUserGame).l
+	cmpa.l	#$0,a2
+	beq.w	.9
+	btst	#1,(SeasonDay+2).w
+	bne.w	.9
+	move.b	(a2),(a0)+
+	move.b	1(a2),(a0)+
+	move.w	(SeasonDay).w,(a0)+
+	addq.w	#1,(TeamSelectHome+4).l
+.9
+	rts
+SeasonMenuCountGoalie	equ	*	;Draw the goalie mark and count one goalie (low confidence)
+	btst	#5,(sflags12).w
+	bne.w	.10
+	move.w	(VSCRLPM).w,d0
+	jsr	(Vmaddr).l
+	move.w	#0,(a0)
+	move.w	(homegoalies).w,d0
+	move.w	d0,(a0)
+.10
+	addq.w	#1,(homegoalies).w
+	rts
 
 SetMenuScroll						;Write the vertical scroll: plane A 0, plane B the menu background scroll
 									;(homegoalies)
@@ -1557,6 +1790,7 @@ SetMenuScroll						;Write the vertical scroll: plane A 0, plane B the menu backg
 	move.w	(homegoalies).w,d0
 	move.w	d0,(a0)
 	rts
+SetupLeagueOptionsScreen	equ	*			;Set the VBint handler, the scroll and map addresses, load the League options sprites and fonts
 	move.l	#$12D46,(VBint).l
 	bclr	#dfok,(disflags).w
 	bset	#dfng,(disflags).w
@@ -1696,51 +1930,181 @@ SetMenuScroll						;Write the vertical scroll: plane A 0, plane B the menu backg
 	jsr	(dobitmap).l
 	move.w	#$2500,sr
 	rts
-	dc.w	$3F38,$DD7E,$4A79,$FFFF,$2722,$6700,$0010,$4EB9
-	dc.w	$0001,$BED6,$0008,$F804,$010D,$145B,$0838,$0002
-	dc.w	$DD80,$6700,$0024,$4EB9,$0001,$BED6,$0008,$F804
-	dc.w	$010E,$1400,$4EB9,$0001,$BED6,$000A,$504C,$4159
-	dc.w	$4F46,$4653,$6000,$0022,$31F9,$FFFF,$2720,$DD7E
-	dc.w	$4EB9,$0001,$16BA,$4EB9,$0001,$BB8E,$0006,$BF0E
-	dc.w	$1400,$4EB9,$0001,$BEEC,$3039,$FFFF,$2722,$5240
-	dc.w	$B079,$FFFF,$2724,$6C00,$000C,$4EB9,$0001,$BED6
-	dc.w	$0004,$5D00,$31DF,$DD7E,$4E75,$4240,$1038,$DD85
-	dc.w	$6700,$0064,$5340,$B079,$FFFF,$2722,$6D00,$0058
-	dc.w	$3039,$FFFF,$2722,$E740,$207C,$FFFF,$2726,$48E7
-	dc.w	$8080,$3030,$0004,$323C,$0002,$4EB9,$0001,$BE1C
-	dc.w	$4EB9,$0001,$BB8E,$0006,$BF1F,$1400,$4EB9,$0001
-	dc.w	$BEEC,$4CDF,$0101,$3030,$0006,$323C,$0002,$4EB9
-	dc.w	$0001,$BE1C,$4EB9,$0001,$BB8E,$0006,$BF08,$1400
-	dc.w	$4EB9,$0001,$BEEC,$4E75,$4EB9,$0001,$BED6,$0022
-	dc.w	$F804,$0108,$1420,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl
-	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl
-	dc.w	$3039,$FFFF,$2722,$E740,$207C,$FFFF,$2726,$33F0
-	dc.w	$0002,$FFFF,$2720,$48E7,$8080,$6100,$FEC4,$6100
-	dc.w	$FF4A,$3038,$B052,$B078,$B052,$67FA,$4CD7,$0101
-	dc.w	$4247,$1E30,$0000,$4EB9,$0001,$BB8E,$0006,$BF17
-	dc.w	$1600,$3839,$FFFF,$2712,$6100,$0164,$1E30,$0001
-	dc.w	$4EB9,$0001,$BB8E,$0006,$BF01,$1600,$3839,$FFFF
-	dc.w	$2714,$6100,$014A,$3038,$B052,$B078,$B052,$67FA
-	dc.w	$4CD7,$0101,$6100,$0008,$4CDF,$0101,$4E75,$3C3C
-	dc.w	$0004,$247C,$FFFF,$271E,$3A39,$FFFF,$2722,$5445
-	dc.w	$08F8,$0000,$C346,$3039,$FFFF,$2724,$5340,$BA40
-	dc.w	$6F00,$000A,$6100,$00D4,$6000,$00BA,$4A45,$6A00
-	dc.w	$000A,$6100,$00C6,$6000,$00AC,$3812,$4EB9,$0001
-	dc.w	$BB8E,$0006,$BF00,$0E00,$207C,$0001,$2B4A,$11F0
-	dc.w	$6000,$B041,$3005,$E740,$207C,$FFFF,$2726,$1230
-	dc.w	$0000,$B238,$DD84,$6600,$0006,$1230,$0001,$207C
-	dc.w	$0001,$2CDE,$4881,$E541,$2070,$1000,$08F8,$0000
-	dc.w	$C346,$BC7C,$0004,$6600,$0014,$08B9,$0002,$FFFF
-	dc.w	$2710,$6700,$0008,$08B8,$0000,$C346,$4A46,$6600
-	dc.w	$0014,$08B9,$0001,$FFFF,$2710,$6700,$0008,$08B8
-	dc.w	$0000,$C346,$0838,$0002,$C344,$6700,$0008,$08B8
-	dc.w	$0000,$C346,$48E7,$FFFE,$2248,$2448,$D1DA,$D3DA
-	dc.w	$4240,$4241,$7405,$7605,$7A04,$4EB9,$0001,$B692
-	dc.w	$4CDF,$7FFF,$558A,$5345,$51CE,$FF2C,$08B8,$0000
-	dc.w	$C346,$4E75,$020A,$121A,$22FF,$48E7,$FFFE,$4EB9
-	dc.w	$0001,$BB8E,$0006,$BF00,$0E00,$207C,$0001,$2B4A
-	dc.w	$11F0,$6000,$B041,$7005,$7205,$343C,$07FF,$0042
-	dc.w	$8000,$4EB9,$0001,$B976,$4CDF,$7FFF,$4E75
+SeasonMenuDrawTeamRow	equ	*	;Season menu: draw the team row (low confidence)
+	move.w	(SeasonDay).w,-(sp)
+	tst.w	(TeamSelectHome+2).l
+	beq.w	.3
+	jsr	(printbigz).l
+	String	$F8,4,1,$D,$14,'['
+.3
+	btst	#2,(SeasonDay+2).w
+	beq.w	.4
+	jsr	(printbigz).l
+	String	$F8,4,1,$E,$14
+	jsr	(printbigz).l
+	String	'PLAYOFFS'
+	bra.w	.5
+.4
+	move.w	(TeamSelectHome).l,(SeasonDay).w
+	jsr	(SetupSeasonGameLookup).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$E,$14
+	jsr	(printbig).l
+.5
+	move.w	(TeamSelectHome+2).l,d0
+	addq.w	#1,d0
+	cmp.w	(TeamSelectHome+4).l,d0
+	bge.w	.6
+	jsr	(printbigz).l
+	String	']'
+.6
+	move.w	(sp)+,(SeasonDay).w
+	rts
+SeasonMenuClampTeam	equ	*	;Season menu: clamp the selected team (low confidence)
+	clr.w	d0
+	move.b	(SeasonTeam+1).w,d0
+	beq.w	.7
+	subq.w	#1,d0
+	cmp.w	(TeamSelectHome+2).l,d0
+	blt.w	.7
+	move.w	(TeamSelectHome+2).l,d0
+	asl.w	#3,d0
+	movea.l	#TeamSelectHome+6,a0
+	movem.l	d0/a0,-(sp)
+	move.w	4(a0,d0.w),d0
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$1F,$14
+	jsr	(printbig).l
+	movem.l	(sp)+,d0/a0
+	move.w	6(a0,d0.w),d0
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),8,$14
+	jsr	(printbig).l
+.7
+	rts
+DrawSeasonTeamSelect	equ	*	;Season menu: draw the team select rows with the team blocks and wait for the next frame
+	jsr	(printbigz).l
+	String	$F8,4,1,8,$14,'                           '
+	move.w	(TeamSelectHome+2).l,d0
+	asl.w	#3,d0
+	movea.l	#TeamSelectHome+6,a0
+	move.w	2(a0,d0.w),(TeamSelectHome).l
+	movem.l	d0/a0,-(sp)
+	bsr.w	SeasonMenuDrawTeamRow
+	bsr.w	SeasonMenuClampTeam
+	move.w	(Vcount).w,d0
+.loop2
+	cmp.w	(Vcount).w,d0
+	beq.s	.loop2
+	movem.l	(sp),d0/a0
+	clr.w	d7
+	move.b	(a0,d0.w),d7
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$17,$16
+	move.w	(pstatsblockchars).l,d4
+	bsr.w	DrawSetupTeamBlock
+	move.b	1(a0,d0.w),d7
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),1,$16
+	move.w	(pstatscount).l,d4
+	bsr.w	DrawSetupTeamBlock
+	move.w	(Vcount).w,d0
+.loop3
+	cmp.w	(Vcount).w,d0
+	beq.s	.loop3
+	movem.l	(sp),d0/a0
+	bsr.w	SeasonMenuDrawLogos
+	movem.l	(sp)+,d0/a0
+	rts
+SeasonMenuDrawLogos	equ	*	;Season menu: draw the team logos
+	move.w	#4,d6
+	movea.l	#vislogochars+6,a2
+	move.w	(TeamSelectHome+2).l,d5
+	addq.w	#2,d5
+	bset	#0,(sflags6).w
+.loop4
+	move.w	(TeamSelectHome+4).l,d0
+	subq.w	#1,d0
+	cmp.w	d0,d5
+	ble.w	.8
+	bsr.w	SeasonMenuDrawLegend
+	bra.w	.14
+.8
+	tst.w	d5
+	bpl.w	.9
+	bsr.w	SeasonMenuDrawLegend
+	bra.w	.14
+.9
+	move.w	(a2),d4
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),0,$E
+	movea.l	#$12B4A,a0
+	move.b	(a0,d6.w),(printx+1).w
+	move.w	d5,d0
+	asl.w	#3,d0
+	movea.l	#TeamSelectHome+6,a0
+	move.b	(a0,d0.w),d1
+	cmp.b	(SeasonTeam).w,d1
+	bne.w	.10
+	move.b	1(a0,d0.w),d1
+.10
+	movea.l	#SmallLogoPtrs,a0
+	ext.w	d1
+	asl.w	#2,d1
+	movea.l	(a0,d1.w),a0
+	bset	#0,(sflags6).w
+	cmp.w	#4,d6
+	bne.w	.11
+	bclr	#2,(TeamSelectRedraw).l
+	beq.w	.11
+	bclr	#0,(sflags6).w
+.11
+	tst.w	d6
+	bne.w	.12
+	bclr	#1,(TeamSelectRedraw).l
+	beq.w	.12
+	bclr	#0,(sflags6).w
+.12
+	btst	#2,(sflags5).w
+	beq.w	.13
+	bclr	#0,(sflags6).w
+.13
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#5,d2
+	moveq	#5,d3
+	moveq	#4,d5
+	jsr	(dobitmap).l
+	movem.l	(sp)+,d0-d7/a0-a6
+.14
+	subq.l	#2,a2
+	subq.w	#1,d5
+	dbf	d6,.loop4
+	bclr	#0,(sflags6).w
+	rts
+	dc.w	$020A,$121A,$22FF
+SeasonMenuDrawLegend	equ	*	;Season menu: print the legend line
+	movem.l	d0-d7/a0-a6,-(sp)
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),0,$E
+	movea.l	#$12B4A,a0
+	move.b	(a0,d6.w),(printx+1).w
+	moveq	#5,d0
+	moveq	#5,d1
+	move.w	#$7FF,d2
+	ori.w	#$8000,d2
+	jsr	(eraser).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 DrawSetupTeamBlock					;Draw the team block (TeamBlockPtrs) of team d7 at printx / printy (the
 									;controller setup screen)

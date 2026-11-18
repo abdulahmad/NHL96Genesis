@@ -23,6 +23,7 @@ def _tn(self, ctx):
 Insn.target_name = _tn
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+IMM_NUMBERS = set()   # long immediates in the ROM range that are numbers, not addresses (decode_hints.csv: `number,ADDR`)
 MARK = re.compile(r'kept as bytes|Not decoded|not decode', re.I)
 
 
@@ -34,7 +35,7 @@ def load_rom():
 
 
 SPA = {}
-PRINTERS = ('printz', 'printcurz', 'printsmallz', 'printbigz', 'appendz')
+PRINTERS = ('printz', 'printcurz', 'printsmallz', 'printbigz', 'appendz', 'printbigcurz', 'printbigz1', 'printbigz2')
 
 
 def load_lst():
@@ -119,13 +120,34 @@ class Ctx:
         return d
 
 
+def row_bytes(ctx, row):
+    """Bytes of one dc.b / dc.w / dc.l source row (numbers, or symbols whose value the listing knows). None when it has other symbols."""
+    m = re.match(r'^\tdc\.([bwl])\t([^;]*)', row)
+    if not m: return None
+    size = {'b': 1, 'w': 2, 'l': 4}[m.group(1)]
+    out = bytearray()
+    for tok in m.group(2).split(','):
+        tok = tok.strip()
+        if not tok: continue
+        if re.match(r'^\$[0-9A-Fa-f]+$', tok): v = int(tok[1:], 16)
+        elif re.match(r'^[0-9]+$', tok): v = int(tok)
+        elif tok in ctx.syms: v = ctx.syms[tok]
+        else: return None
+        out += (v & ((1 << (8 * size)) - 1)).to_bytes(size, 'big')
+    return bytes(out)
+
+
 def find_run(ctx, run):
-    """Address of a dc.b run (list of source lines) by matching the listing and checking the ROM."""
+    """Address of a dc run (list of source lines) by matching the listing and checking the ROM."""
     first = run[0].strip()
-    bs = [int(x, 16) for x in re.findall(r'\$([0-9A-Fa-f]{2})', ''.join(run))]
+    bs = bytearray()
+    for r in run:
+        b = row_bytes(ctx, r)
+        if b is None: return []
+        bs += b
     cands = []
     for i, (a, rest) in enumerate(ctx.lines):
-        if a is not None and rest.rstrip().endswith(first.replace('\t', '\t')) and '\tdc.b' in rest:
+        if a is not None and rest.rstrip().endswith(first) and re.search(r'\tdc\.[bwl]', rest):
             if ctx.rom[a:a + len(bs)] == bytes(bs):
                 cands.append(a)
     return cands
@@ -134,6 +156,7 @@ def find_run(ctx, run):
 class Out:
     def __init__(self):
         self.unres_ram, self.unres_rom, self.errors, self.needname = [], [], [], []
+        self.unres_imm = []
 
 
 def symbolize(ctx, ins, op, lab_here, blk, local, structs, pos):
@@ -186,8 +209,11 @@ def symbolize(ctx, ins, op, lab_here, blk, local, structs, pos):
                 if (full - d) in ctx.ram:
                     blk.unres_ram.append((full, 'imm %s+%d' % (ctx.ram[full - d], d)))
                     return '#%s+%d' % (ctx.ram[full - d], d)
-        if m in ('movea.l', 'move.l') and 0x1000 <= v < 0x200000 and v in ctx.a2l and ins.ops[1][0] == 'an':
-            return '#%s' % ctx.a2l[v][0]
+        if m in ('movea.l', 'move.l') and 0x1000 <= v < 0x200000 and ins.ops[1][0] in ('an', 'absl', 'absw', 'ind', 'disp') and v not in IMM_NUMBERS:
+            nm = (ctx.a2l.get(v) or [None])[0] or ctx.newg.get(v)
+            if nm: return '#%s' % nm
+            blk.unres_imm.append(v)
+            return '#$%X' % v
         if sz == 'l': return '#$%X' % v
         if sz == 'w':
             return '#%s' % ('$%X' % (v & 0xFFFF) if v >= 10 else '%d' % v)
@@ -216,6 +242,13 @@ def name_addr(ctx, v, blk):
     if v in ctx.ports: return ctx.ports[v]
     if v in ctx.a2l: return ctx.a2l[v][0]
     if v in ctx.newg: return ctx.newg[v]
+    # hardware and save RAM ranges are named from their base
+    if v == 0xC00004: return 'Vctrl'
+    if 0xA00000 <= v < 0xA02000: return 'Z80_RAM' + ('+$%X' % (v - 0xA00000) if v > 0xA00000 else '')
+    if 0xA10000 <= v < 0xA10010:
+        for d in range(1, 4):
+            if (v - d) in ctx.ports: return '%s+%d' % (ctx.ports[v - d], d)
+    if 0x200000 <= v < 0x204000: return 'SaveRAM' + ('+$%X' % (v - 0x200000) if v > 0x200000 else '')
     blk.unres_rom.append(v)
     return '$%06X' % v
 
@@ -293,6 +326,10 @@ def decode_block(ctx, start, end, entry_label):
                 x, run = a, []
                 while x < b:
                     i2 = ctx.dis.one(x, b); run.append(i2); x += i2.size
+                    if i2.kind in ('jsr', 'bsr') and i2.target_name(ctx) in PRINTERS:
+                        L = int.from_bytes(ctx.rom[x:x + 2], 'big')
+                        if L < 2 or x + L > b: raise Bad('bad string')
+                        run.append(Insn(x, L, 'String', [('str', ctx.rom[x + 2:x + L], x)])); x += L
                 if run and run[-1].kind in ('rts', 'jmp', 'bra') and a not in pc_refs and not any(
                         ai.kind == 'rts' and False for ai in run):
                     seg = ('code', run)
@@ -355,7 +392,8 @@ def load_hints():
     if os.path.exists(p):
         for l in open(p, errors='replace'):
             f = l.strip().split(',')
-            if f[0] == 'entry': ent.add(int(f[1], 16))
+            if f[0] == 'number': IMM_NUMBERS.add(int(f[1], 16))
+            elif f[0] == 'entry': ent.add(int(f[1], 16))
             elif f[0] == 'data': data.append((int(f[1], 16), int(f[2], 16)))
     return ent, data
 
@@ -378,10 +416,11 @@ def make_records(ctx, segs, start, end, entry_label, names, reserved=frozenset()
     ins_list = [i for s in segs if s[0] == 'code' for i in s[1]]
     addrs = {i.addr for i in ins_list}
     # global labels inside the block: lst labels, names.csv entries
-    glob_at, pre_local = {}, {}
+    glob_at, pre_local, mid_at = {}, {}, {}
     for a in range(start, end):
         if a in ctx.a2l: glob_at[a] = ctx.a2l[a][0]
         elif a in names and names[a][0].startswith('.'): pre_local[a] = names[a][0]
+        elif a in names and names[a][0].startswith('='): mid_at[a] = names[a][0][1:]
         elif a in names: glob_at[a] = names[a][0]
     if entry_label: glob_at[start] = entry_label
     scope_of = {}
@@ -406,7 +445,7 @@ def make_records(ctx, segs, start, end, entry_label, names, reserved=frozenset()
     counters = {}
     calls = {i.target for i in ins_list if i.kind == 'bsr' and i.target is not None and start <= i.target < end}
     for t in sorted(tgt):
-        if t in glob_at or t in pre_local: continue
+        if t in glob_at or t in pre_local or t in mid_at: continue
         if t in calls:
             blk.errors.append('call target %06X needs a name' % t); blk.needname.append(t)
             local[t] = '.call%06X' % t
@@ -434,8 +473,9 @@ def make_records(ctx, segs, start, end, entry_label, names, reserved=frozenset()
             while '.%d' % c['n'] in reserved: c['n'] += 1
             local[t] = '.%d' % c['n']
     recs = []
+    names_at = dict(glob_at); names_at.update(mid_at)
     def lookup(v):
-        return glob_at.get(v) or local.get(v)
+        return names_at.get(v) or local.get(v)
     for s in segs:
         if s[0] == 'code':
             for i in s[1]:
@@ -444,7 +484,7 @@ def make_records(ctx, segs, start, end, entry_label, names, reserved=frozenset()
                 else:
                     ops = []
                     for o in i.ops:
-                        ops.append(symbolize2(ctx, i, o, blk, glob_at, local, start, end))
+                        ops.append(symbolize2(ctx, i, o, blk, names_at, local, start, end))
                     mn = i.mnem
                     if mn == 'cmpi.w' and i.ops[1][0] == 'dn': mn = 'cmpi'   # fixopcodes.js rewrites cmpi.w #x,dn to EA's cmp
                     r = Rec(i.addr, '\t' + mn + ('\t' + ','.join(ops) if ops else ''), i)
@@ -453,17 +493,22 @@ def make_records(ctx, segs, start, end, entry_label, names, reserved=frozenset()
                 if i.addr in glob_at and not (i.addr == start and entry_label):
                     r.glabel = glob_at[i.addr]; r.header = names.get(i.addr, ('', ''))[1]
                 elif i.addr == start and entry_label: r.glabel = None
+                if i.addr in mid_at: r.mid = mid_at[i.addr]; r.midc = names.get(i.addr, ('', ''))[1]
                 if i.addr in local: r.llabel = local[i.addr]
                 if i.addr in pre_local: r.lheader = names[i.addr][1]
                 recs.append(r)
         else:
-            rows = fmt_data(ctx, s[1], s[2])
-            for k, t in enumerate(rows):
-                r = Rec(s[1] + 16 * k, t); r.norm = 'dc'
-                if k == 0:
-                    if s[1] in glob_at and not (s[1] == start and entry_label): r.glabel = glob_at[s[1]]
-                    if s[1] in local: r.llabel = local[s[1]]
-                recs.append(r)
+            cuts = sorted({a for a in list(names_at) + list(local) if s[1] < a < s[2]})
+            pieces = list(zip([s[1]] + cuts, cuts + [s[2]]))
+            for pa, pb in pieces:
+                rows = fmt_data(ctx, pa, pb)
+                for k, t in enumerate(rows):
+                    r = Rec(pa + 16 * k, t); r.norm = 'dc'
+                    if k == 0:
+                        if pa in glob_at and not (pa == start and entry_label): r.glabel = glob_at[pa]; r.header = names.get(pa, ('', ''))[1]
+                        if pa in mid_at: r.mid = mid_at[pa]; r.midc = names.get(pa, ('', ''))[1]
+                        if pa in local: r.llabel = local[pa]
+                    recs.append(r)
     return recs, blk
 
 
@@ -654,6 +699,8 @@ def render(recs, reserved=frozenset()):
             else:
                 lines.append(r.glabel)
         if r.llabel and r.llabel in m: r.llabel = m[r.llabel]
+        if getattr(r, 'mid', None):
+            lines.append(r.mid + '\t' * max(1, -(-(36 - vis(r.mid + ' = *')) // 4)) + '= *' if False else (r.mid + '\tequ\t*' + (('\t;' + r.midc) if r.midc else '')))
         for p in r.pre:
             lines.append('\t;' + p if False else '\t;' + p)
         text = sub(r.text)
@@ -685,7 +732,9 @@ def update_stub(ctx, relfile, names_needed, pending_defs):
     base = os.path.splitext(os.path.basename(relfile))[0]
     p = os.path.join(ROOT, 'src', 'stubinc', base + '_stub.asm')
     if not os.path.exists(p): return []
-    txt = open(p, errors='replace').read()
+    txt = open(p, errors='replace', newline='').read()
+    crlf = '\r\n' in txt
+    txt = txt.replace('\r\n', '\n')
     have = set(re.findall(r'^([A-Za-z_]\w*)\s*=', txt, re.M))
     add = []
     for n in sorted(names_needed):
@@ -703,25 +752,30 @@ def update_stub(ctx, relfile, names_needed, pending_defs):
             m = re.search(r'\n\t*include\s+[^\n]*\n*$', txt)
             i = m.start() if m else len(txt)
         txt = txt[:i].rstrip('\n') + '\n' + '\n'.join(add) + '\n' + txt[i:]
-        open(p, 'w', newline='').write(txt)
+        open(p, 'w', newline='').write(txt.replace('\n', '\r\n') if crlf else txt)
     return add
 
 
 SCOPE_USED = {}
 
 
+def is_glob(l):
+    """A line that starts a new local label scope: a global label, but not `Name = *` or `Name equ x`."""
+    return bool(re.match(r'^[A-Za-z_][\w$]*', l)) and not re.match(r'^[A-Za-z_][\w$]*\s*(=|equ\b)', l, re.I)
+
+
 def reserved_locals(src, i, k):
     """Local labels already used in the global scope(s) the block at src[i:k] sits in."""
     a = i
-    while a > 0 and not re.match(r'^[A-Za-z_][\w$]*', src[a]): a -= 1
+    while a > 0 and not is_glob(src[a]): a -= 1
     b = k
-    while b < len(src) and not re.match(r'^[A-Za-z_][\w$]*', src[b]): b += 1
+    while b < len(src) and not is_glob(src[b]): b += 1
     return frozenset(m.group(0) for l in src[a:b] for m in [re.match(r'^\.[\w]+', l)] if m) | SCOPE_USED.get((id(src), a), frozenset())
 
 
 def scope_key(src, i):
     a = i
-    while a > 0 and not re.match(r'^[A-Za-z_][\w$]*', src[a]): a -= 1
+    while a > 0 and not is_glob(src[a]): a -= 1
     return (id(src), a)
 
 
@@ -744,7 +798,7 @@ def main():
     HINTS = load_hints()
     ctx = Ctx()
     names = load_names()
-    ctx.newg = {k: v[0] for k, v in names.items() if not v[0].startswith('.')}
+    ctx.newg = {k: v[0].lstrip('=') for k, v in names.items() if not v[0].startswith('.')}
     import lineage
     parents = [] if a.no_lineage else lineage.load_parents(a.parents)
     files = a.files or sorted(glob.glob(os.path.join(ROOT, 'src', '**', '*.asm'), recursive=True))
@@ -762,17 +816,26 @@ def main():
                 j = i + 1
                 while j < len(src) and src[j].lstrip().startswith(';') and not src[j].startswith('\tdc'): j += 1
                 k = j
-                while k < len(src) and src[k].startswith('\tdc.b'): k += 1
+                while k < len(src) and re.match(r'^\tdc\.[bwl]\t', src[k]): k += 1
                 if k == j:
                     newsrc.append(line); i += 1; continue
                 run = src[j:k]
                 tot['blocks'] += 1
                 cands = find_run(ctx, run)
+                if len(cands) > 1:
+                    # identical bytes elsewhere: take the first candidate at or after the nearest label above the block
+                    b = i
+                    while b > 0 and not re.match(r'^[A-Za-z_][\w$]*', src[b]): b -= 1
+                    ml = re.match(r'^([A-Za-z_][\w$]*)', src[b])
+                    la = ctx.lab.get(ml.group(1)) if ml else None
+                    if la is not None:
+                        after = sorted(c for c in cands if c >= la)
+                        if after: cands = after[:1]
                 if len(cands) != 1:
                     print('%s:%d: %d address candidates' % (rel, i + 1, len(cands))); tot['bad'] += 1
                     newsrc.extend(src[i:k]); i = k; continue
                 start = cands[0]
-                end = start + sum(r.count('$') for r in run)
+                end = start + sum(len(row_bytes(ctx, r) or b'') for r in run)
                 lab = ctx.a2l.get(start, [None])[0]
                 segs, notes = decode_block(ctx, start, end, lab)
                 recs, blk = make_records(ctx, segs, start, end, lab, names, reserved_locals(src, i, k))
@@ -785,6 +848,8 @@ def main():
                 if blk.unres_ram: msgs.append('ram ' + ','.join(sorted({'%08X%s' % (v, ' ' + n if n else '') for v, n in blk.unres_ram})))
                 ur = sorted({v for v in blk.unres_rom if not (start <= v < end)})
                 if ur: msgs.append('rom ' + ','.join('%06X' % v for v in ur))
+                ui = sorted({v for v in blk.unres_imm if not (start <= v < end)})
+                if ui: msgs.append('imm ' + ','.join('%06X' % v for v in ui))
                 if ur: blk.errors.append('unnamed targets outside the block')
                 if blk.errors: msgs.append('; '.join(blk.errors))
                 for nn in blk.needname:

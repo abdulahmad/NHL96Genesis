@@ -29,6 +29,21 @@ SoundCmd = $08839E					;pause96_stub
 SprSort = $0213AE					;display96
 stop_current_song = $0885FC			;collide96_stub
 Z80Program = $025500				;pause96_stub
+ExitStatsScreenReload = $0154D8				;pause96_menu
+LoadCrowdFrames = $0210D0				;display96
+LoadEnergyBarTiles = $0210C2				;display96
+LoadFaceOffMap = $021108				;display96
+LoadFaceOffSprites = $0210FA				;display96
+LoadRefTiles = $0210EC				;display96
+ReplayBannerMap = $141228				;graphics96
+forceblack2 = $01AF7C				;video96
+printbigz1 = $01C11A				;shootout96_path_stub
+printbigz2 = $01C12C				;goal96_box_stub
+setpads = $016D6A				;control96
+setupEASNmap = $0210B0				;display96
+sfx = $088470				;collide96_stub
+vcountwait = $0151E0				;hockey96_inter_stub
+vtoa = $01A3EE				;collide96_stub
 
 
 ; Main segment code

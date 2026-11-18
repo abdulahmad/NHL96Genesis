@@ -18,6 +18,10 @@ SPApflip = $2BBA					;SPA value (frames96)
 HotList2 = $13A212					;graphics96
 rtss2 = $01F84A						;playoff96_stub
 SPAbglass = $2B88					;frames96
+FindGoalieAimOffset = $0168EC				;control96
+Sweepcheck = $016C82				;control96
+doplayeracc = $01A62A				;lines96_stub
+randomd0 = $01B0A6				;playoff96_stub
 
 
 ; Main segment code

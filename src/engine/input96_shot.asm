@@ -84,6 +84,7 @@ shotdirmath							;shot direction math: puck offset in d3/d4, scaled by d0
 	sub.l	d3,d4
 	divs.w	d2,d4
 	rts
+shotdirmathAssShoot	equ	*			;Part of shotdirmath: temp2 = (puck distance from the end boards) / 8 up to $14, then assignment $12 (assshoot) through assreplace
 	addq.w	#4,sp
 	move.w	(pucky).w,d0
 	btst	#pfgoal,pflags(a3)

@@ -16,15 +16,20 @@ PuckOnAttackHalf					;d0 = 1 when the puck is on the half of the goal player a3 
 	bpl.w	.0						;branch if higher
 	bra.w	.playerabovetopgoalline
 	;In PuckOnAttackHalf after its bra: code nothing reaches.
-	;Code the listing does not decode: kept as bytes
-	dc.b	$30,$38,$BF,$0E,$58,$40,$02,$40,$00,$07,$32,$2B,$00,$54,$B2,$40
-	dc.b	$60,$00,$00,$3C,$67,$00,$00,$38,$52,$41,$02,$41,$00,$07,$B2,$40
-	dc.b	$67,$00,$00,$2C,$52,$41,$02,$41,$00,$07,$B2,$40,$67,$00,$00,$20
-	dc.b	$57,$41,$02,$41,$00,$07,$B2,$40,$67,$00,$00,$14,$53,$41,$02,$41
-	dc.b	$00,$07,$67,$00,$00,$0A
+	move.w	(passdir).w,d0
+	addq.w	#4,d0
+	andi.w	#7,d0
+	move.w	$54(a3),d1
+	cmp.w	d0,d1
+	bra.w	PuckOnAttackHalfYes
+	dc.w	$6700,$0038,$5241,$0241,$0007,$B240,$6700,$002C
+	dc.w	$5241,$0241,$0007,$B240,$6700,$0020,$5741,$0241
+	dc.w	$0007,$B240,$6700,$0014,$5341,$0241,$0007,$6700
+	dc.w	$000A
 .playerabovetopgoalline
 	move.w	#0,d0
 	bra.w	.1
+PuckOnAttackHalfYes	equ	*			;Result 1: the puck is on the attack half
 .0
 	move.w	#1,d0
 .1
@@ -379,21 +384,76 @@ NextAwayHotPlayer					;The same for the away team (awayhotidx, awayhotplayer).
 
 BuildHotColdLists					;The hot / cold player lists of both teams (SortHotColdStarters,
 									;CopyHottestPlayer, CopyColdestPlayer).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$42,$78,$BF,$8E,$42,$78,$BF,$90,$48,$E7,$FF,$FE,$20,$7C,$FF,$FF
-	dc.b	$C7,$26,$61,$00,$00,$3A,$20,$7C,$FF,$FF,$BF,$98,$61,$00,$01,$20
-	dc.b	$20,$7C,$FF,$FF,$BF,$9C,$61,$00,$01,$36,$20,$7C,$FF,$FF,$CA,$C4
-	dc.b	$61,$00,$00,$1C,$20,$7C,$FF,$FF,$BF,$96,$61,$00,$01,$02,$20,$7C
-	dc.b	$FF,$FF,$BF,$9A,$61,$00,$01,$18,$4C,$DF,$7F,$FF,$4E,$75,$48,$E7
-	dc.b	$FF,$FE,$24,$48,$D5,$FC,$00,$00,$01,$BC,$3F,$07,$3E,$28,$00,$28
-	dc.b	$4E,$B9,$00,$00,$EF,$02,$3E,$1F,$22,$7C,$FF,$FF,$BF,$54,$30,$3C
-	dc.b	$00,$05,$12,$18,$53,$01,$12,$C1,$48,$81,$E9,$41,$42,$11,$56,$41
-	dc.b	$3E,$3C,$00,$03,$42,$42,$14,$32,$10,$00,$BE,$3C,$00,$09,$67,$00
-	dc.b	$00,$0C,$BE,$3C,$00,$0D,$67,$00,$00,$04,$D5,$11,$52,$41,$52,$47
-	dc.b	$BE,$3C,$00,$10,$66,$DE,$4A,$19,$51,$C8,$FF,$C8,$22,$7C,$FF,$FF
-	dc.b	$BF,$54,$42,$41,$30,$3C,$00,$04,$1C,$29,$00,$03,$BC,$29,$00,$01
-	dc.b	$6F,$00,$00,$0E,$50,$C1,$34,$29,$00,$02,$33,$51,$00,$02,$32,$82
-	dc.b	$4A,$59,$51,$C8,$FF,$E4,$4A,$41,$66,$D2,$4C,$DF,$7F,$FF,$4E,$75
+	clr.w	(smallfontptr+4).w
+	clr.w	(smallfontptr+6).w
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	#tmstruct,a0
+	bsr.w	BuildTeamHotCold
+	movea.l	#$FFFFBF98,a0
+	bsr.w	CopyHottestPlayer
+	movea.l	#$FFFFBF9C,a0
+	bsr.w	CopyColdestPlayer
+	movea.l	#AwShots,a0
+	bsr.w	BuildTeamHotCold
+	movea.l	#$FFFFBF96,a0
+	bsr.w	CopyHottestPlayer
+	movea.l	#$FFFFBF9A,a0
+	bsr.w	CopyColdestPlayer
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+BuildTeamHotCold					;Hot and cold list of the team at a0 (GetTeamLines, one nibble each)
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	a0,a2
+	adda.l	#$1BC,a2
+	move.w	d7,-(sp)
+	move.w	$28(a0),d7
+	jsr	(GetTeamLines).l
+	move.w	(sp)+,d7
+	movea.l	#TempLegSpd+2,a1
+	move.w	#5,d0
+.loop
+	move.b	(a0)+,d1
+	subq.b	#1,d1
+	move.b	d1,(a1)+
+	ext.w	d1
+	asl.w	#4,d1
+	clr.b	(a1)
+	addq.w	#3,d1
+	move.w	#3,d7
+.loop2
+	clr.w	d2
+	move.b	(a2,d1.w),d2
+	cmp.b	#9,d7
+	beq.w	.1
+	cmp.b	#$D,d7
+	beq.w	.1
+	add.b	d2,(a1)
+.1
+	addq.w	#1,d1
+	addq.w	#1,d7
+	cmp.b	#$10,d7
+	bne.s	.loop2
+	tst.b	(a1)+
+	dbf	d0,.loop
+.loop3
+	movea.l	#TempLegSpd+2,a1
+	clr.w	d1
+	move.w	#4,d0
+.loop4
+	move.b	3(a1),d6
+	cmp.b	1(a1),d6
+	ble.w	.2
+	st	d1
+	move.w	2(a1),d2
+	move.w	(a1),2(a1)
+	move.w	d2,(a1)
+.2
+	tst.w	(a1)+
+	dbf	d0,.loop4
+	tst.w	d1
+	bne.s	.loop3
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 NextHomeColdPlayer					;d1 = the next home cold player (homecoldidx, homecoldplayer).
 	movem.l	d0/a0,-(sp)
@@ -485,22 +545,66 @@ CompareHotColdTotals				;Compare the hot / cold totals of the teams (GetHotColdT
 
 GetHotColdTotal						;d1 = the hot / cold total of the starters of team a0
 									;(SortHotColdStarters, TempBuffer).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$FE,$6A,$30,$3C,$00,$06,$20,$7C,$FF,$FF,$BF,$54,$42,$41
-	dc.b	$14,$28,$00,$01,$48,$82,$D2,$42,$4A,$58,$51,$C8,$FF,$F4,$4E,$75
-	dc.b	$4E,$75,$4E,$75,$48,$E7,$FF,$00,$08,$B8,$00,$00,$D3,$00,$67,$00
-	dc.b	$00,$A2,$08,$B8,$00,$06,$D3,$00,$08,$B8,$00,$07,$D3,$00,$4E,$B9
-	dc.b	$00,$01,$BB,$8E,$00,$06,$EF,$00,$00,$00,$31,$FC,$00,$05,$B0,$42
-	dc.b	$70,$08,$72,$08,$34,$3C,$07,$FF,$08,$38,$00,$01,$D3,$00,$67,$00
-	dc.b	$00,$3C,$31,$FC,$00,$03,$B0,$40,$4E,$B9,$00,$01,$B9,$76,$4E,$B9
-	dc.b	$00,$01,$BB,$8E,$00,$06,$FF,$00,$00,$00,$31,$FC,$00,$0B,$B0,$40
-	dc.b	$31,$FC,$00,$05,$B0,$42,$30,$3C,$00,$19,$32,$3C,$00,$08,$34,$3C
-	dc.b	$07,$FF,$4E,$B9,$00,$01,$B9,$76,$60,$00,$00,$38,$31,$FC,$00,$1C
-	dc.b	$B0,$40,$4E,$B9,$00,$01,$B9,$76,$4E,$B9,$00,$01,$BB,$8E,$00,$06
-	dc.b	$FF,$00,$00,$00,$31,$FC,$00,$03,$B0,$40,$31,$FC,$00,$05,$B0,$42
-	dc.b	$30,$3C,$00,$19,$32,$3C,$00,$08,$34,$3C,$07,$FF,$4E,$B9,$00,$01
-	dc.b	$B9,$76,$4C,$DF,$00,$FF,$4E,$75,$31,$FC,$00,$AA,$D3,$0E,$08,$38
-	dc.b	$00,$05,$D3,$00,$67,$00,$00,$08,$31,$FC,$00,$53,$D3,$0E,$4E,$75
+	bsr.w	BuildTeamHotCold
+	move.w	#6,d0
+	movea.l	#TempLegSpd+2,a0
+	clr.w	d1
+.loop
+	move.b	1(a0),d2
+	ext.w	d2
+	add.w	d2,d1
+	tst.w	(a0)+
+	dbf	d0,.loop
+	rts
+	rts
+	rts
+	movem.l	d0-d7,-(sp)
+	bclr	#0,(SetupSpare).w		;card up?
+	beq.w	.2
+	bclr	#6,(SetupSpare).w		;no visitors block
+	bclr	#7,(SetupSpare).w		;no home block
+	jsr	(printz).l					;map at the card
+	String	$EF,0,0
+	move.w	#5,(printy).w
+	moveq	#8,d0
+	moveq	#8,d1
+	move.w	#$7FF,d2				;blank char
+	btst	#1,(SetupSpare).w		;visitors side?
+	beq.w	.1
+	move.w	#3,(printx).w
+	jsr	(eraser).l
+	jsr	(printz).l					;map at the text
+	String	$FF,0,0
+	move.w	#$B,(printx).w
+	move.w	#5,(printy).w
+	move.w	#$19,d0
+	move.w	#8,d1
+	;(not branched to)
+	move.w	#$7FF,d2				;blank char
+	jsr	(eraser).l
+	bra.w	.2
+	;bit 1 of setupcardflags clear
+.1
+	move.w	#$1C,(printx).w
+	jsr	(eraser).l
+	jsr	(printz).l					;map at the text
+	String	$FF,0,0
+	move.w	#3,(printx).w
+	move.w	#5,(printy).w
+	move.w	#$19,d0
+	move.w	#8,d1
+	move.w	#$7FF,d2				;blank char
+	jsr	(eraser).l
+	;exit: restore the registers
+.2
+	movem.l	(sp)+,d0-d7
+	rts
+	move.w	#$AA,($FFFFD30E).w
+	btst	#5,(SetupSpare).w
+	beq.w	.3
+	move.w	#$53,($FFFFD30E).w
+.3
+	rts
 
 wallcollduringcheck					;During a check, a skater a2 (not a goalie) near the wall: test the wall
 									;at his position with his size + $17.

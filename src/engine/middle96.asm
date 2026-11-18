@@ -104,10 +104,16 @@ FormatPlayerNumInitial				;a1 = mesarea string "NN F. Last" for player d0 of tea
 	rts
 
 GetPlayerNumLast					;GetPlayerName with FormatPlayerName ("NN Last").
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$80,$20,$34,$7C,$C7,$26,$30,$38,$C4,$C8,$6A,$00,$00,$0A
-	dc.b	$02,$40,$00,$FF,$D4,$FC,$03,$9E,$61,$00,$00,$08,$4C,$DF,$04,$01
-	dc.b	$4E,$75
+	movem.l	d0/a2,-(sp)
+	movea.w	#(tmstruct-M68K_RAM),a2
+	move.w	(TempPlOffset).w,d0
+	bpl.w	.1
+	andi.w	#$FF,d0
+	adda.w	#$39E,a2
+.1
+	bsr.w	FormatPlayerName
+	movem.l	(sp)+,d0/a2
+	rts
 
 FormatPlayerName					;a1 = mesarea string "NN Last" for player d0 of team a2, built in
 									;TextBuffer. Called from ShowGoalBox and
@@ -174,10 +180,16 @@ FormatLastName						;Skip the first name, copy the last name, pad; branched to f
 	rts
 
 GetPlayerInitial					;GetPlayerName with FormatPlayerInitial ("F. Last").
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$80,$20,$34,$7C,$C7,$26,$30,$38,$C4,$C8,$6A,$00,$00,$0A
-	dc.b	$02,$40,$00,$FF,$D4,$FC,$03,$9E,$61,$00,$00,$08,$4C,$DF,$04,$01
-	dc.b	$4E,$75
+	movem.l	d0/a2,-(sp)
+	movea.w	#(tmstruct-M68K_RAM),a2
+	move.w	(TempPlOffset).w,d0
+	bpl.w	.1
+	andi.w	#$FF,d0
+	adda.w	#$39E,a2
+.1
+	bsr.w	FormatPlayerInitial
+	movem.l	(sp)+,d0/a2
+	rts
 
 FormatPlayerInitial					;a1 = mesarea "F. Last" for player d0 of team a2.
 	movem.l	d0-d3/a0/a2,-(sp)

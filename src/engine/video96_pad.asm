@@ -27,36 +27,49 @@ ReadJoyData							;Read the pads every vblank. With FourWayPlay, pads 1-4 throug
 
 ReadPad4Way1						;4 way play pad 1: pause the sound driver (SoundCmd $D), select pad 1 on
 									;port 2 and read it on port 1.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$3F,$00,$30,$3C,$00,$0D,$4E,$B9,$00,$08,$83,$9E,$30,$1F,$13,$FC
-	dc.b	$00,$0C,$00,$A1,$00,$05,$60,$00,$00,$4C
+	move.w	d0,-(sp)
+	move.w	#$D,d0
+	jsr	(SoundCmd).l
+	move.w	(sp)+,d0
+	move.b	#$C,(IO_CT2_DATA+1).l
+	bra.w	ReadPad4WayPort1
 
 ReadPad4Way2						;4 way play pad 2, as ReadPad4Way1.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$3F,$00,$30,$3C,$00,$0D,$4E,$B9,$00,$08,$83,$9E,$30,$1F,$13,$FC
-	dc.b	$00,$1C,$00,$A1,$00,$05,$60,$00,$00,$32
+	move.w	d0,-(sp)
+	move.w	#$D,d0
+	jsr	(SoundCmd).l
+	move.w	(sp)+,d0
+	move.b	#$1C,(IO_CT2_DATA+1).l
+	bra.w	ReadPad4WayPort1
 
 ReadPad4Way3						;4 way play pad 3, as ReadPad4Way1.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$3F,$00,$30,$3C,$00,$0D,$4E,$B9,$00,$08,$83,$9E,$30,$1F,$13,$FC
-	dc.b	$00,$2C,$00,$A1,$00,$05,$60,$00,$00,$18
+	move.w	d0,-(sp)
+	move.w	#$D,d0
+	jsr	(SoundCmd).l
+	move.w	(sp)+,d0
+	move.b	#$2C,(IO_CT2_DATA+1).l
+	bra.w	ReadPad4WayPort1
 
 ReadPad4Way4						;4 way play pad 4, as ReadPad4Way1. Falls into ReadPad4WayPort1.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$3F,$00,$30,$3C,$00,$0D,$4E,$B9,$00,$08,$83,$9E,$30,$1F,$13,$FC
-	dc.b	$00,$3C,$00,$A1,$00,$05
+	move.w	d0,-(sp)
+	move.w	#$D,d0
+	jsr	(SoundCmd).l
+	move.w	(sp)+,d0
+	move.b	#$3C,(IO_CT2_DATA+1).l
 
 ReadPad4WayPort1					;Read the pad on port 1; branched to from ReadPad4Way1 ... ReadPad4Way4.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$40,$80,$41,$F9,$00,$A1,$00,$03,$60,$00,$00,$28
+	movem.l	d1/a0,-(sp)
+	lea	(IO_CT1_DATA+1).l,a0
+	bra.w	ReadPad3Button
 
 ReadPad2							;Read pad 2 (port 2). Falls into ReadPadA0.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$40,$80,$41,$F9,$00,$A1,$00,$05,$60,$00,$00,$0C
+	movem.l	d1/a0,-(sp)
+	lea	(IO_CT2_DATA+1).l,a0
+	bra.w	ReadPadA0
 
 ReadPad1							;Read pad 1 (port 1).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$40,$80,$41,$F9,$00,$A1,$00,$03
+	movem.l	d1/a0,-(sp)
+	lea	(IO_CT1_DATA+1).l,a0
 
 ReadPadA0							;Pause the sound driver (SoundCmd $D), then ReadPad3Button.
 	move.w	d0,-(sp)

@@ -34,6 +34,7 @@ setc1player = $016C52				;control96
 setc2player = $016C5C				;control96
 SetMenuPadSide = $1D9844			;code96_15
 WriteSRAM = $024188					;sram96
+DecompressGraphicsPlain = $01B730				;create96_stub
 
 
 ; Main segment code

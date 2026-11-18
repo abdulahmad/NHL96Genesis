@@ -43,6 +43,15 @@ assonetimer = $1D6872				;logic96_timer
 assfight = $00B988					;fight96
 assfwatch = $00C1C8					;fight96
 assreplace = $01A3DA				;collide96_stub
+EvadePC = $01873A				;logic96_puck
+FacePuck = $01A384				;logic96_vec
+GetRoleAss = $00FF68				;input96_shot
+ReadGoaliePulled = $1D9352				;code96_15
+check4bench = $016DAE				;logic96_ass
+check4check = $018D32				;fight96_stub
+donothing = $01731E				;logic96_puck_stub
+randomd0s = $01B09A				;collide96_stub
+skateto = $01A050				;logic96_puck_stub
 
 
 ; Main segment code

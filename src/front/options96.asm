@@ -347,56 +347,135 @@ OptionsMenuList						;The options menu: each item routine keeps its option in ra
 	dc.l	PenaltyItem,LineItem,FightingItem,SkillItem,-1
 
 SkillItem							;Options menu row: skill level
-									;Code the listing does not decode: kept as bytes
-	dc.b	$0C,$78,$00,$04,$D2,$54,$67,$00,$01,$B2,$0C,$78,$00,$05,$D2,$54
-	dc.b	$67,$00,$01,$A8,$0C,$78,$00,$07,$D2,$54,$6C,$00,$01,$9E,$30,$38
-	dc.b	$D2,$68,$B0,$7C,$00,$02,$6F,$00,$00,$04,$42,$40,$4A,$40,$6A,$00
-	dc.b	$00,$06,$30,$3C,$00,$02,$31,$C0,$D2,$68,$22,$7C,$00,$1E,$18,$38
-	dc.b	$4E,$B9,$00,$01,$D7,$F2,$4E,$75
+	cmpi.w	#4,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	cmpi.w	#5,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	cmpi.w	#7,(OptPlayMode).w
+	bge.w	PerLenItemNA
+	move.w	(OptSkill).w,d0
+	cmp.w	#2,d0
+	ble.w	.1
+	clr.w	d0
+.1
+	tst.w	d0
+	bpl.w	.2
+	move.w	#2,d0
+.2
+	move.w	d0,(OptSkill).w
+	movea.l	#SkillText,a1
+	jsr	(SkipStrings).l
+	rts
 
 FightingItem						;Options menu row: fighting
-									;Code the listing does not decode: kept as bytes
-	dc.b	$0C,$78,$00,$04,$D2,$54,$67,$00,$01,$6A,$0C,$78,$00,$05,$D2,$54
-	dc.b	$67,$00,$01,$60,$0C,$78,$00,$06,$D2,$54,$6C,$00,$01,$56,$30,$38
-	dc.b	$D2,$66,$B0,$7C,$00,$01,$6F,$00,$00,$04,$42,$40,$4A,$40,$6A,$00
-	dc.b	$00,$06,$30,$3C,$00,$01,$31,$C0,$D2,$66,$22,$7C,$00,$1E,$18,$10
-	dc.b	$4E,$B9,$00,$01,$D7,$F2,$4E,$75
+	cmpi.w	#4,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	cmpi.w	#5,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	cmpi.w	#6,(OptPlayMode).w
+	bge.w	PerLenItemNA
+	move.w	(OptFighting).w,d0
+	cmp.w	#1,d0
+	ble.w	.1
+	clr.w	d0
+.1
+	tst.w	d0
+	bpl.w	.2
+	move.w	#1,d0
+.2
+	move.w	d0,(OptFighting).w
+	movea.l	#FightingText,a1
+	jsr	(SkipStrings).l
+	rts
 
 LineItem							;Options menu row: line changes
-									;Code the listing does not decode: kept as bytes
-	dc.b	$0C,$78,$00,$04,$D2,$54,$67,$00,$01,$22,$0C,$78,$00,$05,$D2,$54
-	dc.b	$67,$00,$01,$18,$0C,$78,$00,$06,$D2,$54,$6C,$00,$01,$0E,$30,$38
-	dc.b	$D2,$64,$B0,$7C,$00,$02,$6F,$00,$00,$04,$42,$40,$4A,$40,$6A,$00
-	dc.b	$00,$06,$30,$3C,$00,$02,$31,$C0,$D2,$64,$22,$7C,$00,$1E,$17,$D4
-	dc.b	$4E,$B9,$00,$01,$D7,$F2,$4E,$75
+	cmpi.w	#4,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	cmpi.w	#5,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	cmpi.w	#6,(OptPlayMode).w
+	bge.w	PerLenItemNA
+	move.w	(OptLine).w,d0
+	cmp.w	#2,d0
+	ble.w	.1
+	clr.w	d0
+.1
+	tst.w	d0
+	bpl.w	.2
+	move.w	#2,d0
+.2
+	move.w	d0,(OptLine).w
+	movea.l	#LineText,a1
+	jsr	(SkipStrings).l
+	rts
 
 PenaltyItem							;Options menu row: penalties
-									;Code the listing does not decode: kept as bytes
-	dc.b	$0C,$78,$00,$04,$D2,$54,$67,$00,$00,$DA,$0C,$78,$00,$05,$D2,$54
-	dc.b	$67,$00,$00,$D0,$0C,$78,$00,$06,$D2,$54,$6C,$00,$00,$C6,$30,$38
-	dc.b	$D2,$62,$B0,$7C,$00,$02,$6F,$00,$00,$04,$42,$40,$4A,$40,$6A,$00
-	dc.b	$00,$06,$30,$3C,$00,$02,$31,$C0,$D2,$62,$22,$7C,$00,$1E,$17,$98
-	dc.b	$4E,$B9,$00,$01,$D7,$F2,$4E,$75
+	cmpi.w	#4,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	cmpi.w	#5,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	cmpi.w	#6,(OptPlayMode).w
+	bge.w	PerLenItemNA
+	move.w	(OptPen).w,d0
+	cmp.w	#2,d0
+	ble.w	.1
+	clr.w	d0
+.1
+	tst.w	d0
+	bpl.w	.2
+	move.w	#2,d0
+.2
+	move.w	d0,(OptPen).w
+	movea.l	#PenaltyText,a1
+	jsr	(SkipStrings).l
+	rts
 
 UserRecItem							;Options menu row: user records
-									;Code the listing does not decode: kept as bytes
-	dc.b	$0C,$78,$00,$04,$D2,$54,$67,$00,$00,$92,$0C,$78,$00,$05,$D2,$54
-	dc.b	$67,$00,$00,$88,$0C,$78,$00,$06,$D2,$54,$6C,$00,$00,$7E,$30,$38
-	dc.b	$D2,$60,$B0,$7C,$00,$01,$6F,$00,$00,$04,$42,$40,$4A,$40,$6A,$00
-	dc.b	$00,$06,$30,$3C,$00,$01,$31,$C0,$D2,$60,$22,$7C,$00,$1E,$17,$70
-	dc.b	$4E,$B9,$00,$01,$D7,$F2,$4E,$75
+	cmpi.w	#4,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	cmpi.w	#5,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	cmpi.w	#6,(OptPlayMode).w
+	bge.w	PerLenItemNA
+	move.w	(OptUserRec).w,d0
+	cmp.w	#1,d0
+	ble.w	.1
+	clr.w	d0
+.1
+	tst.w	d0
+	bpl.w	.2
+	move.w	#1,d0
+.2
+	move.w	d0,(OptUserRec).w
+	movea.l	#UserRecText,a1
+	jsr	(SkipStrings).l
+	rts
 
 GoalieItem							;Options menu row: goalies
-									;Code the listing does not decode: kept as bytes
-	dc.b	$0C,$78,$00,$04,$D2,$54,$67,$00,$00,$4A,$0C,$78,$00,$05,$D2,$54
-	dc.b	$67,$00,$00,$40,$0C,$78,$00,$07,$D2,$54,$67,$00,$00,$36,$30,$38
-	dc.b	$D2,$5E,$B0,$7C,$00,$01,$6F,$00,$00,$04,$42,$40,$4A,$40,$6A,$00
-	dc.b	$00,$06,$30,$3C,$00,$01,$31,$C0,$D2,$5E,$22,$7C,$00,$1E,$17,$48
-	dc.b	$4E,$B9,$00,$01,$D7,$F2,$4E,$75
+	cmpi.w	#4,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	cmpi.w	#5,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	cmpi.w	#7,(OptPlayMode).w
+	beq.w	PerLenItemNA
+	move.w	(OptGoalie).w,d0
+	cmp.w	#1,d0
+	ble.w	.1
+	clr.w	d0
+.1
+	tst.w	d0
+	bpl.w	.2
+	move.w	#1,d0
+.2
+	move.w	d0,(OptGoalie).w
+	movea.l	#GoalieText,a1
+	jsr	(SkipStrings).l
+	rts
 
 PerLenItem							;Options menu row: period length
 	cmpi.w	#6,(OptPlayMode).w
 	blt.w	.1
+PerLenItemNA	equ	*			;Not applicable text item
 .loop
 	movea.l	#NotApplicableText,a1
 	rts
@@ -422,13 +501,31 @@ PerLenItem							;Options menu row: period length
 	rts
 
 RostersItem							;Options menu row: rosters
-									;Code the listing does not decode: kept as bytes
-	dc.b	$0C,$78,$00,$07,$D2,$54,$67,$AE,$0C,$78,$00,$05,$D2,$54,$67,$A6
-	dc.b	$0C,$78,$00,$04,$D2,$54,$67,$9E,$0C,$78,$00,$01,$D2,$54,$67,$96
-	dc.b	$0C,$78,$00,$02,$D2,$54,$67,$8E,$0C,$78,$00,$03,$D2,$54,$67,$86
-	dc.b	$30,$38,$D2,$6A,$B0,$7C,$00,$01,$6F,$00,$00,$04,$42,$40,$4A,$40
-	dc.b	$6A,$00,$00,$06,$30,$3C,$00,$01,$31,$C0,$D2,$6A,$22,$7C,$00,$1E
-	dc.b	$16,$E4,$4E,$B9,$00,$01,$D7,$F2,$4E,$75
+	cmpi.w	#7,(OptPlayMode).w
+	beq.s	PerLenItemNA
+	cmpi.w	#5,(OptPlayMode).w		;5?
+	beq.s	PerLenItemNA
+	cmpi.w	#4,(OptPlayMode).w
+	beq.s	PerLenItemNA
+	cmpi.w	#1,(OptPlayMode).w
+	beq.s	PerLenItemNA
+	cmpi.w	#2,(OptPlayMode).w
+	beq.s	PerLenItemNA
+	cmpi.w	#3,(OptPlayMode).w
+	beq.s	PerLenItemNA
+	move.w	(OptRosters).w,d0
+	cmp.w	#1,d0
+	ble.w	.1
+	clr.w	d0
+.1
+	tst.w	d0
+	bpl.w	.2
+	move.w	#1,d0
+.2
+	move.w	d0,(OptRosters).w
+	movea.l	#RostersText,a1
+	jsr	(SkipStrings).l
+	rts
 
 PlayModeItem						;Options menu row: play mode
 	move.w	(OptPlayMode).w,d0

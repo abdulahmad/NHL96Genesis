@@ -12,6 +12,15 @@
 	include	macros\genesis.mac		;String
 
 ; External addresses outside, read from lst/nhl96.bin.
+PushNumberWidth = $01BE1C				;goal96_box_stub
+SPAfweaveend = $003230				;frames96
+SPAturnl = $002020				;frames96
+SkipStrings = $01D7F2				;hockey96_inter
+TeamBlockPtrs = $012BFE				;teamgfx96
+dobitmap = $01B692				;lines96_bar_stub
+eraser = $01B976				;goal96_box_stub
+printbig = $01BEEC				;stats96_stub
+printz = $01BB8E				;goal96_box_stub
 
 
 ; Main segment code
