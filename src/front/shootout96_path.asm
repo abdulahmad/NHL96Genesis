@@ -280,6 +280,7 @@ EndShootout							;Shootout over: LockScroll, then the 5 skaters of player slots
 	dbf	d2,.loop
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$48,$E7,$FF,$80,$3E,$2B,$00,$34,$53,$47,$20,$7C,$00,$1D,$84,$B4
 	dc.b	$08,$2B,$00,$07,$00,$62,$67,$00,$00,$08,$20,$7C,$00,$1D,$84,$C4
 	dc.b	$DE,$47,$30,$30,$70,$00,$B0,$6B,$00,$44,$6D,$00,$00,$06,$37,$40
@@ -293,6 +294,7 @@ EndShootout							;Shootout over: LockScroll, then the 5 skaters of player slots
 AddArenaAnimSprite					;Add the arena animation sprites; disabled in 96: the rts comes first and
 									;the body after it is dead
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$4A,$78,$D4,$74,$6B,$00,$01,$18,$4A,$B8,$D4,$7A,$67,$00,$01,$10
 	dc.b	$08,$38,$00,$04,$C3,$42,$66,$00,$01,$06,$08,$38,$00,$03,$C3,$3C
 	dc.b	$66,$00,$00,$FC,$08,$38,$00,$07,$C3,$3A,$66,$00,$00,$F2,$22,$78
@@ -388,6 +390,7 @@ updatePPTeamTime					;Power play time of the teams, once a second. Called from u
 	addq.w	#1,$38C(a2)
 .x
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$48,$E7,$7F,$FE,$30,$2A,$00,$28,$20,$7C,$00,$1D,$86,$5A,$42,$41
 	dc.b	$12,$30,$00,$00,$30,$01,$4C,$DF,$7F,$FE,$4E,$75,$33,$4C,$49,$4B
 	dc.b	$4E,$43,$4B,$43,$34,$42,$4A,$49,$44,$42,$4A,$37,$45,$4B,$47,$38
@@ -474,6 +477,7 @@ ManualGoalieMenu					;The "x Manual Goalie" pause menu item.
 RunArenaAnim						;Run the arena animation (load its frames and tiles, step the frames);
 									;disabled in 96 by the leading rts
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$4A,$78,$D4,$74,$6B,$00,$00,$56,$48,$E7,$FF,$FE,$4A,$B8,$D4,$7A
 	dc.b	$66,$00,$00,$36,$30,$38,$D4,$74,$E7,$40,$20,$7C,$00,$1D,$88,$20
 	dc.b	$21,$F0,$00,$00,$D4,$76,$21,$F0,$00,$04,$D4,$7A,$24,$70,$00,$04
@@ -526,6 +530,7 @@ RunArenaAnim						;Run the arena animation (load its frames and tiles, step the 
 
 StartArenaAnim						;Start arena animation d0; disabled in 96 by the leading rts
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$48,$E7,$FF,$FE,$31,$C0,$D4,$74,$21,$FC,$00,$00,$00,$00,$D4,$76
 	dc.b	$21,$FC,$00,$00,$00,$00,$D4,$7A,$31,$FC,$00,$01,$D4,$6E,$42,$78
 	dc.b	$D4,$70,$50,$F8,$D4,$7E,$4C,$DF,$7F,$FF,$4E,$75

@@ -40,6 +40,7 @@ ReadJoySwapPad3						;Unreferenced. The same for pad 3
 	dc.b	$00,$01,$B3,$48,$31,$F8,$BF,$2E,$BF,$36,$4E,$75
 
 ReadJoySwapPad4						;Unreferenced. The same for pad 4
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$13,$FC,$00,$30,$00,$A1,$00,$05,$31,$F8,$BF,$38,$BF,$2E,$4E,$B9
 	dc.b	$00,$01,$B3,$48,$31,$F8,$BF,$2E,$BF,$38,$4E,$75
 

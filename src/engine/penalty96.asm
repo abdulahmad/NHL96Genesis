@@ -53,6 +53,7 @@ PutBigTile							;Write tile d3 + d6 at column d4, row d5 of the map at VmMAP1 +
 
 BigControlCodeJumpTable				;printbigtext control codes indexed by -byte (as ControlCodeJumpTable);
 									;the handlers follow
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$00,$01,$F8,$4A,$00,$01,$C0,$50,$00,$01,$C0,$62,$00,$01,$C0,$88
 	dc.b	$00,$01,$C0,$9A,$00,$01,$C0,$AC,$00,$01,$C0,$BE,$00,$01,$C0,$D0
 	dc.b	$00,$01,$C0,$40,$61,$00,$00,$20,$61,$00,$00,$0A,$61,$00,$00,$3E

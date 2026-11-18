@@ -6,6 +6,9 @@
 - Branch: `cursor/creditspages-399a`
 - Last check: `tools/verify_all.sh` ALL MATCH (2026-11-05).
 - Next: PR. Same rename in 94G / 95G / 95S.
+- Code as data: 171 blocks are still dc.b (`tools/check_code_as_data.py` lists them; `tools/mark_code_as_data.py` marked 52 more, a few runs need a hand marker). Each needs the names of the
+  mid-routine targets other code jumps to (`python3 tools/decode_code.py` prints them as `NAME` and `rom` lines); apply
+  in one pass after adding them to `tools/decode_names.csv`, then `tools/verify_all.sh` must say ALL MATCH.
 - Open PRs: (this unit)
 
 ## Purpose
@@ -39,6 +42,15 @@ Windows: `npm run build:retail`, `npm run seg:<name>`. Linux (wine): `tools/buil
 - `tools/find95.py <segment | start-end> [--len N] [--min-distinct N] [--refresh]`: 95G labels found in a 96 range
   by their first bytes (95G ROM and name map downloaded from GitHub into `output/ref95/`). Log in `output/`.
 - `tools/fixopcodes.js`, `tools/verifyRom.js`, `tools/verifySegment.js`: as in 95G.
+- Code kept as data (dc.b) becomes real assembly with these (build first: `tools/verify_all.sh`, they read `output/obj/nhl96 .lst`):
+  `tools/check_code_as_data.py` lists every labelled dc run that decodes as 68000 code (exit 1 when there is one; false
+  positives go in `tools/code_as_data_ok.txt`); `tools/mark_code_as_data.py --apply` puts the "Code kept as bytes" marker
+  above each flagged run; `tools/decode_code.py [--apply] [--structs --structregs 2,3] [FILE]` turns each marked run into
+  instructions, local labels, `String` macros and names from `tools/decode_names.csv` (`addr,name,comment`) and from the
+  95G/94G/93G/92G sources (`tools/lineage.py`, `--parents DIR`); `tools/fix_stub.py SEG` adds the stub equates a segment
+  needs; `tools/reflow_comments.py` re-wraps comments to the layout rules. `tools/m68kdis.py` is the disassembler.
+  `tools/check_code_as_data_x86.py REPO` (PC) and `tools/check_code_as_data_snes.py REPO` (SNES) are the exact checks for
+  the other ports: a label in the data files that code calls or jumps to.
 
 ## Naming and comment rules
 In SEGMENT_AGENT.md, "Current rules". History (renames, IDA names) lives in `docs/name_map.csv`

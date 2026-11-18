@@ -113,6 +113,7 @@ PlaceBoardFall						;places a player falling at the boards (tests the position w
 	asr.w	#1,d0
 	add.w	d0,(a3)
 	bra.w	.11
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$30,$3C,$00,$96,$08,$2B,$00,$03,$00,$04,$67,$00,$00,$06,$30,$3C
 	dc.b	$FF,$6A,$90,$53,$E2,$40,$D1,$53,$60,$00,$00,$32
 .8
@@ -155,6 +156,7 @@ chkFgtBit1							;Z set when $77(a2) is 2 or less (d0 kept)
 	movem.w	(sp)+,d0
 .1
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$48,$E7,$00,$80,$20,$7C,$00,$1D,$90,$D0,$30,$3C,$00,$64,$4E,$B9
 	dc.b	$00,$01,$B0,$A6,$02,$40,$00,$07,$D0,$40,$30,$30,$00,$00,$0C,$78
 	dc.b	$FF,$C0,$BF,$E2,$6E,$00,$00,$10,$0C,$78,$00,$C0,$BF,$E4,$6E,$00
@@ -224,6 +226,7 @@ HiScoreScreen						;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up t
 	jsr	(forceblack).l
 	move	#$2700,sr
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$24,$7C,$FF,$FF,$C7,$26,$B4,$6A,$00,$28,$67,$00,$00,$08,$24,$7C
 	dc.b	$FF,$FF,$CA,$C4,$4E,$75
 
@@ -236,6 +239,7 @@ PrepShotPass						;Called before setpassmode / SetShotMode. Loads TempWord1 to d
 .0
 	movem.l	(sp)+,d1-d7/a0
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$48,$E7,$FF,$FE,$22,$7C,$FF,$FF,$DC,$AE,$4E,$B9,$00,$1E,$6B,$24
 	dc.b	$30,$38,$D3,$C0,$13,$BC,$00,$00,$00,$00,$52,$40,$02,$40,$FF,$FE
 	dc.b	$33,$40,$FF,$FE,$4C,$DF,$7F,$FF,$4E,$75,$48,$E7,$FF,$BE,$30,$38
@@ -256,6 +260,7 @@ SetSflags8Bit1						;Always sets sflags8 bit 1 (the bclr is skipped)
 .0
 	bset	#1,(sflags8).w
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$B0,$7C,$00,$50,$6C,$00,$00,$08,$E2,$40,$06,$40,$00,$28,$4E,$75
 	dc.b	$48,$A7,$C0,$00,$30,$38,$B7,$5E,$90,$53,$B0,$7C,$00,$1E,$6E,$00
 	dc.b	$00,$2A,$32,$38,$B7,$86,$B3,$40,$02,$40,$80,$00,$67,$00,$00,$1C
@@ -513,6 +518,7 @@ CanBlock							;Ne when joystick player a3 may block the shot (SPAblock): pfaloc
 .7
 	movem.l	(sp)+,d0-d3/a0-a2
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.w	$48E7,$FFFE,$4278,$D312,$6100,$00CA,$6100,$00C8
 	dc.w	$207C,$0018,$3024,$4EB9,$0001,$218A,$31FC,$0018
 	dc.w	$BD3C,$08B8,$0002,$BFB2,$4278,$D14C,$6100,$02EA

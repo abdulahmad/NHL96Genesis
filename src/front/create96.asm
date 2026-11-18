@@ -32,6 +32,7 @@ CreatePlayer						;The create player screen (roster menu item Create Players) Co
 
 .fieldjumps							;Field routine of each create row, then: next field, after the last one
 									;finish the name
+; Code kept as bytes (decoded by decode_code.py).
 	dc.l	.namefield,.posfield,.handfield,.weightfield,.jerseyfield
 	dc.b	$52,$78,$D4,$86,$0C,$78,$00,$05,$D4,$86,$6D,$00,$FF,$46,$4E,$F9
 	dc.b	$00,$1D,$DD,$F0
@@ -160,6 +161,7 @@ FindGridLetter						;Find char d0 in letter grid table, return index in d0 ($1E 
 .1
 	movem.l	(sp)+,d1-d3/a0-a6
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.w	$4EB9,$0001,$BB8E,$0006,$8F17,$1300,$303C,$0010
 	dc.w	$323C,$0004,$343C,$07FF,$4EB9,$0001,$B976,$4E75
 	dc.w	$4EB9,$0001,$BB8E,$0006,$8F17,$0D00,$303C,$0010

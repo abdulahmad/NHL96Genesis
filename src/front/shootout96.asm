@@ -447,6 +447,7 @@ PenShotTable						;Penalty shot data
 
 UpdatePenaltyShotEnd				;The shot ends (BA_PS_flags bit 4) when the goalie has the puck, the loose
 									;puck timer or the clock runs out. Runs on into EndPenaltyShotPlay
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$48,$A7,$80,$00
 	dc.b	$30,$38,$B7,$BE,$B0,$78,$D2,$D6,$4C,$9F,$00,$01,$67,$00,$00,$3C
 	dc.b	$08,$38,$00,$05,$C3,$40,$67,$00,$00,$38,$08,$38,$00,$05,$C3,$48

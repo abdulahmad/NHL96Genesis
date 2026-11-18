@@ -38,6 +38,7 @@ SetSframe							;Draw one sprite frame. a0 = framelist, d0/d1 = x/y cords, d2 = 
 	movem.l	(sp)+,d0-d5/a0
 .exit
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$48,$E7,$FF,$FE,$42,$78,$D3,$12,$61,$00,$07,$2A,$20,$7C,$00,$18
 	dc.b	$88,$2C,$4E,$B9,$00,$01,$21,$8A,$4E,$B9,$00,$1D,$BB,$92,$31,$FC
 	dc.b	$00,$18,$BD,$3C,$08,$B8,$00,$02,$BF,$B2,$42,$78,$BF,$58,$31,$FC
@@ -82,6 +83,7 @@ LeadersScrollArrows					;League Leaders: draw up/down scroll arrows depending on
 .4
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.w	$48E7,$FFFE,$4EB9,$0001,$BB8E,$0006,$BF1E,$0800
 	dc.w	$3038,$BF56,$227C,$001D,$A8D8,$4EB9,$0001,$D7E2
 	dc.w	$4CDF,$7FFF,$4E75,$000A,$476F,$616C,$7320,$2000
@@ -115,6 +117,7 @@ BuildPlayerLeaders					;League leaders: build and sort the list of category psta
 
 PlayerLeaderJumps					;BuildPlayerLeaders handler per category: goals, assists, points, goals
 									;against average
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$00,$1D,$AA,$56,$00,$1D,$AA,$88,$00,$1D,$AA,$BA,$00,$1D,$AA,$16
 	dc.b	$22,$3C,$00,$00,$59,$8C,$74,$0E,$76,$03,$28,$3C,$00,$00,$5D,$D0
 	dc.b	$7C,$0D,$08,$38,$00,$02,$DD,$80,$67,$00,$00,$14,$22,$3C,$00,$00

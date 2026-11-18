@@ -197,6 +197,7 @@ sctab								;Weights for 0, 1, 2, 3 goals, 8 rows
 	btst	#2,$E(a0)				;gsfso
 	bne.s	.loop					;don't show if the series is over for this game
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.w	$4A43,$6B00,$21BA,$6100,$012A,$6100,$E318,$5278
 	dc.w	$B040,$5978,$B042,$3F38,$B040,$6100,$4E3A,$31FC
 	dc.w	$A000,$B044,$6100,$E4DC,$001A,SPAturnl,SPAturnl,SPAturnl

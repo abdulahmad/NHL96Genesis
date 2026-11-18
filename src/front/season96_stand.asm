@@ -103,6 +103,7 @@ SortStandings						;Sort StandingsList by points, then by fewer games played
 	bne.s	.pass
 	move.w	(sp)+,d1
 	rts
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$30,$3C,$00,$10,$32,$3C,$00,$02,$34,$3C,$07,$FF,$00,$42,$80,$00
 	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$01,$17,$00,$4E,$B9,$00,$01
 	dc.b	$B9,$76,$30,$3C,$00,$12,$32,$3C,$00,$02,$34,$3C,$07,$FF,$00,$42

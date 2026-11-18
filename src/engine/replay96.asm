@@ -41,6 +41,7 @@ ReplayMode							;Instant replay play-back control and display code.
 	move.w	#$18,(palcount).w
 	moveq	#1,d7
 .top
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$30,$38,$B0,$52,$90,$78,$B0,$54,$BE,$40,$62,$F4,$31,$F8,$B0,$52
 	dc.b	$B0,$54,$4A,$78,$DC,$A8,$6B,$00,$00,$14,$9F,$78,$DC,$A8,$6A,$00
 	dc.b	$00,$0C,$42,$78,$DC,$A8,$4E,$B9,$00,$01,$5D,$2A,$48,$E7,$80,$10

@@ -41,6 +41,7 @@ assfaceoff							;Assignment: wait for the faceoff to end (sflags2 bit 0), then 
 	jmp	(assexit).l
 
 assfaceoffpl						;Assignment: the faceoff player
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$00,$8C,$08,$38,$00,$00,$C3,$3C
 	dc.b	$67,$00,$00,$78,$08,$AB,$00,$01,$00,$62,$67,$00,$00,$06,$42,$6B
 	dc.b	$00,$40,$20,$7C,$FF,$FF,$BD,$BE,$08,$2B,$00,$06,$00,$62,$67,$00
@@ -53,6 +54,7 @@ assfaceoffpl						;Assignment: the faceoff player
 	dc.b	$60,$00,$FF,$68,$4E,$75
 
 puckfaceoff							;Puck assignment: the faceoff set up
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$50,$F8,$D2,$38,$50,$F8,$D2,$3A,$50,$F8,$D2,$3C,$08,$B8,$00,$04
 	dc.b	$C3,$4C,$08,$38,$00,$00,$C3,$48,$67,$00,$00,$14,$42,$78,$B7,$86
 	dc.b	$42,$78,$B7,$88,$30,$3C,$00,$1E,$4E,$F9,$00,$01,$A3,$DA,$08,$AB
@@ -91,6 +93,7 @@ puckfaceoff							;Puck assignment: the faceoff set up
 	dc.b	$9D,$0C,$60,$00,$00,$9C
 
 SetFaceoffComputerLine				;Line changes on and team d0 not on a pad: CompLine, SetPersonel
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$4A,$78,$D2,$64,$66,$00,$00,$44,$08,$38,$00,$04,$C3,$4A,$66,$00
 	dc.b	$00,$22,$B0,$78,$C3,$90,$67,$00,$00,$32,$B0,$78,$C3,$92,$67,$00
 	dc.b	$00,$2A,$B0,$78,$C3,$94,$67,$00,$00,$22,$B0,$78,$C3,$96,$67,$00
@@ -98,6 +101,7 @@ SetFaceoffComputerLine				;Line changes on and team d0 not on a pad: CompLine, S
 	dc.b	$00,$01,$D0,$62,$31,$FC,$27,$10,$C3,$68,$4E,$75
 
 StartFaceoffLineChange				;Player d0 (sort object) opens the line change box
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$C5,$4B,$EF,$40,$36,$7C,$B0,$5E,$D6,$C0,$08,$AB,$00,$03,$00,$63
 	dc.b	$2F,$0A,$4E,$B9,$00,$00,$EC,$30,$24,$5F,$08,$2B,$00,$03,$00,$63
 	dc.b	$67,$00,$00,$28,$08,$2B,$00,$06,$00,$62,$67,$00,$00,$12,$35,$7C
@@ -109,12 +113,14 @@ rtsfaceoff							;The shared rts of the faceoff routines
 
 WaitForFaceoffLineChanges			;Run both line change timers; when both are done set the home computer
 									;line
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$30,$3C,$00,$40,$4E,$B9,$00,$00,$9D,$E6,$30,$3C,$00,$42,$4E,$B9
 	dc.b	$00,$00,$9D,$E6,$4A,$6B,$00,$40,$6A,$96,$4A,$6B,$00,$42,$6A,$90
 	dc.b	$34,$7C,$C7,$26,$43,$EA,$03,$9E,$70,$01,$4E,$B9,$00,$00,$9D,$0C
 	dc.b	$31,$FC,$FF,$FF,$D4,$88,$30,$3C,$00,$1C,$4E,$F9,$00,$01,$A3,$DA
 
 UpdateFaceoffLineChangeTimer		;Line change timer d0 (temp1 / temp2 of the puck)
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$4A,$73,$00,$00,$6B,$00,$FF,$6A,$32,$33,$00,$04,$EF,$41,$30,$7C
 	dc.b	$B0,$5E,$34,$7C,$C7,$26,$08,$30,$00,$06,$10,$62,$67,$00,$00,$06
 	dc.b	$D4,$FC,$03,$9E,$08,$30,$00,$03,$10,$63,$66,$00,$00,$0A,$50,$F3
@@ -124,6 +130,7 @@ UpdateFaceoffLineChangeTimer		;Line change timer d0 (temp1 / temp2 of the puck)
 	dc.b	$4E,$F9,$00,$02,$15,$DC,$4E,$F9,$00,$01,$C7,$84
 
 puckfaceoff2						;Puck assignment: the faceoff
+; Code kept as bytes (decoded by decode_code.py).
 	dc.b	$08,$AB,$00,$01,$00,$62,$67,$00,$03,$DE,$08,$B8,$00,$01,$C3,$56
 	dc.b	$08,$B8,$00,$02,$C3,$40,$08,$B8,$00,$05,$C3,$40,$08,$B8,$00,$00
 	dc.b	$C3,$42,$08,$B8,$00,$01,$C3,$42,$08,$B8,$00,$00,$C3,$4E,$08,$B8
