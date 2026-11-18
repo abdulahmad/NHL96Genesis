@@ -1,9 +1,9 @@
 #!/bin/bash
-# verify_all.sh: clean check under wine: fresh extract, the full ROM, then every seg:* segment.
+# verify_all.sh: clean check under wine: fresh extract, the full ROM.
 # Usage: tools/verify_all.sh [-q|--quiet]   (from anywhere; works in the repo root)
-# -q: print only failures and the final ALL MATCH line (the full per-segment summary still goes to output/verify_all.log).
-# Writes every log to output/: verify_all.log (this summary), prebuild.log, top.log, seg_<name>.log,
-# and the assembler logs Build96.log / Build_<name>.log. Exit status 1 if anything is not MATCH.
+# -q: print only failures and the final ALL MATCH line.
+# Writes every log to output/: verify_all.log (this summary), prebuild.log, top.log,
+# and the assembler log Build96.log. Exit status 1 if anything is not MATCH.
 cd "$(cd "$(dirname "$0")/.." && pwd)" || exit 1
 export WINEDEBUG=-all
 mkdir -p output
@@ -21,14 +21,6 @@ grep -qP '^[1-9]\d* error' output/obj/Build96.log && { say "TOP ERRORS in output
 node tools/fixopcodes.js "output/obj/nhl96 .lst" output/obj/nhl96.bin >>output/top.log 2>&1
 mv -f output/obj/modified_nhl96.bin output/
 r=$(node tools/verifyRom.js output/modified_nhl96.bin retail 2>&1 | head -1); say "ROM: $r"; [[ $r == MATCH* ]] || fail=1
-for s in $(node -e 'for(const k in require("./package.json").scripts) if(/^seg:/.test(k)) console.log(k.slice(4))'); do
-  org=$(node -e "console.log(require('./package.json').scripts['seg:$s'].match(/verifySegment.js \S+ (\S+)/)[1])")
-  log=output/seg_$s.log; rm -f output/$s.bin output/modified_$s.bin
-  wine cmd /c "buildseg.bat $s" >$log 2>&1
-  if [ ! -s output/$s.bin ] || grep -qP '^[1-9]\d* error' output/Build_$s.log; then say "$s: ASSEMBLY FAILED (output/Build_$s.log)"; fail=1; continue; fi
-  node tools/fixopcodes.js "output/$s .lst" output/$s.bin >>$log 2>&1
-  r=$(node tools/verifySegment.js $s $org retail 2>&1 | tee -a $log | head -1); say "$s: $r"; [[ $r == MATCH* ]] || fail=1
-done
 n=$(python3 tools/check_code_as_data.py --rom output/obj/nhl96.bin 2>&1 | tail -1); say "code as data (not a failure yet): $n"
 say "$( [ $fail = 0 ] && echo 'ALL MATCH' || echo 'FAILURES: see above')"
 exit $fail

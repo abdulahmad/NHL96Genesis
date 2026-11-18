@@ -58,7 +58,7 @@ def load_lst():
 
 def load_ram():
     ram, ports = {}, {}
-    for f in ('src/ram96.asm', 'src/stubinc/ports.inc', 'src/stubinc/equals.inc', 'src/externs96.asm'):
+    for f in ('src/ram96.asm', 'src/inc/ports.inc', 'src/inc/equals.inc', 'src/externs96.asm'):
         p = os.path.join(ROOT, f)
         if not os.path.exists(p): continue
         for l in open(p, errors='replace'):
@@ -83,7 +83,7 @@ def load_syms():
 def load_struct():
     """Player structure field offsets (Xpos .. checking in equals.inc) -> name."""
     st, on = {}, False
-    for l in open(os.path.join(ROOT, 'src/stubinc/equals.inc'), errors='replace'):
+    for l in open(os.path.join(ROOT, 'src/inc/equals.inc'), errors='replace'):
         m = re.match(r'^([A-Za-z_]\w*)\s+equ\s+\$([0-9A-Fa-f]+)\b', l)
         if m and m.group(1) == 'Xpos': on = True
         if on and m and not (re.match(r'^(pf|sf)', m.group(1)) and not m.group(1).startswith('pflags')):

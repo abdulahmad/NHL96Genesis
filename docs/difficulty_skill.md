@@ -140,7 +140,7 @@ btst    #3,pflags(a3)      ; pfjoycon — joystick-controlled player
 addq.w  #2,d4              ; stronger effective gravity for that player only
 ```
 
-So on **rookie**, user-controlled skaters get **+2** added to the gravity multiplier before the multiply/integrate step. AI skaters on rookie still use the base rookie table value (`$14` / `$1C`). Bit 3 of `pflags` is **`pfjoycon`** (`src/stubinc/equals.inc`), not `pfteam` (bit 6).
+So on **rookie**, user-controlled skaters get **+2** added to the gravity multiplier before the multiply/integrate step. AI skaters on rookie still use the base rookie table value (`$14` / `$1C`). Bit 3 of `pflags` is **`pfjoycon`** (`src/inc/equals.inc`), not `pfteam` (bit 6).
 
 No other source references to `OptSkill` were found besides options UI, SRAM defaults, and this rookie branch.
 
