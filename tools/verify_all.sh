@@ -29,5 +29,6 @@ for s in $(node -e 'for(const k in require("./package.json").scripts) if(/^seg:/
   node tools/fixopcodes.js "output/$s .lst" output/$s.bin >>$log 2>&1
   r=$(node tools/verifySegment.js $s $org retail 2>&1 | tee -a $log | head -1); say "$s: $r"; [[ $r == MATCH* ]] || fail=1
 done
+n=$(python3 tools/check_code_as_data.py --rom output/obj/nhl96.bin 2>&1 | tail -1); say "code as data (not a failure yet): $n"
 say "$( [ $fail = 0 ] && echo 'ALL MATCH' || echo 'FAILURES: see above')"
 exit $fail
