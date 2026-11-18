@@ -365,9 +365,9 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   `front/trade96.asm` is the roster names (DefaultRosters through the name tables, $0100C0-$010919).
   `front/season96_sim.asm` is the season simulation (SimGameStats through PickSimGoalie, $01091A-$010CB1).
   `front/season96.asm` is code96_05 renamed (season and save screens, $010CB2-$012BFD). The routines stay `sub_` until the bodies are read.
-  `src/schedule96.asm` is the season schedule (SeasonSchedule, $013558-$013E9F).
+  `src/front/schedule96.asm` is the season schedule (SeasonSchedule, $013558-$013E9F).
   `front/awards96.asm` is the playoff seeding (nullsub_3 through BuildPOSlots, $013EA0-$0143FD).
-  `src/hockey96.asm` is the cold start and the game loop (Begin through clockcont, $01464C-$014CC7).
+  `src/engine/hockey/hockey96.asm` is the cold start and the game loop (Begin through clockcont, $01464C-$014CC7).
   `engine/pause96_list.asm` is the menu list printers (PrintMenuList, PrintMenuList2, $0143FE-$01464B).
   `engine/pause96.asm` is the demo and the pause menu (demoread through vcountwait, $014CC8-$0151F9).
   `engine/setup96.asm` is the roster attribute columns (GetNameandAttrib through WeightTbl, $0151FA-$01548F).
@@ -375,7 +375,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   `src/teamgfx96.asm` is the team graphics pointers (TeamBlockPtrs, TeamLogoPtrs, SmallLogoPtrs, $012BFE-$013557).
   `engine/replay96.asm` is the instant replay (ReplayMode through rtss8, $01581C-$0162EF). ReadMenuJoy stays in that file.
   `engine/players96_count.asm` is the team counts and WaitVSyncAndReadInput ($015774-$01581B).
-  `src/control96.asm` is the player frame update and the pad switches (updateplayers through setpads, $0162F0-$016DAD).
+  `src/engine/control/control96.asm` is the player frame update and the pad switches (updateplayers through setpads, $0162F0-$016DAD).
   `engine/logic96_ass.asm` is the assignment entries (check4bench through assgoaliecpu, $016DAE-$017C05). code96_06b is gone.
   `engine/logic96_puck.asm` is the puck assignments (AdjustFacingDirection through assshoot, $017C06-$019017).
   `front/shootout96.asm` is the penalty shot and the shootout (puckshootout through EndPenaltyShotPlay, $019018-$019781).
@@ -385,17 +385,17 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   `engine/video96.asm` is the screen and the print routines (remap through printbigtext, $01AF00-$01BF93). code96_08 is gone.
   `engine/penalty96.asm` is the penalties, with big-print in front of AddPenalty ($01BF94-$01D14D).
   `engine/lines96_bar.asm` is the line energy bar (linebar through sub_1D3A6, $01D14E-$01D3CD).
-  `src/hockey96_inter.asm` is the intermission and the ticker (Intermission through SkipStrings, $01D3CE-$01D7FD).
+  `src/engine/hockey/inter.asm` is the intermission and the ticker (Intermission through SkipStrings, $01D3CE-$01D7FD).
   `engine/collide96.asm` is the collisions across the old file boundary (checkcoll through setpde, $01D7FE-$01FB51). rtss2 stays here.
   `engine/players96.asm` is who is on the ice (setpersonel through ClampNibble, $01FB52-$0201DB). code96_09 and code96_10 are gone. code96_11 now starts at VBlank.
-  `src/display96.asm` is the picture (VBlank through resetplstuff, $0201DC-$021481). The crowd stays in that file. VBlank stays here; 95 keeps it in video.
-  `src/control96_team.asm` is the two team structs (clearTeamStats through setplayercolors, $021482-$0215DB).
-  `src/hockey96_open.asm` is the title and the end of a period (sub_215DC through UpdatePlayoffLevel, $0215DC-$021B51).
+  `src/engine/display/display96.asm` is the picture (VBlank through resetplstuff, $0201DC-$021481). The crowd stays in that file. VBlank stays here; 95 keeps it in video.
+  `src/engine/control/team.asm` is the two team structs (clearTeamStats through setplayercolors, $021482-$0215DB).
+  `src/engine/hockey/open.asm` is the title and the end of a period (sub_215DC through UpdatePlayoffLevel, $0215DC-$021B51).
   `engine/setup96_menu.asm` is the default menu choices (VBlank_SetOptions through defmenuoptions, $021B52-$021BAF).
   `engine/playoff96.asm` is the tree and the saved series (ContinuePlayoffs through ResolveGames, $021BB0-$02281F).
   `engine/goal96_box.asm` is the whistle boxes (ShowThreeStars through box, $022820-$022E6F). The stars, the injury and the penalty shot stay in that file.
   `engine/middle96.asm` is the player names (GetPlayerName through PushNumberWidthZero, $022E70-$023143).
-  `src/crash96.asm` is the exception screen (AdrErr through crash, $023144-$023247). code96_11 and code96_12 are gone.
+  `src/engine/crash96.asm` is the exception screen (AdrErr through crash, $023144-$023247). code96_11 and code96_12 are gone.
   `src/code96_14.asm` keeps the crowd meter, the hot and cold players, the team records and the attribute weights ($1D6B66-$1D7FA5).
   `front/shootout96_path.asm` is the shootout body and the seven skate paths (ShootoutModeBox through UnpackPicture, $1D7FA6-$1D8E5B).
   `src/code96_15.asm` keeps the replay icon, the home team graphics, the hi-score screen and the penalty clear ($1D8E5C-$1D9CC5).
@@ -415,7 +415,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   `front/injury96.asm` is the season injuries (RandomInjuryGames through GetInjuryGames, $1E8794-$1E889B).
   `front/title96.asm` is the opening screens, new in 96 (sub_1E889C through sub_1E8F52, $1E889C-$1E9027).
   `src/checksum96.asm` is the ROM checksum (ChecksumLongs through ValidationRoutine, $1E9028-$1E90D1). data96_11, data96_12, code96_17, code96_18, code96_19 and code96_20 are gone.
-  `src/display96_crowd.asm` is the crowd frames (CrowdFrameTbl, $023248-$0232C7).
+  `src/engine/display/crowd.asm` is the crowd frames (CrowdFrameTbl, $023248-$0232C7).
   `engine/middle96_ascii.asm` is the big-font ASCII table (bfasciicon, $0232C8-$023341).
   `engine/lines96_list.asm` is the line names (linelist, $023342-$02336F).
   `engine/setup96_pos.asm` is the position names (PlayerPositionText, $023370-$023383).
@@ -593,3 +593,4 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
   background of the select team, main menu and transactions screens. Left as they are (not IDA names).
 
 - 2026-11-18: `code96_14.asm` and `code96_15.asm` were split by job at routine boundaries, in ROM order, into 23 files named after where 95G keeps the same routines (logic96_onetimer, display96_meter, collide96_corner, players96_attr, scout96_hotcold, collide96_wall, logic96_slot, graphics96_logopal, middle96_string, records96_io, middle96_names, middle96_teamgfx, goal96_print, skate96_board, injury96_fight, title96_hiscore, logic96_shotpass, middle96_goalie, logic96_onetimerend, graphics96_logopal2, penalty96_song, pause96_pad, replay96_block). The ROM map in `src/nhl96.asm` lists each. ALL MATCH.
+- 2026-11-18: folder move. A file with several pieces now has its own folder: `engine/logic/logic96.asm` + `engine/logic/puck.asm` (was `logic96_puck.asm`); the root files control, display, hockey, crash moved under `engine/`, credits and schedule under `front/`. `docs/name_map.csv` `module` keeps the old file names. Build ALL MATCH.
