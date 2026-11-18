@@ -37,60 +37,196 @@ assfaceoff							;Assignment: wait for the faceoff to end (sflags2 bit 0), then 
 	beq.w	.2
 .1
 	rts
+GoAssExit	equ	*			;Jump to assexit (the assfaceoff branches end here)
 .2
 	jmp	(assexit).l
 
 assfaceoffpl						;Assignment: the faceoff player
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$00,$8C,$08,$38,$00,$00,$C3,$3C
-	dc.b	$67,$00,$00,$78,$08,$AB,$00,$01,$00,$62,$67,$00,$00,$06,$42,$6B
-	dc.b	$00,$40,$20,$7C,$FF,$FF,$BD,$BE,$08,$2B,$00,$06,$00,$62,$67,$00
-	dc.b	$00,$04,$58,$48,$30,$2B,$00,$5A,$E4,$48,$52,$40,$08,$2B,$00,$00
-	dc.b	$00,$77,$66,$00,$00,$04,$56,$40,$30,$80,$08,$2B,$00,$03,$00,$62
-	dc.b	$66,$00,$00,$42,$08,$EB,$00,$01,$00,$63,$66,$00,$00,$38,$32,$3C
-	dc.b	$21,$26,$0C,$78,$00,$12,$B7,$9E,$63,$00,$00,$14,$70,$08,$4E,$B9
-	dc.b	$00,$01,$B0,$A6,$4A,$40,$67,$00,$00,$06,$32,$3C,$21,$50,$08,$EB
-	dc.b	$00,$01,$00,$63,$4E,$F9,$00,$01,$A6,$14,$17,$7C,$00,$14,$00,$5E
-	dc.b	$60,$00,$FF,$68,$4E,$75
+	btst	#pfalock,$62(a3)
+	bne.w	.6
+	btst	#sf2faceoff,(sflags2).w
+	beq.w	.5
+	bclr	#pfna,$62(a3)
+	beq.w	.1
+	clr.w	$40(a3)
+.1
+	movea.l	#fofdata2,a0
+	btst	#pfteam,$62(a3)
+	beq.w	.2
+	addq.w	#4,a0
+.2
+	move.w	$5A(a3),d0
+	lsr.w	#2,d0
+	addq.w	#1,d0
+	btst	#0,$77(a3)
+	bne.w	.3
+	addq.w	#3,d0
+.3
+	move.w	d0,(a0)
+	btst	#pfjoycon,$62(a3)
+	bne.w	.6
+	bset	#pf2aip,$63(a3)
+	bne.w	.6
+	move.w	#SPAfaceoff,d1
+	cmpi.w	#$12,($FFFFB79E).w
+	bls.w	.4
+	moveq	#8,d0
+	jsr	(randomd0).l
+	tst.w	d0
+	beq.w	.4
+	move.w	#SPAfaceoffr,d1
+.4
+	bset	#pf2aip,$63(a3)
+	jmp	(SetSPA).l
+.5
+	move.b	#$14,$5E(a3)
+	bra.w	GoAssExit
+.6
+	rts
 
 puckfaceoff							;Puck assignment: the faceoff set up
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$50,$F8,$D2,$38,$50,$F8,$D2,$3A,$50,$F8,$D2,$3C,$08,$B8,$00,$04
-	dc.b	$C3,$4C,$08,$38,$00,$00,$C3,$48,$67,$00,$00,$14,$42,$78,$B7,$86
-	dc.b	$42,$78,$B7,$88,$30,$3C,$00,$1E,$4E,$F9,$00,$01,$A3,$DA,$08,$AB
-	dc.b	$00,$01,$00,$62,$67,$00,$02,$9A,$08,$B8,$00,$00,$C3,$4C,$67,$00
-	dc.b	$00,$0A,$42,$78,$BF,$E2,$42,$78,$BF,$E4,$08,$B8,$00,$07,$C3,$4A
-	dc.b	$42,$B8,$BE,$AE,$42,$B8,$BE,$B2,$42,$B8,$BE,$B6,$08,$B8,$00,$06
-	dc.b	$C3,$4A,$08,$B8,$00,$02,$C3,$4A,$08,$F8,$00,$02,$C3,$56,$4E,$B9
-	dc.b	$00,$1D,$90,$E2,$4A,$78,$D4,$7E,$6B,$00,$00,$0A,$30,$38,$D4,$7E
-	dc.b	$60,$00,$00,$0E,$4E,$B9,$00,$1D,$90,$94,$4A,$40,$6B,$00,$00,$08
-	dc.b	$4E,$B9,$00,$1D,$8A,$B4,$08,$B8,$00,$01,$C3,$46,$08,$B8,$00,$01
-	dc.b	$C3,$48,$4A,$78,$C4,$BE,$67,$00,$02,$C8,$08,$38,$00,$06,$C3,$38
-	dc.b	$66,$00,$02,$BE,$0C,$78,$00,$03,$C4,$BC,$66,$00,$00,$14,$30,$38
-	dc.b	$C7,$32,$B0,$78,$CA,$D0,$67,$00,$00,$08,$4E,$F9,$00,$01,$4B,$DC
-	dc.b	$08,$38,$00,$03,$C3,$38,$66,$00,$02,$9E,$30,$38,$C4,$C2,$E2,$40
-	dc.b	$B0,$78,$C4,$BE,$63,$00,$00,$42,$0C,$78,$00,$3C,$C4,$BE,$6D,$00
-	dc.b	$00,$38,$08,$B8,$00,$07,$C3,$3E,$67,$00,$00,$2E,$08,$38,$00,$00
-	dc.b	$C3,$38,$67,$00,$00,$24,$08,$38,$00,$06,$C3,$4C,$66,$00,$00,$1A
-	dc.b	$31,$F8,$C3,$A0,$D4,$8C,$31,$FC,$00,$02,$D4,$8E,$4E,$B9,$00,$08
-	dc.b	$86,$88,$08,$F8,$00,$04,$C3,$4C,$4E,$B9,$00,$01,$97,$EA,$50,$EB
-	dc.b	$00,$40,$50,$EB,$00,$42,$4A,$78,$D2,$64,$66,$00,$01,$94,$08,$B8
-	dc.b	$00,$01,$C7,$56,$08,$B8,$00,$01,$CA,$F4,$30,$7C,$B0,$5E,$70,$0B
-	dc.b	$08,$A8,$00,$03,$00,$63,$D0,$FC,$00,$80,$51,$C8,$FF,$F4,$30,$38
-	dc.b	$C3,$90,$80,$78,$C3,$92,$67,$00,$00,$3A,$08,$38,$00,$07,$C3,$3A
-	dc.b	$67,$00,$00,$30,$4E,$B9,$00,$01,$AF,$52,$08,$F8,$00,$06,$C3,$3A
-	dc.b	$4E,$B9,$00,$01,$D0,$1E,$31,$FC,$00,$18,$BD,$3C,$4A,$78,$D2,$64
-	dc.b	$66,$00,$00,$10,$08,$38,$00,$04,$C3,$4A,$67,$00,$00,$06,$42,$78
-	dc.b	$BD,$3C,$30,$38,$C3,$84,$6B,$00,$00,$0A,$B0,$7C,$00,$06,$6D,$00
-	dc.b	$00,$2E,$30,$38,$C3,$86,$6B,$00,$00,$0A,$B0,$7C,$00,$06,$6D,$00
-	dc.b	$00,$1E,$30,$38,$C3,$88,$6B,$00,$00,$0A,$B0,$7C,$00,$06,$6D,$00
-	dc.b	$00,$0E,$30,$38,$C3,$8A,$B0,$7C,$00,$06,$6C,$00,$00,$0C,$4A,$40
-	dc.b	$6B,$00,$00,$06,$61,$00,$00,$9C,$30,$38,$C3,$84,$B0,$7C,$00,$06
-	dc.b	$6C,$00,$00,$26,$30,$38,$C3,$86,$B0,$7C,$00,$06,$6C,$00,$00,$1A
-	dc.b	$30,$38,$C3,$88,$B0,$7C,$00,$06,$6C,$00,$00,$0E,$30,$38,$C3,$8A
-	dc.b	$B0,$7C,$00,$06,$6D,$00,$00,$0C,$4A,$40,$6B,$00,$00,$06,$61,$00
-	dc.b	$00,$62,$32,$7C,$C7,$26,$45,$E9,$03,$9E,$70,$02,$4E,$B9,$00,$00
-	dc.b	$9D,$0C,$60,$00,$00,$9C
+	st	(DumpPassSc).w
+	st	(LastCarrierHome).w
+	st	(LastCarrierAway).w
+	bclr	#4,(sflags8).w
+	btst	#0,(gmode2).w
+	beq.w	.1
+	clr.w	(puckvx).w
+	clr.w	(puckvy).w
+	move.w	#$1E,d0
+	jmp	(assreplace).l
+.1
+	bclr	#pfna,$62(a3)
+	beq.w	WaitForFaceoffLineChanges
+	bclr	#0,(sflags8).w
+	beq.w	.2
+	clr.w	(fox).w
+	clr.w	(foy).w
+.2
+	bclr	#7,(sflags7).w
+	clr.l	(padcont).w
+	clr.l	(padcont+4).w
+	clr.l	(padcont+8).w
+	bclr	#6,(sflags7).w
+	bclr	#2,(sflags7).w
+	bset	#2,(sflags12).w
+	jsr	(chkFgtBit1ShotsLead).l
+	tst.w	(faceoffanim).w
+	bmi.w	.3
+	move.w	(faceoffanim).w,d0
+	bra.w	.4
+.3
+	jsr	(PickFaceoffDirection).l
+	tst.w	d0
+	bmi.w	.5
+.4
+	jsr	(SetFaceoffAnim).l
+.5
+	bclr	#1,(sflags6).w
+	bclr	#1,(gmode2).w
+	tst.w	(gameclock).w
+	beq.w	GoPeriodOver
+	btst	#6,(gmode).w
+	bne.w	GoPeriodOver
+	cmpi.w	#3,(gsp).w
+	bne.w	.6
+	move.w	(HmGoals).w,d0
+	cmp.w	(AwGoals).w,d0
+	beq.w	.6
+	jmp	(clockcontPuckAssignments).l
+.6
+	btst	#gmpendel,(gmode).w
+	bne.w	GoStop4Pen
+	move.w	(PerTimeTotal).w,d0
+	asr.w	#1,d0
+	cmp.w	(gameclock).w,d0
+	bls.w	.7
+	cmpi.w	#$3C,(gameclock).w
+	blt.w	.7
+	bclr	#sf3fosong,(sflags3).w
+	beq.w	.7
+	btst	#gmclock,(gmode).w
+	beq.w	.7
+	btst	#6,(sflags8).w
+	bne.w	.7
+	move.w	(HomeTeam).w,(HmTeam).w
+	move.w	#2,(SongIndex).w
+	jsr	(ChooseSong).l
+	bset	#4,(sflags8).w
+.7
+	jsr	(ReturnGoalies).l
+	st	$40(a3)
+	st	$42(a3)
+	tst.w	(OptLine).w
+	bne.w	WaitForFaceoffLineChanges
+	bclr	#tmflcm,(HomeTmFlags).w
+	bclr	#tmflcm,(AwayTmFlags).w
+	movea.w	#(SortCords-M68K_RAM),a0
+	moveq	#$B,d0
+.loop
+	bclr	#pf2lcm,$63(a0)
+	adda.w	#SCstruct,a0
+	dbf	d0,.loop
+	move.w	(cont1team).w,d0
+	or.w	(cont2team).w,d0
+	beq.w	.8
+	btst	#7,(sflags).w
+	beq.w	.8
+	jsr	(forceblack).l
+	bset	#6,(sflags).w
+	jsr	(ClrHor).l
+	move.w	#$18,(palcount).w
+	tst.w	(OptLine).w
+	bne.w	.8
+	btst	#4,(sflags7).w
+	beq.w	.8
+	clr.w	(palcount).w
+.8
+	move.w	(c1playernum).w,d0
+	bmi.w	.9
+	cmp.w	#6,d0
+	blt.w	.12
+.9
+	move.w	(c2playernum).w,d0
+	bmi.w	.10
+	cmp.w	#6,d0
+	blt.w	.12
+.10
+	move.w	(c3playernum).w,d0
+	bmi.w	.11
+	cmp.w	#6,d0
+	blt.w	.12
+.11
+	move.w	(c4playernum).w,d0
+	cmp.w	#6,d0
+	bge.w	.13
+.12
+	tst.w	d0
+	bmi.w	.13
+	bsr.w	StartFaceoffLineChange
+.13
+	move.w	(c1playernum).w,d0
+	cmp.w	#6,d0
+	bge.w	.14
+	move.w	(c2playernum).w,d0
+	cmp.w	#6,d0
+	bge.w	.14
+	move.w	(c3playernum).w,d0
+	cmp.w	#6,d0
+	bge.w	.14
+	move.w	(c4playernum).w,d0
+	cmp.w	#6,d0
+	blt.w	.15
+.14
+	tst.w	d0
+	bmi.w	.15
+	bsr.w	StartFaceoffLineChange
+.15
+	movea.w	#(tmstruct-M68K_RAM),a1
+	lea	$39E(a1),a2
+	moveq	#2,d0
+	jsr	(SetFaceoffComputerLine).l
+	bra.w	WaitForFaceoffLineChanges
 
 SetFaceoffComputerLine				;Line changes on and team d0 not on a pad: CompLine, SetPersonel
 	tst.w	(OptLine).w
@@ -110,6 +246,7 @@ SetFaceoffComputerLine				;Line changes on and team d0 not on a pad: CompLine, S
 	jsr	(setpersonel).l
 	jsr	(printscores1).l
 	move.w	#$2710,(crowdnoisedelay).w
+SetFaceoffComputerLineExit	equ	*			;Shared return of SetFaceoffComputerLine
 .2
 	rts
 
@@ -140,21 +277,54 @@ rtsfaceoff							;The shared rts of the faceoff routines
 
 WaitForFaceoffLineChanges			;Run both line change timers; when both are done set the home computer
 									;line
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$30,$3C,$00,$40,$4E,$B9,$00,$00,$9D,$E6,$30,$3C,$00,$42,$4E,$B9
-	dc.b	$00,$00,$9D,$E6,$4A,$6B,$00,$40,$6A,$96,$4A,$6B,$00,$42,$6A,$90
-	dc.b	$34,$7C,$C7,$26,$43,$EA,$03,$9E,$70,$01,$4E,$B9,$00,$00,$9D,$0C
-	dc.b	$31,$FC,$FF,$FF,$D4,$88,$30,$3C,$00,$1C,$4E,$F9,$00,$01,$A3,$DA
+	move.w	#$40,d0
+	jsr	(UpdateFaceoffLineChangeTimer).l
+	move.w	#$42,d0
+	jsr	(UpdateFaceoffLineChangeTimer).l
+	tst.w	$40(a3)
+	bpl.s	SetFaceoffComputerLineExit
+	tst.w	$42(a3)
+	bpl.s	SetFaceoffComputerLineExit
+	movea.w	#(tmstruct-M68K_RAM),a2
+	lea	$39E(a2),a1
+	moveq	#1,d0
+	jsr	(SetFaceoffComputerLine).l
+	move.w	#$FFFF,(userblockx).w
+	move.w	#$1C,d0					;puckfaceoff2
+	jmp	(assreplace).l
 
 UpdateFaceoffLineChangeTimer		;Line change timer d0 (temp1 / temp2 of the puck)
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$4A,$73,$00,$00,$6B,$00,$FF,$6A,$32,$33,$00,$04,$EF,$41,$30,$7C
-	dc.b	$B0,$5E,$34,$7C,$C7,$26,$08,$30,$00,$06,$10,$62,$67,$00,$00,$06
-	dc.b	$D4,$FC,$03,$9E,$08,$30,$00,$03,$10,$63,$66,$00,$00,$0A,$50,$F3
-	dc.b	$00,$00,$60,$00,$4E,$54,$9F,$73,$00,$00,$6A,$00,$FF,$34,$2F,$0B
-	dc.b	$47,$F0,$10,$00,$08,$2B,$00,$03,$00,$63,$67,$00,$00,$10,$42,$42
-	dc.b	$4E,$B9,$00,$00,$EE,$92,$4E,$B9,$00,$00,$EC,$6E,$26,$5F,$4E,$75
-	dc.b	$4E,$F9,$00,$02,$15,$DC,$4E,$F9,$00,$01,$C7,$84
+	tst.w	(a3,d0.w)
+	bmi.w	SetFaceoffComputerLineExit
+	move.w	4(a3,d0.w),d1
+	asl.w	#7,d1
+	movea.w	#(SortCords-M68K_RAM),a0
+	movea.w	#(tmstruct-M68K_RAM),a2
+	btst	#pfteam,$62(a0,d1.w)
+	beq.w	.1
+	adda.w	#$39E,a2
+.1
+	btst	#3,$63(a0,d1.w)
+	bne.w	.2
+	st	(a3,d0.w)
+	bra.w	SetLCmode2
+.2
+	sub.w	d7,(a3,d0.w)
+	bpl.w	SetFaceoffComputerLineExit
+	move.l	a3,-(sp)
+	lea	(a0,d1.w),a3
+	btst	#pf2lcm,pflags2(a3)
+	beq.w	.3
+	clr.w	d2
+	jsr	(lcfound).l
+	jsr	(SetLCmode2).l
+.3
+	movea.l	(sp)+,a3
+	rts
+GoPeriodOver	equ	*	;Jump to PeriodOver
+	jmp	(PeriodOver).l
+GoStop4Pen	equ	*	;Jump to Stop4Pen
+	jmp	(Stop4Pen).l
 
 puckfaceoff2						;Puck assignment: the faceoff
 	bclr	#pfna,pflags(a3)

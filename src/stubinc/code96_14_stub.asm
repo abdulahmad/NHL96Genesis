@@ -34,6 +34,9 @@ ReadJoy1 = $01B348					;pause96_stub
 ReadJoy2 = $01B360					;pause96_stub
 ReadJoy3 = $01B378					;pause96_stub
 ReadJoy4 = $01B390					;pause96_stub
+GetTeamLines = $00EF02				;control96_team_stub
+eraser = $01B976				;goal96_box_stub
+printz = $01BB8E				;goal96_box_stub
 
 
 ; Main segment code

@@ -38,27 +38,94 @@ SetSframe							;Draw one sprite frame. a0 = framelist, d0/d1 = x/y cords, d2 = 
 	movem.l	(sp)+,d0-d5/a0
 .exit
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$48,$E7,$FF,$FE,$42,$78,$D3,$12,$61,$00,$07,$2A,$20,$7C,$00,$18
-	dc.b	$88,$2C,$4E,$B9,$00,$01,$21,$8A,$4E,$B9,$00,$1D,$BB,$92,$31,$FC
-	dc.b	$00,$18,$BD,$3C,$08,$B8,$00,$02,$BF,$B2,$42,$78,$BF,$58,$31,$FC
-	dc.b	$00,$0D,$BF,$5C,$31,$FC,$00,$0C,$BF,$5A,$42,$78,$BF,$56,$61,$00
-	dc.b	$02,$88,$30,$38,$BF,$60,$B0,$7C,$00,$14,$6F,$00,$00,$06,$30,$3C
-	dc.b	$00,$14,$53,$40,$31,$C0,$BF,$5E,$30,$38,$B0,$52,$B0,$78,$B0,$52
-	dc.b	$67,$FA,$4E,$B9,$00,$01,$26,$40,$61,$00,$01,$26,$30,$38,$B0,$52
-	dc.b	$B0,$78,$B0,$52,$67,$FA,$4E,$B9,$00,$01,$26,$40,$08,$F8,$00,$02
-	dc.b	$BF,$B2,$61,$00,$05,$06,$46,$FC,$25,$00,$61,$00,$00,$AE,$08,$B8
-	dc.b	$00,$02,$BF,$B2,$61,$00,$01,$48,$4A,$41,$67,$00,$00,$8A,$08,$01
-	dc.b	$00,$07,$66,$00,$00,$88,$08,$01,$00,$02,$67,$00,$00,$24,$61,$00
-	dc.b	$01,$B4,$53,$78,$BF,$56,$6A,$00,$00,$0A,$30,$3C,$00,$03,$31,$C0
-	dc.b	$BF,$56,$42,$78,$BF,$58,$31,$FC,$00,$0C,$BF,$5A,$60,$00,$FF,$70
-	dc.b	$08,$01,$00,$00,$67,$00,$00,$14,$4A,$78,$BF,$58,$67,$B6,$53,$78
-	dc.b	$BF,$58,$53,$78,$BF,$5A,$60,$00,$FF,$70,$08,$01,$00,$01,$67,$00
-	dc.b	$00,$18,$30,$38,$BF,$5A,$B0,$78,$BF,$5E,$6C,$98,$52,$78,$BF,$58
-	dc.b	$52,$78,$BF,$5A,$60,$00,$FF,$52,$08,$01,$00,$03,$67,$86,$61,$00
-	dc.b	$01,$54,$52,$78,$BF,$56,$30,$3C,$00,$03,$B0,$78,$BF,$56,$6C,$A2
-	dc.b	$42,$78,$BF,$56,$60,$9C,$4E,$F9,$00,$02,$17,$4A,$21,$FC,$00,$01
-	dc.b	$22,$A4,$DD,$AC,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	clr.w	(carddelay).w
+	bsr.w	SetupLeadersScreenVideo
+	movea.l	#LeadersSprites,a0
+	jsr	(DrawScreenSprite).l
+	jsr	(PStatsPalette).l
+	move.w	#$18,(palcount).w
+	bclr	#2,(disflags).w
+	clr.w	(pstatstop).w
+	move.w	#$D,(pstatsrows).w
+	move.w	#$C,(pstatsrow).w
+	clr.w	(pstatscat).w
+.loop2
+	bsr.w	BuildPlayerLeaders
+	move.w	(pstatslast+2).w,d0
+	cmp.w	#$14,d0
+	ble.w	.1
+	move.w	#$14,d0
+.1
+	subq.w	#1,d0
+	move.w	d0,(pstatslast).w
+.loop3
+	move.w	(Vcount).w,d0
+.loop4
+	cmp.w	(Vcount).w,d0
+	beq.s	.loop4
+	jsr	(SetMenuScroll).l
+	bsr.w	PrintLeadersCategory
+	move.w	(Vcount).w,d0
+.loop5
+	cmp.w	(Vcount).w,d0
+	beq.s	.loop5
+	jsr	(SetMenuScroll).l
+	bset	#2,(disflags).w
+	bsr.w	DrawLeaderRows
+	move.w	#$2500,sr
+	bsr.w	LeadersScrollArrows
+	bclr	#2,(disflags).w
+.loop6
+	bsr.w	LeadersReadPad
+	tst.w	d1
+	beq.w	.5
+	btst	#7,d1
+	bne.w	.6
+	btst	#2,d1
+	beq.w	.2
+	bsr.w	ClearLeadersRows
+	subq.w	#1,(pstatscat).w
+	bpl.w	.loop7
+	move.w	#3,d0
+	move.w	d0,(pstatscat).w
+.loop7
+	clr.w	(pstatstop).w
+	move.w	#$C,(pstatsrow).w
+	bra.w	.loop2
+.2
+	btst	#0,d1
+	beq.w	.3
+	tst.w	(pstatstop).w
+	beq.s	.loop6
+	subq.w	#1,(pstatstop).w
+	subq.w	#1,(pstatsrow).w
+	bra.w	.loop3
+.3
+	btst	#1,d1
+	beq.w	.4
+	move.w	(pstatsrow).w,d0
+	cmp.w	(pstatslast).w,d0
+	bge.s	.loop6
+	addq.w	#1,(pstatstop).w
+	addq.w	#1,(pstatsrow).w
+	bra.w	.loop3
+.4
+	btst	#3,d1
+	beq.s	.loop6
+	bsr.w	ClearLeadersRows
+	addq.w	#1,(pstatscat).w
+	move.w	#3,d0
+	cmp.w	(pstatscat).w,d0
+	bge.s	.loop7
+	clr.w	(pstatscat).w
+	bra.s	.loop7
+.5
+	jmp	(Opening2).l
+.6
+	move.l	#SeasonMenuScreen,(NextScreenPtr).w
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 LeadersScrollArrows					;League Leaders: draw up/down scroll arrows depending on list position.
 	movem.l	d0-d7/a0-a6,-(sp)
@@ -83,27 +150,36 @@ LeadersScrollArrows					;League Leaders: draw up/down scroll arrows depending on
 .4
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.w	$48E7,$FFFE,$4EB9,$0001,$BB8E,$0006,$BF1E,$0800
-	dc.w	$3038,$BF56,$227C,$001D,$A8D8,$4EB9,$0001,$D7E2
-	dc.w	$4CDF,$7FFF,$4E75,$000A,$476F,$616C,$7320,$2000
-	dc.w	$000A,$4173,$7369,$7374,$7300,$000A,$506F,$696E
-	dc.w	$7473,$2000,$000A,SPAturnl,SPAturnl,$4741,$4100,$2C3C
-	dc.w	$0000,$5460,$3C3C,$0064,$3238,$B052,$9278,$B054
-	dc.w	$67F2,$31F8,$B052,$B054,$4EB9,$0001,$2640,$4EB9
-	dc.w	$0001,$B348,$4EB9,$0001,$B320,$4A41,$6700,$0006
-	dc.w	$6000,$0050,$4EB9,$0001,$B360,$4EB9,$0001,$B320
-	dc.w	$4A41,$6700,$0006,$6000,$003A,$4A78,$D250,$6700
-	dc.w	$002E,$4EB9,$0001,$B378,$4EB9,$0001,$B320,$4A41
-	dc.w	$6700,$0006,$6000,$001C,$4EB9,$0001,$B390,$4EB9
-	dc.w	$0001,$B320,$4A41,$6700,$0006,$6000,$0006,$51CE
-	dc.w	$FF84,$4E75,$48E7,$FFFE,$303C,$0024,$323C,$000D
-	dc.w	$343C,$07FF,$0042,$8000,$4EB9,$0001,$BB8E,$0006
-	dc.w	$BF02,$0B00,$4EB9,$0001,$B976,$4EB9,$0001,$BED6
-	dc.w	$000E,$F804,$011E,$0820,SPAturnl,SPAturnl,SPAturnl,$4EB9
-	dc.w	$0001,$BED6,$001E,$F804,$0109,$0520,SPAturnl,SPAturnl
-	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl
-	dc.w	$2000,$4CDF,$7FFF,$4E75
+PrintLeadersCategory	equ	*	;Print the category name of the leaders screen
+	movem.l	d0-d7/a0-a6,-(sp)
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$1E,8
+	move.w	(pstatscat).w,d0
+	movea.l	#$1DA8D8,a1
+	jsr	(PrintBigListItem).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+	dc.w	$000A,$476F,$616C,$7320,$2000,$000A,$4173,$7369
+	dc.w	$7374,$7300,$000A,$506F,$696E,$7473,$2000,$000A
+	dc.w	SPAturnl,SPAturnl,$4741,$4100
+LeadersReadPad	equ	*
+	dc.w	$2C3C,$0000,$5460,$3C3C,$0064,$3238,$B052,$9278
+	dc.w	$B054,$67F2,$31F8,$B052,$B054,$4EB9,$0001,$2640
+	dc.w	$4EB9,$0001,$B348,$4EB9,$0001,$B320,$4A41,$6700
+	dc.w	$0006,$6000,$0050,$4EB9,$0001,$B360,$4EB9,$0001
+	dc.w	$B320,$4A41,$6700,$0006,$6000,$003A,$4A78,$D250
+	dc.w	$6700,$002E,$4EB9,$0001,$B378,$4EB9,$0001,$B320
+	dc.w	$4A41,$6700,$0006,$6000,$001C,$4EB9,$0001,$B390
+	dc.w	$4EB9,$0001,$B320,$4A41,$6700,$0006,$6000,$0006
+	dc.w	$51CE,$FF84,$4E75
+ClearLeadersRows	equ	*	;Clear the leaders rows and print the headings again
+	dc.w	$48E7,$FFFE,$303C,$0024,$323C,$000D,$343C,$07FF
+	dc.w	$0042,$8000,$4EB9,$0001,$BB8E,$0006,$BF02,$0B00
+	dc.w	$4EB9,$0001,$B976,$4EB9,$0001,$BED6,$000E,$F804
+	dc.w	$011E,$0820,SPAturnl,SPAturnl,SPAturnl,$4EB9,$0001,$BED6
+	dc.w	$001E,$F804,$0109,$0520,SPAturnl,SPAturnl,SPAturnl,SPAturnl
+	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,$2000,$4CDF
+	dc.w	$7FFF,$4E75
 
 BuildPlayerLeaders					;League leaders: build and sort the list of category pstatscat through
 									;PlayerLeaderJumps
@@ -113,116 +189,410 @@ BuildPlayerLeaders					;League leaders: build and sort the list of category psta
 	movea.l	#PlayerLeaderJumps,a0
 	movea.l	(a0,d0.w),a0
 	jmp	(a0)
-	dc.b	$4C,$DF,$7F,$FF,$4E,$75
+BuildPlayerLeadersExit	equ	*
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 PlayerLeaderJumps					;BuildPlayerLeaders handler per category: goals, assists, points, goals
 									;against average
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$00,$1D,$AA,$56,$00,$1D,$AA,$88,$00,$1D,$AA,$BA,$00,$1D,$AA,$16
-	dc.b	$22,$3C,$00,$00,$59,$8C,$74,$0E,$76,$03,$28,$3C,$00,$00,$5D,$D0
-	dc.b	$7C,$0D,$08,$38,$00,$02,$DD,$80,$67,$00,$00,$14,$22,$3C,$00,$00
-	dc.b	$32,$68,$74,$0E,$76,$03,$28,$3C,$00,$00,$35,$08,$7C,$0D,$2A,$7C
-	dc.b	$00,$00,$98,$EC,$08,$F8,$00,$01,$C3,$40,$61,$00,$00,$9A,$60,$AA
-	dc.b	$22,$3C,$00,$00,$02,$68,$74,$0C,$76,$18,$08,$38,$00,$02,$DD,$80
-	dc.b	$67,$00,$00,$0C,$22,$3C,$00,$00,$04,$48,$74,$0A,$76,$18,$2A,$7C
-	dc.b	$00,$00,$97,$A0,$08,$B8,$00,$01,$C3,$40,$61,$00,$00,$E6,$60,$00
-	dc.b	$FF,$7A,$22,$3C,$00,$00,$1F,$A8,$74,$0C,$76,$18,$08,$38,$00,$02
-	dc.b	$DD,$80,$67,$00,$00,$0C,$22,$3C,$00,$00,$13,$48,$74,$0A,$76,$18
-	dc.b	$2A,$7C,$00,$00,$97,$A0,$08,$B8,$00,$01,$C3,$40,$61,$00,$00,$B4
-	dc.b	$60,$00,$FF,$48,$22,$3C,$00,$00,$02,$68,$74,$0C,$76,$18,$08,$38
-	dc.b	$00,$02,$DD,$80,$67,$00,$00,$0C,$22,$3C,$00,$00,$04,$48,$74,$0A
-	dc.b	$76,$18,$2A,$7C,$00,$00,$98,$0E,$08,$B8,$00,$01,$C3,$40,$61,$00
-	dc.b	$00,$82,$60,$00,$FF,$16,$20,$7C,$FF,$FF,$19,$3A,$24,$7C,$FF,$FF
-	dc.b	$BF,$60,$26,$7C,$FF,$FF,$13,$88,$42,$47,$42,$52,$42,$45,$48,$E7
-	dc.b	$4D,$00,$08,$38,$00,$02,$DD,$80,$67,$00,$00,$0E,$4E,$B9,$00,$01
-	dc.b	$43,$BC,$3A,$07,$CA,$FC,$00,$1B,$4E,$B9,$00,$01,$57,$74,$36,$00
-	dc.b	$4E,$95,$4C,$DF,$00,$B2,$06,$81,$00,$00,$00,$2A,$06,$84,$00,$00
-	dc.b	$00,$27,$06,$45,$00,$1B,$52,$47,$08,$38,$00,$02,$DD,$80,$67,$00
-	dc.b	$00,$0C,$BE,$7C,$00,$10,$6D,$B6,$60,$00,$00,$08,$BE,$7C,$00,$1A
-	dc.b	$6D,$AC,$36,$38,$BF,$60,$67,$00,$00,$FA,$53,$43,$42,$44,$60,$00
-	dc.b	$00,$86,$20,$7C,$FF,$FF,$19,$3A,$24,$7C,$FF,$FF,$BF,$60,$26,$7C
-	dc.b	$FF,$FF,$13,$88,$42,$47,$42,$52,$42,$45,$48,$A7,$05,$00,$08,$38
-	dc.b	$00,$02,$DD,$80,$67,$00,$00,$0E,$4E,$B9,$00,$01,$43,$BC,$3A,$07
-	dc.b	$CA,$FC,$00,$1B,$4E,$B9,$00,$01,$57,$B2,$31,$C0,$DD,$C0,$4E,$B9
-	dc.b	$00,$01,$57,$74,$91,$78,$DD,$C0,$04,$78,$00,$18,$DD,$C0,$44,$78
-	dc.b	$DD,$C0,$DA,$40,$4E,$95,$4C,$9F,$00,$A0,$06,$45,$00,$1B,$52,$47
-	dc.b	$08,$38,$00,$02,$DD,$80,$67,$00,$00,$0C,$BE,$7C,$00,$10,$6D,$AA
-	dc.b	$60,$00,$00,$08,$BE,$7C,$00,$1A,$6D,$A0,$36,$38,$BF,$60,$67,$00
-	dc.b	$00,$72,$53,$43,$42,$44,$22,$7C,$FF,$FF,$19,$3A,$20,$7C,$FF,$FF
-	dc.b	$13,$88,$08,$38,$00,$01,$C3,$40,$66,$00,$00,$5A,$42,$40,$42,$78
-	dc.b	$BF,$46,$34,$38,$BF,$60,$67,$00,$00,$4A,$55,$42,$67,$00,$00,$44
-	dc.b	$6B,$00,$00,$40,$3A,$31,$00,$00,$3C,$31,$00,$02,$BC,$45,$6F,$00
-	dc.b	$00,$26,$50,$F8,$BF,$46,$3F,$31,$00,$00,$3F,$31,$00,$02,$33,$9F
-	dc.b	$00,$00,$33,$9F,$00,$02,$3F,$30,$00,$00,$3F,$30,$00,$02,$31,$9F
-	dc.b	$00,$00,$31,$9F,$00,$02,$54,$40,$51,$CA,$FF,$CA,$4A,$78,$BF,$46
-	dc.b	$66,$AA,$4E,$75
+	dc.w	$001D,$AA56,$001D,$AA88,$001D,$AABA,$001D,$AA16
+	move.l	#$598C,d1
+	moveq	#$E,d2
+	moveq	#3,d3
+	move.l	#$5DD0,d4
+	moveq	#$D,d6
+	btst	#2,(SeasonDay+2).w
+	beq.w	.1
+	move.l	#$3268,d1
+	moveq	#$E,d2
+	moveq	#3,d3
+	move.l	#$3508,d4
+	moveq	#$D,d6
+.1
+	movea.l	#ReadSRAMBitsSkip3,a5
+	bset	#1,(BA_PS_flags).w
+	bsr.w	BuildGoalieLeaders
+	bra.s	BuildPlayerLeadersExit
+	move.l	#$268,d1
+	moveq	#$C,d2
+	moveq	#$18,d3
+	btst	#2,(SeasonDay+2).w
+	beq.w	.2
+	move.l	#$448,d1
+	moveq	#$A,d2
+	moveq	#$18,d3
+.2
+	movea.l	#ReadSRAMBitsSkip1,a5
+	bclr	#1,(BA_PS_flags).w
+	bsr.w	BuildSkaterLeaders
+	bra.w	BuildPlayerLeadersExit
+	move.l	#$1FA8,d1
+	moveq	#$C,d2
+	moveq	#$18,d3
+	btst	#2,(SeasonDay+2).w
+	beq.w	.3
+	move.l	#$1348,d1
+	moveq	#$A,d2
+	moveq	#$18,d3
+.3
+	movea.l	#ReadSRAMBitsSkip1,a5
+	bclr	#1,(BA_PS_flags).w
+	bsr.w	BuildSkaterLeaders
+	bra.w	BuildPlayerLeadersExit
+	move.l	#$268,d1
+	moveq	#$C,d2
+	moveq	#$18,d3
+	btst	#2,(SeasonDay+2).w
+	beq.w	.4
+	move.l	#$448,d1
+	moveq	#$A,d2
+	moveq	#$18,d3
+.4
+	movea.l	#ReadSRAMBitsSkip2,a5
+	bclr	#1,(BA_PS_flags).w
+	bsr.w	BuildSkaterLeaders
+	bra.w	BuildPlayerLeadersExit
+BuildGoalieLeaders					;Leaders: sort the goalies of every team into the leader list
+	movea.l	#$FFFF193A,a0
+	movea.l	#pstatslast+2,a2
+	movea.l	#LeaderIds,a3
+	clr.w	d7
+	clr.w	(a2)
+	clr.w	d5
+.loop
+	movem.l	d1/d4-d5/d7,-(sp)
+	btst	#2,(SeasonDay+2).w
+	beq.w	.1
+	jsr	(GetPOSlotTeam).l
+	move.w	d7,d5
+	mulu.w	#$1B,d5
+.1
+	jsr	(GetGoalieCountD7).l
+	move.w	d0,d3
+	jsr	(a5)
+	movem.l	(sp)+,d1/d4-d5/d7
+	addi.l	#$2A,d1
+	addi.l	#$27,d4
+	addi.w	#$1B,d5
+	addq.w	#1,d7
+	btst	#2,(SeasonDay+2).w
+	beq.w	.2
+	cmp.w	#$10,d7
+	blt.s	.loop
+	bra.w	.3
+.2
+	cmp.w	#$1A,d7
+	blt.s	.loop
+.3
+	move.w	(pstatslast+2).w,d3
+	beq.w	PlayerLeaderJumpsExit
+	subq.w	#1,d3
+	clr.w	d4
+	bra.w	SortLeaderValues
+BuildSkaterLeaders					;Leaders: sort the skaters of every team into the leader list
+	movea.l	#$FFFF193A,a0
+	movea.l	#pstatslast+2,a2
+	movea.l	#LeaderIds,a3
+	clr.w	d7
+	clr.w	(a2)
+	clr.w	d5
+.loop
+	movem.w	d5/d7,-(sp)
+	btst	#2,(SeasonDay+2).w
+	beq.w	.1
+	jsr	(GetPOSlotTeam).l
+	move.w	d7,d5
+	mulu.w	#$1B,d5
+.1
+	jsr	(GetPlayerCountD7).l
+	move.w	d0,(PlayoffMenuTeam+2).w
+	jsr	(GetGoalieCountD7).l
+	sub.w	d0,(PlayoffMenuTeam+2).w
+	subi.w	#$18,(PlayoffMenuTeam+2).w
+	neg.w	(PlayoffMenuTeam+2).w
+	add.w	d0,d5
+	jsr	(a5)
+	movem.w	(sp)+,d5/d7
+	addi.w	#$1B,d5
+	addq.w	#1,d7
+	btst	#2,(SeasonDay+2).w
+	beq.w	.2
+	cmp.w	#$10,d7
+	blt.s	.loop
+	bra.w	.3
+.2
+	cmp.w	#$1A,d7
+	blt.s	.loop
+.3
+	move.w	(pstatslast+2).w,d3
+	beq.w	PlayerLeaderJumpsExit
+	subq.w	#1,d3
+	clr.w	d4
+SortLeaderValues	equ	*	;Leaders: order the values a1 (up or down by BA_PS_flags) and note whether it changed
+	movea.l	#$FFFF193A,a1
+	movea.l	#LeaderIds,a0
+	btst	#1,(BA_PS_flags).w
+	bne.w	SortValuesUp
+.loop2
+	clr.w	d0
+	clr.w	(TempWord1).w
+	move.w	(pstatslast+2).w,d2
+	beq.w	PlayerLeaderJumpsExit
+	subq.w	#2,d2
+	beq.w	PlayerLeaderJumpsExit
+	bmi.w	PlayerLeaderJumpsExit
+.loop3
+	move.w	(a1,d0.w),d5
+	move.w	2(a1,d0.w),d6
+	cmp.w	d5,d6
+	ble.w	.4
+	st	(TempWord1).w
+	move.w	(a1,d0.w),-(sp)
+	move.w	2(a1,d0.w),-(sp)
+	move.w	(sp)+,(a1,d0.w)
+	move.w	(sp)+,2(a1,d0.w)
+	move.w	(a0,d0.w),-(sp)
+	move.w	2(a0,d0.w),-(sp)
+	move.w	(sp)+,(a0,d0.w)
+	move.w	(sp)+,2(a0,d0.w)
+.4
+	addq.w	#2,d0
+	dbf	d2,.loop3
+	tst.w	(TempWord1).w
+	bne.s	.loop2
+PlayerLeaderJumpsExit	equ	*
+	rts
 
 SortValuesUp						;Bubble sort the values at LeaderValues / players at LeaderPlayers
 									;ascending.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$42,$40,$42,$78,$BF,$46,$34,$38,$BF,$60,$67,$F2,$55,$42,$67,$EE
-	dc.b	$6B,$EC,$3A,$31,$00,$00,$3C,$31,$00,$02,$BC,$45,$6C,$00,$00,$26
-	dc.b	$50,$F8,$BF,$46,$3F,$31,$00,$00,$3F,$31,$00,$02,$33,$9F,$00,$00
-	dc.b	$33,$9F,$00,$02,$3F,$30,$00,$00,$3F,$30,$00,$02,$31,$9F,$00,$00
-	dc.b	$31,$9F,$00,$02,$54,$40,$51,$CA,$FF,$CA,$4A,$78,$BF,$46,$66,$B0
-	dc.b	$4E,$75,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$8F,$00,$00,$00,$42,$46
-	dc.b	$2A,$7C,$FF,$FF,$19,$3A,$31,$FC,$00,$0B,$B0,$42,$31,$FC,$00,$04
-	dc.b	$B0,$40,$22,$7C,$00,$1D,$AE,$32,$4E,$B9,$00,$01,$BC,$84,$30,$06
-	dc.b	$D0,$78,$BF,$58,$B0,$78,$BF,$60,$6D,$00,$00,$18,$30,$06,$D0,$78
-	dc.b	$BF,$58,$B0,$78,$BF,$5E,$6C,$00,$01,$2C,$31,$C0,$BF,$5E,$60,$00
-	dc.b	$01,$24,$31,$FC,$00,$04,$B0,$40,$30,$06,$D0,$78,$BF,$58,$3F,$00
-	dc.b	$52,$40,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9,$00,$01
-	dc.b	$BC,$84,$31,$FC,$00,$07,$B0,$40,$20,$7C,$FF,$FF,$13,$88,$30,$06
-	dc.b	$D0,$78,$BF,$58,$D0,$40,$30,$30,$00,$00,$48,$C0,$80,$FC,$00,$1B
-	dc.b	$3E,$00,$48,$40,$4A,$5F,$66,$00,$00,$48,$3F,$38,$B0,$40,$3F,$38
-	dc.b	$B0,$42,$3F,$38,$B0,$44,$3F,$38,$B0,$46,$4E,$B9,$00,$01,$01,$6A
-	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$14,$05,$00,$3F,$00,$30,$11
-	dc.b	$55,$40,$E2,$40,$91,$78,$B0,$40,$4E,$B9,$00,$01,$BE,$EC,$30,$1F
-	dc.b	$31,$DF,$B0,$46,$31,$DF,$B0,$44,$31,$DF,$B0,$42,$31,$DF,$B0,$40
-	dc.b	$4E,$B9,$00,$01,$01,$7A,$4E,$B9,$00,$01,$BC,$84,$31,$FC,$00,$19
-	dc.b	$B0,$40,$22,$7C,$00,$00,$07,$7E,$30,$07,$E5,$40,$22,$71,$00,$00
-	dc.b	$D2,$E9,$00,$04,$D2,$D1,$4E,$B9,$00,$01,$BC,$84,$31,$FC,$00,$20
-	dc.b	$B0,$40,$20,$7C,$FF,$FF,$19,$3A,$30,$06,$D0,$78,$BF,$58,$D0,$40
-	dc.b	$30,$30,$00,$00,$0C,$78,$00,$03,$BF,$56,$66,$00,$00,$38,$48,$C0
-	dc.b	$80,$FC,$00,$64,$48,$40,$3F,$00,$48,$40,$32,$3C,$00,$03,$4E,$B9
-	dc.b	$00,$01,$BE,$1C,$4E,$B9,$00,$01,$BC,$84,$4E,$B9,$00,$01,$BC,$72
-	dc.b	$00,$04,$2E,$00,$30,$1F,$32,$3C,$00,$02,$4E,$B9,$00,$02,$30,$E8
-	dc.b	$60,$00,$00,$0C,$32,$3C,$00,$03,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BC,$84,$52,$78,$B0,$42,$52,$46,$BC,$78,$BF,$5C,$6D,$00
-	dc.b	$FE,$9C,$60,$00,$00,$02,$4E,$75
+	clr.w	d0
+	clr.w	(TempWord1).w
+	move.w	(pstatslast+2).w,d2
+	beq.s	PlayerLeaderJumpsExit
+	subq.w	#2,d2
+	beq.s	PlayerLeaderJumpsExit
+	bmi.s	PlayerLeaderJumpsExit
+.loop
+	move.w	(a1,d0.w),d5
+	move.w	2(a1,d0.w),d6
+	cmp.w	d5,d6
+	bge.w	.1
+	st	(TempWord1).w
+	move.w	(a1,d0.w),-(sp)
+	move.w	2(a1,d0.w),-(sp)
+	move.w	(sp)+,(a1,d0.w)
+	move.w	(sp)+,2(a1,d0.w)
+	move.w	(a0,d0.w),-(sp)
+	move.w	2(a0,d0.w),-(sp)
+	move.w	(sp)+,(a0,d0.w)
+	move.w	(sp)+,2(a0,d0.w)
+.1
+	addq.w	#2,d0
+	dbf	d2,.loop
+	tst.w	(TempWord1).w
+	bne.s	SortValuesUp
+	rts
+DrawLeaderRows	equ	*	;Draw the rows of the player leaders table
+	jsr	(printz).l
+	String	$8F,0,0
+	clr.w	d6
+	movea.l	#$FFFF193A,a5
+	move.w	#$B,(printy).w
+.loop2
+	move.w	#4,(printx).w
+	movea.l	#BlankStatsRow,a1
+	jsr	(printcur).l
+	move.w	d6,d0
+	add.w	(pstatstop).w,d0
+	cmp.w	(pstatslast+2).w,d0
+	blt.w	.2
+	move.w	d6,d0
+	add.w	(pstatstop).w,d0
+	cmp.w	(pstatslast).w,d0
+	bge.w	.6
+	move.w	d0,(pstatslast).w
+	bra.w	.6
+.2
+	move.w	#4,(printx).w
+	move.w	d6,d0
+	add.w	(pstatstop).w,d0
+	move.w	d0,-(sp)
+	addq.w	#1,d0
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printcur).l
+	move.w	#7,(printx).w
+	movea.l	#LeaderIds,a0
+	move.w	d6,d0
+	add.w	(pstatstop).w,d0
+	add.w	d0,d0
+	move.w	(a0,d0.w),d0
+	ext.l	d0
+	divu.w	#$1B,d0
+	move.w	d0,d7
+	swap	d0
+	tst.w	(sp)+
+	bne.w	.3
+	move.w	(printx).w,-(sp)
+	move.w	(printy).w,-(sp)
+	move.w	(printa).w,-(sp)
+	move.w	(printm).w,-(sp)
+	jsr	(GetPlayerNameD7ToA1).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$14,5
+	move.w	d0,-(sp)
+	move.w	(a1),d0
+	subq.w	#2,d0
+	asr.w	#1,d0
+	sub.w	d0,(printx).w
+	jsr	(printbig).l
+	move.w	(sp)+,d0
+	move.w	(sp)+,(printm).w
+	move.w	(sp)+,(printa).w
+	move.w	(sp)+,(printy).w
+	move.w	(sp)+,(printx).w
+.3
+	jsr	(FormatPlayerNameD7).l
+	jsr	(printcur).l
+	move.w	#$19,(printx).w
+	movea.l	#$77E,a1
+	move.w	d7,d0
+	asl.w	#2,d0
+	movea.l	(a1,d0.w),a1
+	adda.w	4(a1),a1
+	adda.w	(a1),a1
+	jsr	(printcur).l
+	move.w	#$20,(printx).w
+	movea.l	#$FFFF193A,a0
+	move.w	d6,d0
+	add.w	(pstatstop).w,d0
+	add.w	d0,d0
+	move.w	(a0,d0.w),d0
+	cmpi.w	#3,(pstatscat).w
+	bne.w	.4
+	ext.l	d0
+	divu.w	#$64,d0
+	swap	d0
+	move.w	d0,-(sp)
+	swap	d0
+	move.w	#3,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printcur).l
+	jsr	(printcurz).l
+	String	'.'
+	move.w	(sp)+,d0
+	move.w	#2,d1
+	jsr	(PushNumberWidthZero).l
+	bra.w	.5
+.4
+	move.w	#3,d1
+	jsr	(PushNumberWidth).l
+.5
+	jsr	(printcur).l
+.6
+	addq.w	#1,(printy).w
+	addq.w	#1,d6
+	cmp.w	(pstatsrows).w,d6
+	blt.w	.loop2
+	bra.w	.7
+.7
+	rts
 
 BlankStatsRow						;A String of blanks that clears a stats list row
 	dc.b	$00,$24,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
 	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$08,$F8,$00,$05,$C3,$56,$21,$FC,$00,$01,$2D,$46
-	dc.b	$D2,$44,$08,$B8,$00,$00,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$08,$B8
-	dc.b	$00,$01,$BF,$B2,$31,$FC,$00,$00,$B0,$00,$31,$FC,$B4,$00,$B0,$02
-	dc.b	$31,$FC,$B8,$00,$B0,$0C,$31,$FC,$00,$05,$B0,$0E,$31,$FC,$C0,$00
-	dc.b	$B0,$08,$31,$FC,$00,$06,$B0,$0A,$31,$FC,$E0,$00,$B0,$04,$31,$FC
-	dc.b	$00,$06,$B0,$06,$30,$3C,$00,$00,$08,$F8,$00,$05,$BF,$B2,$4E,$B9
-	dc.b	$00,$01,$B5,$7E,$08,$B8,$00,$05,$BF,$B2,$4E,$B9,$00,$01,$B2,$C4
-	dc.b	$38,$3C,$00,$01,$22,$7C,$00,$18,$88,$2C,$4E,$B9,$00,$01,$21,$7A
-	dc.b	$31,$C4,$B0,$1C,$24,$7C,$00,$17,$91,$70,$4E,$B9,$00,$01,$B7,$30
-	dc.b	$31,$C4,$B0,$1E,$24,$7C,$00,$17,$A1,$6C,$4E,$B9,$00,$01,$B7,$30
-	dc.b	$21,$FC,$00,$17,$91,$68,$BF,$8A,$31,$C4,$B0,$18,$24,$7C,$00,$17
-	dc.b	$B6,$88,$4E,$B9,$00,$01,$B7,$30,$08,$F8,$00,$02,$C3,$54,$4E,$B9
-	dc.b	$00,$01,$BA,$2E,$00,$08,$FF,$01,$FD,$00,$FC,$00,$70,$28,$72,$1C
-	dc.b	$34,$3C,$07,$FF,$4E,$B9,$00,$01,$B9,$76,$4E,$B9,$00,$01,$BB,$8E
-	dc.b	$00,$06,$BF,$00,$00,$00,$20,$7C,$00,$18,$63,$3E,$22,$48,$24,$48
-	dc.b	$D1,$DA,$D3,$DA,$42,$40,$42,$41,$74,$28,$76,$1C,$7A,$08,$4E,$B9
-	dc.b	$00,$01,$B6,$92,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$0B,$01,$00
-	dc.b	$20,$7C,$00,$18,$80,$0C,$08,$38,$00,$02,$DD,$80,$67,$00,$00,$08
-	dc.b	$20,$7C,$00,$18,$8C,$4A,$22,$48,$24,$48,$D1,$DA,$D3,$DA,$42,$40
-	dc.b	$42,$41,$34,$11,$36,$29,$00,$02,$7A,$08,$4E,$B9,$00,$01,$B6,$92
-	dc.b	$3F,$38,$B0,$1C,$31,$F8,$B0,$1E,$B0,$1C,$4E,$B9,$00,$01,$BC,$72
-	dc.b	$00,$28,$8F,$0A,$19,$7B,$7D,$2D,$53,$43,$52,$4F,$4C,$4C,$20,$4C
-	dc.b	$49,$53,$54,$8F,$0A,$1A,$5B,$5D,$2D,$43,$48,$41,$4E,$47,$45,$20
-	dc.b	$43,$41,$54,$45,$47,$4F,$52,$59,$31,$DF,$B0,$1C,$4E,$B9,$00,$01
-	dc.b	$BB,$8E,$00,$06,$FE,$00,$00,$00,$20,$7C,$00,$17,$0B,$0C,$22,$48
-	dc.b	$24,$48,$D1,$DA,$D3,$DA,$42,$40,$42,$41,$74,$40,$76,$1C,$7A,$01
-	dc.b	$4E,$B9,$00,$01,$B6,$92,$4E,$B9,$00,$01,$BE,$D6,$00,$1C,$F8,$04
-	dc.b	$01,$07,$08,$23,$F8,$04,$01,$0B,$08,$50,$4C,$41,$59,$45,$52,$F8
-	dc.b	$04,$01,$18,$08,$54,$45,$41,$4D,$46,$FC,$25,$00,$4E,$75
+	dc.b	$20,$20,$20,$20
+SetupLeadersScreenVideo	equ	*	;Set the VBint handler, scroll and map addresses for the leaders screen and load its graphics
+	bset	#5,(sflags12).w
+	move.l	#VBlank_Menus,(VBint).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
+	move.w	#0,(VSCRLPM).w
+	move.w	#$B400,(VSPRITES).w
+	move.w	#$B800,(VmMAP3).w
+	move.w	#5,(Map3col1).w
+	move.w	#$C000,(VmMAP2).w
+	move.w	#6,(Map2col1).w
+	move.w	#$E000,(VmMAP1).w
+	move.w	#6,(Map1col1).w
+	move.w	#0,d0					;fade to color
+	bset	#5,(disflags).w
+	jsr	(setVram).l
+	bclr	#5,(disflags).w
+	jsr	(orjoy).l
+	move.w	#1,d4
+	movea.l	#LeadersSprites,a1
+	jsr	(LoadScreenSprite).l
+	move.w	d4,(smallfontchars).w
+	movea.l	#RosterFont+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.w	d4,(smallfont2chars).w
+	movea.l	#SmallFontMap2+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.l	#RosterFont,(smallfontptr).w
+	move.w	d4,(BigFontchars).w
+	movea.l	#BigFontMap4+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	bset	#2,(sflags11).w
+	jsr	(printsmallz).l
+	String	$FF,1,$FD,0,$FC
+	moveq	#$28,d0
+	moveq	#$1C,d1
+	move.w	#$7FF,d2
+	jsr	(eraser).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),0,0
+	movea.l	#LeadersBgMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#$28,d2
+	moveq	#$1C,d3
+	moveq	#8,d5
+	jsr	(dobitmap).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$B,1
+	movea.l	#LeagueLeadersTitleMap,a0
+	btst	#2,(SeasonDay+2).w
+	beq.w	.1
+	movea.l	#PlayoffLeadersTitleMap,a0
+.1
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	move.w	(a1),d2
+	move.w	2(a1),d3
+	moveq	#8,d5
+	jsr	(dobitmap).l
+	move.w	(smallfontchars).w,-(sp)
+	move.w	(smallfont2chars).w,(smallfontchars).w
+	jsr	(printcurz).l
+	String	$8F,$A,$19,'{}-SCROLL LIST',$8F,$A,$1A,'[]-CHANGE CATEGORY'
+	move.w	(sp)+,(smallfontchars).w
+	jsr	(printz).l
+	String	$FE,0,0
+	movea.l	#IceBgMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#$40,d2
+	moveq	#$1C,d3
+	moveq	#1,d5
+	jsr	(dobitmap).l
+	jsr	(printbigz).l
+	String	$F8,4,1,7,8,'#',$F8,4,1,$B,8,'PLAYER',$F8,4,1,$18,8,'TEAM'
+	move.w	#$2500,sr
+	rts
 
 SeasonPlayoffStats					;The playoff stats screen in a season (PlayoffStatsMenu with GameFlags bit
 									;7): the players or goalies of a

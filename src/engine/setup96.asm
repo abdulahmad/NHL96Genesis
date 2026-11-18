@@ -122,8 +122,9 @@ AttribFighting						;Bit 0 of the nibble is the handedness: drop it, then a rati
 	subq.w	#1,d1
 
 AttribRating						;d0 * 100 / d1. Falls into AttribPrintPct.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$C0,$FC,$00,$64,$80,$C1,$4E,$B9,$00,$1D,$93,$02
+	mulu.w	#$64,d0
+	divu.w	d1,d0
+	jsr	(SoftClampCoord).l
 
 AttribPrintPct						;Print d0 4 wide, then 4 blanks.
 	moveq	#4,d1

@@ -44,6 +44,34 @@ LoadReplayIcon = $1D8E5C			;code96_15
 LoadHomeTeamGfx = $1D8E6C			;code96_15
 printbigcur = $01BEE8				;pause96_stub
 SkipStrings = $01D7F2				;hockey96_inter
+BigFontMap = $1B89C8				;graphics96
+BigFontMap3 = $1B9416				;graphics96
+ClearMenuBox = $1E2EAA				;summary96
+ConvertByteToDigits = $0230C4				;trade96_stub
+DigitFontMap = $1B9ED8				;graphics96
+DrawScreenSprite = $01218A				;options96_stub
+FoxBannerMap = $1BCF78				;graphics96
+GetRosterName = $0101E6				;players96_stub
+HockeyNewsBannerMap = $1BD5E6				;graphics96
+LoadScreenSprite = $01217A				;create96_stub
+PauseBgBitmap = $1BBBEC				;graphics96
+PauseRinkMap = $1BA4BE				;graphics96
+PauseSprites = $1BCBFA				;graphics96
+PushNumberWidth = $01BE1C				;goal96_box_stub
+PushTime = $01BD84				;penalty96_stub
+RosterFont = $179168				;graphics96
+SmallLogoPtrs = $012CDE				;teamgfx96
+VBlank_SpriteFade = $1E2E76				;awards96_show_stub
+Vmaddr = $01B678				;season96_stub
+dobitmap = $01B692				;lines96_bar_stub
+eraser = $01B976				;goal96_box_stub
+orjoy = $01B2C4				;hockey96_stub
+printbigcurz = $01BEC4				;video96
+printcur = $01BC84				;create96_stub
+printsmallz = $01BA2E				;pause96_stub
+printz = $01BB8E				;goal96_box_stub
+setVram = $01B57E				;create96_stub
+song = $088586				;goal96_box_stub
 
 
 ; Main segment code

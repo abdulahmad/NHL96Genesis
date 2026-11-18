@@ -2,7 +2,273 @@
 00C0C6,banner,Fight banner: close both line change boxes and frame a box with the name and team of both fighters and "vs"
 00C166,addinfo,d0 = penalty byte (player SCnum in the low nibble): build "<name> <team>" in a1; add fighting to d3; keep the widest line in d2 and centre printx
 00BBBC,.hold,Hold the two fighters together: stop a3 and when the fighters are more than $18 pixels apart push them toward each other
-00BC0E,chkhit,Part of the fight that checks whether the punch of a3 hit the opponent a0 (frame change only)
+00BC0E,=chkhit,Part of the fight that checks whether the punch of a3 hit the opponent a0 (frame change only)
 00BE72,.cwdgrab,Crowd reacts to a grab hit and the held player a3 is shoved 3 pixels
 00BFC6,.cwd,Crowd reacts to a punch; push the hit player a3 back (the knock back is scaled by 0 in this game)
 00BFEE,.fall,a3 lost the fight: the winner a0 gets the fighting penalty and the crowd cheers
+009A3A,=GoAssExit,Jump to assexit (the assfaceoff branches end here)
+009E46,=GoPeriodOver,Jump to PeriodOver
+009E4C,=GoStop4Pen,Jump to Stop4Pen
+00C608,=GoAssReplace,Jump to assreplace
+00CAE4,=GoDoNothing,Jump to donothing
+00E7DA,=asswingoCheckSlot,Part of asswingo: d1 = 5; test the player a0 (pflags2 bit 2, number at $65) against d0 and branch to the winger lane setup
+00F466,=shotdirmathAssShoot,Part of shotdirmath: temp2 = (puck distance from the end boards) / 8 up to $14, then assignment $12 (assshoot) through assreplace
+01016A,=GetPlayerNameD7ToA1,getplayernameD7 with the name pointer returned in a1
+0104AC,=ReadCreatedPlayerSRAM,Read the $36 byte created player record number d7 from save RAM ($1550 + d7 * $36)
+0104CA,=WriteCreatedPlayerSRAM,Write the $36 byte created player record number d7 to save RAM and update the checksum
+0114E4,SeasonHeaderToOptions,Copy the option bytes of the season header (SeasonDay, SeasonPen, SeasonTeam ...) into the Opt* words
+012502,BuildSeasonMenuTeamList,Season menu: build the team select list TeamSelectHome+6 from SeasonSchedule (or leave it for the playoffs)
+012656,=SetupLeagueOptionsScreen,Set the VBint handler, the scroll and map addresses, load the League options sprites and fonts
+0129AE,=DrawSeasonTeamSelect,Season menu: draw the team select rows with the team blocks and wait for the next frame
+012D7E,=SeasonMenuListByDay,
+012DF0,=SeasonMenuListSixRows,Season menu: six rows; menulist by SeasonDay and the playoff flags
+014BDC,=clockcontPuckAssignments,
+0154D8,=ExitStatsScreenReload,
+0156AC,PrintSelectGoalieItem,Pause menu Change Goalie: print the item at the cursor with the big font
+015E12,=suba4ToggleReplayView,
+015EE4,AdvanceReplayRecord,Step a4 to the next $64 byte replay record and wrap from the end of the buffer to AwardIds
+015F70,=RevReplayAdjFrames,Reverse replay: adjust the frame offsets of the six skaters of record a4
+0168EC,=FindGoalieAimOffset,
+016FB4,assbenchTakeNewPos,Set position from newpos, assign by position, clear newpos and newpnum
+0171AA,ReleasePadFromPlayer,Take the joystick off player a3 (chgplayer for the pad that controls it)
+01731C,=assgoaliebreakwaitEnd,
+01743E,assscoreRandomTemp1,temp1 = random 0..$77 (wait time before the player moves)
+017BDC,ClampYPosition,Clamp d1 to the goal line range ($FEE7..$119) and subtract d3
+01838E,chk4lc,Late check: when the puck is in the player half and the roll allows, set the check bit
+01842E,=chk4shot,Choose to shoot: puck carrier with a clear lane and a random roll
+0185E8,=chk4pass,Choose to pass: random roll weighted by the stick hand and the lines
+0197FC,ReturnGoaliesTeam,
+019D0C,CheckAttackersOffside,Team a2: offside bit for the attackers beyond the blue line
+019FEE,PuckPathAtLine,Where the puck path crosses the line d4 (uses the puck velocity)
+01A110,avdgoal,Skate target adjusted to stay out of the goalie crease (clears fodir2, steers around the goal)
+01A1D4,avdgoalcrease,Second half of avdgoal: keep the target inside the crease width ($50) on the far side
+01A210,PuckLeadPosition,d0/d1 = puck position plus its velocity (puck lead point for skating to the puck)
+01A24A,=skatetoIntercept,
+01C050,BigControlCodeSetMap,Big font control code: set the map shift printm from the next byte
+01C062,BigControlCodeSetAttrib,Big font control code: set the attribute printa from the next byte
+01C088,BigControlCodeSetXPos,Big font control code: set printx from the next byte
+01D0C6,PrintPenaltyBoxPlayers,Penalty box list of team a2: the players without a coincidental penalty
+01D0FA,pplpen,Print one penalty box line: player number and time remaining (a2 = team, d0 = roster offset)
+02144A,ResetTeamPlayers,Clear the team offside bit and reset the six skaters of team a2 (SetSPA, impact, pflags)
+021B38,PrintPlayoffLevelRow,Print the playoff level string; for the second team set printx $1A
+1D7072,BuildTeamHotCold,Hot and cold list of the team at a0 (GetTeamLines, one nibble each)
+1D853C,=AddArenaAnimSpriteFrame,Add the sprite of arena animation frame d0 (d6 < $40) to the sprite list
+1D85F4,=AddArenaAnimSpriteDone,
+1D87E2,NextArenaFrame,Step the arena animation to the next frame of its frame list (wrap at the end marker)
+1D9094,=PickFaceoffDirection,d0 = a random direction word from the table at $1D90D0; 6 near the center
+1D90E2,=chkFgtBit1ShotsLead,
+1D9302,=SoftClampCoord,d0 = d0 (or d0 / 2 + $28 when under $50)
+1D97E2,ClearSongLeadFlag,Clear sflags2 bit 5
+1D9EAE,DrawStandingsRow,Print one row of the standings table
+1D9F50,DrawStandingsTeamLogo,Draw the team logo of team d1 for the standings
+1DA8B2,=PrintLeadersCategory,Print the category name of the leaders screen
+1DA900,=LeadersReadPad,
+1DA986,=ClearLeadersRows,Clear the leaders rows and print the headings again
+1DAA00,=BuildPlayerLeadersExit,
+1DAAEC,BuildGoalieLeaders,Leaders: sort the goalies of every team into the leader list
+1DAB68,BuildSkaterLeaders,Leaders: sort the skaters of every team into the leader list
+1DAC58,=PlayerLeaderJumpsExit,
+1DACAC,=DrawLeaderRows,Draw the rows of the player leaders table
+1DAE56,=SetupLeadersScreenVideo,Set the VBint handler, scroll and map addresses for the leaders screen and load its graphics
+1DC208,=TradePlayersPrintTeams,
+1DCB4E,CountChosen,Count the chosen players of the trade list (goalies, then skaters) into a0
+1DCCCA,=SetupTradeScreenVideo,Set the VBint handler, scroll and map addresses for the trade screen and load its graphics
+1DCE6E,=DrawTradeTeamLogo,Draw the logo of team d1 on the trade screen
+1DCEAE,=FillTradeRosterList,Fill the trade roster list a0 with the players of the team (goalies first)
+1DCF56,=SortTradeRosterList,Sort the trade roster list a0 by position
+1DCF92,=PrintTradeSmallText,Print the String that follows with the second small font set
+1DD004,=TradeReadPad,Wait one frame and read the pad for the trade screen
+1DD19E,ConvertTradeSlots,Convert the three roster slot words at a0 to position slots (GetPositionSlot)
+1DD93C,=CreatePlayerInit,
+1DD9DE,=CreatePlayerLoop,
+1DD9E6,=CreatePlayerWaitPad,
+1DDA8C,=CreatePlayerNextEntry,
+1DDD7C,=NameEntryMoveColumn,
+1DDE14,=CreateNameDoneReturn,Restore the registers and return
+1DDE1A,=ToggleNameEntryCase,Toggle the upper / lower case of the name entry and redraw the letter grid
+1DDE68,=PositionGridCursor,Print the grid cursor at the letter d5
+1DDF6C,=DrawLetterGrid,Draw the letter grid of the name entry screen
+1DDFAE,=DrawNameEntryPrompt,Print the prompt lines of the name entry screen
+1DE0FE,MoveNameLogArrows,Move the arrows of the saved names list
+1DE24A,=ReadSavedNameFromSRAM,Read the saved name selected in the log from save RAM
+1DE31A,=SetupCreateScreenVideo,Set the VBint handler, scroll and map addresses for the create player screen and load its graphics
+1DE5BA,=DrawNameEntryScreen,Draw the name entry screen
+1DE894,=SaveNewNameDone,
+1DE8B2,=SaveNameErrorExit,
+1DE95C,=CheckCreatedPlayerLimit,d0 = -1 when the created player count ($202A9D) has reached $14
+1DEB4C,DrawRatingsHeader,Print the headings of the ratings screen
+1DECCE,DrawAllFields,Draw every rating field and the two column heads
+1DECF0,DrawFieldsHeaderLeft,Print the left column heading of the fields
+1DED60,DrawFieldsHeaderRight,Print the right column heading of the fields
+1DED9A,=DrawRatingValue,Draw the value of rating field d7 (skater or goalie field list)
+1DF186,DrawFieldLabel,Print the label of field d7 (skater or goalie list) and its marker
+1DF368,=CallFieldEditor,Call the edit routine of the selected field (skater or goalie list)
+1DF436,=AdjustAttribExit,
+1DFEAA,CompareGoalieCountToThree,d0 = goalie count of the team; flags from cmp #3
+1DFF42,=DrawFreeAgentCursor,Draw the free agent screen cursor
+1E00C6,ReadFreeAgentPads,Free agents screen: wait one frame and read the pad
+1E014C,=DrawFreeAgentsExit,
+1E014E,=DrawFreeAgentsClearD0,
+1E01F2,=FillFreeAgentList,Fill the free agent list with the players of the free agent pool
+1E0264,=TestFreeAgentFlag,Set the flags from the free agent record flag at $201BB8
+1E0276,=SetupFreeAgentsVideo,Set the VBint handler, scroll and map addresses for the free agents screen and load its graphics
+1E03FE,=DrawFreeAgentTeamHeader,Print the team heading of the free agents screen
+1E0498,=DrawFreeAgentStartExit,Print the start-exit hint of the free agents screen
+1E04FA,=EraseFreeAgentBoxes,Erase the two message boxes of the free agents screen
+1E090C,=DrawReleaseCursor,Draw the release screen cursor
+1E0946,=DrawReleaseRosterSaveSR,Save sr, then fall into DrawReleaseRoster
+1E0A44,ReadReleasePads,Release screen: wait one frame and read the pad
+1E0ACA,=DrawReleaseRosterExit,
+1E0ACC,=DrawReleaseRosterClearD0,
+1E0B34,=SortReleaseList,Sort the release list by position
+1E0CFE,=DrawReleaseFooter,Print the footer of the release screen
+1E0DC6,ClearSavedLinesA,Clear $41 bytes of save RAM at 0 (ClearSRAMBytes)
+1E0DD0,ClearSavedLinesB,Clear $41 bytes of save RAM at $C39 (ClearSRAMBytes)
+1E1D3A,LineEditorMoveCursor,Line editor: move the cursor row by d0 and rescroll the player list
+1E1EAE,DrawLineIcon,Draw the icon of line d5 at its LineIconPosTable position
+1E1F7E,DrawLineIconLabel,Print the label under a line icon
+1E2018,=DrawLineEditorBackdrop,Clear the top of the line editor and draw its background map
+1E242C,=SetupLineEditorVideo,Set the VBint handler, scroll and map addresses for the line editor and load its graphics
+1E2624,=CopyStatsPalette,Copy PStatsPal to the palette buffer
+1E30CA,FillGoalieIndexList,Fill CalTeam with the goalie indexes 0 .. count-1
+1E3172,ResetGoalieScrolling,Reset the scroll counters to the goalie count
+1E31BA,RosterMoveCursor,Move the roster cursor by d0 rows and redraw
+1E31F6,DrawRosterRow,Print one row of the roster screen
+1E329C,SetupRosterScreenVideo,Set the VBint handler, scroll and map addresses for the roster screen and load its graphics
+1E34DC,DrawRosterTeamLogo,Draw the logo of the team at Xvel(a2) on the roster screen
+1E34F8,ReloadHomeTeamStruct,Reload tmstruct from the home team, clear the attribute deltas and restoreteams
+1E359E,DrawScoringRow,Print one row of the scoring summary
+1E3688,PrintScorerName,Print the scorer name d0 (or nothing when negative) and move to the next row
+1E395A,SetupPenaltySummaryVideo,Set the VBint handler, scroll and map addresses for the penalty summary and load its graphics
+1E3B52,DrawPenaltyRows,Print the rows of the penalty summary
+1E3CD4,DrawPeriodStatsHeader,Print the heading of the period stats screen
+1E3DD6,PeriodStatsPrintTotal,Print a team total of the period stats with the big font and add it to the running sum
+1E3E12,=SetupPeriodStatsVideo,Set the VBint handler, scroll and map addresses for the period stats screen and load its graphics
+1E4062,DrawStatsReportHeader,Print the heading of the stats report
+1E412E,PrintStatValue,Print one value of the stats report (number, time or percentage by column type)
+1E41FE,StatsPushNumber,Jump to PushNumber
+1E4204,StatsPushTime,Jump to PushTime
+1E45BE,=ShootersReadPad,
+1E47A6,ShootersMoveCursor,Shootout shooters list: move the cursor row by d0 and rescroll
+1E494A,=DrawShootersBackdrop,Draw the background of the shooter list
+1E4A28,=ClearShootersBackdrop,Clear the background of the shooter list
+1E4A42,=DrawShooterName,Print a shooter name with the small font
+1E4AE8,DrawShootersTitle,Print the title of the shooter list
+1E4B56,DrawShooterRow,Print one row of the shooter list
+1E4BE0,=SetupShootersVideo,Set the VBint handler, scroll and map addresses for the shooter list and load its graphics
+1E4E98,RecordsChoosePage,Records screen: pick the page by TempWord1
+1E4EA4,PrintRecordTitles,Print the heading of the record page: wins, saves or goals
+01744A,=assscoreSkateOrReturn,Part of assscore: when pflags bit 3 is clear go to skateto, else return
+01C09A,=BigControlCodeSetYPos,Big font control code: set printy from the next byte and jump to xyVmMap
+1D97EA,=LeadSongExit,Restore sflags2 and the registers and return
+1DABEC,=SortLeaderValues,Leaders: order the values a1 (up or down by BA_PS_flags) and note whether it changed
+1E1B5E,=LineEditorLoop,Line editor main loop: draw the screen and read the pad
+1E1D6E,=LineEditorSetSlot,Line editor: put the chosen player into the line slot and redraw
+1E2FB4,=RosterInputLoop,Roster screen main loop: read the pad
+1E31B2,=RosterScrollDown,Roster screen: scroll down by one row and redraw
+1E31DE,=RosterScrollUp,Roster screen: scroll up and redraw
+1E36A0,=ScoringSummaryScrollMark,Scoring summary: print the more marker when scrolled and continue with the row setup
+1E45AE,=ShootersLoop,Shooters list main loop: read the pad
+1E47DA,=ShootersSelectPlayer,Shooters list: put the chosen shooter into the round slot and redraw
+1E1EA7,=LineIconSlotTable,Table of one byte per line slot, indexed from the line editor cursor (OptLine moves the index by one)
+0097A0,=ReadSRAMBitsSkip1,Entry after the register save when the bit field is skipped (low confidence)
+00980E,=ReadSRAMBitsSkip2,Second skip entry of ReadSRAMBits (low confidence)
+0098EC,=ReadSRAMBitsSkip3,Third skip entry of ReadSRAMBits (low confidence)
+009D56,=SetFaceoffComputerLineExit,Shared return of SetFaceoffComputerLine
+01261C,=SeasonMenuCountGoalie,Draw the goalie mark and count one goalie (low confidence)
+016494,=updateplayersanim,Animate the player after the position check of updateplayers
+0169A6,=HoldplayerImpact,Hold player: pick the impact frame and check the boards
+016DAC,=setpadsExit,Shared return of setpads
+016FCC,=assbenchExit,Shared return of assbench
+0175C8,=assgoaliepuckx,Goalie AI: use the puck x position (low confidence)
+019780,=EndPenaltyShotPlayExit,Shared return of EndPenaltyShotPlay
+01EFE6,=wallcollsfx,Play the board hit sound when the flag was set
+01EFFA,=wallcollcheck,Wall collision: clip a skater's y velocity and check the crease height
+01F07E,=wallcollskater,Wall collision of one skater against the others (low confidence)
+01F3A8,=wallcolldist,Distance check between two skaters (low confidence)
+01F3EC,=wallcollpuck,Skater and puck contact check
+01F5BE,=wallcollhit,A skater hits the puck: take the puck and flag the hit
+01FACE,=puckgoaliescatter,Scatter the puck in random directions after a goalie hit
+0207AE,=showclockPrint,Print the clock digit string
+0207E8,showclockVertical,Draw the clock when the display flag is set
+1D6BDC,=PuckOnAttackHalfYes,Result 1: the puck is on the attack half
+1D9060,=PlaceBoardFallExit,Shared return of PlaceBoardFall
+1D9ACE,=CanBlockExit,Shared return of CanBlock
+1D9AD0,CanBlockScreenInit,Set up the menu screen planes and VBlank handler (low confidence)
+1D9E12,=SortStandingsHeaders,Print and erase the two header rows of the standings
+1DDDA6,=CreateListMoveDraw,Redraw the grid letters after a cursor move
+1DDE18,=CreateNameDoneExit,Shared return of CreateNameDone
+1DDEE4,=FindGridLetterMsg1,Print the first create player message and clear its line
+1DDF04,=FindGridLetterMsg2,Print the second create player message and clear its line
+1DDF24,=FindGridLetterMsg3,Print the third create player message
+1DF0FC,=HandTextLeft,Print the left hand text (low confidence)
+1DF108,=HandTextRight,Print the right hand text (low confidence)
+1E0430,=BuildFreeAgentListHeader,Print the free agent list header
+1E1584,=PerLenItemNA,Not applicable text item
+1E219C,=LineCursorHelp,Line cursor help text
+1E2D58,=PauseScreenDrawBench,Draw the bench players of the pause screen
+1E2D8C,=PauseScreenDrawName,Draw one player name row of the pause screen
+1E36EE,GoalTypeScreenInit,Set up the planes and VBlank handler of the goal types screen
+1E43CE,TeamStatScreenInit,Set up the planes and VBlank handler of the team stats screen
+1E493A,=ShootersMoveRedraw,Redraw the shooter rows after a move
+1E4F2C,=RecHeaderSavesRow,Print the saves record header row
+1E5038,=RecHeaderSavesBox,Print the saves record header box
+1E50AC,=RecHeaderSavesRowTotal,Print the saves record header total row
+1E5404,RecordsScreenInit,Set up the planes and VBlank handler of the team records screen
+01D72E,=sctabPrintTeam,Print the team name of a scoreboard line
+01D7BE,=sctabPrintHeader,Print the scoreboard header
+023482,PAttribSpeed,Player attribute label row: Speed (mask, count, text)
+023498,PAttribHanded,Player attribute label row: Handed
+0234C4,PAttribDefAwareness,Player attribute label row: Defensive awareness
+0234DA,PAttribShotPower,Player attribute label row: Shot power
+0234F0,PAttribShotAccuracy,Player attribute label row: Shot accuracy
+023506,PAttribPassAccuracy,Player attribute label row: Pass accuracy
+02351C,PAttribStickHandling,Player attribute label row: Stick handling
+023532,PAttribWeight,Player attribute label row: Weight
+023548,PAttribEndurance,Player attribute label row: Endurance
+02355E,PAttribAggressiveness,Player attribute label row: Aggressiveness
+02358A,PAttribChecking,Player attribute label row: Checking
+0235CE,GAttribSpeed,Goalie attribute label row: Speed
+023610,GAttribOffAwareness,Goalie attribute label row: Offensive awareness
+02363C,GAttribStickRight,Goalie attribute label row: Stick right
+023652,GAttribStickLeft,Goalie attribute label row: Stick left
+023668,GAttribGloveRight,Goalie attribute label row: Glove right
+02367E,GAttribGloveLeft,Goalie attribute label row: Glove left
+023694,GAttribWeight,Goalie attribute label row: Weight
+1E1B3C,=LineEditorHelp,Print the help line of the line editor
+0128B6,=SeasonMenuDrawTeamRow,Season menu: draw the team row (low confidence)
+012940,=SeasonMenuClampTeam,Season menu: clamp the selected team (low confidence)
+012A54,=SeasonMenuDrawLogos,Season menu: draw the team logos
+012B50,=SeasonMenuDrawLegend,Season menu: print the legend line
+1E25DA,=SaveTeamLineLabel,Print the label of a saved team line with the second small font
+1E2122,LineIconPlayerBoxPos,Position of the player box of each line icon (x, y, count)
+1E212A,LineIconPosTable+2,Second entry of LineIconPosTable
+1DDA78,=CreateFieldJumps,Create player: the table of field routines
+179170,RosterFont+8,Roster font tiles after the header
+17A16C,SmallFontMap2+8,Small font map 2 after the header
+17AA7A,BigFontMap2+8,Big font map 2 after the header
+17B688,BigFontMap4+8,Big font map 4 after the header
+1B89D0,BigFontMap+8,Big font map after the header
+1B941E,BigFontMap3+8,Big font map 3 after the header
+1B9EE0,DigitFontMap+8,Digit font map after the header
+19E7FE,LineEditorBgMap+8,Line editor background map after the header
+1DFC44,=SignFreeAgentsRedraw,Redraw the free agent screen and wait for the next frame
+1E4D8A,=ShootersPrintLabel,Print the shooter label with the second small font
+010378,=GetJerseyNumberRead,Read the jersey number of a player from the save RAM table
+1DE72A,=FormatNameRecordMark,Print the marker of the selected name record and redraw the list markers
+1DE0C0,=DrawCreateListMarkers,Draw the markers of the created player list
+1E05EC,=ReleasePlayersWait,Wait for a frame and redraw the release screen
+0116BA,=SetupSeasonGameLookup,Look up the day in the schedule table to find the game
+1DE0F8,=MoveListMarkersDraw,Draw the arrow markers of the created player list
+0120C2,TeamRankOverall,Team select rank lookup: the rank of team d0 in the overall standings (a byte table)
+0120D6,TeamRankOverallTable,Overall rank of each team (one byte per team, 1 = best)
+012092,TeamRankGoaltending,Team select rank lookup: the goaltending rank of team d0
+0120A6,TeamRankGoaltendingTable,Goaltending rank of each team
+012062,TeamRankPenaltyKilling,Team select rank lookup: the penalty killing rank of team d0
+012076,TeamRankPenaltyKillingTable,Penalty killing rank of each team
+012032,TeamRankPowerPlay,Team select rank lookup: the power play rank of team d0
+012046,TeamRankPowerPlayTable,Power play rank of each team
+012002,TeamRankEvenStrength,Team select rank lookup: the even strength rank of team d0
+012016,TeamRankEvenStrengthTable,Even strength rank of each team
+00E38C,=assdefoLeftSide,Defense wing: pick the x offset on the left side relative to the puck (low confidence)
+00E450,=assdefoRightSide,Defense wing: pick the x offset on the right side relative to the puck (low confidence)

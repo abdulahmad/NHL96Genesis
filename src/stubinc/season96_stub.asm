@@ -65,6 +65,13 @@ LeagueOptionsTitleMap = $17DBDC		;graphics96
 printcurz = $01BC72					;create96_stub
 SmallLogoPtrs = $012CDE				;teamgfx96
 SPAturnl = $2020					;frames96
+FlipUserRec = $1E1A5E				;options96
+SeasonMenuListByDay = $012D7E				;teamgfx96
+SeasonMenuListSixRows = $012DF0				;teamgfx96
+SetGoalieModes = $1E1A3C				;options96
+SetLineOption = $1E1A66				;options96
+SetPenOption = $1E1A8E				;options96
+SetSkillLevel = $1E1AA8				;options96
 
 
 ; Main segment code

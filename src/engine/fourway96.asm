@@ -28,19 +28,30 @@ Detect4WayPlay						;Detect the 4 way play adaptor (EA 4 Way Play) on port 2:
 
 ReadJoySwapPad1						;Unreferenced. Read 4 way play pad 1. Not decoded in the listing: kept as
 									;bytes
-	dc.b	$13,$FC,$00,$00,$00,$A1,$00,$05,$31,$F8,$BF,$32,$BF,$2E,$4E,$B9
-	dc.b	$00,$01,$B3,$48,$31,$F8,$BF,$2E,$BF,$32,$4E,$75
+	move.b	#0,(IO_CT2_DATA+1).l
+	move.w	(pad4way4+5).w,(pad4way4+1).w
+	jsr	(ReadJoy1).l
+	move.w	(pad4way4+1).w,(pad4way4+5).w
+	rts
 
 ReadJoySwapPad2						;Unreferenced. The same for pad 2
-	dc.b	$13,$FC,$00,$10,$00,$A1,$00,$05,$31,$F8,$BF,$34,$BF,$2E,$4E,$B9
-	dc.b	$00,$01,$B3,$48,$31,$F8,$BF,$2E,$BF,$34,$4E,$75
+	move.b	#$10,(IO_CT2_DATA+1).l
+	move.w	(pad4way4+7).w,(pad4way4+1).w
+	jsr	(ReadJoy1).l
+	move.w	(pad4way4+1).w,(pad4way4+7).w
+	rts
 
 ReadJoySwapPad3						;Unreferenced. The same for pad 3
-	dc.b	$13,$FC,$00,$20,$00,$A1,$00,$05,$31,$F8,$BF,$36,$BF,$2E,$4E,$B9
-	dc.b	$00,$01,$B3,$48,$31,$F8,$BF,$2E,$BF,$36,$4E,$75
+	move.b	#$20,(IO_CT2_DATA+1).l
+	move.w	($FFFFBF36).w,(pad4way4+1).w
+	jsr	(ReadJoy1).l
+	move.w	(pad4way4+1).w,($FFFFBF36).w
+	rts
 
 ReadJoySwapPad4						;Unreferenced. The same for pad 4
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$13,$FC,$00,$30,$00,$A1,$00,$05,$31,$F8,$BF,$38,$BF,$2E,$4E,$B9
-	dc.b	$00,$01,$B3,$48,$31,$F8,$BF,$2E,$BF,$38,$4E,$75
+	move.b	#$30,(IO_CT2_DATA+1).l	;4 way play: select pad
+	move.w	($FFFFBF38).w,(pad4way4+1).w
+	jsr	(ReadJoy1).l
+	move.w	(pad4way4+1).w,($FFFFBF38).w
+	rts
 

@@ -553,16 +553,48 @@ DoDMA								;Dma d0 words from a0 to vram d1 (two transfers when the source cro
 	rts
 
 DoDMA_nd2							;Vram to vram copy by dma, protected from vblank.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$F0,$40,$3F,$38,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$43,$F9
-	dc.b	$00,$C0,$00,$04,$32,$BC,$81,$54,$32,$BC,$8F,$01,$36,$3C,$93,$00
-	dc.b	$16,$00,$32,$83,$36,$3C,$94,$00,$E0,$48,$16,$00,$32,$83,$36,$3C
-	dc.b	$95,$00,$16,$02,$32,$83,$36,$3C,$96,$00,$E0,$4A,$16,$02,$32,$83
-	dc.b	$32,$BC,$97,$C0,$42,$80,$30,$01,$E5,$80,$E4,$48,$48,$40,$00,$40
-	dc.b	$00,$C0,$21,$C0,$D2,$7C,$3F,$00,$30,$3C,$00,$0D,$4E,$B9,$00,$08
-	dc.b	$83,$9E,$30,$1F,$32,$B8,$D2,$7C,$32,$B8,$D2,$7E,$61,$00,$00,$5C
-	dc.b	$32,$BC,$81,$64,$32,$BC,$8F,$02,$30,$3C,$00,$0E,$4E,$B9,$00,$08
-	dc.b	$83,$9E,$31,$DF,$BF,$B2,$4C,$DF,$02,$0F,$4E,$75
+	movem.l	d0-d3/a1,-(sp)
+	move.w	(disflags).w,-(sp)
+	bset	#dfng,(disflags).w
+	lea	(Vctrl).l,a1
+	move.w	#VDPR_MODE2+$54,(a1)
+	move.w	#VDPR_AUTOINC+$01,(a1)
+	move.w	#$9300,d3
+	move.b	d0,d3
+	move.w	d3,(a1)
+	move.w	#$9400,d3
+	lsr.w	#8,d0
+	move.b	d0,d3
+	move.w	d3,(a1)
+	move.w	#$9500,d3
+	move.b	d2,d3
+	move.w	d3,(a1)
+	move.w	#$9600,d3
+	lsr.w	#8,d2
+	move.b	d2,d3
+	move.w	d3,(a1)
+	move.w	#VDPR_DMASRCH+$C0,(a1)
+	clr.l	d0
+	move.w	d1,d0
+	asl.l	#2,d0
+	lsr.w	#2,d0
+	swap	d0
+	ori.w	#$C0,d0
+	move.l	d0,(dmaram).w
+	move.w	d0,-(sp)
+	move.w	#$D,d0
+	jsr	(SoundCmd).l
+	move.w	(sp)+,d0
+	move.w	(dmaram).w,(a1)
+	move.w	(dmaram+2).w,(a1)
+	bsr.w	WaitDMA
+	move.w	#VDPR_MODE2+$64,(a1)
+	move.w	#VDPR_AUTOINC+$02,(a1)
+	move.w	#$E,d0
+	jsr	(SoundCmd).l
+	move.w	(sp)+,(disflags).w
+	movem.l	(sp)+,d0-d3/a1
+	rts
 
 DoFill								;Fill d0 bytes of vram at d1 with the word d2
 	movem.l	d3/a1,-(sp)

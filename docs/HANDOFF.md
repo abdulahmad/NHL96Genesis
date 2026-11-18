@@ -6,9 +6,9 @@
 - Branch: `cursor/creditspages-399a`
 - Last check: `tools/verify_all.sh` ALL MATCH (2026-11-05).
 - Next: PR. Same rename in 94G / 95G / 95S.
-- Code as data: 171 blocks are still dc.b (`tools/check_code_as_data.py` lists them; `tools/mark_code_as_data.py` marked 52 more, a few runs need a hand marker). Each needs the names of the
-  mid-routine targets other code jumps to (`python3 tools/decode_code.py` prints them as `NAME` and `rom` lines); apply
-  in one pass after adding them to `tools/decode_names.csv`, then `tools/verify_all.sh` must say ALL MATCH.
+- Code as data: none left (2026-11-18). `tools/check_code_as_data.py` reports 0 candidates and `tools/verify_all.sh` says ALL MATCH. The last
+  ~220 dc.b blocks were turned into instructions in one pass with `tools/decode_code.py` (names in `tools/decode_names.csv`,
+  forced code starts and data pockets in `tools/decode_hints.csv`).
 - Open PRs: (this unit)
 
 ## Purpose
@@ -48,7 +48,14 @@ Windows: `npm run build:retail`, `npm run seg:<name>`. Linux (wine): `tools/buil
   above each flagged run; `tools/decode_code.py [--apply] [--structs --structregs 2,3] [FILE]` turns each marked run into
   instructions, local labels, `String` macros and names from `tools/decode_names.csv` (`addr,name,comment`) and from the
   95G/94G/93G/92G sources (`tools/lineage.py`, `--parents DIR`); `tools/fix_stub.py SEG` adds the stub equates a segment
-  needs; `tools/reflow_comments.py` re-wraps comments to the layout rules. `tools/m68kdis.py` is the disassembler.
+  needs; `tools/reflow_comments.py` re-wraps comments to the layout rules.
+  How the last blocks were done: `tools/split_runs.py [--apply]` cuts a run where `tools/decode_hints.csv` says `block,ADDR` and
+  puts the marker there (`data,START,END` makes a range a data pocket); `tools/insert_labels.py [--apply] [--data] LIST` puts
+  `Name equ *` in front of the line that starts at an address of already decoded code (the label does not start a new local
+  scope and may be used before it is defined; a plain `Name` label would reset the local labels, a `Name = *` one cannot be
+  used before its line); `tools/fix_stubs.py` adds the stub equates a segment needs after a decode (reads the failed segment
+  logs); `tools/check_names.py` checks every csv name sits at its address. Order: build, split_runs, rebuild (the listing
+  must match the rows), decode_code --apply, fix_stubs, verify_all. `tools/m68kdis.py` is the disassembler.
   `tools/check_code_as_data_x86.py REPO` (PC) and `tools/check_code_as_data_snes.py REPO` (SNES) are the exact checks for
   the other ports: a label in the data files that code calls or jumps to.
 
@@ -524,18 +531,7 @@ Work branch `naming-pass`, one commit per file, each ALL MATCH. Names from the b
   AwardsBgMap, TradeBgMap, CreateBgMap, NameEntryBgMap, PlayerStatsBgMap, PlayerStatsTitleMap, PeriodStatsMap,
   LineEditorBgMap). revframetbl is not a picture: RevReplayAdj's frame table (95G role).
 
-- Found inside dc.b blocks, not labelled yet (a label there needs the dc.b line split at the address; no byte moves):
-  avdgoal $1A110 and skatetopuck $1A24A (94G / 95G bodies match) in skateto's bytes, with a new skatetopuck entry at
-  $1A210; 94G ReloadRinkGraphics at $154D8 (ExitStatsScreen + 4; ClrHor and ReplayMode call it); TagTradePositions
-  $1DD19E (ExecuteTrade); PrintCreateName $1DEB4C and DrawRatings $1DECCE (ModifyRatings); BuildPlayerLeaders' exit
-  after its jmp (a0); the jmp assreplace stub at $C608 and jmp donothing at $CAE4 (the assignment code's long branches);
-  the screen setup code of NHL Standings (in CanBlock's bytes), Game Options (SortStandings), the leaders (after
-  BlankStatsRow), the scoring summary (GoalTypeTbl), Game Stats (TeamStatTextTblNoPen), Record Holders
-  (ReadTeamRecords) and League Options (after SetMenuScroll); the menu handlers after VBlank_Menus' rte.
-  InitializeGameStructures' first instructions sit 6 bytes before its label, inside NOPJoyTbl's bytes (no callers).
-- Possible original bugs, kept as they are: MakeTree's first .bypoints call sorts seed numbers as team numbers (the call
-  after the loop orders the finalists correctly); SimTeamStrength reads its save RAM roster flag a goalie-count off;
-  RandomInjuryGames reads the high byte of the SeasonDay word.
+- Found inside dc.b blocks, formerly not labelled (all decoded and named 2026-11-18, see `tools/decode_names.csv`): avdgoal, skatetopuck, ExitStatsScreenReload, TagTradePositions, PrintCreateName, DrawRatings, BuildPlayerLeaders' exit, GoAssReplace and the other assignment jmp stubs, the screen setup of the summary, standings, options and records screens, the menu handlers after VBlank_Menus' rte.
 
 ## Unsure
 

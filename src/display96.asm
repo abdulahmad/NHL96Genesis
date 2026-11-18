@@ -454,17 +454,48 @@ rtsShowCrowd						;Shared rts of showcrowd and ShowCrowdFrame
 JumpToShowClock						;setvideo enters showclock here
 	jmp	showclock
 	;After JumpToShowClock: code that only its own branches reach.
-	;Code the listing does not decode: kept as bytes
-	dc.b	$08,$38,$00,$07,$C3,$3A,$67,$00,$00,$B8,$08,$38,$00,$00,$C3,$48
-	dc.b	$66,$00,$00,$72,$2F,$09,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BE,$0D
-	dc.b	$05,$00,$30,$38,$C4,$BE,$48,$C0,$80,$FC,$02,$58,$2F,$00,$4A,$40
-	dc.b	$66,$00,$00,$0A,$52,$78,$B0,$40,$60,$00,$00,$08,$4E,$B9,$00,$02
-	dc.b	$07,$AE,$20,$1F,$48,$40,$48,$C0,$80,$FC,$00,$3C,$2F,$00,$4E,$B9
-	dc.b	$00,$02,$07,$AE,$20,$1F,$48,$40,$48,$C0,$54,$78,$B0,$40,$80,$FC
-	dc.b	$00,$0A,$2F,$00,$4E,$B9,$00,$02,$07,$AE,$20,$1F,$48,$40,$48,$C0
-	dc.b	$4E,$B9,$00,$02,$07,$AE,$22,$5F,$4E,$B9,$00,$01,$BB,$8E,$00,$06
-	dc.b	$BD,$0D,$05,$00,$4E,$75
+	btst	#sfhor,(sflags).w		;sfhor
+	beq.w	showclockVertical
+	btst	#0,(gmode2).w			;shootout
+	bne.w	.3
+	move.l	a1,-(sp)
+	jsr	(printz).l
+	String	$BE,$D,5
+	move.w	(gameclock).w,d0
+	ext.l	d0
+	divu.w	#$258,d0				;tens of minutes (600 seconds)
+	move.l	d0,-(sp)
+	tst.w	d0
+	bne.w	.1
+	addq.w	#1,(printx).w
+	bra.w	.2
+.1
+	jsr	(showclockPrint).l
+.2
+	move.l	(sp)+,d0
+	swap	d0
+	ext.l	d0
+	divu.w	#$3C,d0					;minutes
+	move.l	d0,-(sp)
+	jsr	(showclockPrint).l
+	move.l	(sp)+,d0
+	swap	d0
+	ext.l	d0
+	addq.w	#2,(printx).w
+	divu.w	#$A,d0					;tens of seconds
+	move.l	d0,-(sp)
+	jsr	(showclockPrint).l
+	move.l	(sp)+,d0
+	swap	d0
+	ext.l	d0
+	jsr	(showclockPrint).l
+	movea.l	(sp)+,a1
+	jsr	(printz).l
+	String	$BD,$D,5
+.3
+	rts
 
+showclockPrint	equ	*			;Print the clock digit string
 .digit								;A clock digit for the dead clock code above (.digits) Code the listing
 	movea.l	#$207C0,a1
 	asl.w	#2,d0
@@ -473,21 +504,61 @@ JumpToShowClock						;setvideo enters showclock here
 	rts
 
 .digits								;.digit: the digit chars
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$00,$04,$30,$00,$00,$04,$31,$00,$00,$04,$32,$00,$00,$04,$33,$00
-	dc.b	$00,$04,$34,$00,$00,$04,$35,$00,$00,$04,$36,$00,$00,$04,$37,$00
-	dc.b	$00,$04,$38,$00,$00,$04,$39,$00,$08,$B8,$00,$03,$BF,$B2,$67,$00
-	dc.b	$F0,$5A,$08,$38,$00,$03,$C3,$3C,$66,$00,$F0,$50,$0C,$78,$00,$04
-	dc.b	$C4,$BC,$67,$00,$F0,$46,$30,$7C,$BF,$C6,$22,$7C,$00,$17,$9A,$76
-	dc.b	$D3,$E9,$00,$04,$30,$29,$00,$78,$D0,$78,$B0,$1C,$00,$40,$80,$00
-	dc.b	$31,$C0,$BF,$C0,$30,$38,$C4,$BE,$08,$38,$00,$01,$C3,$48,$67,$00
-	dc.b	$00,$06,$30,$38,$D3,$26,$48,$C0,$80,$FC,$00,$0A,$61,$00,$00,$54
-	dc.b	$80,$FC,$00,$06,$61,$00,$00,$4C,$55,$48,$80,$FC,$00,$0A,$61,$00
-	dc.b	$00,$42,$48,$40,$4A,$80,$66,$00,$00,$06,$70,$F0,$48,$40,$61,$00
-	dc.b	$00,$32,$2A,$C8,$3A,$FC,$00,$05,$32,$7C,$B0,$04,$70,$18,$74,$03
-	dc.b	$08,$38,$00,$07,$C3,$3A,$67,$00,$00,$0A,$32,$7C,$B0,$08,$70,$05
-	dc.b	$74,$0D,$32,$29,$00,$02,$E3,$60,$D0,$42,$E3,$40,$D0,$51,$3A,$C0
-	dc.b	$4E,$75
+	dc.w	$0004,$3000,$0004,$3100,$0004,$3200,$0004,SPAfpunchfinal
+	dc.w	$0004,$3400,$0004,$3500,$0004,$3600,$0004,$3700
+	dc.w	$0004,$3800,$0004,$3900
+showclockVertical					;Draw the clock when the display flag is set
+	bclr	#3,(disflags).w
+	beq.w	rtss2
+	btst	#3,(sflags2).w
+	bne.w	rtss2
+	cmpi.w	#4,(gsp).w
+	beq.w	rtss2
+	movea.w	#$BFC6,a0
+	movea.l	#SmallFontMap,a1
+	adda.l	4(a1),a1
+	move.w	$78(a1),d0
+	add.w	(smallfontchars).w,d0
+	ori.w	#$8000,d0
+	move.w	d0,(lty+8).w
+	move.w	(gameclock).w,d0
+	btst	#1,(gmode2).w
+	beq.w	.next
+	move.w	(shootoutclock).w,d0
+.next
+	ext.l	d0
+	divu.w	#$A,d0
+	bsr.w	ClockDigitChar
+	divu.w	#6,d0
+	bsr.w	ClockDigitChar
+	subq.w	#2,a0
+	divu.w	#$A,d0
+	bsr.w	ClockDigitChar
+	swap	d0
+	tst.l	d0
+	bne.w	.next2
+	moveq	#-$10,d0
+	swap	d0
+.next2
+	bsr.w	ClockDigitChar
+	move.l	a0,(a5)+
+	move.w	#5,(a5)+
+	movea.w	#(VmMAP1-M68K_RAM),a1
+	moveq	#$18,d0
+	moveq	#3,d2
+	btst	#7,(sflags).w
+	beq.w	.next3
+	movea.w	#(VmMAP2-M68K_RAM),a1
+	moveq	#5,d0
+	moveq	#$D,d2
+.next3
+	move.w	2(a1),d1
+	asl.w	d1,d0
+	add.w	d2,d0
+	asl.w	#1,d0
+	add.w	(a1),d0
+	move.w	d0,(a5)+
+	rts
 
 ClockDigitChar						;Next digit of d0 (divu remainder) as a
 									;small-font clock char word to -(a0)
@@ -1049,18 +1120,46 @@ setupice							;Set all variables, send non purgeable graphics, build sprite fra
 	move	#$2300,sr
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$48,$E7,$FF,$FE,$61,$00,$9F,$B2,$08,$B8,$00,$00,$C3,$3A,$3F,$38
-	dc.b	$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$42,$78,$BD,$32,$42,$78,$BD,$2E
-	dc.b	$31,$FC,$07,$D0,$BD,$30,$50,$F8,$B8,$C2,$38,$38,$B0,$2E,$61,$00
-	dc.b	$01,$4C,$61,$00,$00,$CC,$08,$38,$00,$01,$C3,$38,$67,$00,$00,$16
-	dc.b	$36,$7C,$B0,$5E,$70,$0B,$08,$6B,$00,$07,$00,$62,$D6,$FC,$00,$80
-	dc.b	$51,$C8,$FF,$F4,$61,$00,$05,$C2,$21,$FC,$FF,$FF,$FF,$FF,$BE,$AA
-	dc.b	$42,$B8,$BE,$AE,$42,$B8,$BE,$B2,$42,$B8,$BE,$B6,$50,$F8,$C3,$84
-	dc.b	$50,$F8,$C3,$86,$50,$F8,$C3,$88,$50,$F8,$C3,$8A,$61,$00,$00,$98
-	dc.b	$61,$00,$00,$2A,$31,$FC,$00,$1C,$BD,$3C,$31,$DF,$BF,$B2,$21,$FC
-	dc.b	$00,$02,$01,$DC,$D2,$44,$08,$B8,$00,$00,$BF,$B2,$08,$B8,$00,$02
-	dc.b	$BF,$B2,$46,$FC,$23,$00,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	bsr.w	forceblack
+	bclr	#sfpz,(sflags).w
+	move.w	(disflags).w,-(sp)
+	bset	#dfng,(disflags).w
+	clr.w	(Hpos).w
+	clr.w	(Vpos).w
+	move.w	#$7D0,(Oldrow).w		;2000
+	st	(Zamx).w
+	move.w	(spritechars).w,d4		;sprite char start from setupice
+	bsr.w	defaultsprites
+	bsr.w	setupIceRinkPal			;transfer pal 0&1
+	btst	#gmdir,(gmode).w
+	beq.w	.gok
+	movea.w	#(SortCords-M68K_RAM),a3
+	moveq	#$B,d0					;12 players
+.l01
+	bchg	#pfgoal,$62(a3)			;gmdir set: swap pfgoal on all 12 players
+	adda.w	#SCstruct,a3
+	dbf	d0,.l01
+.gok
+	bsr.w	setplayercolors			;copy both teams' palettes
+	move.l	#$FFFFFFFF,(PadControlBits).w
+	clr.l	(padcont).w
+	clr.l	(padcont+4).w
+	clr.l	(padcont+8).w
+	st	(c1playernum).w
+	st	(c2playernum).w
+	st	(c3playernum).w
+	st	(c4playernum).w
+	bsr.w	setupEASNmap
+	bsr.w	DumpPadSprites
+	move.w	#$1C,(palcount).w		;fade in new graphics now
+	move.w	(sp)+,(disflags).w
+	move.l	#VBlank,(VBint).w
+	bclr	#dfok,(disflags).w
+	bclr	#dfng,(disflags).w
+	move.w	#$2300,sr
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts								;(its only xref is a constant, so no label)
 
 DumpPadSprites						;The six pad sprites (addframe2), then the dma list
 	movea.w	#(DMAList-M68K_RAM),a5
@@ -1284,11 +1383,29 @@ SprSort								;Sort objects in struct SortObj and set corresponding tables for 
 	rts
 
 resetplstuff						;Reset the player variables of the sort objects.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$E0,$F0,$34,$7C,$C7,$26,$61,$00,$00,$10,$34,$7C,$CA,$C4
-	dc.b	$61,$00,$00,$08,$4C,$DF,$0F,$07,$4E,$75,$08,$AA,$00,$04,$00,$30
-	dc.b	$74,$05,$36,$6A,$00,$22,$42,$2B,$00,$63,$4A,$6B,$00,$34,$6B,$00
-	dc.b	$00,$18,$32,$3C,$08,$56,$61,$00,$91,$AC,$42,$6B,$00,$32,$42,$2B
-	dc.b	$00,$5E,$02,$2B,$00,$C2,$00,$62,$D6,$FC,$00,$80,$51,$CA,$FF,$D8
-	dc.b	$4E,$75
+	movem.l	d0-d2/a0-a3,-(sp)
+	movea.w	#(tmstruct-M68K_RAM),a2
+	bsr.w	ResetTeamPlayers
+	movea.w	#(AwShots-M68K_RAM),a2
+	bsr.w	ResetTeamPlayers
+	movem.l	(sp)+,d0-d2/a0-a3
+	rts
+ResetTeamPlayers					;Clear the team offside bit and reset the six skaters of team a2 (SetSPA,
+									;impact, pflags)
+	bclr	#4,$30(a2)				;clear team offside bit
+	moveq	#5,d2
+	movea.w	$22(a2),a3				;tmsort
+.loop
+	clr.b	$63(a3)					;pflags2
+	tst.w	$34(a3)					;check for goalie
+	bmi.w	.1
+	move.w	#SPAglide,d1
+	bsr.w	SetSPA
+	clr.w	$32(a3)					;impact
+	clr.b	$5E(a3)					;nopuck
+	andi.b	#$C2,$62(a3)			;2^pfteam + 2^pfgoal +2^pfna, pflags
+.1
+	adda.w	#SCstruct,a3			;SCstruct size
+	dbf	d2,.loop
+	rts
 

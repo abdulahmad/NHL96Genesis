@@ -61,6 +61,7 @@ DefaultRosters
 	blt.w	.team
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
+GetPlayerNameD7ToA1	equ	*			;getplayernameD7 with the name pointer returned in a1
 	movem.l	d0-d3/d7/a0/a2,-(sp)
 	bsr.w	getplayernameD7
 	movea.l	a0,a1
@@ -109,8 +110,7 @@ getnamea0							;Shared tail of getplayername: GetRosterName, a0 = the name
 GetCreatedName
 	movem.l	d0-d1/d5-d7/a0,-(sp)
 	bra.w	GetRosterNameTail
-	;Not decoded in the listing and not referenced from it: kept as bytes
-	dc.b	$4E,$75
+	rts
 
 GetRosterName						;a1 = name String of player d0 of team d7 (season roster aware)
 	movem.l	d0-d1/d5-d7/a0,-(sp)
@@ -247,6 +247,7 @@ GetJerseyNumber						;The jersey number byte of player d0 of team d7
 	jsr	(MakeSRAMChecksum).l
 	movem.l	(sp)+,d0-d1
 	rts
+GetJerseyNumberRead	equ	*			;Read the jersey number of a player from the save RAM table
 	btst	#4,(sflags11).w
 	bne.w	.3
 	movem.l	d0/d7/a0,-(sp)
@@ -351,6 +352,7 @@ GetPositionSlot						;d0 = the position slot (0 G, 1 LD, 2 RD, 3 LW, 4 C, 5 RW) 
 .5
 	movem.l	(sp)+,d1/d6-d7/a0-a1
 	rts
+ReadCreatedPlayerSRAM	equ	*			;Read the $36 byte created player record number d7 from save RAM ($1550 + d7 * $36)
 	movem.l	d0-d1,-(sp)
 	move.w	d7,d0
 	mulu.w	#$36,d0
@@ -359,6 +361,7 @@ GetPositionSlot						;d0 = the position slot (0 G, 1 LD, 2 RD, 3 LW, 4 C, 5 RW) 
 	jsr	(ReadSRAM).l
 	movem.l	(sp)+,d0-d1
 	rts
+WriteCreatedPlayerSRAM	equ	*			;Write the $36 byte created player record number d7 to save RAM and update the checksum
 	movem.l	d0-d1,-(sp)
 	move.w	d7,d0
 	mulu.w	#$36,d0

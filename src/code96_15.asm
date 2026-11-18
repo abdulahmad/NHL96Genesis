@@ -113,9 +113,15 @@ PlaceBoardFall						;places a player falling at the boards (tests the position w
 	asr.w	#1,d0
 	add.w	d0,(a3)
 	bra.w	.11
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$30,$3C,$00,$96,$08,$2B,$00,$03,$00,$04,$67,$00,$00,$06,$30,$3C
-	dc.b	$FF,$6A,$90,$53,$E2,$40,$D1,$53,$60,$00,$00,$32
+	move.w	#$96,d0
+	btst	#3,4(a3)
+	beq.w	.12
+	move.w	#$FF6A,d0
+.12
+	sub.w	(a3),d0
+	asr.w	#1,d0
+	add.w	d0,(a3)
+	bra.w	PlaceBoardFallExit
 .8
 	move.w	#$FF70,d0
 	btst	#3,4(a3)
@@ -134,6 +140,7 @@ PlaceBoardFall						;places a player falling at the boards (tests the position w
 	sub.w	(a3),d0
 	asr.w	#1,d0
 	add.w	d0,(a3)
+PlaceBoardFallExit	equ	*			;Shared return of PlaceBoardFall
 .11
 	rts
 
@@ -156,6 +163,7 @@ chkFgtBit1							;Z set when $77(a2) is 2 or less (d0 kept)
 	movem.w	(sp)+,d0
 .1
 	rts
+PickFaceoffDirection	equ	*			;d0 = a random direction word from the table at $1D90D0; 6 near the center
 	movem.l	a0,-(sp)
 	movea.l	#$1D90D0,a0
 	move.w	#$64,d0
@@ -171,11 +179,24 @@ chkFgtBit1							;Z set when $77(a2) is 2 or less (d0 kept)
 .2
 	movem.l	(sp)+,a0
 	rts
-	dc.w	$0003,$0005,$0003,$0001,$0005,$0002,$0003,$0003
-	dc.w	$FFFF,$48E7,$E0E0,$207C,$FFFF,$C726,$227C,$FFFF
-	dc.w	$CAC4,$3028,$0024,$9069,$0024,$6700,$0012,$6A00
-	dc.w	$0004,$C149,$0C68,$0006,$0028,$6600,$0002,$4CDF
-	dc.w	$0707,$4E75
+	dc.b	$00,$03,$00,$05,$00,$03,$00,$01,$00,$05,$00,$02,$00,$03,$00,$03
+	dc.b	$FF,$FF
+chkFgtBit1ShotsLead	equ	*
+	movem.l	d0-d2/a0-a2,-(sp)
+	movea.l	#tmstruct,a0
+	movea.l	#AwShots,a1
+	move.w	$24(a0),d0				;home players on ice
+	sub.w	$24(a1),d0
+	beq.w	.4						;same number on the ice: done
+	bpl.w	.3						;home has more: test home
+	exg	a0,a1						;away has more: test the away team
+.3
+	cmpi.w	#6,$28(a0)
+	bne.w	.4						;(the branch goes to the next line either way)
+	;exit: restore the registers
+.4
+	movem.l	(sp)+,d0-d2/a0-a2
+	rts
 
 HiScoreScreen						;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up to $50 * 4
 									;frames or a button (waitx)
@@ -263,16 +284,42 @@ PrepShotPass						;Called before setpassmode / SetShotMode. Loads TempWord1 to d
 	move.w	d0,-$2(a1)
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
-	dc.w	$48E7,$FFBE,$3038,$D248,$4A40,$6700,$0080,$227C
-	dc.w	$FFFF,$D3AE,$31C0,$D3C2,$4EB9,$001E,$6B24,$D2F8
-	dc.w	$D3C0,$12BC,$0000,$5278,$D3C0,$0278,$FFFE,$D3C0
-	dc.w	$5478,$D3C0,$31F8,$D3C0,$D3AC,$227C,$FFFF,$D3AC
-	dc.w	$2F09,$267C,$FFFF,$BF54,$227C,$001D,$92C8,$6100
-	dc.w	$E7F4,$225F,$267C,$FFFF,$BF54,$4EB9,$0001,$BE80
-	dc.w	$267C,$FFFF,$BF54,$4EB9,$0001,$BE78,$0004,$2900
-	dc.w	$227C,$FFFF,$BF54,$4CDF,$7DFF,$4E75,$000E,$2870
-	dc.w	$6C61,$7965,$6420,$6279,$2000,$0002,$227C,$001D
-	dc.w	$92D6,$60E2,$48E7,$FFBE,$3038,$D24A,$6000,$FF6A
+	movem.l	d0-d7/a0/a2-a6,-(sp)
+	move.w	(pad1user).w,d0
+.loop
+	tst.w	d0
+	beq.w	.1
+	movea.l	#NameEntryBuf+2,a1
+	move.w	d0,(namelogsel).w
+	jsr	(GetLogName).l
+	adda.w	(NameEntryLen).w,a1
+	move.b	#0,(a1)
+	addq.w	#1,(NameEntryLen).w
+	andi.w	#$FFFE,(NameEntryLen).w
+	addq.w	#2,(NameEntryLen).w
+	move.w	(NameEntryLen).w,(NameEntryBuf).w
+	movea.l	#NameEntryBuf,a1
+	move.l	a1,-(sp)
+	movea.l	#TempLegSpd+2,a3
+	movea.l	#$1D92C8,a1
+	bsr.w	CopyString
+	movea.l	(sp)+,a1
+	movea.l	#TempLegSpd+2,a3
+	jsr	(appstring).l
+	movea.l	#TempLegSpd+2,a3
+	jsr	(appendz).l
+	String	')'
+	movea.l	#TempLegSpd+2,a1
+.loop2
+	movem.l	(sp)+,d0-d7/a0/a2-a6
+	rts
+	dc.w	$000E,$2870,$6C61,$7965,$6420,$6279,$2000,$0002
+.1
+	movea.l	#$1D92D6,a1
+	bra.s	.loop2
+	movem.l	d0-d7/a0/a2-a6,-(sp)
+	move.w	(pad2user).w,d0
+	bra.w	.loop
 
 SetSflags8Bit1						;Always sets sflags8 bit 1 (the bclr is skipped)
 	bra.w	.0
@@ -280,6 +327,7 @@ SetSflags8Bit1						;Always sets sflags8 bit 1 (the bclr is skipped)
 .0
 	bset	#1,(sflags8).w
 	rts
+SoftClampCoord	equ	*			;d0 = d0 (or d0 / 2 + $28 when under $50)
 	cmp.w	#$50,d0
 	bge.w	.exit
 	asr.w	#1,d0
@@ -405,18 +453,50 @@ LeadSong							;Not in a shootout (gmode2 bit 1) and one team has more players o
 									;(tmap): once (sflags2 bit 5) ChooseSong
 									;with SongIndex 1 (home) or 4, and sflags8 bit 6; sflags2 bit 6 keeps
 									;which team. sflags2 is put back on exit. Called from puckfaceoff2.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$80,$F0,$3F,$38,$C3,$3C,$08,$38,$00,$01,$C3,$48,$66,$00
-	dc.b	$00,$92,$34,$7C,$C7,$26,$47,$EA,$03,$9E,$30,$2A,$00,$24,$90,$6B
-	dc.b	$00,$24,$67,$00,$00,$7E,$6A,$00,$00,$1A,$08,$38,$00,$06,$C3,$3C
-	dc.b	$66,$00,$00,$26,$61,$00,$00,$64,$08,$F8,$00,$06,$C3,$3C,$60,$00
-	dc.b	$00,$18,$C5,$4B,$08,$38,$00,$06,$C3,$3C,$67,$00,$00,$0C,$61,$00
-	dc.b	$00,$4A,$08,$B8,$00,$06,$C3,$3C,$08,$F8,$00,$05,$C3,$3C,$66,$00
-	dc.b	$00,$42,$B6,$FC,$C7,$26,$66,$00,$00,$1E,$31,$F8,$C3,$A0,$D4,$8C
-	dc.b	$31,$FC,$00,$01,$D4,$8E,$4E,$B9,$00,$08,$86,$88,$08,$F8,$00,$06
-	dc.b	$C3,$4C,$60,$00,$00,$1E,$31,$F8,$C3,$A0,$D4,$8C,$31,$FC,$00,$04
-	dc.b	$D4,$8E,$4E,$B9,$00,$08,$86,$88,$60,$E2,$08,$B8,$00,$05,$C3,$3C
-	dc.b	$4E,$75,$31,$DF,$C3,$3C,$4C,$DF,$0F,$01,$4E,$75
+	movem.l	d0/a0-a3,-(sp)
+	move.w	(sflags2).w,-(sp)
+	btst	#1,(gmode2).w
+	bne.w	LeadSongExit
+	movea.w	#(tmstruct-M68K_RAM),a2
+	lea	$39E(a2),a3
+	move.w	$24(a2),d0
+	sub.w	$24(a3),d0
+	beq.w	LeadSongExit
+	bpl.w	.1
+	btst	#sf2pwrtm,(sflags2).w
+	bne.w	.2
+	bsr.w	ClearSongLeadFlag
+	bset	#sf2pwrtm,(sflags2).w
+	bra.w	.2
+.1
+	exg	a2,a3
+	btst	#sf2pwrtm,(sflags2).w
+	beq.w	.2
+	bsr.w	ClearSongLeadFlag
+	bclr	#sf2pwrtm,(sflags2).w
+.2
+	bset	#sf2pwrplay,(sflags2).w
+	bne.w	LeadSongExit
+	cmpa.w	#(tmstruct-M68K_RAM),a3
+	bne.w	.3
+	move.w	(HomeTeam).w,(HmTeam).w
+	move.w	#1,(SongIndex).w
+	jsr	(ChooseSong).l
+.loop
+	bset	#6,(sflags8).w
+	bra.w	LeadSongExit
+.3
+	move.w	(HomeTeam).w,(HmTeam).w
+	move.w	#4,(SongIndex).w
+	jsr	(ChooseSong).l
+	bra.s	.loop
+ClearSongLeadFlag					;Clear sflags2 bit 5
+	bclr	#5,(sflags2).w
+	rts
+LeadSongExit	equ	*	;Restore sflags2 and the registers and return
+	move.w	(sp)+,(sflags2).w
+	movem.l	(sp)+,d0/a0-a3
+	rts
 
 ClearPenalties						;Clear the penalties: PBnum, Penaltytimer, PenCntDwn, PenBuf and both
 									;teams' penalty slots (clrTmPdst)
@@ -557,50 +637,176 @@ CanBlock							;Ne when joystick player a3 may block the shot (SPAblock): pfaloc
 .7
 	movem.l	(sp)+,d0-d3/a0-a2
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.w	$48E7,$FFFE,$4278,$D312,$6100,$00CA,$6100,$00C8
-	dc.w	$207C,$0018,$3024,$4EB9,$0001,$218A,$31FC,$0018
-	dc.w	$BD3C,$08B8,$0002,$BFB2,$4278,$D14C,$6100,$02EA
-	dc.w	$207C,$FFFF,$D168,$4EB9,$0001,$161E,$6100,$028E
-	dc.w	$6100,$0356,$6100,$03D2,$46FC,$2500,$3038,$B052
-	dc.w	$B078,$B052,$67FA,$4EB9,$0001,$2640,$0C78,$5460
-	dc.w	$D312,$4EB9,$0001,$B2C4,$4EB9,$0001,$B320,$4A41
-	dc.w	$6700,$0006,$4278,$D312,$0801,$0007,$6600,$0048
-	dc.w	$0801,$0002,$6700,$000A,$0A78,$0001,$D14C,$609C
-	dc.w	$0801,$0003,$6700,$000A,$0A78,$0001,$D14C,$608C
-	dc.w	$0801,$0000,$6700,$000C,$0A78,$0002,$D14C,$6000
-	dc.w	$FF7C,$0801,$0001,$6700,$000C,$0A78,$0002,$D14C
-	dc.w	$6000,$FF6A,$6086,$21FC,$0001,$22A4,$DDAC,$4CDF
-	dc.w	$7FFF,$4E75,$4E75,$08F8,$0005,$C356,$21FC,$0001
-	dc.w	$2D46,$D244,$08B8,$0000,$BFB2,$08F8,$0002,$BFB2
-	dc.w	$08B8,$0001,$BFB2,$31FC,$0000,$B000,$31FC,$B400
-	dc.w	$B00C,$31FC,$0005,$B00E,$31FC,$BC00,$B002,$31FC
-	dc.w	$C000,$B008,$31FC,$0006,$B00A,$31FC,$E000,$B004
-	dc.w	$31FC,$0006,$B006,$303C,$0000,$08F8,$0005,$BFB2
-	dc.w	$4EB9,$0001,$B57E,$08B8,$0005,$BFB2,$4EB9,$0001
-	dc.w	$B2C4,$383C,$0001,$227C,$0018,$3024,$4EB9,$0001
-	dc.w	$217A,$31C4,$B01C,$247C,$0017,$A16C,$4EB9,$0001
-	dc.w	$B730,$5344,$21FC,$0017,$A164,$BF8A,$31C4,$B014
-	dc.w	$247C,$0017,$AA7A,$4EB9,$0001,$B730,$0444,$0009
-	dc.w	$31C4,$B018,$247C,$0017,$B688,$4EB9,$0001,$B730
-	dc.w	$323C,$0019,$4242,$207C,$FFFF,$2328,$227C,$0001
-	dc.w	$2BFE,$B47C,$0001,$6600,$001E,$3F04,$3838,$B01C
-	dc.w	$5244,$30C4,$2469,$0004,$504A,$4EB9,$0001,$B730
-	dc.w	$381F,$6000,$0014,$30C4,$3002,$E540,$2471,$0000
-	dc.w	$504A,$4EB9,$0001,$B730,$5242,$51C9,$FFC6,$4EB9
-	dc.w	$0001,$BA2E,$0008,$FF01,$FD00,$FC00,$7028,$721C
-	dc.w	$343C,$07FF,$4EB9,$0001,$B976,$4EB9,$0001,$BB8E
-	dc.w	$0006,$BF00,$0000,$207C,$0018,$1456,$2248,$2448
-	dc.w	$D1DA,$D3DA,$4240,$4241,$7428,$761C,$7A08,$4EB9
-	dc.w	$0001,$B692,$4EB9,$0001,$BB8E,$0006,$BF0B,$0100
-	dc.w	$207C,$0018,$0C36,$2248,$2448,$D1DA,$D3DA,$4240
-	dc.w	$4241,$3411,$3629,$0002,$7A08,$4EB9,$0001,$B692
-	dc.w	$4EB9,$0001,$BB8E,$0006,$FE00,$0000,$207C,$0017
-	dc.w	$0B0C,$2248,$2448,$D1DA,$D3DA,$4240,$4241,$7440
-	dc.w	$761C,$7A01,$4EB9,$0001,$B692,$4EB9,$0001,$BC72
-	dc.w	$001E,$8F06,$1A7B,$7D20,$434F,$4E46,$4552,$454E
-	dc.w	$4345,$205B,$5D20,$4449,$5649,$5349,$4F4E,$08F8
-	dc.w	$0002,$C354,$4EB9,$0001,$BED6,$001C,$F804,$0114
-	dc.w	$0857,$F804,$0119,$084C,$F804,$011E,$0854,$F804
-	dc.w	$0122,$0850,$5453,$46FC,$2500,$4E75
+	movem.l	d0-d7/a0-a6,-(sp)
+	clr.w	(carddelay).w
+	bsr.w	CanBlockExit
+	bsr.w	CanBlockScreenInit
+	movea.l	#StandingsSprites,a0
+	jsr	(DrawScreenSprite).l
+	move.w	#$18,(palcount).w
+	bclr	#2,(disflags).w
+	clr.w	(StandingsMode).w
+.loop
+	bsr.w	StandingsGroups
+	movea.l	#StandingsBuf,a0
+	jsr	(ReadStandings).l
+	bsr.w	StandingsPoints
+	bsr.w	SortStandings
+	bsr.w	SortStandingsHeaders
+	move.w	#$2500,sr
+.loop2
+	move.w	(Vcount).w,d0			;frame counter
+	;loop
+.loop3
+	cmp.w	(Vcount).w,d0
+	beq.s	.loop3					;wait for a new frame
+	jsr	(SetMenuScroll).l			;read the pads
+	cmpi.w	#$5460,(carddelay).w
+	jsr	(orjoy).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.8
+	clr.w	(carddelay).w
+.8
+	btst	#7,d1
+	bne.w	.13
+	btst	#2,d1
+	beq.w	.9
+	eori.w	#1,(StandingsMode).w
+	bra.s	.loop
+.9
+	btst	#3,d1
+	beq.w	.10
+	eori.w	#1,(StandingsMode).w
+	bra.s	.loop
+.10
+	btst	#0,d1
+	beq.w	.11
+	eori.w	#2,(StandingsMode).w
+	bra.w	.loop
+.11
+	btst	#1,d1
+	beq.w	.12
+	eori.w	#2,(StandingsMode).w
+	bra.w	.loop
+.12
+	bra.s	.loop2
+.13
+	move.l	#SeasonMenuScreen,(NextScreenPtr).w
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+CanBlockExit	equ	*	;Shared return of CanBlock
+	rts
+CanBlockScreenInit					;Set up the menu screen planes and VBlank handler (low confidence)
+	bset	#5,(sflags12).w
+	move.l	#VBlank_Menus,(VBint).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
+	move.w	#0,(VSCRLPM).w
+	move.w	#$B400,(VmMAP3).w
+	move.w	#5,(Map3col1).w
+	move.w	#$BC00,(VSPRITES).w
+	move.w	#$C000,(VmMAP2).w
+	move.w	#6,(Map2col1).w
+	move.w	#$E000,(VmMAP1).w
+	move.w	#6,(Map1col1).w
+	move.w	#0,d0
+	bset	#5,(disflags).w
+	jsr	(setVram).l
+	bclr	#5,(disflags).w
+	jsr	(orjoy).l
+	move.w	#1,d4
+	movea.l	#StandingsSprites,a1
+	jsr	(LoadScreenSprite).l
+	move.w	d4,(smallfontchars).w
+	movea.l	#SmallFontMap2+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	subq.w	#1,d4
+	move.l	#SmallFontMap2,(smallfontptr).w
+	move.w	d4,(printbigchars).w
+	movea.l	#BigFontMap2+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	subi.w	#9,d4
+	move.w	d4,(BigFontchars).w
+	movea.l	#BigFontMap4+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.w	#$19,d1
+	clr.w	d2
+	movea.l	#$FFFF2328,a0
+	movea.l	#TeamBlockPtrs,a1
+.loop
+	cmp.w	#1,d2
+	bne.w	.8
+	move.w	d4,-(sp)
+	move.w	(smallfontchars).w,d4
+	addq.w	#1,d4
+	move.w	d4,(a0)+
+	movea.l	4(a1),a2
+	addq.w	#8,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.w	(sp)+,d4
+	bra.w	.9
+.8
+	move.w	d4,(a0)+
+	move.w	d2,d0
+	asl.w	#2,d0
+	movea.l	(a1,d0.w),a2
+	addq.w	#8,a2
+	jsr	(DecompressGraphicsPlain).l
+.9
+	addq.w	#1,d2
+	dbf	d1,.loop
+	jsr	(printsmallz).l
+	String	$FF,1,$FD,0,$FC
+	moveq	#$28,d0
+	moveq	#$1C,d1
+	move.w	#$7FF,d2
+	jsr	(eraser).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),0,0
+	movea.l	#StandingsBgMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#$28,d2
+	moveq	#$1C,d3
+	moveq	#8,d5
+	jsr	(dobitmap).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$B,1
+	movea.l	#StandingsTitleMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	move.w	(a1),d2
+	move.w	2(a1),d3
+	moveq	#8,d5
+	jsr	(dobitmap).l
+	jsr	(printz).l
+	String	$FE,0,0
+	movea.l	#IceBgMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#$40,d2
+	moveq	#$1C,d3
+	moveq	#1,d5
+	jsr	(dobitmap).l
+	jsr	(printcurz).l
+	String	$8F,6,$1A,'{} CONFERENCE [] DIVISION'
+	bset	#2,(sflags11).w
+	jsr	(printbigz).l
+	String	$F8,4,1,$14,8,'W',$F8,4,1,$19,8,'L',$F8,4,1,$1E,8,'T',$F8,4,1,$22,8,'PTS'
+	move.w	#$2500,sr
+	rts
 

@@ -97,9 +97,11 @@ updateplayers						;This routine calls all collision/animation/assignment code f
 	beq.w	.20
 	move.w	#$FF70,(a3)
 	bra.w	.20
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$36,$BC,$00,$96,$08,$2B,$00,$03,$00,$04,$67,$00,$00,$2E,$36,$BC
-	dc.b	$FF,$6A,$60,$00,$00,$26
+	move.w	#$96,(a3)
+	btst	#3,4(a3)
+	beq.w	updateplayersanim
+	move.w	#$FF6A,(a3)
+	bra.w	updateplayersanim
 .8
 	move.w	#$FF70,(a3)
 	btst	#3,attribute(a3)
@@ -110,6 +112,7 @@ updateplayers						;This routine calls all collision/animation/assignment code f
 	move.w	#$FF6A,(a3)
 	btst	#3,attribute(a3)
 	beq.w	*+4
+updateplayersanim	equ	*			;Animate the player after the position check of updateplayers
 .20
 	tst.w	position(a3)
 	bmi.w	.32
@@ -449,6 +452,7 @@ FindGoalie							;d0 = SCnum of the goalie of the team of player d0 (the first p
 	movem.l	(sp)+,d1/a0
 	rts
 	;The burst code again; nothing reaches this copy.
+FindGoalieAimOffset	equ	*
 	jsr	(getpde).l					;get players energy
 	tst.w	(OptLine).w
 	bne.w	.2
@@ -506,6 +510,7 @@ Holdplayer							;Hold check (SPAhook, SPAHold with the stick up); a puck carrie
 	move.w	impactp(a3),d0			;move last impact player into d0
 	asl.w	#7,d0					;calc offset
 	adda.w	d0,a0					;add offset to a0
+HoldplayerImpact	equ	*			;Hold player: pick the impact frame and check the boards
 	bset	#pfalock,pflags(a3)		;lock animation
 	move.w	#SPAhook,d1				;move anim into d1 - normal hold check
 	tst.w	impact(a3)				;check if impact = 0
@@ -838,5 +843,6 @@ setpads								;Put SCnum of a3 in the d4 nibble of PadControlBits; d4 = -2 puck
 	or.l	d1,(PadControlBits).w
 .1
 	movem.l	(sp)+,d0-d1
+setpadsExit	equ	*			;Shared return of setpads
 	rts
 

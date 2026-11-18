@@ -41,72 +41,285 @@ ReplayMode							;Instant replay play-back control and display code.
 	move.w	#$18,(palcount).w
 	moveq	#1,d7
 .top
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$30,$38,$B0,$52,$90,$78,$B0,$54,$BE,$40,$62,$F4,$31,$F8,$B0,$52
-	dc.b	$B0,$54,$4A,$78,$DC,$A8,$6B,$00,$00,$14,$9F,$78,$DC,$A8,$6A,$00
-	dc.b	$00,$0C,$42,$78,$DC,$A8,$4E,$B9,$00,$01,$5D,$2A,$48,$E7,$80,$10
-	dc.b	$26,$7C,$FF,$FF,$B6,$5E,$37,$7C,$00,$01,$00,$08,$26,$7C,$FF,$FF
-	dc.b	$B6,$DE,$37,$7C,$00,$01,$00,$08,$4C,$DF,$08,$01,$7E,$01,$61,$00
-	dc.b	$03,$C0,$08,$38,$00,$00,$C3,$44,$67,$00,$00,$12,$02,$40,$FF,$F0
-	dc.b	$00,$40,$00,$08,$02,$41,$FF,$F0,$02,$43,$FF,$F0,$3A,$7C,$BE,$56
-	dc.b	$08,$38,$00,$05,$C3,$3E,$67,$00,$00,$0C,$3A,$01,$02,$45,$00,$0F
-	dc.b	$67,$00,$01,$88,$08,$00,$00,$03,$66,$00,$01,$80,$0C,$55,$FF,$60
-	dc.b	$6E,$00,$00,$0A,$3A,$BC,$00,$00,$60,$00,$00,$02,$0C,$6D,$FE,$B0
-	dc.b	$00,$14,$6E,$00,$00,$08,$3B,$7C,$00,$00,$00,$14,$08,$F8,$00,$05
-	dc.b	$C3,$3A,$66,$00,$00,$0C,$3A,$B8,$BD,$32,$3B,$78,$BD,$2E,$00,$14
-	dc.b	$3A,$00,$02,$45,$00,$07,$0A,$45,$00,$04,$32,$7C,$B0,$5E,$50,$C3
-	dc.b	$08,$B8,$00,$05,$C3,$3E,$67,$00,$00,$06,$36,$2D,$00,$16,$30,$15
-	dc.b	$32,$2D,$00,$14,$74,$0B,$28,$3C,$00,$00,$01,$00,$48,$A7,$C0,$00
-	dc.b	$B6,$69,$00,$52,$67,$00,$00,$58,$4C,$97,$00,$03,$90,$51,$92,$69
-	dc.b	$00,$14,$4E,$B9,$00,$01,$A3,$EE,$08,$00,$00,$03,$66,$00,$00,$40
-	dc.b	$90,$45,$52,$40,$02,$40,$00,$07,$B0,$7C,$00,$02,$62,$00,$00,$30
-	dc.b	$4C,$97,$00,$03,$90,$51,$92,$69,$00,$14,$C1,$C0,$C3,$C1,$D0,$81
-	dc.b	$B0,$BC,$00,$00,$00,$04,$63,$00,$00,$16,$B0,$84,$62,$00,$00,$10
-	dc.b	$28,$00,$3B,$69,$00,$52,$00,$16,$08,$F8,$00,$05,$C3,$3E,$D2,$FC
-	dc.b	$00,$80,$51,$CA,$FF,$9C,$58,$4F,$08,$38,$00,$05,$C3,$3E,$67,$00
-	dc.b	$00,$22,$30,$2D,$00,$16,$EF,$40,$36,$7C,$B0,$5E,$D6,$C0,$78,$04
-	dc.b	$61,$00,$13,$30,$61,$00,$04,$BC,$4E,$B9,$00,$02,$03,$4A,$60,$00
-	dc.b	$FE,$80,$08,$F8,$00,$05,$C3,$3A,$0A,$45,$00,$04,$E5,$45,$41,$FA
-	dc.b	$00,$5A,$30,$30,$50,$00,$D0,$55,$B0,$7C,$00,$96,$6E,$00,$00,$0C
-	dc.b	$B0,$7C,$FF,$6A,$6D,$00,$00,$04,$3A,$80,$32,$30,$50,$02,$D2,$6D
-	dc.b	$00,$14,$B2,$7C,$01,$3C,$6E,$00,$00,$0E,$B2,$7C,$FE,$C4,$6D,$00
-	dc.b	$00,$06,$3B,$41,$00,$14,$36,$4D,$42,$6D,$00,$18,$02,$B8,$00,$0F
-	dc.b	$FF,$FF,$BE,$AA,$00,$B8,$00,$E0,$00,$00,$BE,$AA,$61,$00,$04,$54
-	dc.b	$4E,$B9,$00,$02,$03,$4A,$60,$00,$FE,$18,$00,$00,$00,$02,$00,$02
-	dc.b	$00,$02,$00,$02,$00,$00,$00,$02,$FF,$FE,$00,$00,$FF,$FE,$FF,$FE
-	dc.b	$FF,$FE,$FF,$FE,$00,$00,$FF,$FE,$00,$02,$50,$ED,$00,$18,$08,$01
-	dc.b	$00,$05,$67,$00,$00,$12,$08,$38,$00,$00,$C3,$44,$66,$00,$00,$08
-	dc.b	$08,$78,$00,$01,$C3,$3E,$08,$03,$00,$06,$67,$00,$00,$30,$08,$38
-	dc.b	$00,$00,$C3,$44,$66,$00,$00,$26,$61,$00,$02,$DE,$61,$00,$02,$DA
-	dc.b	$61,$00,$02,$D6,$61,$00,$02,$D2,$4E,$B9,$00,$02,$13,$AE,$4E,$B9
-	dc.b	$00,$02,$03,$4A,$7E,$01,$08,$B8,$00,$01,$C3,$3E,$08,$38,$00,$00
-	dc.b	$C3,$44,$66,$00,$00,$52,$08,$03,$00,$04,$67,$00,$00,$4A,$08,$03
-	dc.b	$00,$06,$67,$00,$00,$2A,$08,$B8,$00,$05,$C3,$3E,$08,$B8,$00,$05
-	dc.b	$C3,$3A,$2F,$00,$20,$38,$BE,$AA,$02,$80,$00,$0F,$FF,$FF,$00,$80
-	dc.b	$00,$E0,$00,$00,$21,$C0,$BE,$AA,$20,$1F,$60,$00,$FD,$64,$61,$00
-	dc.b	$02,$AA,$4E,$B9,$00,$02,$13,$AE,$4E,$B9,$00,$02,$03,$4A,$E3,$47
-	dc.b	$08,$B8,$00,$01,$C3,$3E,$08,$38,$00,$01,$C3,$3E,$67,$00,$00,$1A
-	dc.b	$50,$F8,$C0,$64,$61,$00,$02,$84,$3F,$38,$C0,$64,$4E,$B9,$00,$08
-	dc.b	$84,$70,$4E,$B9,$00,$02,$13,$AE,$4E,$B9,$00,$02,$03,$4A,$08,$38
-	dc.b	$00,$00,$C3,$44,$66,$00,$00,$24,$08,$01,$00,$07,$67,$00,$FD,$12
-	dc.b	$4E,$B9,$00,$01,$5D,$48,$08,$B8,$00,$01,$C3,$3E,$08,$F8,$00,$00
-	dc.b	$C3,$44,$66,$00,$00,$06,$60,$00,$FC,$F8,$08,$01,$00,$07,$66,$00
-	dc.b	$00,$40,$08,$01,$00,$06,$66,$00,$00,$32,$08,$01,$00,$04,$66,$00
-	dc.b	$00,$3A,$08,$01,$00,$05,$67,$00,$FC,$D8,$08,$F8,$00,$06,$C3,$42
-	dc.b	$08,$B8,$00,$00,$C3,$44,$4E,$B9,$00,$01,$5D,$C2,$61,$00,$02,$0C
-	dc.b	$4E,$B9,$00,$02,$13,$AE,$60,$00,$FC,$B8,$4E,$F9,$00,$01,$58,$C8
-	dc.b	$42,$78,$CF,$FE,$08,$F8,$00,$01,$C3,$44,$61,$00,$53,$2E,$00,$B8
-	dc.b	$F0,$00,$00,$00,$BE,$AA,$08,$B8,$00,$05,$C3,$3A,$28,$78,$B0,$4E
-	dc.b	$08,$B8,$00,$04,$C3,$42,$61,$00,$03,$30,$4E,$B9,$00,$02,$13,$AE
-	dc.b	$08,$B8,$00,$03,$C3,$3C,$31,$DF,$BF,$B2,$4E,$B9,$00,$01,$54,$D8
-	dc.b	$4E,$B9,$00,$02,$10,$B0,$4E,$B9,$00,$02,$10,$C2,$4E,$B9,$00,$02
-	dc.b	$10,$D0,$4E,$B9,$00,$02,$10,$EC,$31,$FC,$FF,$FF,$D2,$A2,$30,$3C
-	dc.b	$00,$00,$32,$3C,$1B,$24,$20,$7C,$00,$02,$55,$00,$4E,$B9,$00,$08
-	dc.b	$83,$9E,$30,$3C,$00,$09,$4E,$B9,$00,$08,$83,$9E,$30,$3C,$00,$06
-	dc.b	$42,$41,$20,$7C,$00,$02,$70,$26,$4E,$B9,$00,$08,$83,$9E,$30,$3C
-	dc.b	$00,$07,$32,$3C,$00,$00,$4E,$B9,$00,$08,$83,$9E,$08,$38,$00,$04
-	dc.b	$BF,$B2,$67,$00,$00,$0E,$4E,$B9,$00,$02,$11,$08,$4E,$B9,$00,$02
-	dc.b	$10,$FA,$4E,$B9,$00,$02,$03,$4A,$31,$FC,$00,$18,$BD,$3C,$4E,$75
+	;loop
+.loop2
+	move.w	(Vcount).w,d0			;wait until d7 frames have passed
+	sub.w	(OldVcount).w,d0		;frames since the last
+	cmp.w	d0,d7					;enough?
+	bhi.s	.loop2
+	move.w	(Vcount).w,(OldVcount).w	;new frame count
+	tst.w	(OptPad+2).w			;icon showing?
+	bmi.w	.1
+	sub.w	d7,(OptPad+2).w
+	bpl.w	.1
+	clr.w	(OptPad+2).w
+	jsr	(EraseReplayIcon).l
+	;icon timer handled
+.1
+	movem.l	d0/a3,-(sp)
+	movea.l	#SortCords+(12*SCstruct),a3
+	move.w	#1,8(a3)
+	movea.l	#SortCords+(13*SCstruct),a3
+	move.w	#1,8(a3)
+	movem.l	(sp)+,d0/a3
+	moveq	#1,d7					;1 frame
+	bsr.w	ReadMenuJoy				;read the paused pad
+	btst	#0,(sflags5).w			;slow mode?
+	beq.w	.2
+	andi.w	#$FFF0,d0				;direction bits only
+	ori.w	#8,d0					;no direction
+	andi.w	#$FFF0,d1
+	andi.w	#$FFF0,d3
+	;positions rounded in slow mode
+.2
+	movea.w	#$BE56,a5
+	btst	#5,(sflags3).w			;tracking an object?
+	beq.w	.3
+	move.w	d1,d5
+	andi.w	#$F,d5					;new d-pad press?
+	beq.w	.12
+	;not tracking, or a new d-pad press: manual camera
+.3
+	btst	#3,d0					;no direction?
+	bne.w	.12
+	cmpi.w	#$FF60,(a5)				;X past the left?
+	bgt.w	.4
+	move.w	#0,(a5)					;centre
+	bra.w	.4
+.4
+	cmpi.w	#$FEB0,$14(a5)
+	bgt.w	.5
+	move.w	#0,$14(a5)				;centre
+	;Y inside the rink
+.5
+	bset	#sfscrl,(sflags).w		;manual scrolling is on
+	bne.w	.6						;scrolling?
+	move.w	(Hpos).w,(a5)			;first frame: camera starts at the screen
+	move.w	(Vpos).w,$14(a5)
+	;camera on manual
+.6
+	move.w	d0,d5					;d5 = d-pad direction
+	andi.w	#7,d5					;direction
+	eori.w	#4,d5					;opposite
+	movea.w	#(SortCords-M68K_RAM),a1
+	st	d3							;no object to skip
+	bclr	#5,(sflags3).w
+	beq.w	.7						;was not tracking
+	move.w	$16(a5),d3				;skip the object tracked now
+	;search start, skipping the tracked object
+.7
+	move.w	(a5),d0					;camera position d0/d1: search 12 players
+	move.w	$14(a5),d1
+	moveq	#$B,d2
+	move.l	#$100,d4				;nearest distance squared so far
+	movem.w	d0-d1,-(sp)				;save the camera position
+	;each player
+.loop3
+	cmp.w	$52(a1),d3				;loop over the 12 players, skipping the tracked one
+	beq.w	.8						;tracked object?
+	movem.w	(sp),d0-d1				;camera position
+	sub.w	(a1),d0
+	sub.w	$14(a1),d1
+	jsr	(vtoa).l					;direction to object
+	btst	#3,d0					;no direction?
+	bne.w	.8
+	sub.w	d5,d0					;minus the pad direction
+	addq.w	#1,d0
+	andi.w	#7,d0
+	cmp.w	#2,d0					;within 45 degrees?
+	bhi.w	.8						;not within 45 degrees of the d-pad
+	movem.w	(sp),d0-d1				;camera position
+	sub.w	(a1),d0
+	sub.w	$14(a1),d1
+	muls.w	d0,d0
+	muls.w	d1,d1
+	add.l	d1,d0					;distance squared
+	cmp.l	#$4,d0					;too close?
+	bls.w	.8						;too close
+	cmp.l	d4,d0					;closer?
+	bhi.w	.8
+	move.l	d0,d4					;closest so far
+	move.w	$52(a1),$16(a5)
+	bset	#5,(sflags3).w
+	;next player
+.8
+	adda.w	#SCstruct,a1
+	dbf	d2,.loop3					;loop
+	addq.w	#4,sp					;drop the camera position
+	btst	#5,(sflags3).w			;tracking?
+	beq.w	.9						;nothing found: scroll by hand
+	move.w	$16(a5),d0
+	asl.w	#7,d0					;* SCstruct
+	movea.w	#(SortCords-M68K_RAM),a3
+	adda.w	d0,a3
+	moveq	#4,d4					;4 pads
+	bsr.w	setpads					;set the pads
+	bsr.w	UpdateCameraPos
+	jsr	(setvideo).l
+	bra.w	.loop2
+	;sf3track clear
+.9
+	bset	#sfscrl,(sflags).w		;no object found: scroll the camera by hand
+	eori.w	#4,d5					;opposite
+	asl.w	#2,d5
+	lea	.table(pc),a0
+	move.w	(a0,d5.w),d0
+	add.w	(a5),d0					;plus the camera X
+	cmp.w	#$96,d0
+	bgt.w	.10
+	cmp.w	#$FF6A,d0
+	blt.w	.10
+	move.w	d0,(a5)
+	;X step taken (or out of range)
+.10
+	move.w	2(a0,d5.w),d1
+	add.w	$14(a5),d1				;plus the camera Y
+	cmp.w	#$13C,d1
+	bgt.w	.11
+	cmp.w	#$FEC4,d1
+	blt.w	.11
+	move.w	d1,$14(a5)
+	;Y step taken (or out of range)
+.11
+	movea.w	a5,a3					;camera struct is the object to follow
+	clr.w	$18(a5)					;camera moving
+	andi.l	#$FFFFF,(PadControlBits).w
+	ori.l	#$E00000,(PadControlBits).w
+	bsr.w	UpdateCameraPos			;camera position
+	jsr	(setvideo).l
+	bra.w	.loop2
+.table
+	dc.w	$0000,$0002,$0002,$0002,$0002,$0000,$0002,$FFFE
+	dc.w	$0000,$FFFE,$FFFE,$FFFE,$FFFE,$0000,$FFFE,$0002
+	;d5 = 0 or bit 3 of d0 set
+.12
+	st	$18(a5)
+	btst	#5,d1					;C?
+	beq.w	.13
+	btst	#0,(sflags5).w			;slow mode?
+	bne.w	.13
+	bchg	#sf3rmplay,(sflags3).w
+	;C toggles play mode (not in slow mode)
+.13
+	btst	#6,d3					;A held?
+	beq.w	.14
+	btst	#0,(sflags5).w			;slow mode?
+	bne.w	.14
+	bsr.w	suba4					;fast rewind
+	bsr.w	suba4					;back a frame
+	bsr.w	suba4					;back a frame
+	bsr.w	suba4					;back a frame
+	jsr	(SprSort).l
+	jsr	(setvideo).l
+	moveq	#1,d7					;1 frame
+	bclr	#sf3rmplay,(sflags3).w	;turn off play mode
+	;A: back a frame, unless slow mode
+.14
+	btst	#0,(sflags5).w			;slow mode?
+	bne.w	.16
+	btst	#4,d3					;B held?
+	beq.w	.16
+	btst	#6,d3					;A too?
+	beq.w	.15
+	bclr	#5,(sflags3).w
+	bclr	#sfscrl,(sflags).w		;a+b but = manual scroll off (hidden feature)
+	move.l	d0,-(sp)
+	move.l	(PadControlBits).w,d0
+	andi.l	#$FFFFF,d0
+	ori.l	#$E00000,d0
+	move.l	d0,(PadControlBits).w
+	move.l	(sp)+,d0
+	bra.w	.loop2
+	;bit 6 of d3 clear
+.15
+	bsr.w	suba4ToggleReplayView	;forward a frame
+	jsr	(SprSort).l
+	jsr	(setvideo).l
+	asl.w	#1,d7					;double delay time between frames = 1/2 speed slow motion
+	bclr	#sf3rmplay,(sflags3).w	;turn off play mode
+	;B: forward at half speed, unless slow mode
+.16
+	btst	#sf3rmplay,(sflags3).w	;play mode on?
+	beq.w	.17
+	st	(lastsfx).w					;play mode is on = advance one frame at original speed
+	bsr.w	suba4ToggleReplayView	;forward a frame
+	move.w	(lastsfx).w,-(sp)		;play sound effects
+	jsr	(sfx).l
+	jsr	(SprSort).l
+	;frame advanced or not, redraw
+.17
+	jsr	(setvideo).l
+	btst	#0,(sflags5).w			;slow mode?
+	bne.w	.18
+	btst	#7,d1					;start?
+	beq.w	.loop2
+	jsr	(ShowReplayBanner).l
+	bclr	#sf3rmplay,(sflags3).w
+	bset	#0,(sflags5).w			;slow mode
+	bne.w	.18
+	bra.w	.loop2
+	;bit 0 of sflags5 set or 0 was set
+.18
+	btst	#7,d1					;start?
+	bne.w	.20
+	btst	#6,d1					;A?
+	bne.w	.19
+	btst	#4,d1					;B?
+	bne.w	.21
+	btst	#5,d1					;C?
+	beq.w	.loop2
+	bset	#6,(sflags4).w			;reverse angle change
+	bclr	#0,(sflags5).w			;not slow mode
+	jsr	(EraseReplayBanner).l
+	bsr.w	suba4ToggleReplayView	;forward a frame
+	jsr	(SprSort).l
+	bra.w	.loop2
+	;bit 6 of d1 set
+.19
+	jmp	(.loop2).l
+	;bit 7 of d1 set
+.20
+	clr.w	(menuitem).w
+	bset	#1,(sflags5).w			;back to the menu
+	;leave the replay
+.21
+	bsr.w	forceblack				;screen off
+	ori.l	#$F0000000,(PadControlBits).w
+	bclr	#sfscrl,(sflags).w
+	movea.l	(recbpr).w,a4			;back to the current frame
+	bclr	#4,(sflags4).w			;normal angle
+	bsr.w	RevReplayAdjFrames		;restore the frame
+	jsr	(SprSort).l
+	bclr	#sf2replay,(sflags2).w
+	move.w	(sp)+,(disflags).w
+	jsr	(ExitStatsScreenReload).l
+	jsr	(setupEASNmap).l
+	jsr	(LoadEnergyBarTiles).l
+	jsr	(LoadCrowdFrames).l
+	jsr	(LoadRefTiles).l
+	move.w	#$FFFF,(PlayingSong).w
+	move.w	#0,d0
+	move.w	#$1B24,d1
+	movea.l	#Z80Program,a0
+	jsr	(SoundCmd).l
+	move.w	#9,d0
+	jsr	(SoundCmd).l
+	move.w	#6,d0
+	clr.w	d1
+	movea.l	#SoundBanks,a0
+	jsr	(SoundCmd).l
+	move.w	#7,d0
+	move.w	#0,d1
+	jsr	(SoundCmd).l
+	btst	#4,(disflags).w			;faceoff showing?
+	beq.w	.22
+	jsr	(LoadFaceOffMap).l
+	jsr	(LoadFaceOffSprites).l
+	;faceoff map reloaded when it was showing
+.22
+	jsr	(setvideo).l				;horizontal interrupt on
+	move.w	#$18,(palcount).w
+	rts
 
 ReadMenuJoy							;Read the menu pad: pad menupadnum (ReadJoy1-4)
 	tst.w	(menupadnum).w
@@ -142,15 +355,25 @@ EraseReplayIcon						;Erase the replay icon (replayicontimer ran out).
 
 ShowReplayBanner					;Erase the replay icon, show the replay banner and stop the
 									;replayicontimer timer.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$4E,$B9,$00,$01,$5D,$2A,$50,$F8,$DC,$A8,$61,$00,$5E,$3A,$00,$06
-	dc.b	$BF,$02,$00,$00,$70,$00,$72,$00,$74,$14,$76,$08,$38,$38,$B0,$3A
-	dc.b	$3A,$3C,$00,$00,$22,$7C,$00,$14,$12,$28,$D3,$E9,$00,$04,$34,$7C
-	dc.b	$07,$72,$61,$00,$59,$16,$4E,$B9,$00,$01,$C1,$1A,$00,$20,$F8,$04
-	dc.b	$01,$07,$01,$6F,$70,$74,$69,$6F,$6E,$73,$FD,$07,$FA,$02,$72,$65
-	dc.b	$76,$65,$72,$73,$65,$20,$61,$6E,$67,$6C,$65,$00,$4E,$B9,$00,$01
-	dc.b	$C1,$2C,$00,$16,$FD,$05,$FC,$05,$73,$74,$61,$72,$74,$20,$2D,$20
-	dc.b	$74,$6F,$20,$67,$61,$6D,$65,$00,$4E,$75
+	jsr	(EraseReplayIcon).l
+	st	(OptPad+2).w
+	bsr.w	printz
+	String	-(TXPRI+TXMAP1),2,0
+	moveq	#0,d0
+	moveq	#0,d1
+	moveq	#$14,d2
+	moveq	#8,d3
+	move.w	(ExtraChars).w,d4
+	move.w	#0,d5
+	movea.l	#ReplayBannerMap,a1
+	adda.l	4(a1),a1
+	movea.w	#$772,a2
+	bsr.w	dobitmap
+	jsr	(printbigz1).l
+	String	$F8,4,1,7,1,'options',$FD,7,$FA,2,'reverse angle'
+	jsr	(printbigz2).l
+	String	$FD,5,$FC,5,'start - to game'
+	rts
 
 EraseReplayBanner					;Erase the area ShowReplayBanner drew.
 	jsr	(printz).l
@@ -162,25 +385,78 @@ EraseReplayBanner					;Erase the area ShowReplayBanner drew.
 
 suba4								;a4 = current replay frame. Back up 1 frame and set video parameters for
 									;display.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$B9,$FC,$FF,$FF,$00,$00,$66,$00,$00,$12,$08,$38,$00,$04,$C3,$3A
-	dc.b	$67,$00,$00,$18,$28,$7C,$FF,$FF,$AF,$64,$98,$FC,$00,$64,$B9,$F8
-	dc.b	$B0,$4E,$66,$00,$01,$6C,$D8,$FC,$00,$64,$61,$00,$01,$64,$42,$47
-	dc.b	$4E,$75,$08,$B8,$00,$06,$C3,$42,$67,$00,$00,$9E,$48,$E7,$FF,$FE
-	dc.b	$08,$78,$00,$04,$C3,$42,$3F,$38,$BD,$32,$3F,$38,$BD,$2E,$61,$00
-	dc.b	$51,$4C,$4E,$B9,$00,$01,$51,$E0,$4E,$B9,$00,$01,$51,$E0,$42,$78
-	dc.b	$BD,$32,$42,$78,$BD,$2E,$31,$FC,$07,$D0,$BD,$30,$30,$3C,$00,$01
-	dc.b	$4E,$B9,$00,$02,$03,$4A,$4E,$B9,$00,$01,$51,$E0,$51,$C8,$FF,$F2
-	dc.b	$31,$DF,$BD,$2E,$31,$DF,$BD,$32,$30,$3C,$00,$01,$4E,$B9,$00,$02
-	dc.b	$03,$4A,$4E,$B9,$00,$01,$51,$E0,$51,$C8,$FF,$F8,$48,$E7,$00,$80
-	dc.b	$20,$7C,$FF,$FF,$B6,$5E,$31,$7C,$00,$01,$00,$08,$D0,$FC,$00,$80
-	dc.b	$31,$7C,$00,$01,$00,$08,$4C,$DF,$01,$00,$61,$00,$00,$C4,$08,$38
-	dc.b	$00,$05,$C3,$3A,$67,$00,$00,$02,$4E,$B9,$00,$01,$5C,$F8,$31,$FC
-	dc.b	$00,$64,$BD,$3C,$4C,$DF,$7F,$FF,$42,$47,$08,$38,$00,$02,$C3,$3C
-	dc.b	$67,$00,$00,$16,$48,$E7,$00,$08,$61,$00,$00,$1A,$B9,$F8,$B0,$4E
-	dc.b	$4C,$DF,$10,$00,$67,$00,$04,$18,$B9,$F8,$B0,$4E,$67,$00,$04,$10
-	dc.b	$61,$00,$00,$8E,$D8,$FC,$00,$64,$B9,$FC,$FF,$FF,$AF,$64,$66,$00
-	dc.b	$03,$FE,$28,$7C,$FF,$FF,$00,$00,$4E,$75
+	cmpa.l	#M68K_RAM,a4
+	bne.w	.1
+	btst	#sfwrap,(sflags).w
+	beq.w	.2
+	movea.l	#replayend,a4
+.1
+	suba.w	#$64,a4
+	cmpa.l	(recbpr).w,a4
+	bne.w	RevReplayAdjFrames
+	adda.w	#$64,a4
+.2
+	bsr.w	RevReplayAdjFrames
+	clr.w	d7
+	rts
+suba4ToggleReplayView	equ	*
+	bclr	#6,(sflags4).w
+	beq.w	.4
+	movem.l	d0-d7/a0-a6,-(sp)
+	bchg	#4,(sflags4).w
+	move.w	(Hpos).w,-(sp)
+	move.w	(Vpos).w,-(sp)
+	bsr.w	forceblack2
+	jsr	(vcountwait).l
+	jsr	(vcountwait).l
+	clr.w	(Hpos).w
+	clr.w	(Vpos).w
+	move.w	#$7D0,(Oldrow).w
+	move.w	#1,d0
+.loop
+	jsr	(setvideo).l
+	jsr	(vcountwait).l
+	dbf	d0,.loop
+	move.w	(sp)+,(Vpos).w
+	move.w	(sp)+,(Hpos).w
+	move.w	#1,d0
+	jsr	(setvideo).l
+.loop2
+	jsr	(vcountwait).l
+	dbf	d0,.loop2
+	movem.l	a0,-(sp)
+	movea.l	#SortCords+(12*SCstruct),a0
+	move.w	#1,8(a0)
+	adda.w	#SCstruct,a0
+	move.w	#1,8(a0)
+	movem.l	(sp)+,a0
+	bsr.w	RevReplayAdj
+	btst	#sfscrl,(sflags).w
+	beq.w	.3
+.3
+	jsr	(ShowReplayIcon).l
+	move.w	#$64,(palcount).w
+	movem.l	(sp)+,d0-d7/a0-a6
+.4
+	clr.w	d7
+	btst	#sf2drec,(sflags2).w
+	beq.w	.5
+	movem.l	a4,-(sp)
+	bsr.w	AdvanceReplayRecord
+	cmpa.l	(recbpr).w,a4
+	movem.l	(sp)+,a4
+	beq.w	rtss8
+.5
+	cmpa.l	(recbpr).w,a4
+	beq.w	rtss8
+	bsr.w	RevReplayAdjFrames
+AdvanceReplayRecord					;Step a4 to the next $64 byte replay record and wrap from the end of the
+									;buffer to AwardIds
+	adda.w	#$64,a4
+	cmpa.l	#$FFFFAF64,a4
+	bne.w	rtss8
+	movea.l	#AwardIds,a4
+	rts
 
 UpdateCameraPos						;Camera struct a5 = object a3 x/y (negated for the reverse angle),
 									;Hpos/Vpos clamped.
@@ -223,6 +499,7 @@ RevReplayAdj						;Set sflags4 bit 7 for a reverse angle replay, then fall into 
 	btst	#4,(sflags4).w
 	beq.w	.1
 	bset	#7,(sflags4).w
+RevReplayAdjFrames	equ	*			;Reverse replay: adjust the frame offsets of the six skaters of record a4
 .1
 	movem.l	d0-d2/a0/a6,-(sp)
 	movea.l	#revframetbl,a6			;reverse frame table

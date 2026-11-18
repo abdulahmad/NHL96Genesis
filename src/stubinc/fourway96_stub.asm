@@ -10,6 +10,8 @@
 	include	ram96.asm				;RAM map
 	include	externs96.asm			;outside addresses still in incbin segments. Equates only
 	include	macros\genesis.mac		;String
+ReadJoy1 = $01B348				;pause96_stub
+
 
 ; Main segment code
 	include	engine\fourway96.asm

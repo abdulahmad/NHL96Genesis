@@ -40,6 +40,7 @@ SprSort = $0213AE					;display96
 StartShootoutPath = $1D8B60			;shootout96_path
 Stop4Pen = $01C784					;collide96_stub
 vtoa = $01A3EE						;collide96_stub
+AddPenalty2 = $01C1D2				;collide96_stub
 
 
 ; Main segment code

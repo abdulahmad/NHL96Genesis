@@ -75,6 +75,16 @@ MenuReleasePlayer = $1DC150			;trade96_edit
 TradePlayers = $1DC158				;trade96_edit
 TeamRosterScreen = $1E2EFC			;summary96
 SPAturnl = $2020					;frames96
+GetPlayerNameD7ToA1 = $01016A				;trade96
+LeadersBgMap = $18633E				;graphics96
+LeadersSprites = $18882C				;graphics96
+LeagueLeadersTitleMap = $18800C				;graphics96
+PlayoffLeadersTitleMap = $188C4A				;graphics96
+PrintBigListItem = $01D7E2				;hockey96_inter
+PushNumberWidthZero = $0230E8				;middle96
+ReadSRAMBitsSkip1 = $0097A0				;srambits96
+ReadSRAMBitsSkip2 = $00980E				;srambits96
+ReadSRAMBitsSkip3 = $0098EC				;srambits96
 
 
 ; Main segment code

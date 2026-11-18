@@ -1,133 +1,390 @@
 ;	The create-player screen and the created-player list.
 
 CreatePlayer						;The create player screen (roster menu item Create Players) Code the
-									;listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$08,$B8,$00,$06,$C3,$56,$08,$B8,$00,$07,$C3,$58
-	dc.b	$42,$40,$10,$39,$00,$20,$1B,$B9,$B0,$7C,$00,$14,$6D,$00,$00,$08
-	dc.b	$08,$F8,$00,$07,$C3,$58
+	movem.l	d0-d7/a0-a6,-(sp)
+	bclr	#6,(sflags12).w
+	bclr	#7,(sflags13).w
+	clr.w	d0
+	move.b	(SaveRAM+$1BB9).l,d0
+	cmp.w	#$14,d0
+	blt.w	CreatePlayerInit
+	bset	#7,(sflags13).w
 
 .redraw								;Redraw the create screen: reset the field row and the mode, read and draw
 									;the name list
-									;Code the listing does not decode: kept as bytes
-	dc.b	$42,$78,$D4,$84,$42,$78,$D4,$86,$42,$78,$D3,$12,$61,$00,$09,$D0
-	dc.b	$20,$7C,$00,$19,$4C,$48,$4E,$B9,$00,$01,$21,$8A,$4E,$B9,$00,$1D
-	dc.b	$BB,$92,$31,$FC,$00,$18,$BD,$3C,$08,$B8,$00,$02,$BF,$B2,$61,$00
-	dc.b	$0B,$52,$4A,$79,$FF,$FF,$55,$F0,$66,$00,$00,$14,$08,$F8,$00,$06
-	dc.b	$C3,$56,$33,$FC,$00,$01,$FF,$FF,$55,$F0,$60,$00,$00,$42,$42,$78
-	dc.b	$D3,$C4,$31,$FC,$00,$01,$D3,$C2,$30,$39,$FF,$FF,$55,$F0,$53,$40
-	dc.b	$33,$C0,$FF,$FF,$55,$F8,$55,$40,$6A,$00,$00,$04,$42,$40,$33,$C0
-	dc.b	$FF,$FF,$55,$F4,$30,$39,$FF,$FF,$55,$F8,$52,$40,$31,$C0,$D3,$C2
-	dc.b	$22,$7C,$FF,$FF,$D3,$AC,$61,$00,$09,$00,$61,$00,$08,$82,$61,$00
-	dc.b	$05,$E2,$42,$44,$42,$78,$D4,$84,$42,$78,$D4,$86,$42,$40,$60,$00
-	dc.b	$03,$A0,$61,$00,$0B,$DA,$46,$FC,$25,$00,$30,$38,$B0,$52,$B0,$78
-	dc.b	$B0,$52,$67,$FA,$4E,$B9,$00,$01,$26,$40,$4E,$B9,$00,$01,$B2,$82
-	dc.b	$4E,$B9,$00,$01,$B3,$20,$4A,$41,$67,$E0,$08,$38,$00,$07,$C3,$58
-	dc.b	$66,$00,$00,$0C,$08,$38,$00,$06,$C3,$56,$67,$00,$00,$0C,$08,$01
-	dc.b	$00,$07,$67,$C6,$60,$00,$03,$F2,$4A,$78,$D4,$84,$66,$00,$00,$3C
-	dc.b	$30,$3C,$00,$01,$08,$01,$00,$01,$66,$00,$02,$AA,$30,$3C,$FF,$FF
-	dc.b	$08,$01,$00,$00,$66,$00,$02,$9E,$08,$01,$00,$06,$67,$00,$00,$10
-	dc.b	$42,$44,$42,$45,$61,$00,$03,$C8,$42,$40,$60,$00,$02,$88,$08,$01
-	dc.b	$00,$04,$66,$00,$03,$B4,$60,$00,$FF,$7A,$20,$7C,$00,$1D,$DA,$78
-	dc.b	$30,$38,$D4,$86,$E5,$40,$20,$70,$00,$00,$4E,$D0
+CreatePlayerInit	equ	*
+	clr.w	(NameEntryMode).w
+	clr.w	(NameEntryMode+2).w
+	clr.w	(carddelay).w
+	bsr.w	SetupCreateScreenVideo
+	movea.l	#CreateSprites,a0
+	jsr	(DrawScreenSprite).l
+	jsr	(PStatsPalette).l
+	move.w	#$18,(palcount).w
+	bclr	#2,(disflags).w
+	bsr.w	ReadCreatedPlayers
+	tst.w	($FFFF55F0).l
+	bne.w	.1
+	bset	#6,(sflags12).w
+	move.w	#1,($FFFF55F0).l
+	bra.w	.3
+.1
+	clr.w	(namelogarrows).w
+	move.w	#1,(namelogsel).w
+	move.w	($FFFF55F0).l,d0
+	subq.w	#1,d0
+	move.w	d0,($FFFF55F8).l
+	subq.w	#2,d0
+	bpl.w	.2
+	clr.w	d0
+.2
+	move.w	d0,($FFFF55F4).l
+	move.w	($FFFF55F8).l,d0
+	addq.w	#1,d0
+	move.w	d0,(namelogsel).w
+	movea.l	#NameEntryBuf,a1
+	bsr.w	GetCreateName
+	bsr.w	ReadSavedNameFromSRAM
+.3
+	bsr.w	DrawNameEntryPrompt
+	clr.w	d4
+	clr.w	(NameEntryMode).w
+	clr.w	(NameEntryMode+2).w
+	clr.w	d0
+	bra.w	NameEntryMoveColumn
+CreatePlayerLoop	equ	*
+	bsr.w	DrawNameEntryScreen
+	move.w	#$2500,sr
+CreatePlayerWaitPad	equ	*
+	move.w	(Vcount).w,d0
+.loop
+	cmp.w	(Vcount).w,d0
+	beq.s	.loop
+	jsr	(SetMenuScroll).l
+	jsr	(FindHeldMenuPad).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.s	CreatePlayerWaitPad
+	btst	#7,(sflags13).w
+	bne.w	.4
+	btst	#6,(sflags12).w
+	beq.w	.5
+.4
+	btst	#7,d1
+	beq.s	CreatePlayerWaitPad
+	bra.w	CreateNameDoneReturn
+.5
+	tst.w	(NameEntryMode).w
+	bne.w	.7
+	move.w	#1,d0
+	btst	#1,d1
+	bne.w	CreateListMove
+	move.w	#$FFFF,d0
+	btst	#0,d1
+	bne.w	CreateListMove
+	btst	#6,d1
+	beq.w	.6
+	clr.w	d4
+	clr.w	d5
+	bsr.w	ToggleNameEntryCase
+	clr.w	d0
+	bra.w	CreateListMove
+.6
+	btst	#4,d1
+	bne.w	CreateNameDoneReturn
+	bra.w	CreatePlayerLoop
+.7
+	movea.l	#CreateFieldJumps,a0
+	move.w	(NameEntryMode+2).w,d0
+	asl.w	#2,d0
+	movea.l	(a0,d0.w),a0
+	jmp	(a0)
 
+CreateFieldJumps	equ	*			;Create player: the table of field routines
 .fieldjumps							;Field routine of each create row, then: next field, after the last one
 									;finish the name
-; Code kept as bytes (decoded by decode_code.py).
 	dc.l	.namefield,.posfield,.handfield,.weightfield,.jerseyfield
-	dc.b	$52,$78,$D4,$86,$0C,$78,$00,$05,$D4,$86,$6D,$00,$FF,$46,$4E,$F9
-	dc.b	$00,$1D,$DD,$F0
+CreatePlayerNextEntry	equ	*
+	addq.w	#1,(NameEntryMode+2).w
+	cmpi.w	#5,(NameEntryMode+2).w
+	blt.w	CreatePlayerLoop
+	jmp	(CreateNameDone).l
 
 .posfield							;Position field: left / right change the position slot 0-5 Code the
-									;listing does not decode: kept as bytes
-	dc.b	$08,$01,$00,$07,$66,$E6,$08,$01,$00,$04,$66,$00,$03,$68,$08,$01
-	dc.b	$00,$02,$67,$00,$00,$1A,$10,$39,$FF,$FF,$56,$08,$48,$80,$53,$40
-	dc.b	$6B,$00,$FF,$24,$13,$C0,$FF,$FF,$56,$08,$60,$00,$FF,$12,$08,$01
-	dc.b	$00,$03,$67,$00,$FF,$12,$10,$39,$FF,$FF,$56,$08,$48,$80,$52,$40
-	dc.b	$B0,$7C,$00,$05,$6E,$00,$FF,$00,$13,$C0,$FF,$FF,$56,$08,$60,$00
-	dc.b	$FE,$EE
+	btst	#7,d1
+	bne.s	CreatePlayerNextEntry
+	btst	#4,d1
+	bne.w	CreateNameDoneReturn
+	btst	#2,d1
+	beq.w	.8
+	move.b	($FFFF5608).l,d0
+	ext.w	d0
+	subq.w	#1,d0
+	bmi.w	CreatePlayerWaitPad
+	move.b	d0,($FFFF5608).l
+	bra.w	CreatePlayerLoop
+.8
+	btst	#3,d1
+	beq.w	CreatePlayerWaitPad
+	move.b	($FFFF5608).l,d0
+	ext.w	d0
+	addq.w	#1,d0
+	cmp.w	#5,d0
+	bgt.w	CreatePlayerWaitPad
+	move.b	d0,($FFFF5608).l
+	bra.w	CreatePlayerLoop
 
 .handfield							;Hand field: left / right toggle the shooting hand Code the listing does
-									;not decode: kept as bytes
-	dc.b	$08,$01,$00,$07,$66,$94,$08,$01,$00,$04,$66,$00,$03,$16,$08,$01
-	dc.b	$00,$02,$67,$00,$00,$0E,$0A,$39,$00,$01,$FF,$FF,$56,$04,$60,$00
-	dc.b	$FE,$CC,$08,$01,$00,$03,$67,$00,$FE,$CC,$60,$EA
+	btst	#7,d1
+	bne.s	CreatePlayerNextEntry
+	btst	#4,d1
+	bne.w	CreateNameDoneReturn
+	btst	#2,d1
+	beq.w	.9
+.loop2
+	eori.b	#1,($FFFF5604).l
+	bra.w	CreatePlayerLoop
+.9
+	btst	#3,d1
+	beq.w	CreatePlayerWaitPad
+	bra.s	.loop2
 
 .weightfield						;Weight field: left / right change the weight
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$01,$00,$07,$66,$00,$FF,$68,$08,$01,$00,$04,$66,$00,$02,$E8
-	dc.b	$08,$01,$00,$02,$67,$00,$00,$2C,$10,$39,$FF,$FF,$56,$01,$E8,$48
-	dc.b	$02,$40,$00,$0F,$67,$00,$FE,$A2,$53,$00,$E9,$08,$02,$40,$00,$F0
-	dc.b	$02,$39,$00,$0F,$FF,$FF,$56,$01,$81,$39,$FF,$FF,$56,$01,$60,$00
-	dc.b	$FE,$80,$08,$01,$00,$03,$67,$00,$FE,$80,$10,$39,$FF,$FF,$56,$01
-	dc.b	$E8,$48,$02,$40,$00,$0F,$B0,$7C,$00,$0F,$67,$00,$FE,$6C,$52,$00
-	dc.b	$60,$C8
+	btst	#7,d1
+	bne.w	CreatePlayerNextEntry
+	btst	#4,d1
+	bne.w	CreateNameDoneReturn
+	btst	#2,d1
+	beq.w	.10
+	move.b	($FFFF5601).l,d0
+	lsr.w	#4,d0
+	andi.w	#$F,d0
+	beq.w	CreatePlayerWaitPad
+	subq.b	#1,d0
+.loop3
+	lsl.b	#4,d0
+	andi.w	#$F0,d0
+	andi.b	#$F,($FFFF5601).l
+	or.b	d0,($FFFF5601).l
+	bra.w	CreatePlayerLoop
+.10
+	btst	#3,d1
+	beq.w	CreatePlayerWaitPad
+	move.b	($FFFF5601).l,d0
+	lsr.w	#4,d0
+	andi.w	#$F,d0
+	cmp.w	#$F,d0
+	beq.w	CreatePlayerWaitPad
+	addq.b	#1,d0
+	bra.s	.loop3
 
 .jerseyfield						;Jersey field: left / right change the BCD jersey number Code the listing
-									;does not decode: kept as bytes
-	dc.b	$08,$01,$00,$07,$66,$00,$FF,$06,$08,$01,$00,$04,$66,$00,$02,$86
-	dc.b	$08,$01,$00,$02,$67,$00,$00,$2E,$10,$39,$FF,$FF,$56,$00,$67,$00
-	dc.b	$FE,$46,$12,$00,$02,$41,$00,$0F,$66,$00,$00,$0E,$04,$00,$00,$10
-	dc.b	$00,$00,$00,$09,$60,$00,$00,$04,$53,$00,$13,$C0,$FF,$FF,$56,$00
-	dc.b	$60,$00,$FE,$1C,$08,$01,$00,$03,$67,$00,$FE,$1C,$10,$39,$FF,$FF
-	dc.b	$56,$00,$B0,$3C,$00,$99,$67,$00,$FE,$0E,$12,$00,$02,$41,$00,$0F
-	dc.b	$B2,$3C,$00,$09,$66,$00,$00,$0C,$06,$00,$00,$10,$02,$00,$00,$F0
-	dc.b	$60,$C8,$52,$00,$60,$C4
+	btst	#7,d1
+	bne.w	CreatePlayerNextEntry
+	btst	#4,d1
+	bne.w	CreateNameDoneReturn
+	btst	#2,d1
+	beq.w	.12
+	move.b	($FFFF5600).l,d0
+	beq.w	CreatePlayerWaitPad
+	move.b	d0,d1
+	andi.w	#$F,d1
+	bne.w	.11
+	subi.b	#$10,d0
+	ori.b	#9,d0
+	bra.w	.loop4
+.11
+	subq.b	#1,d0
+.loop4
+	move.b	d0,($FFFF5600).l
+	bra.w	CreatePlayerLoop
+.12
+	btst	#3,d1
+	beq.w	CreatePlayerWaitPad
+	move.b	($FFFF5600).l,d0
+	cmp.b	#$99,d0
+	beq.w	CreatePlayerWaitPad
+	move.b	d0,d1
+	andi.w	#$F,d1
+	cmp.b	#9,d1
+	bne.w	.13
+	addi.b	#$10,d0
+	andi.b	#$F0,d0
+	bra.s	.loop4
+.13
+	addq.b	#1,d0
+	bra.s	.loop4
 
 .namefield							;Name field: the pads edit the name (grid), start checks it
 									;(BuildEnteredName) and goes to the next field
-									;Code the listing does not decode: kept as bytes
-	dc.b	$70,$FF,$08,$01,$00,$07,$67,$00,$00,$9E,$61,$00,$0C,$B8,$6B,$00
-	dc.b	$00,$34,$61,$00,$02,$FA,$4E,$B9,$00,$01,$BA,$2E,$00,$24,$FE,$07
-	dc.b	$FF,$01,$FD,$18,$FC,$13,$5B,$5D,$2D,$73,$65,$6C,$65,$63,$74,$69
-	dc.b	$6F,$6E,$FD,$18,$FA,$01,$73,$74,$61,$72,$74,$3D,$6E,$65,$78,$74
-	dc.b	$60,$00,$FE,$54,$61,$00,$02,$A8,$4E,$B9,$00,$01,$BA,$2E,$00,$38
-	dc.b	$FE,$07,$FF,$01,$FD,$18,$FC,$13,$62,$61,$64,$20,$6E,$61,$6D,$65
-	dc.b	$20,$65,$6E,$74,$72,$79,$2E,$FD,$18,$FA,$01,$61,$6E,$79,$20,$62
-	dc.b	$75,$74,$74,$6F,$6E,$FD,$18,$FA,$01,$74,$6F,$20,$63,$6F,$6E,$74
-	dc.b	$69,$6E,$75,$65,$2E,$00,$61,$00,$F0,$0C,$4E,$B9,$00,$01,$B2,$82
-	dc.b	$4E,$B9,$00,$01,$B3,$20,$4A,$41,$67,$EC,$61,$00,$02,$52,$61,$00
-	dc.b	$02,$8E,$60,$00,$FD,$44,$08,$01,$00,$06,$66,$00,$00,$DA,$44,$40
-	dc.b	$08,$01,$00,$05,$66,$00,$00,$D0,$08,$01,$00,$03,$66,$00,$00,$F2
-	dc.b	$44,$40,$08,$01,$00,$02,$66,$00,$00,$E8,$70,$0A,$08,$01,$00,$01
-	dc.b	$66,$00,$00,$DE,$44,$40,$08,$01,$00,$00,$66,$00,$00,$D4,$08,$01
-	dc.b	$00,$04,$67,$00,$FD,$04,$60,$00,$01,$36
+	moveq	#-$1,d0
+	btst	#7,d1
+	beq.w	.15
+	bsr.w	BuildEnteredName
+	bmi.w	.14
+	bsr.w	FindGridLetterMsg2
+	jsr	(printsmallz).l
+	String	$FE,7,$FF,1,$FD,$18,$FC,$13,'[]-selection',$FD,$18,$FA,1,'start=next'
+	bra.w	CreatePlayerNextEntry
+.14
+	bsr.w	FindGridLetterMsg1
+	jsr	(printsmallz).l
+	String	$FE,7,$FF,1,$FD,$18,$FC,$13,'bad name entry.',$FD,$18,$FA,1,'any button',$FD,$18,$FA,1,'to continue.'
+.loop5
+	bsr.w	WaitMenuFrame
+	jsr	(FindHeldMenuPad).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.s	.loop5
+	bsr.w	FindGridLetterMsg1
+	bsr.w	FindGridLetterMsg3
+	bra.w	CreatePlayerLoop
+.15
+	btst	#6,d1
+	bne.w	NameEntryMoveColumn
+	neg.w	d0
+	btst	#5,d1
+	bne.w	NameEntryMoveColumn
+	btst	#3,d1
+	bne.w	CreateListMoveDraw
+	neg.w	d0
+	btst	#2,d1
+	bne.w	CreateListMoveDraw
+	moveq	#$A,d0
+	btst	#1,d1
+	bne.w	CreateListMoveDraw
+	neg.w	d0
+	btst	#0,d1
+	bne.w	CreateListMoveDraw
+	btst	#4,d1
+	beq.w	CreatePlayerLoop
+	bra.w	CreateNameDoneReturn
 
 CreateListMove						;CreatePlayer: move in the name list
-									;Code the listing does not decode: kept as bytes
-	dc.b	$D1,$78,$D3,$C2,$32,$38,$D3,$C2,$B2,$79,$FF,$FF,$55,$F0,$6F,$00
-	dc.b	$00,$06,$91,$78,$D3,$C2,$4A,$78,$D3,$C2,$66,$00,$00,$06,$91,$78
-	dc.b	$D3,$C2,$30,$38,$D3,$C2,$53,$40,$B0,$79,$FF,$FF,$55,$F4,$6C,$00
-	dc.b	$00,$12,$53,$79,$FF,$FF,$55,$F4,$53,$79,$FF,$FF,$55,$F8,$61,$00
-	dc.b	$02,$8E,$B0,$79,$FF,$FF,$55,$F8,$6F,$00,$00,$12,$52,$79,$FF,$FF
-	dc.b	$55,$F4,$52,$79,$FF,$FF,$55,$F8,$61,$00,$02,$74,$22,$7C,$FF,$FF
-	dc.b	$D3,$AC,$61,$00,$05,$80,$61,$00,$05,$02,$4A,$78,$D4,$84,$66,$00
-	dc.b	$00,$06,$60,$00,$FC,$8A,$4E,$B9,$00,$01,$BC,$72,$00,$06,$8F,$01
-	dc.b	$0C,$00,$D9,$78,$B0,$40,$4E,$B9,$00,$01,$BC,$72,$00,$04,$20,$00
-	dc.b	$61,$00,$01,$1A,$30,$04,$44,$40,$60,$00,$00,$02,$D0,$44,$B0,$7C
-	dc.b	$00,$11,$62,$00,$FC,$5A,$38,$00,$20,$7C,$FF,$FF,$D3,$AC,$42,$40
-	dc.b	$0C,$30,$00,$2D,$40,$00,$67,$00,$00,$0E,$10,$30,$40,$00,$48,$80
-	dc.b	$61,$00,$01,$18,$90,$45,$D0,$45,$B0,$7C,$00,$1D,$62,$00,$FC,$30
-	dc.b	$3F,$00,$61,$00,$00,$B4,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$07
-	dc.b	$74,$01,$61,$00,$00,$7A,$3A,$1F,$61,$00,$00,$9E,$4A,$78,$D4,$84
-	dc.b	$67,$00,$00,$02,$61,$00,$00,$68,$20,$7C,$FF,$FF,$D3,$AC,$22,$7C
-	dc.b	$00,$1E,$6B,$04,$10,$31,$50,$00,$11,$80,$40,$00,$60,$00,$FB,$F0
+	add.w	d0,(namelogsel).w
+	move.w	(namelogsel).w,d1
+	cmp.w	($FFFF55F0).l,d1
+	ble.w	.1
+	sub.w	d0,(namelogsel).w
+.1
+	tst.w	(namelogsel).w
+	bne.w	.2
+	sub.w	d0,(namelogsel).w
+.2
+	move.w	(namelogsel).w,d0
+	subq.w	#1,d0
+	cmp.w	($FFFF55F4).l,d0
+	bge.w	.3
+	subq.w	#1,($FFFF55F4).l
+	subq.w	#1,($FFFF55F8).l
+	bsr.w	DrawNameEntryPrompt
+.3
+	cmp.w	($FFFF55F8).l,d0
+	ble.w	.4
+	addq.w	#1,($FFFF55F4).l
+	addq.w	#1,($FFFF55F8).l
+	bsr.w	DrawNameEntryPrompt
+.4
+	movea.l	#NameEntryBuf,a1
+	bsr.w	GetCreateName
+	bsr.w	ReadSavedNameFromSRAM
+	tst.w	(NameEntryMode).w
+	bne.w	.5
+	bra.w	CreatePlayerLoop
+.5
+	jsr	(printcurz).l
+	String	$8F,1,$C
+	add.w	d4,(printx).w
+	jsr	(printcurz).l
+	String	' '
+	bsr.w	FixFirstLetter
+	move.w	d4,d0
+	neg.w	d0
+	bra.w	NameEntryMoveColumn
+NameEntryMoveColumn	equ	*
+	add.w	d4,d0
+	cmp.w	#$11,d0
+	bhi.w	CreatePlayerLoop
+	move.w	d0,d4
+	movea.l	#NameEntryBuf,a0
+	clr.w	d0
+	cmpi.b	#$2D,(a0,d4.w)
+	beq.w	CreateListMoveDraw
+	move.b	(a0,d4.w),d0
+	ext.w	d0
+	bsr.w	FindGridLetter
+	sub.w	d5,d0
+CreateListMoveDraw	equ	*	;Redraw the grid letters after a cursor move
+	add.w	d5,d0
+	cmp.w	#$1D,d0
+	bhi.w	CreatePlayerLoop
+	move.w	d0,-(sp)
+	bsr.w	PositionGridCursor
+	jsr	(printsmallz).l
+	String	$FE,7
+	moveq	#1,d2
+	bsr.w	PrintGridLetter
+	move.w	(sp)+,d5
+	bsr.w	PositionGridCursor
+	tst.w	(NameEntryMode).w
+	beq.w	.6
+.6
+	bsr.w	PrintGridLetter
+	movea.l	#NameEntryBuf,a0
+	movea.l	#CreateLetterGrid,a1
+	move.b	(a1,d5.w),d0
+	move.b	d0,(a0,d4.w)
+	bra.w	CreatePlayerLoop
 
 CreateNameDone						;All fields done: SaveCreateName (fail: redraw), InitCreateRecord, the
 									;checksum, then ModifyRatings
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$09,$82,$6B,$00,$00,$18,$61,$00,$0B,$92,$08,$B8,$00,$06
-	dc.b	$C3,$50,$4E,$B9,$00,$02,$41,$AA,$4E,$F9,$00,$1D,$EA,$5A,$4E,$F9
-	dc.b	$00,$1D,$D9,$3C,$4C,$DF,$7F,$FF,$4E,$75,$48,$E7,$FF,$FE,$08,$78
-	dc.b	$00,$00,$D4,$85,$66,$00,$00,$0C,$61,$00,$01,$42,$4C,$DF,$7F,$FF
-	dc.b	$4E,$75,$22,$7C,$FF,$FF,$D3,$AC,$61,$00,$04,$8A,$60,$EE
+	bsr.w	SaveCreateName
+	bmi.w	.1
+	bsr.w	InitCreateRecord
+	bclr	#6,(GameFlags).w
+	jsr	(MakeSRAMChecksum).l
+	jmp	(ModifyRatings).l
+.1
+	jmp	(CreatePlayerInit).l
+CreateNameDoneReturn	equ	*	;Restore the registers and return
+	movem.l	(sp)+,d0-d7/a0-a6
+CreateNameDoneExit	equ	*	;Shared return of CreateNameDone
+	rts
+ToggleNameEntryCase	equ	*	;Toggle the upper / lower case of the name entry and redraw the letter grid
+	movem.l	d0-d7/a0-a6,-(sp)
+	bchg	#0,(NameEntryMode+1).w
+	bne.w	.2
+	bsr.w	DrawLetterGrid
+.loop
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+.2
+	movea.l	#NameEntryBuf,a1
+	bsr.w	GetCreateName
+	bra.s	.loop
 
 PrintGridLetter						;If grid mode, print letter d5 of the grid table (cursor letter) Code the
-									;listing does not decode: kept as bytes
-	dc.b	$4A,$78,$D4,$84,$67,$D4,$22,$7C,$FF,$FF,$D1,$30,$32,$BC,$00,$04
-	dc.b	$13,$7C,$00,$00,$00,$03,$20,$7C,$00,$1E,$6B,$04,$10,$30,$50,$00
-	dc.b	$13,$40,$00,$02,$4E,$F9,$00,$01,$BC,$84,$4E,$B9,$00,$01,$BC,$72
-	dc.b	$00,$06,$AF,$1A,$0F,$00,$30,$05,$48,$C0,$80,$FC,$00,$0A,$D1,$78
-	dc.b	$B0,$42,$48,$40,$D1,$78,$B0,$40,$70,$01,$72,$01,$4E,$75
+	tst.w	(NameEntryMode).w
+	beq.s	CreateNameDoneExit
+	movea.l	#CalTeam,a1
+	move.w	#4,(a1)
+	move.b	#0,3(a1)
+	movea.l	#CreateLetterGrid,a0
+	move.b	(a0,d5.w),d0
+	move.b	d0,2(a1)
+	jmp	(printcur).l
+PositionGridCursor	equ	*	;Print the grid cursor at the letter d5
+	jsr	(printcurz).l
+	String	$AF,$1A,$F
+	move.w	d5,d0
+	ext.l	d0
+	divu.w	#$A,d0
+	add.w	d0,(printy).w
+	swap	d0
+	add.w	d0,(printx).w
+	moveq	#1,d0
+	moveq	#1,d1
+	rts
 
 FixFirstLetter						;Normalize first letter of name buffer to a
 									;letter grid char (unknown -> A)
@@ -161,31 +418,47 @@ FindGridLetter						;Find char d0 in letter grid table, return index in d0 ($1E 
 .1
 	movem.l	(sp)+,d1-d3/a0-a6
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.w	$4EB9,$0001,$BB8E,$0006,$8F17,$1300,$303C,$0010
-	dc.w	$323C,$0004,$343C,$07FF,$4EB9,$0001,$B976,$4E75
-	dc.w	$4EB9,$0001,$BB8E,$0006,$8F17,$0D00,$303C,$0010
-	dc.w	$323C,$000A,$343C,$07FF,$4EB9,$0001,$B976,$4E75
+FindGridLetterMsg1	equ	*	;Print the first create player message and clear its line
+	jsr	(printz).l
+	String	$8F,$17,$13
+	move.w	#$10,d0
+	move.w	#4,d1
+	move.w	#$7FF,d2
+	jsr	(eraser).l
+	rts
+FindGridLetterMsg2	equ	*	;Print the second create player message and clear its line
+FindGridLetterMsg2	equ	*	;Print the second create player message and clear its line
+	jsr	(printz).l
+	String	$8F,$17,$D
+	move.w	#$10,d0
+	move.w	#$A,d1
+	move.w	#$7FF,d2
+	jsr	(eraser).l
+	rts
+FindGridLetterMsg3	equ	*	;Print the third create player message
 	dc.w	$4EB9,$0001,$BA2E,$0040,$FE07,$FF01,$FD18,$FC13
 	dc.w	$613D,$676F,$2062,$6163,$6BFD,$18FA,$0162,$3D63
 	dc.w	$616E,$6365,$6CFD,$18FA,$0163,$3D65,$6E74,$6572
 	dc.w	$206C,$6574,$7465,$72FD,$18FA,$0173,$7461,$7274
-	dc.w	$3D64,$6F6E,$6500,$4E75,$61B6,$4EB9,$0001,$BC72
-	dc.w	$0006,$8F1A,$0F00,$207C,$001E,$6B04,$7002,$7209
-	dc.w	$227C,$FFFF,$BFF2,$32FC,$000C,$12D8,$51C9,$FFFC
-	dc.w	$327C,$BFF2,$4EB9,$0001,$BC84,$5278,$B042,$0478
-	dc.w	$000A,$B040,$51C8,$FFD8,$4E75,$48E7,$FFFE,$0838
-	dc.w	$0007,$C358,$6600,$0056,$0838,$0006,$C356,$6700
-	dc.w	$0096,$4EB9,$0001,$BC72,$0040,$8F13,$066D,$6178
+	dc.w	$3D64,$6F6E,$6500,$4E75
+DrawLetterGrid	equ	*	;Draw the letter grid of the name entry screen
+	dc.w	$61B6,$4EB9,$0001,$BC72,$0006,$8F1A,$0F00,$207C
+	dc.w	$001E,$6B04,$7002,$7209,$227C,$FFFF,$BFF2,$32FC
+	dc.w	$000C,$12D8,$51C9,$FFFC,$327C,$BFF2,$4EB9,$0001
+	dc.w	$BC84,$5278,$B042,$0478,$000A,$B040,$51C8,$FFD8
+	dc.w	$4E75
+DrawNameEntryPrompt	equ	*	;Print the prompt lines of the name entry screen
+	dc.w	$48E7,$FFFE,$0838,$0007,$C358,$6600,$0056,$0838
+	dc.w	$0006,$C356,$6700,$0096,$4EB9,$0001,$BC72,$0040
+	dc.w	$8F13,$066D,$6178,$696D,$756D,$206E,$756D,$6265
+	dc.w	$7220,$6F66,$8F12,$0763,$7265,$6174,$6564,$2070
+	dc.w	$6C61,$7965,$7273,$2E8F,$1108,$7072,$6573,$7320
+	dc.w	$7374,$6172,$7420,$746F,$2065,$7869,$742E,$6000
+	dc.w	$00AC,$4EB9,$0001,$BC72,$0040,$8F13,$066D,$6178
 	dc.w	$696D,$756D,$206E,$756D,$6265,$7220,$6F66,$8F12
-	dc.w	$0763,$7265,$6174,$6564,$2070,$6C61,$7965,$7273
-	dc.w	$2E8F,$1108,$7072,$6573,$7320,$7374,$6172,$7420
-	dc.w	$746F,$2065,$7869,$742E,$6000,$00AC,$4EB9,$0001
-	dc.w	$BC72,$0040,$8F13,$066D,$6178,$696D,$756D,$206E
-	dc.w	$756D,$6265,$7220,$6F66,$8F12,$0766,$7265,$6520
-	dc.w	$6167,$656E,$7473,$2E20,SPAturnl,$208F,$1108,$7072
-	dc.w	$6573,$7320,$7374,$6172,$7420,$746F,$2065,$7869
-	dc.w	$742E
+	dc.w	$0766,$7265,$6520,$6167,$656E,$7473,$2E20,SPAturnl
+	dc.w	$208F,$1108,$7072,$6573,$7320,$7374,$6172,$7420
+	dc.w	$746F,$2065,$7869,$742E
 
 DrawCreateList						;Draw list of up to 6 player names starting at player CreateListTop Code
 	bra.w	.1
@@ -198,18 +471,41 @@ DrawCreateList						;Draw list of up to 6 player names starting at player Create
 .1
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
-	dc.w	$48E7,$FFFE,$0838,$0006,$C356,$6600,$002C,$0838
-	dc.w	$0007,$C358
+DrawCreateListMarkers	equ	*	;Draw the markers of the created player list
+	movem.l	d0-d7/a0-a6,-(sp)
+	btst	#6,(sflags12).w
+	bne.w	MoveListMarkersDraw
+	btst	#7,(sflags13).w
 
 MoveListMarkers						;Move selection arrows to the current list row if it changed Code the
-									;listing does not decode: kept as bytes
-	dc.b	$66,$00,$00,$22,$30,$38,$D3,$C2,$B0,$78,$D3,$C4,$67,$00,$00,$16
-	dc.b	$22,$7C,$00,$1D,$E1,$44,$61,$00,$00,$12,$22,$7C,$00,$1D,$E1,$3C
-	dc.b	$61,$00,$00,$08,$4C,$DF,$7F,$FF,$4E,$75,$4A,$78,$D3,$C4,$67,$00
-	dc.b	$00,$30,$4E,$B9,$00,$01,$BC,$72,$00,$06,$8F,$13,$06,$00,$30,$38
-	dc.b	$D3,$C4,$53,$40,$90,$79,$FF,$FF,$55,$F4,$D1,$78,$B0,$42,$2F,$09
-	dc.b	$22,$5F,$D2,$D1,$31,$FC,$00,$26,$B0,$40,$4E,$B9,$00,$01,$BC,$84
-	dc.b	$31,$F8,$D3,$C2,$D3,$C4,$4E,$75
+	bne.w	MoveListMarkersDraw
+	move.w	(namelogsel).w,d0
+	cmp.w	(namelogarrows).w,d0
+	beq.w	MoveListMarkersDraw
+	movea.l	#ListMarkersOff,a1
+	bsr.w	MoveNameLogArrows
+	movea.l	#ListMarkers,a1
+	bsr.w	MoveNameLogArrows
+MoveListMarkersDraw	equ	*	;Draw the arrow markers of the created player list
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+MoveNameLogArrows					;Move the arrows of the saved names list
+	tst.w	(namelogarrows).w
+	beq.w	.next2
+	jsr	(printcurz).l
+	String	$8F,$13,6
+	move.w	(namelogarrows).w,d0
+	subq.w	#1,d0
+	sub.w	($FFFF55F4).l,d0
+	add.w	d0,(printy).w
+	move.l	a1,-(sp)
+	movea.l	(sp)+,a1
+	adda.w	(a1),a1
+	move.w	#$26,(printx).w
+	jsr	(printcur).l
+.next2
+	move.w	(namelogsel).w,(namelogarrows).w
+	rts
 
 ListMarkers							;Row markers ] and [
 	String	']'
@@ -300,6 +596,7 @@ PrintEditName						;Print 18-char name from a1 with - padding, highlight cursor 
 	move.w	(sp)+,(NameEntryLen).w
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
+ReadSavedNameFromSRAM	equ	*			;Read the saved name selected in the log from save RAM
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(namelogsel).w,d1
 	subq.w	#1,d1
@@ -361,47 +658,142 @@ GetCreateName						;Copy player name (CreateListRow-1)*18 from M68K_RAM to a1, 0
 	dbf	d3,.loop
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
-	dc.w	$08F8,$0005,$C356,$21FC,$0001,$2D46,$D244,$08B8
-	dc.w	$0000,$BFB2,$08F8,$0002,$BFB2,$08B8,$0001,$BFB2
-	dc.w	$31FC,$0000,$B000,$31FC,$B400,$B002,$31FC,$B800
-	dc.w	$B00C,$31FC,$0005,$B00E,$31FC,$C000,$B008,$31FC
-	dc.w	$0006,$B00A,$31FC,$E000,$B004,$31FC,$0006,$B006
-	dc.w	$303C,$0000,$08F8,$0005,$BFB2,$4EB9,$0001,$B57E
-	dc.w	$08B8,$0005,$BFB2,$4EB9,$0001,$B2C4,$383C,$0001
-	dc.w	$227C,$0019,$4C48,$4EB9,$0001,$217A,$31C4,$B01C
-	dc.w	$247C,$0017,$9170,$4EB9,$0001,$B730,$31C4,$B01E
-	dc.w	$247C,$0017,$A16C,$4EB9,$0001,$B730,$21FC,$0017
-	dc.w	$9168,$BF8A,$4EB9,$0001,$BA2E,$0008,$FF01,$FD00
-	dc.w	$FC00,$7028,$721C,$343C,$07FF,$4EB9,$0001,$B976
-	dc.w	$4EB9,$0001,$BC72,$0006,$BF00,$0000,$207C,$0019
-	dc.w	$321A,$2248,$2448,$D1DA,$D3DA,$4240,$4241,$7428
-	dc.w	$761C,$7A08,$4EB9,$0001,$B692,$4EB9,$0001,$BC72
-	dc.w	$0006,$BF0B,$0100,$207C,$0019,$29FA,$2248,$2448
-	dc.w	$D1DA,$D3DA,$4240,$4241,$3411,$3629,$0002,$7A08
-	dc.w	$4EB9,$0001,$B692,$4EB9,$0001,$BC72,$0006,$FE00
-	dc.w	$0000,$207C,$0017,$3C7A,$2248,$2448,$D1DA,$D3DA
-	dc.w	$4240,$4241,$7440,$761C,$7A01,$4EB9,$0001,$B692
-	dc.w	$3F38,$B01C,$31F8,$B01E,$B01C,$0838,$0007,$C358
-	dc.w	$6600,$000C,$0838,$0006,$C356,$6700,$001C,$4EB9
-	dc.w	$0001,$BC72,$0010,$8F03,$0753,$5441,$5254,$2D45
-	dc.w	$5849,$5400,$6000,$0024,$4EB9,$0001,$BC72,$001C
-	dc.w	$8F03,$0741,$2D65,$6469,$7420,$736C,$6F74,$8F03
-	dc.w	$0842,$2D63,$616E,$6365,$6C00,$31DF,$B01C,$46FC
-	dc.w	$2500,$4E75
+SetupCreateScreenVideo	equ	*	;Set the VBint handler, scroll and map addresses for the create player screen and load its graphics
+	bset	#5,(sflags12).w
+	move.l	#VBlank_Menus,(VBint).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
+	move.w	#0,(VSCRLPM).w
+	move.w	#$B400,(VSPRITES).w
+	move.w	#$B800,(VmMAP3).w
+	move.w	#5,(Map3col1).w
+	move.w	#$C000,(VmMAP2).w
+	move.w	#6,(Map2col1).w
+	move.w	#$E000,(VmMAP1).w
+	move.w	#6,(Map1col1).w
+	move.w	#0,d0					;fade to color
+	bset	#5,(disflags).w
+	jsr	(setVram).l
+	bclr	#5,(disflags).w
+	jsr	(orjoy).l
+	move.w	#1,d4
+	movea.l	#CreateSprites,a1
+	jsr	(LoadScreenSprite).l
+	move.w	d4,(smallfontchars).w
+	movea.l	#RosterFont+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.w	d4,(smallfont2chars).w
+	movea.l	#SmallFontMap2+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.l	#RosterFont,(smallfontptr).w
+	jsr	(printsmallz).l
+	String	$FF,1,$FD,0,$FC
+	moveq	#$28,d0
+	moveq	#$1C,d1
+	move.w	#$7FF,d2
+	jsr	(eraser).l
+	jsr	(printcurz).l
+	String	-(TXPRI+TXMAP1),0,0
+	movea.l	#CreateBgMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#$28,d2
+	moveq	#$1C,d3
+	moveq	#8,d5
+	jsr	(dobitmap).l
+	jsr	(printcurz).l
+	String	-(TXPRI+TXMAP1),$B,1
+	movea.l	#CreateTitleMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	move.w	(a1),d2
+	move.w	2(a1),d3
+	moveq	#8,d5
+	jsr	(dobitmap).l
+	jsr	(printcurz).l
+	String	$FE,0,0
+	movea.l	#ControllerBgMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#$40,d2
+	moveq	#$1C,d3
+	moveq	#1,d5
+	jsr	(dobitmap).l
+	move.w	(smallfontchars).w,-(sp)
+	move.w	(smallfont2chars).w,(smallfontchars).w
+	btst	#7,(sflags13).w
+	bne.w	.5
+	btst	#6,(sflags12).w
+	beq.w	.6
+.5
+	jsr	(printcurz).l
+	String	$8F,3,7,'START-EXIT'
+	bra.w	.7
+.6
+	jsr	(printcurz).l
+	String	$8F,3,7,'A-edit slot',$8F,3,8,'B-cancel'
+.7
+	move.w	(sp)+,(smallfontchars).w
+	move.w	#$2500,sr
+	rts
 
 ReadCreatedPlayers					;Read the created players from save RAM into name records and ids Code the
-									;listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$42,$79,$FF,$FF,$55,$F0,$20,$7C,$FF,$FF,$13,$88
-	dc.b	$20,$3C,$00,$00,$0D,$B4,$72,$28,$4E,$B9,$00,$02,$41,$E8,$3C,$3C
-	dc.b	$00,$14,$26,$7C,$FF,$FF,$4E,$20,$24,$7C,$FF,$FF,$00,$00,$3A,$3C
-	dc.b	$FF,$FF,$60,$00,$00,$36,$4A,$58,$6B,$00,$00,$30,$30,$28,$FF,$FE
-	dc.b	$02,$40,$1F,$00,$B0,$7C,$1E,$00,$66,$00,$00,$20,$30,$28,$FF,$FE
-	dc.b	$4E,$B9,$00,$01,$01,$DC,$61,$00,$00,$52,$D4,$FC,$00,$12,$30,$28
-	dc.b	$FF,$FE,$36,$C0,$52,$79,$FF,$FF,$55,$F0,$52,$45,$51,$CE,$FF,$C8
-	dc.b	$0C,$79,$00,$14,$FF,$FF,$55,$F0,$6C,$00,$00,$2A,$30,$39,$00,$20
-	dc.b	$2A,$9C,$02,$40,$00,$FF,$B0,$3C,$00,$13,$6C,$00,$00,$18,$30,$3C
-	dc.b	$00,$11,$14,$FC,$00,$00,$51,$C8,$FF,$FA,$36,$BC,$80,$00,$52,$79
-	dc.b	$FF,$FF,$55,$F0,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	clr.w	($FFFF55F0).l
+	movea.l	#LeaderIds,a0
+	move.l	#$DB4,d0
+	moveq	#$28,d1
+	jsr	(ReadSRAM).l
+	move.w	#$14,d6
+	movea.l	#$FFFF4E20,a3
+	movea.l	#M68K_RAM,a2
+	move.w	#$FFFF,d5
+	bra.w	.1
+.loop
+	tst.w	(a0)+
+	bmi.w	.1
+	move.w	-$2(a0),d0
+	andi.w	#$1F00,d0
+	cmp.w	#$1E00,d0
+	bne.w	.1
+	move.w	-$2(a0),d0
+	jsr	(GetCreatedName).l
+	bsr.w	FormatNameRecord
+	adda.w	#$12,a2
+	move.w	-$2(a0),d0
+	move.w	d0,(a3)+
+	addq.w	#1,($FFFF55F0).l
+.1
+	addq.w	#1,d5
+	dbf	d6,.loop
+	cmpi.w	#$14,($FFFF55F0).l
+	bge.w	.2
+	move.w	(SaveRAM+$2A9C).l,d0
+	andi.w	#$FF,d0
+	cmp.b	#$13,d0
+	bge.w	.2
+	move.w	#$11,d0
+.loop2
+	move.b	#0,(a2)+
+	dbf	d0,.loop2
+	move.w	#$8000,(a3)
+	addq.w	#1,($FFFF55F0).l
+.2
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 FormatNameRecord					;Format name string at a1 into an 18-byte record at a2: first name padded
 									;to 8 and last name to 10 with dashes
@@ -439,32 +831,83 @@ FormatNameRecord					;Format name string at a1 into an 18-byte record at a2: fir
 .3
 	movem.l	(sp)+,d0-d7/a1-a2
 	rts
-	dc.w	$6100,$FB90,$4EB9,$0001,$BC72,$0006,$8F14,$0500
-	dc.w	$4A78,$D484,$6700,$0176,$4EB9,$0001,$BC72,$0006
-	dc.w	$8F01,$0C00,$303C,$0000,$6100,$0146,$4EB9,$0001
-	dc.w	$BC72,$000C,$4675,$6C6C,$204E,$616D,$653A,$31FC
-	dc.w	$0001,$B040,$5278,$B042,$227C,$FFFF,$D3AC,$6100
-	dc.w	$FB76,$31FC,$0001,$B040,$5478,$B042,$303C,$0001
-	dc.w	$6100,$010E,$4EB9,$0001,$BA2E,$0010,$F900,$706F
-	dc.w	$7369,$7469,$6F6E,$3AFD,$0E00,$1039,$FFFF,$5608
-	dc.w	$4880,$227C,$001D,$E74C,$4EB9,$0001,$D7F2,$4EB9
-	dc.w	$0001,$BC84,$31FC,$0001,$B040,$5478,$B042,$303C
-	dc.w	$0002,$6100,$00CC,$4EB9,$0001,$BA2E,$0010,$6861
-	dc.w	$6E64,$6564,$6E65,$7373,$3AFD,$0E00,$1039,$FFFF
-	dc.w	$5604,$0240,$0001,$227C,$001D,$E764,$4EB9,$0001
-	dc.w	$D7F2,$4EB9,$0001,$BC84,$31FC,$0001,$B040,$5478
-	dc.w	$B042,$303C,$0003,$6100,$0088,$4EB9,$0001,$BA2E
-	dc.w	$0010,$7765,$6967,$6874,$3AFD,$0E20,SPAturnl,$FD0E
-	dc.w	$1039,$FFFF,$5601,$E848,$0240,$000F,$4EB9,$0001
-	dc.w	$545A,$4EB9,$0001,$BDE8,$4EB9,$0001,$BC84,$31FC
-	dc.w	$0001,$B040,$5478,$B042,$303C,$0004,$6100,$0042
-	dc.w	$4EB9,$0001,$BA2E,$0012,$556E,$6966,$6F72,$6D20
-	dc.w	$233A,$FD0E,SPAturnl,$FD0E,$1039,$FFFF,$5600,$3200
-	dc.w	$0241,$000F,$3F01,$E848,$0240,$000F,$C0FC,$000A
-	dc.w	$D05F,$4EB9,$0001,$BDE8,$4EB9,$0001,$BC84,$4E75
-	dc.w	$4EB9,$0001,$BA2E,$0004,$FE07,$B078,$D486,$6600
-	dc.w	$000C,$4EB9,$0001,$BA2E,$0004,$FE05,$6100,$F978
-	dc.w	$4E75
+DrawNameEntryScreen	equ	*	;Draw the name entry screen
+	bsr.w	CountNameLength
+	jsr	(printcurz).l
+	String	$8F,$14,5
+	tst.w	(NameEntryMode).w
+	beq.w	.4
+	jsr	(printcurz).l
+	String	$8F,1,$C
+	move.w	#0,d0
+	bsr.w	FormatNameRecordMark
+	jsr	(printcurz).l
+	String	'Full Name:'
+	move.w	#1,(printx).w
+	addq.w	#1,(printy).w
+	movea.l	#NameEntryBuf,a1
+	bsr.w	PrintEditName
+	move.w	#1,(printx).w
+	addq.w	#2,(printy).w
+	move.w	#1,d0
+	bsr.w	FormatNameRecordMark
+	jsr	(printsmallz).l
+	String	$F9,0,'position:',$FD,$E
+	move.b	($FFFF5608).l,d0
+	ext.w	d0
+	movea.l	#PosText,a1
+	jsr	(SkipStrings).l
+	jsr	(printcur).l
+	move.w	#1,(printx).w
+	addq.w	#2,(printy).w
+	move.w	#2,d0
+	bsr.w	FormatNameRecordMark
+	jsr	(printsmallz).l
+	String	'handedness:',$FD,$E
+	move.b	($FFFF5604).l,d0
+	andi.w	#1,d0
+	movea.l	#HandNames,a1
+	jsr	(SkipStrings).l
+	jsr	(printcur).l
+	move.w	#1,(printx).w
+	addq.w	#2,(printy).w
+	move.w	#3,d0
+	bsr.w	FormatNameRecordMark
+	jsr	(printsmallz).l
+	String	'weight:',$FD,$E,'   ',$FD,$E
+	move.b	($FFFF5601).l,d0
+	lsr.w	#4,d0
+	andi.w	#$F,d0
+	jsr	(RatingToWeight).l
+	jsr	(PushNumber).l
+	jsr	(printcur).l
+	move.w	#1,(printx).w
+	addq.w	#2,(printy).w
+	move.w	#4,d0
+	bsr.w	FormatNameRecordMark
+	jsr	(printsmallz).l
+	String	'Uniform #:',$FD,$E,'  ',$FD,$E
+	move.b	($FFFF5600).l,d0
+	move.w	d0,d1
+	andi.w	#$F,d1
+	move.w	d1,-(sp)
+	lsr.w	#4,d0
+	andi.w	#$F,d0
+	mulu.w	#$A,d0
+	add.w	(sp)+,d0
+	jsr	(PushNumber).l
+	jsr	(printcur).l
+	rts
+FormatNameRecordMark	equ	*	;Print the marker of the selected name record and redraw the list markers
+	jsr	(printsmallz).l
+	String	$FE,7
+	cmp.w	(NameEntryMode+2).w,d0
+	bne.w	.4
+	jsr	(printsmallz).l
+	String	$FE,5
+.4
+	bsr.w	DrawCreateListMarkers
+	rts
 
 PosText								;Position texts (code96_04 and the create player screen)
 	String	'G '
@@ -480,16 +923,44 @@ HandNames							;Shooting hand texts
 
 SaveCreateName						;Save entered name to the created-player record (new or existing); invalid
 									;name -> message; d0=0 ok/-1
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$61,$00,$01,$40,$6B,$00,$01,$22,$30,$38,$D3,$C2
-	dc.b	$53,$40,$D0,$40,$20,$7C,$FF,$FF,$4E,$20,$4A,$70,$00,$00,$6B,$00
-	dc.b	$00,$7A,$48,$E7,$70,$40,$22,$7C,$00,$20,$1B,$68,$34,$3C,$00,$00
-	dc.b	$36,$31,$20,$00,$02,$43,$00,$FF,$E1,$4B,$32,$31,$20,$02,$02,$41
-	dc.b	$00,$FF,$86,$41,$B6,$70,$00,$00,$67,$00,$00,$0C,$58,$42,$B4,$7C
-	dc.b	$00,$50,$6D,$DC,$42,$42,$E4,$42,$33,$C2,$FF,$FF,$55,$FC,$4C,$DF
-	dc.b	$02,$0E,$32,$30,$00,$00,$02,$41,$00,$FF,$33,$C1,$FF,$FF,$55,$FE
-	dc.b	$EB,$41,$D2,$41,$20,$7C,$00,$20,$25,$9C,$D0,$C1,$61,$00,$00,$06
-	dc.b	$60,$00,$00,$9E
+	movem.l	d0-d7/a0-a6,-(sp)
+	bsr.w	BuildEnteredName
+	bmi.w	SaveNameError
+	move.w	(namelogsel).w,d0
+	subq.w	#1,d0
+	add.w	d0,d0
+	movea.l	#$FFFF4E20,a0
+	tst.w	(a0,d0.w)
+	bmi.w	SaveNewName
+	movem.l	d1-d3/a1,-(sp)
+	movea.l	#$201B68,a1
+	move.w	#0,d2
+.loop
+	move.w	(a1,d2.w),d3
+	andi.w	#$FF,d3
+	lsl.w	#8,d3
+	move.w	2(a1,d2.w),d1
+	andi.w	#$FF,d1
+	or.w	d1,d3
+	cmp.w	(a0,d0.w),d3
+	beq.w	.1
+	addq.w	#4,d2
+	cmp.w	#$50,d2
+	blt.s	.loop
+	clr.w	d2
+.1
+	asr.w	#2,d2
+	move.w	d2,($FFFF55FC).l
+	movem.l	(sp)+,d1-d3/a1
+	move.w	(a0,d0.w),d1
+	andi.w	#$FF,d1
+	move.w	d1,($FFFF55FE).l
+	asl.w	#5,d1
+	add.w	d1,d1
+	movea.l	#$20259C,a0
+	adda.w	d1,a0
+	bsr.w	CopyNameWords
+	bra.w	SaveNewNameDone
 
 CopyNameWords						;Copy the length-prefixed name at StatWork into a0 as words Code the
 	movea.l	#TempLegSpd+2,a1
@@ -505,24 +976,56 @@ CopyNameWords						;Copy the length-prefixed name at StatWork into a0 as words C
 SaveNewName							;SaveCreateName, new player: take a free SRCreatedPlayers slot, store the
 									;name and add it to the free agent
 									;list
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$01,$4C,$6B,$00,$00,$88,$20,$7C,$00,$20,$25,$9C,$42,$46
-	dc.b	$3A,$3C,$00,$13,$4A,$28,$00,$01,$66,$00,$00,$0A,$4A,$28,$00,$03
-	dc.b	$67,$00,$00,$12,$D1,$FC,$00,$00,$00,$40,$52,$46,$51,$CD,$FF,$E6
-	dc.b	$60,$00,$00,$5C,$61,$B4,$52,$39,$00,$20,$2A,$9D,$20,$7C,$00,$20
-	dc.b	$1B,$68,$30,$39,$00,$20,$1B,$B8,$02,$40,$00,$FF,$B0,$3C,$00,$14
-	dc.b	$6C,$00,$00,$38,$42,$79,$FF,$FF,$55,$FC,$4A,$28,$00,$01,$6B,$00
-	dc.b	$00,$0C,$58,$88,$52,$79,$FF,$FF,$55,$FC,$60,$EE,$11,$46,$00,$03
-	dc.b	$02,$46,$00,$FF,$33,$C6,$FF,$FF,$55,$FE,$11,$7C,$00,$1E,$00,$01
-	dc.b	$52,$79,$00,$20,$1B,$B8,$60,$00,$00,$1C,$60,$00,$00,$06,$60,$00
-	dc.b	$00,$02
+	bsr.w	CheckCreatedPlayerLimit
+	bmi.w	.5
+	movea.l	#$20259C,a0
+	clr.w	d6
+	move.w	#$13,d5
+.loop
+	tst.b	1(a0)
+	bne.w	.1
+	tst.b	3(a0)
+	beq.w	.2
+.1
+	adda.l	#$40,a0
+	addq.w	#1,d6
+	dbf	d5,.loop
+	bra.w	.5
+.2
+	bsr.s	CopyNameWords
+	addq.b	#1,(SaveRAM+$2A9D).l
+	movea.l	#$201B68,a0
+	move.w	(SaveRAM+$1BB8).l,d0
+	andi.w	#$FF,d0
+	cmp.b	#$14,d0
+	bge.w	.4
+	clr.w	($FFFF55FC).l
+.loop2
+	tst.b	1(a0)
+	bmi.w	.3
+	addq.l	#4,a0
+	addq.w	#1,($FFFF55FC).l
+	bra.s	.loop2
+.3
+	move.b	d6,3(a0)
+	andi.w	#$FF,d6
+	move.w	d6,($FFFF55FE).l
+	move.b	#$1E,1(a0)
+	addq.w	#1,(SaveRAM+$1BB8).l
+SaveNewNameDone	equ	*
+	bra.w	SaveNameErrorExit
+.4
+	bra.w	SaveNameError
+.5
+	bra.w	SaveNameError
 
 SaveNameError						;SaveCreateName: back to font 0, d0 = -1
 	jsr	(printsmallz).l
 	String	$F9
 	move.w	#$FFFF,d0
 	bra.w	.1
-	dc.w	$4240
+SaveNameErrorExit	equ	*
+	clr.w	d0
 .1
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
@@ -531,20 +1034,76 @@ BuildEnteredName					;Build the entered name (from NameEntryBuf, spaces/dashes d
 									;after first name) as a length-word
 									;string at StatWork and check it has a first and last name; d0 = 0 ok, -1
 									;invalid
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$BF,$56,$22,$7C,$FF,$FF,$D3,$AC
-	dc.b	$30,$38,$D3,$C0,$53,$40,$42,$45,$42,$46,$BC,$7C,$00,$08,$66,$00
-	dc.b	$00,$08,$10,$FC,$00,$20,$52,$45,$12,$19,$B2,$3C,$00,$20,$67,$00
-	dc.b	$00,$0E,$B2,$3C,$00,$2D,$67,$00,$00,$06,$10,$C1,$52,$45,$52,$46
-	dc.b	$51,$C8,$FF,$D8,$08,$05,$00,$00,$67,$00,$00,$08,$10,$BC,$00,$00
-	dc.b	$52,$45,$54,$45,$31,$C5,$BF,$54,$BA,$7C,$00,$06,$6D,$00,$00,$3A
-	dc.b	$20,$7C,$FF,$FF,$BF,$54,$D0,$D0,$10,$20,$4A,$00,$66,$00,$00,$04
-	dc.b	$10,$20,$B0,$3C,$00,$20,$67,$00,$00,$20,$30,$7C,$BF,$54,$30,$18
-	dc.b	$53,$40,$0C,$18,$00,$20,$67,$00,$00,$0A,$51,$C8,$FF,$F6,$60,$00
-	dc.b	$00,$08,$42,$40,$60,$00,$00,$06,$30,$3C,$FF,$FF,$4C,$DF,$7F,$FF
-	dc.b	$4E,$75,$48,$A7,$80,$00,$42,$40,$10,$39,$00,$20,$2A,$9D,$B0,$3C
-	dc.b	$00,$14,$6D,$00,$00,$0A,$30,$3C,$FF,$FF,$60,$00,$00,$06,$30,$3C
-	dc.b	$00,$01,$4C,$9F,$00,$01,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	#pstatscat,a0
+	movea.l	#NameEntryBuf,a1
+	move.w	(NameEntryLen).w,d0
+	subq.w	#1,d0
+	clr.w	d5
+	clr.w	d6
+.loop
+	cmp.w	#8,d6
+	bne.w	.1
+	move.b	#$20,(a0)+
+	addq.w	#1,d5
+.1
+	move.b	(a1)+,d1
+	cmp.b	#$20,d1
+	beq.w	.2
+	cmp.b	#$2D,d1
+	beq.w	.2
+	move.b	d1,(a0)+
+	addq.w	#1,d5
+.2
+	addq.w	#1,d6
+	dbf	d0,.loop
+	btst	#0,d5
+	beq.w	.3
+	move.b	#0,(a0)
+	addq.w	#1,d5
+.3
+	addq.w	#2,d5
+	move.w	d5,(TempLegSpd+2).w
+	cmp.w	#6,d5
+	blt.w	.6
+	movea.l	#TempLegSpd+2,a0
+	adda.w	(a0),a0
+	move.b	-(a0),d0
+	tst.b	d0
+	bne.w	.4
+	move.b	-(a0),d0
+.4
+	cmp.b	#$20,d0
+	beq.w	.6
+	movea.w	#(pstatscat-2-M68K_RAM),a0
+	move.w	(a0)+,d0
+	subq.w	#1,d0
+.loop2
+	cmpi.b	#$20,(a0)+
+	beq.w	.5
+	dbf	d0,.loop2
+	bra.w	.6
+.5
+	clr.w	d0
+	bra.w	.7
+.6
+	move.w	#$FFFF,d0
+.7
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+CheckCreatedPlayerLimit	equ	*	;d0 = -1 when the created player count ($202A9D) has reached $14
+	movem.w	d0,-(sp)
+	clr.w	d0
+	move.b	(SaveRAM+$2A9D).l,d0
+	cmp.b	#$14,d0
+	blt.w	.8
+	move.w	#$FFFF,d0
+	bra.w	.9
+.8
+	move.w	#1,d0
+.9
+	movem.w	(sp)+,d0
+	rts
 
 NewCreateRecord						;Same as InitCreateRecord but with bit 2 of sflags8 set (skips the read)
 	bset	#2,(sflags8).w
@@ -609,69 +1168,226 @@ CreateRecordTail2					;8 byte record tail (record byte $1F set)
 
 ModifyRatings						;Modify Ratings screen: up / down pick a rating, A / B lower / raise it
 									;(EditField), start commits the player
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$0C,$B0,$20,$7C,$00,$19,$69,$B4,$4E,$B9,$00,$01,$21,$8A
-	dc.b	$4E,$B9,$00,$1D,$BB,$92,$31,$FC,$00,$18,$BD,$3C,$08,$B8,$00,$02
-	dc.b	$BF,$B2,$61,$00,$0A,$F4,$61,$00,$0B,$0A,$61,$00,$0B,$4A,$61,$00
-	dc.b	$00,$C2,$42,$79,$FF,$FF,$75,$32,$61,$00,$02,$3A,$46,$FC,$25,$00
-	dc.b	$30,$38,$B0,$52,$B0,$78,$B0,$52,$67,$FA,$4E,$B9,$00,$01,$26,$40
-	dc.b	$4E,$B9,$00,$01,$B2,$82,$4E,$B9,$00,$01,$B3,$20,$4A,$41,$67,$E0
-	dc.b	$08,$01,$00,$07,$67,$00,$00,$0C,$4E,$B9,$00,$1D,$F5,$F4,$60,$00
-	dc.b	$00,$7C,$08,$01,$00,$00,$67,$00,$00,$20,$4A,$79,$FF,$FF,$75,$32
-	dc.b	$66,$00,$00,$0E,$61,$00,$08,$6C,$33,$C4,$FF,$FF,$75,$32,$60,$A8
-	dc.b	$53,$79,$FF,$FF,$75,$32,$60,$A0,$08,$01,$00,$01,$67,$00,$00,$22
-	dc.b	$61,$00,$08,$50,$B8,$79,$FF,$FF,$75,$32,$6F,$00,$00,$0A,$52,$79
-	dc.b	$FF,$FF,$75,$32,$60,$82,$42,$79,$FF,$FF,$75,$32,$60,$00,$FF,$7A
-	dc.b	$08,$01,$00,$06,$67,$00,$00,$0E,$30,$3C,$FF,$FF,$61,$00,$08,$40
-	dc.b	$60,$00,$FF,$66,$08,$01,$00,$04,$67,$00,$00,$0E,$30,$3C,$00,$01
-	dc.b	$61,$00,$08,$2C,$60,$00,$FF,$52,$60,$00,$FF,$56,$4C,$DF,$7F,$FF
-	dc.b	$4E,$75,$48,$E7,$FF,$FE,$4E,$B9,$00,$01,$BC,$72,$00,$14,$8F,$07
-	dc.b	$06,$46,$69,$72,$73,$74,$3A,$8F,$08,$07,$4C,$61,$73,$74,$3A,$00
-	dc.b	$20,$7C,$FF,$FF,$BF,$F4,$22,$7C,$FF,$FF,$75,$3A,$31,$FC,$00,$02
-	dc.b	$BF,$F2,$10,$19,$B0,$3C,$00,$20,$67,$00,$00,$0A,$10,$C0,$52,$78
-	dc.b	$BF,$F2,$60,$EE,$42,$10,$52,$78,$BF,$F2,$02,$78,$FF,$FE,$BF,$F2
-	dc.b	$22,$7C,$FF,$FF,$BF,$F2,$4E,$B9,$00,$01,$BC,$72,$00,$06,$8F,$0D
-	dc.b	$06,$00,$4E,$B9,$00,$01,$BC,$84,$20,$7C,$FF,$FF,$BF,$F4,$22,$7C
-	dc.b	$FF,$FF,$75,$3A,$31,$FC,$00,$02,$BF,$F2,$3C,$39,$FF,$FF,$75,$38
-	dc.b	$57,$46,$10,$19,$53,$46,$B0,$3C,$00,$20,$66,$F6,$10,$D9,$52,$78
-	dc.b	$BF,$F2,$51,$CE,$FF,$F8,$42,$10,$52,$78,$BF,$F2,$02,$78,$FF,$FE
-	dc.b	$BF,$F2,$22,$7C,$FF,$FF,$BF,$F2,$4E,$B9,$00,$01,$BC,$72,$00,$06
-	dc.b	$8F,$0D,$07,$00,$4E,$B9,$00,$01,$BC,$84,$4E,$B9,$00,$01,$BC,$72
-	dc.b	$00,$0A,$8F,$09,$08,$70,$6F,$73,$3A,$00,$22,$7C,$FF,$FF,$75,$38
-	dc.b	$D2,$D1,$10,$29,$00,$08,$48,$80,$2F,$09,$22,$7C,$00,$1D,$E7,$4C
-	dc.b	$4E,$B9,$00,$01,$D7,$F2,$4E,$B9,$00,$01,$BC,$84,$4E,$B9,$00,$01
-	dc.b	$BC,$72,$00,$0A,$8F,$1C,$08,$68,$61,$6E,$64,$3A,$22,$57,$10,$29
-	dc.b	$00,$04,$02,$40,$00,$01,$22,$7C,$00,$1D,$E7,$64,$4E,$B9,$00,$01
-	dc.b	$D7,$F2,$4E,$B9,$00,$01,$BC,$84,$4E,$B9,$00,$01,$BC,$72,$00,$0C
-	dc.b	$8F,$1A,$07,$77,$65,$69,$67,$68,$74,$3A,$22,$57,$10,$29,$00,$01
-	dc.b	$E8,$48,$02,$40,$00,$0F,$4E,$B9,$00,$01,$54,$5A,$4E,$B9,$00,$01
-	dc.b	$BD,$E8,$4E,$B9,$00,$01,$BC,$84,$4E,$B9,$00,$01,$BC,$72,$00,$0C
-	dc.b	$8F,$1A,$06,$6E,$75,$6D,$62,$65,$72,$3A,$22,$5F,$10,$11,$32,$00
-	dc.b	$02,$41,$00,$0F,$3F,$01,$E8,$48,$02,$40,$00,$0F,$C0,$FC,$00,$0A
-	dc.b	$D0,$5F,$4E,$B9,$00,$01,$BD,$E8,$4E,$B9,$00,$01,$BC,$84,$4C,$DF
-	dc.b	$7F,$FF,$4E,$75,$48,$E7,$FF,$FE,$42,$47,$61,$00,$06,$76,$61,$00
-	dc.b	$04,$9A,$52,$47,$BE,$44,$6F,$F6,$61,$00,$00,$0C,$61,$00,$00,$78
-	dc.b	$4C,$DF,$7F,$FF,$4E,$75,$4E,$B9,$00,$01,$BA,$2E,$00,$14,$FE,$07
-	dc.b	$FD,$1B,$FC,$10,$4F,$56,$45,$52,$41,$4C,$4C,$FD,$1D,$FC,$11,$00
-	dc.b	$20,$7C,$FF,$FF,$75,$38,$D0,$D0,$50,$48,$28,$7C,$FF,$FF,$C8,$F2
-	dc.b	$2C,$7C,$00,$1D,$F9,$FC,$28,$39,$00,$02,$35,$B8,$4A,$79,$FF,$FF
-	dc.b	$75,$34,$67,$00,$00,$0E,$2C,$7C,$00,$1D,$F9,$EC,$28,$39,$00,$02
-	dc.b	$34,$56,$4E,$B9,$00,$1D,$F8,$AC,$C0,$FC,$00,$64,$80,$C1,$4E,$B9
-	dc.b	$00,$1D,$93,$02,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$4E,$75,$4E,$B9,$00,$01,$BA,$2E,$00,$1C,$FE,$07
-	dc.b	$FD,$17,$FC,$0D,$50,$6F,$69,$6E,$74,$73,$20,$72,$65,$6D,$61,$69
-	dc.b	$6E,$69,$6E,$67,$FD,$1D,$FC,$0E,$30,$39,$FF,$FF,$75,$36,$32,$3C
-	dc.b	$00,$03,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9,$00,$01,$BA,$40,$4E,$75
-	dc.b	$48,$E7,$FF,$FE,$20,$7C,$00,$1D,$F1,$28,$4A,$79,$FF,$FF,$75,$34
-	dc.b	$66,$00,$00,$08,$20,$7C,$00,$1D,$F1,$50,$30,$07,$E5,$40,$20,$70
-	dc.b	$00,$00,$24,$7C,$FF,$FF,$75,$38,$D4,$D2,$4E,$90,$4C,$DF,$7F,$FF
-	dc.b	$4E,$75
+	bsr.w	CreateRatingsGfx
+	movea.l	#CreateRatingsSprites,a0
+	jsr	(DrawScreenSprite).l
+	jsr	(PStatsPalette).l
+	move.w	#$18,(palcount).w
+	bclr	#2,(disflags).w
+	bsr.w	ClearAttribDeltas
+	bsr.w	LoadCreateTemplate
+	bsr.w	SetPointsPool
+	bsr.w	DrawRatingsHeader
+	clr.w	($FFFF7532).l
+.loop
+	bsr.w	DrawAllFields
+	move.w	#$2500,sr
+.loop2
+	move.w	(Vcount).w,d0
+.loop3
+	cmp.w	(Vcount).w,d0
+	beq.s	.loop3
+	jsr	(SetMenuScroll).l
+	jsr	(FindHeldMenuPad).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.s	.loop2
+	btst	#7,d1
+	beq.w	.1
+	jsr	(CommitCreatedPlayer).l
+	bra.w	.8
+.1
+	btst	#0,d1
+	beq.w	.3
+	tst.w	($FFFF7532).l
+	bne.w	.2
+	bsr.w	LastFieldRow
+	move.w	d4,($FFFF7532).l
+	bra.s	.loop
+.2
+	subq.w	#1,($FFFF7532).l
+	bra.s	.loop
+.3
+	btst	#1,d1
+	beq.w	.5
+	bsr.w	LastFieldRow
+	cmp.w	($FFFF7532).l,d4
+	ble.w	.4
+	addq.w	#1,($FFFF7532).l
+	bra.s	.loop
+.4
+	clr.w	($FFFF7532).l
+	bra.w	.loop
+.5
+	btst	#6,d1
+	beq.w	.6
+	move.w	#$FFFF,d0
+	bsr.w	CallFieldEditor
+	bra.w	.loop
+.6
+	btst	#4,d1
+	beq.w	.7
+	move.w	#1,d0
+	bsr.w	CallFieldEditor
+	bra.w	.loop
+.7
+	bra.w	.loop2
+.8
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+DrawRatingsHeader					;Print the headings of the ratings screen
+	movem.l	d0-d7/a0-a6,-(sp)
+	jsr	(printcurz).l
+	String	$8F,7,6,'First:',$8F,8,7,'Last:'
+	movea.l	#TextBuffer,a0
+	movea.l	#CreatePoints+4,a1
+	move.w	#2,(mesarea).w
+.loop
+	move.b	(a1)+,d0
+	cmp.b	#$20,d0
+	beq.w	.1
+	move.b	d0,(a0)+
+	addq.w	#1,(mesarea).w
+	bra.s	.loop
+.1
+	clr.b	(a0)
+	addq.w	#1,(mesarea).w
+	andi.w	#$FFFE,(mesarea).w
+	movea.l	#mesarea,a1
+	jsr	(printcurz).l
+	String	$8F,$D,6
+	jsr	(printcur).l
+	movea.l	#TextBuffer,a0
+	movea.l	#CreatePoints+4,a1
+	move.w	#2,(mesarea).w
+	move.w	(CreatePoints+2).l,d6
+	subq.w	#3,d6
+.loop2
+	move.b	(a1)+,d0
+	subq.w	#1,d6
+	cmp.b	#$20,d0
+	bne.s	.loop2
+.loop3
+	move.b	(a1)+,(a0)+
+	addq.w	#1,(mesarea).w
+	dbf	d6,.loop3
+	clr.b	(a0)
+	addq.w	#1,(mesarea).w
+	andi.w	#$FFFE,(mesarea).w
+	movea.l	#mesarea,a1
+	jsr	(printcurz).l
+	String	$8F,$D,7
+	jsr	(printcur).l
+	jsr	(printcurz).l
+	String	$8F,9,8,'pos:'
+	movea.l	#CreatePoints+2,a1
+	adda.w	(a1),a1
+	move.b	8(a1),d0
+	ext.w	d0
+	move.l	a1,-(sp)
+	movea.l	#PosText,a1
+	jsr	(SkipStrings).l
+	jsr	(printcur).l
+	jsr	(printcurz).l
+	String	$8F,$1C,8,'hand:'
+	movea.l	(sp),a1
+	move.b	4(a1),d0
+	andi.w	#1,d0
+	movea.l	#HandNames,a1
+	jsr	(SkipStrings).l
+	jsr	(printcur).l
+	jsr	(printcurz).l
+	String	$8F,$1A,7,'weight:'
+	movea.l	(sp),a1
+	move.b	1(a1),d0
+	lsr.w	#4,d0
+	andi.w	#$F,d0
+	jsr	(RatingToWeight).l
+	jsr	(PushNumber).l
+	jsr	(printcur).l
+	jsr	(printcurz).l
+	String	$8F,$1A,6,'number:'
+	movea.l	(sp)+,a1
+	move.b	(a1),d0
+	move.w	d0,d1
+	andi.w	#$F,d1
+	move.w	d1,-(sp)
+	lsr.w	#4,d0
+	andi.w	#$F,d0
+	mulu.w	#$A,d0
+	add.w	(sp)+,d0
+	jsr	(PushNumber).l
+	jsr	(printcur).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+DrawAllFields						;Draw every rating field and the two column heads
+	movem.l	d0-d7/a0-a6,-(sp)
+	clr.w	d7
+	bsr.w	LastFieldRow
+.loop
+	bsr.w	DrawField
+	addq.w	#1,d7
+	cmp.w	d4,d7
+	ble.s	.loop
+	bsr.w	DrawFieldsHeaderLeft
+	bsr.w	DrawFieldsHeaderRight
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+DrawFieldsHeaderLeft				;Print the left column heading of the fields
+	jsr	(printsmallz).l
+	String	$FE,7,$FD,$1B,$FC,$10,'OVERALL',$FD,$1D,$FC,$11
+	movea.l	#CreatePoints+2,a0
+	adda.w	(a0),a0
+	addq.w	#8,a0
+	movea.l	#$FFFFC8F2,a4
+	movea.l	#OvrGoalWgtList2,a6
+	move.l	(GAttribOverallMask).l,d4
+	tst.w	($FFFF7534).l
+	beq.w	.1
+	movea.l	#OvrPlayerWgtList2,a6
+	move.l	(PAttribOverallMask).l,d4
+.1
+	jsr	(CalcAttribRating).l
+	mulu.w	#$64,d0
+	divu.w	d1,d0
+	jsr	(SoftClampCoord).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	rts
+DrawFieldsHeaderRight				;Print the right column heading of the fields
+	jsr	(printsmallz).l
+	String	$FE,7,$FD,$17,$FC,$D,'Points remaining',$FD,$1D,$FC,$E
+	move.w	(CreatePoints).l,d0
+	move.w	#3,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	rts
+DrawRatingValue	equ	*	;Draw the value of rating field d7 (skater or goalie field list)
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	#SkaterFieldList,a0
+	tst.w	($FFFF7534).l
+	bne.w	.1
+	movea.l	#GoalieFieldList,a0
+.1
+	move.w	d7,d0
+	asl.w	#2,d0
+	movea.l	(a0,d0.w),a0
+	movea.l	#CreatePoints+2,a2
+	adda.w	(a2),a2
+	jsr	(a0)
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 FieldSpeed							;Create player field: Speed
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$03,$3A,$61,$00,$00,$22,$28,$39,$00,$02,$34,$98,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$03,$0A
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(PAttribHanded).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldPrintSetup						;Set print target a4 / a0 and the number print table a6 for a field value
 	movea.l	#$FFFFC8F2,a4
@@ -681,127 +1397,215 @@ FieldPrintSetup						;Set print target a4 / a0 and the number print table a6 for
 	rts
 
 FieldAgility						;Create player field: Agility
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$03,$00,$61,$E8,$28,$39,$00,$02,$34,$82,$4E,$B9,$00,$1D
-	dc.b	$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9,$00,$01
-	dc.b	$BA,$40,$60,$00,$02,$D2
+	bsr.w	HandTextRight
+	bsr.s	FieldPrintSetup
+	move.l	(PAttribSpeed).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldEndurance						;Create player field: Endurance
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$02,$DA,$61,$C2,$28,$39,$00,$02,$35,$5E,$4E,$B9,$00,$1D
-	dc.b	$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9,$00,$01
-	dc.b	$BA,$40,$60,$00,$02,$AC
+	bsr.w	HandTextRight
+	bsr.s	FieldPrintSetup
+	move.l	(PAttribAggressiveness).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldOffAware						;Create player field: OffAware
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$02,$B4,$61,$9C,$28,$39,$00,$02,$34,$C4,$4E,$B9,$00,$1D
-	dc.b	$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9,$00,$01
-	dc.b	$BA,$40,$60,$00,$02,$86
+	bsr.w	HandTextRight
+	bsr.s	FieldPrintSetup
+	move.l	(PAttribDefAwareness).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldDefAware						;Create player field: DefAware
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$02,$8E,$61,$00,$FF,$76,$28,$39,$00,$02,$34,$DA,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$02,$5E
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(PAttribShotPower).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldStickhandling					;Create player field: Stickhandling
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$02,$66,$61,$00,$FF,$4E,$28,$39,$00,$02,$35,$32,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$02,$36
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(PAttribWeight).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldWeight							;Create player field: Weight
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$02,$3E,$61,$00,$FF,$26,$28,$39,$00,$02,$35,$48,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$E7,$40,$06,$40,$00,$8C,$32,$3C,$00,$03,$4E,$B9
-	dc.b	$00,$01,$BE,$1C,$4E,$B9,$00,$01,$BA,$40,$60,$00,$02,$08
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(PAttribEndurance).l,d4
+	jsr	(CalcAttribRating).l
+	asl.w	#3,d0
+	addi.w	#$8C,d0
+	move.w	#3,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldShotPower						;Create player field: ShotPower
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$02,$10,$61,$00,$FE,$F8,$28,$39,$00,$02,$34,$F0,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$01,$E0
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(PAttribShotAccuracy).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldShotAcc						;Create player field: ShotAcc
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$01,$E8,$61,$00,$FE,$D0,$28,$39,$00,$02,$35,$06,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$01,$B8
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(PAttribPassAccuracy).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldPassAcc						;Create player field: PassAcc
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$01,$C0,$61,$00,$FE,$A8,$28,$39,$00,$02,$35,$1C,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$01,$90
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(PAttribStickHandling).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldChecking						;Create player field: Checking
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$01,$98,$61,$00,$FE,$80,$28,$39,$00,$02,$35,$8A,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-
-FieldBlank2							;Create player field: Blank2
-									;Code the listing does not decode: kept as bytes
-	dc.b	$00,$01,$BA,$40,$60,$00,$01,$68
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(PAttribChecking).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldJersey							;Create player field: Jersey
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$01,$70,$42,$44,$18,$12,$E8,$4C,$C8,$FC,$00,$0A,$10,$12
-	dc.b	$02,$00,$00,$0F,$D0,$04,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C
-	dc.b	$4E,$B9,$00,$01,$BA,$40,$60,$00,$01,$3E
+	bsr.w	HandTextRight
+	clr.w	d4
+	move.b	(a2),d4
+	lsr.w	#4,d4
+	mulu.w	#$A,d4
+	move.b	(a2),d0
+	andi.b	#$F,d0
+	add.b	d4,d0
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldGAgility						;Create player field: GAgility
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$01,$46,$61,$00,$FE,$2E,$28,$39,$00,$02,$35,$CE,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$01,$16
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(GAttribSpeed).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldGDefAware						;Create player field: GDefAware
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$01,$1E,$61,$00,$FE,$06,$28,$39,$00,$02,$36,$10,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$00,$EE
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(GAttribOffAwareness).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldGPuckCtrl						;Create player field: GPuckCtrl
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$00,$F6,$61,$00,$FD,$DE,$28,$39,$00,$02,$36,$3C,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$00,$C6
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(GAttribStickRight).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldGStickR						;Create player field: GStickR
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$00,$CE,$61,$00,$FD,$B6,$28,$39,$00,$02,$36,$52,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$00,$9E
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(GAttribStickLeft).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldGStickL						;Create player field: GStickL
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$00,$A6,$61,$00,$FD,$8E,$28,$39,$00,$02,$36,$68,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$00,$76
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(GAttribGloveRight).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldGGloveR						;Create player field: GGloveR
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$00,$7E,$61,$00,$FD,$66,$28,$39,$00,$02,$36,$7E,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$00,$4E
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(GAttribGloveLeft).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldGGloveL						;Create player field: GGloveL
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$00,$56,$61,$00,$FD,$3E,$28,$39,$00,$02,$36,$94,$4E,$B9
-	dc.b	$00,$1D,$F8,$AC,$32,$3C,$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9
-	dc.b	$00,$01,$BA,$40,$60,$00,$00,$26
+	bsr.w	HandTextRight
+	bsr.w	FieldPrintSetup
+	move.l	(GAttribWeight).l,d4
+	jsr	(CalcAttribRating).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printsmall).l
+	bra.w	HandTextLeft
 
 FieldHand							;Create player field: Hand
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$00,$2E,$10,$2A,$00,$04,$02,$40,$00,$01,$22,$7C,$00,$1D
-	dc.b	$F0,$F4,$4E,$B9,$00,$01,$D7,$EA,$60,$00,$00,$0A
+	bsr.w	HandTextRight
+	move.b	4(a2),d0
+	andi.w	#1,d0
+	movea.l	#HandText,a1
+	jsr	(PrintSmallListItem).l
+	bra.w	HandTextLeft
 
 HandText							;FieldHand: the hand letters
 	String	'L'
 	String	'R'
-	dc.b	$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$07,$4E,$75,$4E,$B9,$00,$01
-	dc.b	$BA,$2E,$00,$04,$FE,$07,$BE,$79,$FF,$FF,$75,$32,$66,$00,$00,$0C
-	dc.b	$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$05,$4E,$75
+HandTextLeft	equ	*	;Print the left hand text (low confidence)
+	jsr	(printsmallz).l
+	String	$FE,7
+	rts
+HandTextRight	equ	*	;Print the right hand text (low confidence)
+	jsr	(printsmallz).l
+	String	$FE,7
+	cmp.w	($FFFF7532).l,d7
+	bne.w	.1
+	jsr	(printsmallz).l
+	String	$FE,5
+.1
+	rts
 
 SkaterFieldList						;The field routine of each skater rating row
 	dc.l	FieldAgility,FieldSpeed,FieldOffAware,FieldDefAware,FieldShotPower,FieldChecking
@@ -812,14 +1616,32 @@ GoalieFieldList						;The field routine of each goalie rating row
 	dc.l	FieldGStickL,FieldGGloveR,FieldGGloveL
 
 DrawField							;Draw one create player field: label then value, all registers saved Code
-									;the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$61,$00,$00,$0C,$61,$00,$FC,$1C,$4C,$DF,$7F,$FF
-	dc.b	$4E,$75,$48,$E7,$C0,$C0,$22,$7C,$00,$1D,$F1,$DA,$4A,$79,$FF,$FF
-	dc.b	$75,$34,$66,$00,$00,$08,$22,$7C,$00,$1D,$F2,$A2,$30,$07,$48,$E7
-	dc.b	$80,$40,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$07,$BE,$79,$FF,$FF
-	dc.b	$75,$32,$66,$00,$00,$0C,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$05
-	dc.b	$4C,$DF,$02,$01,$4E,$B9,$00,$01,$D7,$F2,$4E,$B9,$00,$01,$BA,$40
-	dc.b	$4C,$DF,$03,$03,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	bsr.w	DrawFieldLabel
+	bsr.w	DrawRatingValue
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+DrawFieldLabel						;Print the label of field d7 (skater or goalie list) and its marker
+	movem.l	d0-d1/a0-a1,-(sp)
+	movea.l	#SkaterSkillLabels,a1
+	tst.w	($FFFF7534).l
+	bne.w	.1
+	movea.l	#GoalieSkillLabels,a1
+.1
+	move.w	d7,d0
+	movem.l	d0/a1,-(sp)
+	jsr	(printsmallz).l
+	String	$FE,7
+	cmp.w	($FFFF7532).l,d7
+	bne.w	.2
+	jsr	(printsmallz).l
+	String	$FE,5
+.2
+	movem.l	(sp)+,d0/a1
+	jsr	(SkipStrings).l
+	jsr	(printsmall).l
+	movem.l	(sp)+,d0-d1/a0-a1
+	rts
 
 SkaterSkillLabels					;The skater rating labels
 	String	CC_SetX,$02,CC_SetY,$0D,'Agility',CC_SetX,$13
@@ -855,6 +1677,7 @@ EditField							;Run the edit routine of the cursor row
 									;(CreateCursorY) for the player type
 	movem.l	(sp)+,d6/a0
 	rts
+CallFieldEditor	equ	*			;Call the edit routine of the selected field (skater or goalie list)
 	movea.l	#GoalieEditList,a0
 	tst.w	($FFFF7534).l
 	beq.w	.1
@@ -875,8 +1698,7 @@ SkaterEditList						;The edit routine of each skater rating row
 	dc.l	EditStickhandling,EditShotAcc,EditEndurance,EditPassAcc
 
 EditGAgility						;Create player edit: GAgility
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$35,$CE
+	move.l	(GAttribSpeed).l,d4
 
 AdjustAttrib						;Adjust attribute selected by d4 bit by d0, paying from points pool
 									;CreatePoints
@@ -908,38 +1730,51 @@ AdjustAttrib						;Adjust attribute selected by d4 bit by d0, paying from points
 	bra.w	.4
 .3
 	move.w	(TempPlOffset).w,(CreatePoints).l
+AdjustAttribExit	equ	*
 .4
 	rts
 
 EditGDefAware						;Create player edit: GDefAware
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$36,$10,$60,$A0
+	move.l	(GAttribOffAwareness).l,d4
+	bra.s	AdjustAttrib
 
 EditGPuckCtrl						;Create player edit: GPuckCtrl
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$36,$3C,$60,$98
+	move.l	(GAttribStickRight).l,d4
+	bra.s	AdjustAttrib
 
 EditWeight							;Create player edit: Weight
-									;Code the listing does not decode: kept as bytes
-	dc.b	$20,$7C,$FF,$FF,$75,$38,$D0,$D0,$42,$41,$12,$28,$00,$01,$E8,$49
-	dc.b	$02,$41,$00,$0F,$D2,$40,$6B,$D6,$B2,$7C,$00,$0F,$6E,$D0,$E9,$49
-	dc.b	$10,$28,$00,$01,$02,$40,$00,$0F,$80,$41,$11,$40,$00,$01,$4E,$75
+	movea.l	#CreatePoints+2,a0
+	adda.w	(a0),a0
+	clr.w	d1
+	move.b	1(a0),d1
+	lsr.w	#4,d1
+	andi.w	#$F,d1
+	add.w	d0,d1
+	bmi.s	AdjustAttribExit
+	cmp.w	#$F,d1
+	bgt.s	AdjustAttribExit
+	lsl.w	#4,d1
+	move.b	1(a0),d0
+	andi.w	#$F,d0
+	or.w	d1,d0
+	move.b	d0,1(a0)
+	rts
 
 EditGStickR							;Create player edit: GStickR
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$36,$52,$60,$00,$FF,$60
+	move.l	(GAttribStickLeft).l,d4
+	bra.w	AdjustAttrib
 
 EditGStickL							;Create player edit: GStickL
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$36,$68,$60,$00,$FF,$56
+	move.l	(GAttribGloveRight).l,d4
+	bra.w	AdjustAttrib
 
 EditGGloveR							;Create player edit: GGloveR
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$36,$7E,$60,$00,$FF,$4C
+	move.l	(GAttribGloveLeft).l,d4
+	bra.w	AdjustAttrib
 
 EditGGloveL							;Create player edit: GGloveL
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$36,$94,$60,$00,$FF,$42
+	move.l	(GAttribWeight).l,d4
+	bra.w	AdjustAttrib
 
 EditHand							;Create player edit: Hand
 	movea.l	#CreatePoints+2,a0
@@ -984,48 +1819,47 @@ EditJersey							;Create player edit: Jersey
 	rts
 
 EditSpeed							;Create player edit: Speed
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$34,$98,$60,$00,$FE,$CC
+	move.l	(PAttribHanded).l,d4
+	bra.w	AdjustAttrib
 
 EditAgility							;Create player edit: Agility
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$34,$82,$60,$00,$FE,$C2
+	move.l	(PAttribSpeed).l,d4
+	bra.w	AdjustAttrib
 
 EditEndurance						;Create player edit: Endurance
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$35,$5E,$60,$00,$FE,$B8
+	move.l	(PAttribAggressiveness).l,d4
+	bra.w	AdjustAttrib
 
 EditOffAware						;Create player edit: OffAware
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$34,$C4,$60,$00,$FE,$AE
+	move.l	(PAttribDefAwareness).l,d4
+	bra.w	AdjustAttrib
 
 EditDefAware						;Create player edit: DefAware
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$34,$DA,$60,$00,$FE,$A4
+	move.l	(PAttribShotPower).l,d4
+	bra.w	AdjustAttrib
 
 EditStickhandling					;Create player edit: Stickhandling
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$35,$32,$60,$00,$FE,$9A
+	move.l	(PAttribWeight).l,d4
+	bra.w	AdjustAttrib
 
 EditShotPower						;Create player edit: ShotPower
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$34,$F0,$60,$00,$FE,$90
+	move.l	(PAttribShotAccuracy).l,d4
+	bra.w	AdjustAttrib
 
 EditShotAcc							;Create player edit: ShotAcc
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$35,$06,$60,$00,$FE,$86
+	move.l	(PAttribPassAccuracy).l,d4
+	bra.w	AdjustAttrib
 
 EditPassAcc							;Create player edit: PassAcc
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$35,$1C,$60,$00,$FE,$7C
+	move.l	(PAttribStickHandling).l,d4
+	bra.w	AdjustAttrib
 
 EditChecking						;Create player edit: Checking
-									;Code the listing does not decode: kept as bytes
-	dc.b	$28,$39,$00,$02,$35,$8A,$60,$00,$FE,$72
+	move.l	(PAttribChecking).l,d4
+	bra.w	AdjustAttrib
 
 EditNone							;Create player edit: nothing
-									;Code the listing does not decode: kept as bytes
-	dc.b	$4E,$75
+	rts
 
 ClearAttribDeltas					;Clear 16-byte attribute buffer AttribDeltas
 	movem.l	d0-d7/a0-a6,-(sp)
@@ -1134,12 +1968,10 @@ CrScale								;d3 += d2/14 (signed)
 	rts
 
 CommitNone1							;Nothing to commit
-									;Code the listing does not decode: kept as bytes
-	dc.b	$4E,$75
+	rts
 
 CommitNone2							;Nothing to commit
-									;Code the listing does not decode: kept as bytes
-	dc.b	$4E,$75
+	rts
 
 CrScaleEven							;Scale even part of d3 via CrScale, keep low bit of d3 Code the listing
 	move.w	d3,-(sp)
@@ -1498,226 +2330,748 @@ WriteCreateList						;Write the created players list to save RAM
 	rts
 
 SignFreeAgents						;The sign free agents screen (roster menu item Sign Free Agents) Code the
-									;listing does not decode: kept as bytes
-	dc.b	$4E,$B9,$00,$01,$AF,$52,$61,$00,$06,$C2,$20,$7C,$00,$19,$76,$2A
-	dc.b	$4E,$B9,$00,$01,$21,$8A,$4E,$B9,$00,$1E,$0D,$66,$61,$00,$08,$CE
-	dc.b	$30,$3C,$00,$03,$20,$7C,$FF,$FF,$C8,$E2,$42,$98,$51,$C8,$FF,$FC
-	dc.b	$42,$79,$FF,$FF,$27,$16,$42,$79,$FF,$FF,$27,$10,$61,$00,$08,$14
-	dc.b	$31,$FC,$00,$18,$BD,$3C,$08,$B8,$00,$02,$BF,$B2,$61,$00,$06,$6A
-	dc.b	$67,$00,$05,$50,$3E,$39,$FF,$FF,$27,$16,$4E,$B9,$00,$1E,$0D,$86
-	dc.b	$42,$79,$FF,$FF,$27,$12,$30,$39,$00,$20,$1B,$B8,$53,$00,$02,$40
-	dc.b	$00,$FF,$B0,$7C,$00,$09,$6F,$00,$00,$06,$30,$3C,$00,$09,$33,$C0
-	dc.b	$FF,$FF,$27,$14,$20,$7C,$FF,$FF,$3A,$98,$61,$00,$05,$74,$61,$00
-	dc.b	$05,$B6,$31,$FC,$FF,$FF,$D0,$14,$4E,$B9,$00,$1D,$CC,$8A,$61,$00
-	dc.b	$07,$B2,$4E,$B9,$00,$1D,$CC,$8A,$61,$00,$03,$26,$61,$00,$02,$5C
-	dc.b	$46,$FC,$25,$00,$60,$00,$00,$2A,$0C,$78,$FF,$FF,$D0,$14,$67,$00
-	dc.b	$00,$20,$4E,$B9,$00,$1D,$CC,$8A,$61,$00,$07,$88,$4E,$B9,$00,$1D
-	dc.b	$CC,$8A,$61,$00,$02,$FC,$4E,$B9,$00,$1D,$CC,$8A,$61,$00,$02,$2C
-	dc.b	$31,$FC,$FF,$FF,$D0,$14,$61,$00,$04,$32,$4A,$41,$67,$00,$04,$B2
-	dc.b	$08,$01,$00,$00,$67,$00,$00,$2C,$4A,$79,$FF,$FF,$27,$10,$67,$00
-	dc.b	$00,$0A,$53,$79,$FF,$FF,$27,$10,$60,$8E,$4A,$79,$FF,$FF,$27,$12
-	dc.b	$67,$CE,$53,$79,$FF,$FF,$27,$12,$53,$79,$FF,$FF,$27,$14,$60,$00
-	dc.b	$FF,$78,$08,$01,$00,$01,$67,$00,$00,$46,$30,$39,$FF,$FF,$27,$10
-	dc.b	$D0,$79,$FF,$FF,$27,$12,$B0,$79,$FF,$FF,$27,$14,$67,$00,$00,$0C
-	dc.b	$52,$79,$FF,$FF,$27,$10,$60,$00,$FF,$50,$30,$39,$00,$20,$1B,$B8
-	dc.b	$02,$40,$00,$FF,$53,$40,$B0,$79,$FF,$FF,$27,$14,$6F,$82,$52,$79
-	dc.b	$FF,$FF,$27,$12,$52,$79,$FF,$FF,$27,$14,$60,$00,$FF,$2C,$08,$01
-	dc.b	$00,$04,$67,$00,$00,$1E,$52,$79,$FF,$FF,$27,$16,$0C,$79,$00,$1A
-	dc.b	$FF,$FF,$27,$16,$6D,$00,$FF,$12,$42,$79,$FF,$FF,$27,$16,$60,$00
-	dc.b	$FF,$08,$08,$01,$00,$06,$67,$00,$00,$18,$53,$79,$FF,$FF,$27,$16
-	dc.b	$6A,$00,$FE,$F6,$33,$FC,$00,$19,$FF,$FF,$27,$16,$60,$00,$FE,$EA
-	dc.b	$08,$01,$00,$07,$66,$00,$03,$EA,$08,$01,$00,$05,$67,$00,$01,$3C
-	dc.b	$3E,$39,$FF,$FF,$27,$16,$20,$7C,$FF,$FF,$4E,$20,$30,$39,$FF,$FF
-	dc.b	$27,$12,$D0,$79,$FF,$FF,$27,$10,$D0,$40,$30,$30,$00,$00,$48,$A7
-	dc.b	$01,$00,$3E,$3C,$00,$1C,$02,$40,$00,$FF,$4E,$B9,$00,$01,$03,$AA
-	dc.b	$31,$C0,$BF,$7C,$4A,$40,$4C,$9F,$00,$80,$66,$00,$00,$0E,$61,$00
-	dc.b	$00,$FE,$67,$00,$01,$92,$66,$00,$00,$1C,$4E,$B9,$00,$01,$57,$B2
-	dc.b	$3F,$00,$4E,$B9,$00,$01,$57,$74,$90,$5F,$44,$40,$B0,$7C,$00,$18
-	dc.b	$67,$00,$01,$74,$20,$7C,$FF,$FF,$4E,$20,$30,$39,$FF,$FF,$27,$12
-	dc.b	$D0,$79,$FF,$FF,$27,$10,$D0,$40,$30,$30,$00,$00,$31,$C0,$BF,$46
-	dc.b	$3E,$3C,$00,$1C,$30,$38,$BF,$46,$4E,$B9,$00,$01,$02,$B8,$11,$F8
-	dc.b	$DD,$AB,$BF,$46,$24,$7C,$FF,$FF,$D3,$C8,$3F,$38,$BF,$46,$08,$B8
-	dc.b	$00,$06,$C3,$50,$4E,$B9,$00,$1D,$FA,$58,$31,$DF,$BF,$46,$31,$F9
-	dc.b	$FF,$FF,$27,$16,$BF,$4C,$30,$38,$BF,$7C,$33,$C0,$FF,$FF,$27,$18
-	dc.b	$3E,$39,$FF,$FF,$27,$16,$4A,$40,$67,$00,$00,$0C,$4E,$B9,$00,$01
-	dc.b	$57,$B2,$60,$00,$00,$08,$4E,$B9,$00,$01,$57,$74,$32,$39,$FF,$FF
-	dc.b	$27,$18,$E1,$49,$80,$41,$31,$C0,$BF,$48,$31,$F9,$FF,$FF,$27,$16
-	dc.b	$BF,$4C,$24,$7C,$FF,$FF,$D3,$C8,$3F,$38,$BF,$46,$3F,$38,$BF,$48
-	dc.b	$3F,$38,$BF,$4C,$4E,$B9,$00,$1D,$D5,$16,$31,$DF,$BF,$4C,$31,$DF
-	dc.b	$BF,$48,$31,$DF,$BF,$46,$08,$B8,$00,$06,$C3,$50,$4E,$B9,$00,$02
-	dc.b	$41,$AA,$61,$00,$06,$6A,$4A,$79,$FF,$FF,$27,$10,$67,$00,$00,$08
-	dc.b	$53,$79,$FF,$FF,$27,$10,$60,$00,$FD,$54,$60,$00,$FD,$BC,$4E,$B9
-	dc.b	$00,$01,$57,$74,$B0,$7C,$00,$03,$4E,$75
+	jsr	(forceblack).l
+	bsr.w	SetupFreeAgentsVideo
+	movea.l	#SignPlayersSprites,a0
+	jsr	(DrawScreenSprite).l
+	jsr	(PStatsPalette2).l
+	bsr.w	DrawFreeAgentStartExit
+	move.w	#3,d0
+	movea.l	#$FFFFC8E2,a0
+.loop
+	clr.l	(a0)+
+	dbf	d0,.loop
+	clr.w	(homelogochars).l
+	clr.w	(TeamSelectRedraw).l
+	bsr.w	DrawFreeAgentTeamHeader
+	move.w	#$18,(palcount).w
+	bclr	#2,(disflags).w
+.loop2
+	bsr.w	TestFreeAgentFlag
+	beq.w	DrawFreeAgentsClearD0
+	move.w	(homelogochars).l,d7
+	jsr	(CheckTeamLines).l
+	clr.w	(pstatsblockchars).l
+	move.w	(SaveRAM+$1BB8).l,d0
+	subq.b	#1,d0
+	andi.w	#$FF,d0
+	cmp.w	#9,d0
+	ble.w	.1
+	move.w	#9,d0
+.1
+	move.w	d0,(pstatscount).l
+	movea.l	#$FFFF3A98,a0
+	bsr.w	BuildFreeAgentList
+	bsr.w	FillFreeAgentList
+	move.w	#$FFFF,($FFFFD014).w
+SignFreeAgentsRedraw	equ	*	;Redraw the free agent screen and wait for the next frame
+	jsr	(WaitMenuFrame).l
+	bsr.w	DrawFreeAgentTeamHeader
+	jsr	(WaitMenuFrame).l
+	bsr.w	DrawFreeAgents
+	bsr.w	FreeAgentArrows
+	move.w	#$2500,sr
+	bra.w	.loop4
+.loop3
+	cmpi.w	#$FFFF,($FFFFD014).w
+	beq.w	.loop4
+	jsr	(WaitMenuFrame).l
+	bsr.w	DrawFreeAgentTeamHeader
+	jsr	(WaitMenuFrame).l
+	bsr.w	DrawFreeAgents
+	jsr	(WaitMenuFrame).l
+	bsr.w	FreeAgentArrows
+.loop4
+	move.w	#$FFFF,($FFFFD014).w
+	bsr.w	ReadFreeAgentPads
+	tst.w	d1
+	beq.w	DrawFreeAgentsExit
+	btst	#0,d1
+	beq.w	.3
+	tst.w	(TeamSelectRedraw).l
+	beq.w	.2
+	subq.w	#1,(TeamSelectRedraw).l
+	bra.s	SignFreeAgentsRedraw
+.2
+	tst.w	(pstatsblockchars).l
+	beq.s	.loop4
+	subq.w	#1,(pstatsblockchars).l
+	subq.w	#1,(pstatscount).l
+	bra.w	SignFreeAgentsRedraw
+.3
+	btst	#1,d1
+	beq.w	.5
+	move.w	(TeamSelectRedraw).l,d0
+	add.w	(pstatsblockchars).l,d0
+	cmp.w	(pstatscount).l,d0
+	beq.w	.4
+	addq.w	#1,(TeamSelectRedraw).l
+	bra.w	SignFreeAgentsRedraw
+.4
+	move.w	(SaveRAM+$1BB8).l,d0
+	andi.w	#$FF,d0
+	subq.w	#1,d0
+	cmp.w	(pstatscount).l,d0
+	ble.s	.loop4
+	addq.w	#1,(pstatsblockchars).l
+	addq.w	#1,(pstatscount).l
+	bra.w	SignFreeAgentsRedraw
+.5
+	btst	#4,d1
+	beq.w	.6
+	addq.w	#1,(homelogochars).l
+	cmpi.w	#$1A,(homelogochars).l
+	blt.w	SignFreeAgentsRedraw
+	clr.w	(homelogochars).l
+	bra.w	SignFreeAgentsRedraw
+.6
+	btst	#6,d1
+	beq.w	.7
+	subq.w	#1,(homelogochars).l
+	bpl.w	SignFreeAgentsRedraw
+	move.w	#$19,(homelogochars).l
+	bra.w	SignFreeAgentsRedraw
+.7
+	btst	#7,d1
+	bne.w	DrawFreeAgentsExit
+	btst	#5,d1
+	beq.w	.13
+	move.w	(homelogochars).l,d7
+	movea.l	#$FFFF4E20,a0
+	move.w	(pstatsblockchars).l,d0
+	add.w	(TeamSelectRedraw).l,d0
+	add.w	d0,d0
+	move.w	(a0,d0.w),d0
+	movem.w	d7,-(sp)
+	move.w	#$1C,d7
+	andi.w	#$FF,d0
+	jsr	(GetPositionSlot).l
+	move.w	d0,(recwins).w
+	tst.w	d0
+	movem.w	(sp)+,d7
+	bne.w	.8
+	bsr.w	CompareGoalieCountToThree
+	beq.w	DrawFreeAgentCursor
+	bne.w	.9
+.8
+	jsr	(GetPlayerCountD7).l
+	move.w	d0,-(sp)
+	jsr	(GetGoalieCountD7).l
+	sub.w	(sp)+,d0
+	neg.w	d0
+	cmp.w	#$18,d0
+	beq.w	DrawFreeAgentCursor
+.9
+	movea.l	#$FFFF4E20,a0
+	move.w	(pstatsblockchars).l,d0
+	add.w	(TeamSelectRedraw).l,d0
+	add.w	d0,d0
+	move.w	(a0,d0.w),d0
+	move.w	d0,(TempWord1).w
+	move.w	#$1C,d7
+	move.w	(TempWord1).w,d0
+	jsr	(GetJerseyNumber).l
+	move.b	(jerseynum+1).w,(TempWord1).w
+	movea.l	#nameentryvis+2,a2
+	move.w	(TempWord1).w,-(sp)
+	bclr	#6,(GameFlags).w
+	jsr	(DeleteCreatedPlayer).l
+	move.w	(sp)+,(TempWord1).w
+	move.w	(homelogochars).l,(TempMaxSpd).w
+	move.w	(recwins).w,d0
+	move.w	d0,(vislogochars).l
+	move.w	(homelogochars).l,d7
+	tst.w	d0
+	beq.w	.10
+	jsr	(GetPlayerCountD7).l
+	bra.w	.11
+.10
+	jsr	(GetGoalieCountD7).l
+.11
+	move.w	(vislogochars).l,d1
+	lsl.w	#8,d1
+	or.w	d1,d0
+	move.w	d0,(TempWord2).w
+	move.w	(homelogochars).l,(TempMaxSpd).w
+	movea.l	#nameentryvis+2,a2
+	move.w	(TempWord1).w,-(sp)
+	move.w	(TempWord2).w,-(sp)
+	move.w	(TempMaxSpd).w,-(sp)
+	jsr	(InsertTradedPlayer).l
+	move.w	(sp)+,(TempMaxSpd).w
+	move.w	(sp)+,(TempWord2).w
+	move.w	(sp)+,(TempWord1).w
+	bclr	#6,(GameFlags).w
+	jsr	(MakeSRAMChecksum).l
+	bsr.w	EraseFreeAgentBoxes
+	tst.w	(TeamSelectRedraw).l
+	beq.w	.12
+	subq.w	#1,(TeamSelectRedraw).l
+.12
+	bra.w	.loop2
+.13
+	bra.w	.loop3
+CompareGoalieCountToThree			;d0 = goalie count of the team; flags from cmp #3
+	jsr	(GetGoalieCountD7).l
+	cmp.w	#3,d0
+	rts
 
 FreeAgentArrows						;Draw scroll up/down arrows for the list
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$07,$30,$39
-	dc.b	$FF,$FF,$27,$12,$D0,$79,$FF,$FF,$27,$10,$67,$00,$00,$14,$4E,$B9
-	dc.b	$00,$01,$BA,$2E,$00,$08,$FD,$02,$FC,$10,$7B,$00,$60,$00,$00,$10
-	dc.b	$4E,$B9,$00,$01,$BA,$2E,$00,$08,$FD,$02,$FC,$10,$20,$00,$32,$39
-	dc.b	$FF,$FF,$27,$10,$D2,$79,$FF,$FF,$27,$12,$30,$39,$00,$20,$1B,$B8
-	dc.b	$02,$40,$00,$FF,$53,$40,$B2,$40,$6C,$00,$00,$14,$4E,$B9,$00,$01
-	dc.b	$BA,$2E,$00,$08,$FD,$02,$FC,$19,$7D,$00,$60,$00,$00,$10,$4E,$B9
-	dc.b	$00,$01,$BA,$2E,$00,$08,$FD,$02,$FC,$19,$20,$00,$4E,$B9,$00,$01
-	dc.b	$BA,$2E,$00,$04,$FE,$07,$4C,$DF,$7F,$FF,$4E,$75,$61,$00,$04,$EC
-	dc.b	$4E,$B9,$00,$01,$BA,$2E,$00,$24,$FE,$07,$FD,$18,$FC,$06,$56,$49
-	dc.b	$4F,$4C,$41,$54,$49,$4F,$4E,$20,$4F,$46,$FD,$17,$FA,$01,$52,$4F
-	dc.b	$53,$54,$45,$52,$20,$52,$55,$4C,$45,$53,$61,$00,$01,$54,$61,$00
-	dc.b	$05,$22,$60,$00,$FC,$CA
+	movem.l	d0-d7/a0-a6,-(sp)
+	jsr	(printsmallz).l
+	String	$FE,7
+	move.w	(pstatsblockchars).l,d0
+	add.w	(TeamSelectRedraw).l,d0
+	beq.w	.1
+	jsr	(printsmallz).l
+	String	$FD,2,$FC,$10,'{'
+	bra.w	.2
+.1
+	jsr	(printsmallz).l
+	String	$FD,2,$FC,$10,' '
+.2
+	move.w	(TeamSelectRedraw).l,d1
+	add.w	(pstatsblockchars).l,d1
+	move.w	(SaveRAM+$1BB8).l,d0
+	andi.w	#$FF,d0
+	subq.w	#1,d0
+	cmp.w	d0,d1
+	bge.w	.3
+	jsr	(printsmallz).l
+	String	$FD,2,$FC,$19,'}'
+	bra.w	.4
+.3
+	jsr	(printsmallz).l
+	String	$FD,2,$FC,$19,' '
+.4
+	jsr	(printsmallz).l
+	String	$FE,7
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+DrawFreeAgentCursor	equ	*	;Draw the free agent screen cursor
+	bsr.w	BuildFreeAgentListHeader
+	jsr	(printsmallz).l
+	String	$FE,7,$FD,$18,$FC,6,'VIOLATION OF',$FD,$17,$FA,1,'ROSTER RULES'
+	bsr.w	ReadFreeAgentPads
+	bsr.w	DrawFreeAgentStartExit
+	bra.w	SignFreeAgentsRedraw
 
 DrawFreeAgents						;Draw visible free agent rows (pos, name, rating) Code the listing does
-									;not decode: kept as bytes
-	dc.b	$3A,$39,$FF,$FF,$27,$10,$2A,$7C,$FF,$FF,$27,$12,$28,$7C,$FF,$FF
-	dc.b	$3A,$98,$26,$7C,$FF,$FF,$4E,$20,$31,$FC,$00,$10,$B0,$42,$3E,$3C
-	dc.b	$00,$1C,$3F,$38,$B0,$42,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$8F,$00
-	dc.b	$00,$00,$31,$DF,$B0,$42,$42,$46,$30,$15,$E3,$40,$48,$C0,$D9,$C0
-	dc.b	$D7,$C0,$4E,$B9,$00,$01,$BA,$2E,$00,$24,$FD,$02,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$FB,$02,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$31,$FC,$00,$03
-	dc.b	$B0,$40,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$07,$BC,$45,$66,$00
-	dc.b	$00,$0C,$4E,$B9,$00,$01,$BA,$2E,$00,$04,$FE,$06,$30,$13,$3E,$3C
-	dc.b	$00,$1C,$4E,$B9,$00,$01,$01,$7A,$4E,$B9,$00,$01,$BC,$84,$31,$FC
-	dc.b	$00,$16,$B0,$40,$22,$7C,$00,$1D,$D8,$FE,$3E,$3C,$00,$1C,$30,$1B
-	dc.b	$4E,$B9,$00,$01,$03,$AA,$33,$C0,$FF,$FF,$27,$18,$4E,$B9,$00,$01
-	dc.b	$D7,$F2,$4E,$B9,$00,$01,$BC,$84,$31,$FC,$00,$1F,$B0,$40,$30,$14
-	dc.b	$4E,$B9,$00,$01,$01,$DC,$D2,$D1,$50,$49,$20,$49,$48,$E7,$00,$08
-	dc.b	$28,$7C,$FF,$FF,$C8,$F2,$2C,$7C,$00,$1D,$F9,$FC,$28,$39,$00,$02
-	dc.b	$35,$B8,$4A,$79,$FF,$FF,$27,$18,$67,$00,$00,$0E,$2C,$7C,$00,$1D
-	dc.b	$F9,$EC,$28,$39,$00,$02,$34,$56,$4E,$B9,$00,$1D,$F8,$AC,$4C,$DF
-	dc.b	$10,$00,$C0,$FC,$00,$64,$80,$C1,$4E,$B9,$00,$1D,$93,$02,$32,$3C
-	dc.b	$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9,$00,$01,$BC,$84,$54,$8C
-	dc.b	$52,$78,$B0,$42,$52,$46,$30,$39,$FF,$FF,$27,$12,$D0,$46,$B0,$79
-	dc.b	$FF,$FF,$27,$14,$6F,$00,$FE,$FC,$4E,$75,$2C,$3C,$00,$00,$54,$60
-	dc.b	$3C,$3C,$00,$64,$32,$38,$B0,$52,$92,$78,$B0,$54,$67,$F2,$31,$F8
-	dc.b	$B0,$52,$B0,$54,$4E,$B9,$00,$01,$26,$40,$4E,$B9,$00,$01,$B3,$48
-	dc.b	$4E,$B9,$00,$01,$B3,$20,$4A,$41,$67,$00,$00,$06,$60,$00,$00,$50
-	dc.b	$4E,$B9,$00,$01,$B3,$60,$4E,$B9,$00,$01,$B3,$20,$4A,$41,$67,$00
-	dc.b	$00,$06,$60,$00,$00,$3A,$4A,$78,$D2,$50,$67,$00,$00,$2E,$4E,$B9
-	dc.b	$00,$01,$B3,$78,$4E,$B9,$00,$01,$B3,$20,$4A,$41,$67,$00,$00,$06
-	dc.b	$60,$00,$00,$1C,$4E,$B9,$00,$01,$B3,$90,$4E,$B9,$00,$01,$B3,$20
-	dc.b	$4A,$41,$67,$00,$00,$06,$60,$00,$00,$06,$51,$CE,$FF,$84,$4E,$75
-	dc.b	$4E,$75,$42,$40,$60,$00,$00,$02,$48,$A7,$E0,$00,$61,$00,$02,$D6
-	dc.b	$4C,$9F,$00,$07,$22,$7C,$00,$1E,$01,$78,$4E,$B9,$00,$01,$D7,$F2
-	dc.b	$4E,$B9,$00,$01,$BC,$84,$61,$00,$FF,$52,$60,$D4
+	move.w	(TeamSelectRedraw).l,d5
+	movea.l	#pstatsblockchars,a5
+	movea.l	#$FFFF3A98,a4
+	movea.l	#$FFFF4E20,a3
+	move.w	#$10,(printy).w
+	move.w	#$1C,d7
+	move.w	(printy).w,-(sp)
+	jsr	(printz).l
+	String	$8F,0,0
+	move.w	(sp)+,(printy).w
+	clr.w	d6
+	move.w	(a5),d0
+	asl.w	#1,d0
+	ext.l	d0
+	adda.l	d0,a4
+	adda.l	d0,a3
+.loop
+	jsr	(printsmallz).l
+	String	$FD,2,'               ',$FB,2,'               '
+	move.w	#3,(printx).w
+	jsr	(printsmallz).l
+	String	$FE,7
+	cmp.w	d5,d6
+	bne.w	.1
+	jsr	(printsmallz).l
+	String	$FE,6
+.1
+	move.w	(a3),d0
+	move.w	#$1C,d7
+	jsr	(FormatPlayerNameD7).l
+	jsr	(printcur).l
+	move.w	#$16,(printx).w
+	movea.l	#PositionLetters,a1
+	move.w	#$1C,d7
+	move.w	(a3)+,d0
+	jsr	(GetPositionSlot).l
+	move.w	d0,(vislogochars).l
+	jsr	(SkipStrings).l
+	jsr	(printcur).l
+	move.w	#$1F,(printx).w
+	move.w	(a4),d0
+	jsr	(GetCreatedName).l
+	adda.w	(a1),a1
+	addq.w	#8,a1
+	movea.l	a1,a0
+	movem.l	a4,-(sp)
+	movea.l	#$FFFFC8F2,a4
+	movea.l	#OvrGoalWgtList2,a6
+	move.l	(GAttribOverallMask).l,d4
+	tst.w	(vislogochars).l
+	beq.w	.2
+	movea.l	#OvrPlayerWgtList2,a6
+	move.l	(PAttribOverallMask).l,d4
+.2
+	jsr	(CalcAttribRating).l
+	movem.l	(sp)+,a4
+	mulu.w	#$64,d0
+	divu.w	d1,d0
+	jsr	(SoftClampCoord).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printcur).l
+	addq.l	#2,a4
+	addq.w	#1,(printy).w
+	addq.w	#1,d6
+	move.w	(pstatsblockchars).l,d0
+	add.w	d6,d0
+	cmp.w	(pstatscount).l,d0
+	ble.w	.loop
+	rts
+ReadFreeAgentPads					;Free agents screen: wait one frame and read the pad
+	move.l	#$5460,d6
+.loop
+	move.w	#$64,d6
+	move.w	(Vcount).w,d1
+	sub.w	(OldVcount).w,d1
+	beq.s	.loop
+	move.w	(Vcount).w,(OldVcount).w
+	jsr	(SetMenuScroll).l
+	jsr	(ReadJoy1).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.1
+	bra.w	.5
+.1
+	jsr	(ReadJoy2).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.2
+	bra.w	.5
+.2
+	tst.w	(FourWayPlay).w
+	beq.w	.4
+	jsr	(ReadJoy3).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.3
+	bra.w	.5
+.3
+	jsr	(ReadJoy4).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.4
+	bra.w	.5
+.4
+	dbf	d6,.loop
+.5
+	rts
+DrawFreeAgentsExit	equ	*
+	rts
+DrawFreeAgentsClearD0	equ	*
+	clr.w	d0
+	bra.w	.6
+.6
+	movem.w	d0-d2,-(sp)
+	bsr.w	BuildFreeAgentListHeader
+	movem.w	(sp)+,d0-d2
+	movea.l	#FreeAgentMsgText,a1
+	jsr	(SkipStrings).l
+	jsr	(printcur).l
+	bsr.w	ReadFreeAgentPads
+	bra.s	DrawFreeAgentsExit
 
 FreeAgentMsgText					;SignFreeAgents: the message when there are no free agents
 	String	CC_Font1Pal3Pri,$18,$06,'No free agents.',CC_Font1Pal3Pri,$17,$07,'Press Any button',CC_Font1Pal3Pri,$16,$08,'to exit.'
 	dc.b	$4E,$75
 
 BuildFreeAgentList					;Copy the free agent list from save RAM to a work table and an index list
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$30,$39,$00,$20,$1B,$B8,$02,$40,$00,$FF,$67,$00
-	dc.b	$00,$30,$53,$40,$20,$7C,$00,$20,$1B,$68,$22,$7C,$FF,$FF,$3A,$98
-	dc.b	$2A,$7C,$FF,$FF,$4E,$20,$42,$46,$22,$18,$14,$01,$02,$42,$00,$FF
-	dc.b	$48,$41,$E1,$49,$84,$41,$32,$C2,$3A,$C6,$52,$46,$51,$C8,$FF,$EA
-	dc.b	$4C,$DF,$7F,$FF,$4E,$75,$48,$E7,$FF,$FE,$3A,$39,$00,$20,$1B,$B8
-	dc.b	$02,$45,$00,$FF,$BA,$7C,$00,$02,$6D,$00,$00,$58,$55,$45,$3E,$3C
-	dc.b	$00,$1C,$20,$7C,$FF,$FF,$3A,$98,$22,$7C,$FF,$FF,$4E,$20,$38,$05
-	dc.b	$42,$46,$30,$11,$4E,$B9,$00,$01,$03,$AA,$3F,$00,$30,$29,$00,$02
-	dc.b	$4E,$B9,$00,$01,$03,$AA,$B0,$5F,$6C,$00,$00,$1C,$50,$C6,$30,$11
-	dc.b	$34,$29,$00,$02,$33,$40,$00,$02,$32,$82,$30,$10,$34,$28,$00,$02
-	dc.b	$31,$40,$00,$02,$30,$82,$54,$48,$54,$49,$51,$CC,$FF,$C6,$4A,$46
-	dc.b	$66,$B0,$4C,$DF,$7F,$FF,$4E,$75,$48,$A7,$80,$00,$30,$39,$00,$20
-	dc.b	$1B,$B8,$4A,$00,$4C,$9F,$00,$01,$4E,$75,$08,$F8,$00,$05,$C3,$56
-	dc.b	$21,$FC,$00,$01,$2D,$46,$D2,$44,$08,$B8,$00,$00,$BF,$B2,$08,$F8
-	dc.b	$00,$02,$BF,$B2,$08,$B8,$00,$01,$BF,$B2,$31,$FC,$00,$00,$B0,$00
-	dc.b	$31,$FC,$B8,$00,$B0,$02,$31,$FC,$B8,$00,$B0,$0C,$31,$FC,$00,$05
-	dc.b	$B0,$0E,$31,$FC,$C0,$00,$B0,$08,$31,$FC,$00,$06,$B0,$0A,$31,$FC
-	dc.b	$E0,$00,$B0,$04,$31,$FC,$00,$06,$B0,$06,$30,$3C,$00,$00,$08,$F8
-	dc.b	$00,$05,$BF,$B2,$4E,$B9,$00,$01,$B5,$7E,$08,$B8,$00,$05,$BF,$B2
-	dc.b	$4E,$B9,$00,$01,$B2,$C4,$38,$3C,$00,$01,$22,$7C,$00,$19,$76,$2A
-	dc.b	$4E,$B9,$00,$01,$21,$7A,$31,$C4,$B0,$1C,$24,$7C,$00,$17,$91,$70
-	dc.b	$4E,$B9,$00,$01,$B7,$30,$31,$C4,$B0,$1E,$24,$7C,$00,$17,$A1,$6C
-	dc.b	$4E,$B9,$00,$01,$B7,$30,$21,$FC,$00,$17,$91,$68,$BF,$8A,$31,$C4
-	dc.b	$B0,$18,$24,$7C,$00,$17,$B6,$88,$4E,$B9,$00,$01,$B7,$30,$08,$F8
-	dc.b	$00,$02,$C3,$54,$4E,$B9,$00,$01,$BA,$2E,$00,$08,$FF,$01,$FD,$00
-	dc.b	$FC,$00,$70,$28,$72,$1C,$34,$3C,$07,$FF,$4E,$B9,$00,$01,$B9,$76
-	dc.b	$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$00,$00,$00,$20,$7C,$00,$19
-	dc.b	$82,$60,$22,$48,$24,$48,$D1,$DA,$D3,$DA,$42,$40,$42,$41,$74,$28
-	dc.b	$76,$1C,$7A,$08,$4E,$B9,$00,$01,$B6,$92,$4E,$B9,$00,$01,$BB,$8E
-	dc.b	$00,$06,$BF,$0B,$01,$00,$20,$7C,$00,$19,$6E,$0A,$22,$48,$24,$48
-	dc.b	$D1,$DA,$D3,$DA,$42,$40,$42,$41,$34,$11,$36,$29,$00,$02,$7A,$08
-	dc.b	$4E,$B9,$00,$01,$B6,$92,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$FE,$00
-	dc.b	$00,$00,$20,$7C,$00,$17,$3C,$7A,$22,$48,$24,$48,$D1,$DA,$D3,$DA
-	dc.b	$42,$40,$42,$41,$74,$40,$76,$1C,$7A,$01,$4E,$B9,$00,$01,$B6,$92
-	dc.b	$33,$C4,$FF,$FF,$23,$28,$06,$44,$00,$C8,$08,$F8,$00,$02,$C3,$54
-	dc.b	$4E,$B9,$00,$01,$BE,$D6,$00,$16,$F8,$04,$01,$15,$0C,$70,$6F,$73
-	dc.b	$F8,$04,$01,$1C,$0C,$6F,$76,$65,$72,$61,$6C,$6C,$46,$FC,$25,$00
-	dc.b	$4E,$75,$48,$E7,$FF,$FE,$3E,$39,$FF,$FF,$27,$16,$4E,$B9,$00,$01
-	dc.b	$BB,$8E,$00,$06,$BF,$01,$04,$00,$38,$39,$FF,$FF,$23,$28,$3A,$3C
-	dc.b	$00,$02,$4E,$B9,$00,$01,$2B,$B2,$31,$FC,$00,$64,$BD,$3C,$4C,$DF
-	dc.b	$7F,$FF,$4E,$75,$48,$E7,$FF,$FE,$4E,$B9,$00,$01,$BA,$2E,$00,$58
-	dc.b	$FE,$07,$FF,$01,$FD,$18,$FC,$06,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$FD,$17,$FA,$01,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$FD,$16,$FA,$01,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$FD,$15,$FA,$01,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$00,$4C,$DF,$7F,$FF,$4E,$75,$48,$E7,$FF,$FE
-	dc.b	$61,$92,$4E,$B9,$00,$01,$BC,$72,$00,$06,$8F,$18,$06,$00,$4E,$B9
-	dc.b	$00,$01,$BA,$2E,$00,$44,$73,$74,$61,$72,$74,$2D,$65,$78,$69,$74
-	dc.b	$FD,$17,$FA,$01,$63,$2D,$73,$69,$67,$6E,$20,$70,$6C,$61,$79,$65
-	dc.b	$72,$FD,$16,$FA,$01,$7B,$7D,$73,$65,$6C,$65,$63,$74,$20,$70,$6C
-	dc.b	$61,$79,$65,$72,$FD,$15,$FA,$01,$61,$2F,$62,$2D,$73,$77,$69,$74
-	dc.b	$63,$68,$20,$74,$65,$61,$6D,$73,$4C,$DF,$7F,$FF,$4E,$75,$4E,$B9
-	dc.b	$00,$01,$BB,$8E,$00,$06,$8F,$02,$10,$00,$34,$3C,$07,$FF,$30,$3C
-	dc.b	$00,$0E,$32,$3C,$00,$0A,$4E,$B9,$00,$01,$B9,$76,$4E,$B9,$00,$01
-	dc.b	$BB,$8E,$00,$06,$8F,$14,$10,$00,$34,$3C,$07,$FF,$30,$3C,$00,$10
-	dc.b	$32,$3C,$00,$0A,$4E,$F9,$00,$01,$B9,$76
+	movem.l	d0-d7/a0-a6,-(sp)
+	move.w	(SaveRAM+$1BB8).l,d0
+	andi.w	#$FF,d0
+	beq.w	.1
+	subq.w	#1,d0
+	movea.l	#$201B68,a0
+	movea.l	#$FFFF3A98,a1
+	movea.l	#$FFFF4E20,a5
+	clr.w	d6
+.loop
+	move.l	(a0)+,d1
+	move.b	d1,d2
+	andi.w	#$FF,d2
+	swap	d1
+	lsl.w	#8,d1
+	or.w	d1,d2
+	move.w	d2,(a1)+
+	move.w	d6,(a5)+
+	addq.w	#1,d6
+	dbf	d0,.loop
+.1
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+FillFreeAgentList	equ	*	;Fill the free agent list with the players of the free agent pool
+	movem.l	d0-d7/a0-a6,-(sp)
+	move.w	(SaveRAM+$1BB8).l,d5
+	andi.w	#$FF,d5
+	cmp.w	#2,d5
+	blt.w	.3
+	subq.w	#2,d5
+	move.w	#$1C,d7
+.loop2
+	movea.l	#$FFFF3A98,a0
+	movea.l	#$FFFF4E20,a1
+	move.w	d5,d4
+	clr.w	d6
+.loop3
+	move.w	(a1),d0
+	jsr	(GetPositionSlot).l
+	move.w	d0,-(sp)
+	move.w	2(a1),d0
+	jsr	(GetPositionSlot).l
+	cmp.w	(sp)+,d0
+	bge.w	.2
+	st	d6
+	move.w	(a1),d0
+	move.w	2(a1),d2
+	move.w	d0,2(a1)
+	move.w	d2,(a1)
+	move.w	(a0),d0
+	move.w	2(a0),d2
+	move.w	d0,2(a0)
+	move.w	d2,(a0)
+.2
+	addq.w	#2,a0
+	addq.w	#2,a1
+	dbf	d4,.loop3
+	tst.w	d6
+	bne.s	.loop2
+.3
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+TestFreeAgentFlag	equ	*	;Set the flags from the free agent record flag at $201BB8
+	movem.w	d0,-(sp)
+	move.w	(SaveRAM+$1BB8).l,d0
+	tst.b	d0
+	movem.w	(sp)+,d0
+	rts
+SetupFreeAgentsVideo	equ	*	;Set the VBint handler, scroll and map addresses for the free agents screen and load its graphics
+	bset	#5,(sflags12).w
+	move.l	#VBlank_Menus,(VBint).w
+	bclr	#dfok,(disflags).w
+	bset	#dfng,(disflags).w
+	bclr	#df32c,(disflags).w
+	move.w	#0,(VSCRLPM).w
+	move.w	#$B800,(VSPRITES).w
+	move.w	#$B800,(VmMAP3).w
+	move.w	#5,(Map3col1).w
+	move.w	#$C000,(VmMAP2).w
+	move.w	#6,(Map2col1).w
+	move.w	#$E000,(VmMAP1).w
+	move.w	#6,(Map1col1).w
+	move.w	#0,d0					;fade to color
+	bset	#5,(disflags).w
+	jsr	(setVram).l
+	bclr	#5,(disflags).w
+	jsr	(orjoy).l
+	move.w	#1,d4
+	movea.l	#SignPlayersSprites,a1
+	jsr	(LoadScreenSprite).l
+	move.w	d4,(smallfontchars).w
+	movea.l	#RosterFont+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.w	d4,(smallfont2chars).w
+	movea.l	#SmallFontMap2+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	move.l	#RosterFont,(smallfontptr).w
+	move.w	d4,(BigFontchars).w
+	movea.l	#BigFontMap4+8,a2
+	jsr	(DecompressGraphicsPlain).l
+	bset	#2,(sflags11).w
+	jsr	(printsmallz).l
+	String	$FF,1,$FD,0,$FC
+	moveq	#$28,d0
+	moveq	#$1C,d1
+	move.w	#$7FF,d2
+	jsr	(eraser).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),0,0
+	movea.l	#SignReleaseBgMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#$28,d2
+	moveq	#$1C,d3
+	moveq	#8,d5
+	jsr	(dobitmap).l
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),$B,1
+	movea.l	#SignPlayersTitleMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	move.w	(a1),d2
+	move.w	2(a1),d3
+	moveq	#8,d5
+	jsr	(dobitmap).l
+	jsr	(printz).l
+	String	$FE,0,0
+	movea.l	#ControllerBgMap,a0
+	movea.l	a0,a1
+	movea.l	a0,a2
+	adda.l	(a2)+,a0
+	adda.l	(a2)+,a1
+	clr.w	d0
+	clr.w	d1
+	moveq	#$40,d2
+	moveq	#$1C,d3
+	moveq	#1,d5
+	jsr	(dobitmap).l
+	move.w	d4,($FFFF2328).l
+	addi.w	#$C8,d4
+	bset	#2,(sflags11).w
+	jsr	(printbigz).l
+	String	$F8,4,1,$15,$C,'pos',$F8,4,1,$1C,$C,'overall'
+	move.w	#$2500,sr
+	rts
+DrawFreeAgentTeamHeader	equ	*	;Print the team heading of the free agents screen
+	movem.l	d0-d7/a0-a6,-(sp)
+	move.w	(homelogochars).l,d7
+	jsr	(printz).l
+	String	-(TXPRI+TXMAP1),1,4
+	move.w	($FFFF2328).l,d4
+	move.w	#2,d5
+	jsr	(DrawTeamLogoD7).l
+	move.w	#$64,(palcount).w
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+BuildFreeAgentListHeader	equ	*	;Print the free agent list header
+	movem.l	d0-d7/a0-a6,-(sp)
+	jsr	(printsmallz).l
+	String	$FE,7,$FF,1,$FD,$18,$FC,6,'               ',$FD,$17,$FA,1,'                ',$FD,$16,$FA,1,'                 ',$FD,$15,$FA,1,'                 '
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+DrawFreeAgentStartExit	equ	*	;Print the start-exit hint of the free agents screen
+	movem.l	d0-d7/a0-a6,-(sp)
+	bsr.s	BuildFreeAgentListHeader
+	jsr	(printcurz).l
+	String	$8F,$18,6
+	jsr	(printsmallz).l
+	String	'start-exit',$FD,$17,$FA,1,'c-sign player',$FD,$16,$FA,1,'{}select player',$FD,$15,$FA,1,'a/b-switch teams'
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+EraseFreeAgentBoxes	equ	*	;Erase the two message boxes of the free agents screen
+	jsr	(printz).l
+	String	$8F,2,$10
+	move.w	#$7FF,d2
+	move.w	#$E,d0
+	move.w	#$A,d1
+	jsr	(eraser).l
+	jsr	(printz).l
+	String	$8F,$14,$10
+	move.w	#$7FF,d2
+	move.w	#$10,d0
+	move.w	#$A,d1
+	jmp	(eraser).l
 
 ReleasePlayers						;The release player screen (roster menu item Release Player) Code the
-									;listing does not decode: kept as bytes
-	dc.b	$4E,$B9,$00,$01,$AF,$52,$4E,$B9,$00,$1E,$0B,$76,$20,$7C,$00,$19
-	dc.b	$97,$AE,$4E,$B9,$00,$01,$21,$8A,$4E,$B9,$00,$1E,$0D,$66,$61,$00
-	dc.b	$07,$A8,$42,$79,$FF,$FF,$27,$16,$42,$79,$FF,$FF,$27,$10,$31,$FC
-	dc.b	$00,$00,$C3,$A0,$31,$FC,$00,$00,$C3,$A2,$4E,$B9,$00,$02,$14,$82
-	dc.b	$61,$00,$FE,$86,$31,$FC,$00,$18,$BD,$3C,$08,$B8,$00,$02,$BF,$B2
-	dc.b	$30,$39,$00,$20,$1B,$B8,$02,$40,$00,$FF,$B0,$7C,$00,$14,$6C,$00
-	dc.b	$05,$36,$42,$79,$FF,$FF,$27,$12,$3E,$39,$FF,$FF,$27,$16,$4E,$B9
-	dc.b	$00,$1E,$0D,$86,$31,$C7,$C3,$A0,$31,$C7,$C3,$A2,$4E,$B9,$00,$02
-	dc.b	$14,$82,$4E,$B9,$00,$01,$57,$B2,$53,$40,$B0,$7C,$00,$09,$6F,$00
-	dc.b	$00,$06,$30,$3C,$00,$09,$33,$C0,$FF,$FF,$27,$14,$20,$7C,$FF,$FF
-	dc.b	$3A,$98,$22,$7C,$FF,$FF,$2A,$F8,$61,$00,$C8,$CE,$61,$00,$05,$50
-	dc.b	$31,$FC,$FF,$FF,$D0,$14,$4E,$B9,$00,$1D,$CC,$8A,$61,$00,$FE,$0A
-	dc.b	$4E,$B9,$00,$1D,$CC,$8A,$61,$00,$03,$48,$61,$00,$02,$7C,$0C,$78
-	dc.b	$FF,$FF,$D0,$14,$67,$00,$00,$16,$4E,$B9,$00,$1D,$CC,$8A,$61,$00
-	dc.b	$FD,$E8,$4E,$B9,$00,$1D,$CC,$8A,$61,$00,$03,$26,$31,$FC,$FF,$FF
-	dc.b	$D0,$14,$61,$00,$04,$1A,$4A,$41,$67,$00,$04,$9A,$08,$01,$00,$00
-	dc.b	$67,$00,$00,$2A,$4A,$79,$FF,$FF,$27,$10,$67,$00,$00,$0A,$53,$79
-	dc.b	$FF,$FF,$27,$10,$60,$A0,$4A,$79,$FF,$FF,$27,$12,$67,$CE,$53,$79
-	dc.b	$FF,$FF,$27,$12,$53,$79,$FF,$FF,$27,$14,$60,$8A,$08,$01,$00,$01
-	dc.b	$67,$00,$00,$48,$30,$39,$FF,$FF,$27,$10,$D0,$79,$FF,$FF,$27,$12
-	dc.b	$B0,$79,$FF,$FF,$27,$14,$67,$00,$00,$0C,$52,$79,$FF,$FF,$27,$10
-	dc.b	$60,$00,$FF,$64,$3E,$39,$FF,$FF,$27,$16,$4E,$B9,$00,$01,$57,$B2
-	dc.b	$53,$40,$B0,$79,$FF,$FF,$27,$14,$6F,$82,$52,$79,$FF,$FF,$27,$12
-	dc.b	$52,$79,$FF,$FF,$27,$14,$60,$00,$FF,$3E,$08,$01,$00,$04,$67,$00
-	dc.b	$00,$32,$42,$79,$FF,$FF,$27,$10,$42,$79,$FF,$FF,$27,$12,$33,$FC
-	dc.b	$00,$09,$FF,$FF,$27,$14,$52,$79,$FF,$FF,$27,$16,$0C,$79,$00,$1A
-	dc.b	$FF,$FF,$27,$16,$6D,$00,$FE,$AA,$42,$79,$FF,$FF,$27,$16,$60,$00
-	dc.b	$FE,$A0,$08,$01,$00,$06,$67,$00,$00,$2C,$42,$79,$FF,$FF,$27,$10
-	dc.b	$42,$79,$FF,$FF,$27,$12,$33,$FC,$00,$09,$FF,$FF,$27,$14,$53,$79
-	dc.b	$FF,$FF,$27,$16,$6A,$00,$FE,$7A,$33,$FC,$00,$19,$FF,$FF,$27,$16
-	dc.b	$60,$00,$FE,$6E,$08,$01,$00,$07,$66,$00,$03,$AA,$08,$01,$00,$05
-	dc.b	$67,$00,$01,$46,$3E,$39,$FF,$FF,$27,$16,$4E,$B9,$00,$01,$57,$B2
-	dc.b	$B0,$7C,$00,$11,$67,$00,$01,$D0,$20,$7C,$FF,$FF,$3A,$98,$30,$39
-	dc.b	$FF,$FF,$27,$12,$D0,$79,$FF,$FF,$27,$10,$E5,$40,$D0,$C0,$42,$40
-	dc.b	$10,$28,$00,$01,$66,$00,$00,$0C,$4E,$B9,$00,$1E,$08,$72,$67,$00
-	dc.b	$01,$A6,$20,$7C,$FF,$FF,$3A,$98,$30,$39,$FF,$FF,$27,$12,$D0,$79
-	dc.b	$FF,$FF,$27,$10,$E5,$40,$D0,$C0,$11,$E8,$00,$01,$BF,$46,$11,$E8
-	dc.b	$00,$02,$BF,$47,$31,$F9,$FF,$FF,$27,$16,$BF,$4A,$24,$7C,$FF,$FF
-	dc.b	$D3,$C8,$4E,$B9,$00,$1D,$D2,$12,$31,$F9,$FF,$FF,$27,$16,$D0,$16
-	dc.b	$31,$F9,$FF,$FF,$27,$16,$D0,$1E,$20,$7C,$00,$20,$1B,$68,$42,$78
-	dc.b	$BF,$50,$4A,$28,$00,$01,$6B,$00,$00,$0A,$58,$88,$52,$78,$BF,$50
-	dc.b	$60,$F0,$30,$38,$D3,$C8,$02,$40,$1F,$FF,$12,$38,$BF,$46,$02,$41
-	dc.b	$00,$03,$34,$3C,$00,$0D,$E5,$69,$80,$41,$32,$00,$E0,$49,$02,$41
-	dc.b	$00,$FF,$30,$81,$02,$40,$00,$FF,$31,$40,$00,$02,$48,$E7,$FF,$FE
-	dc.b	$30,$38,$BF,$50,$C0,$FC,$00,$0C,$20,$7C,$00,$20,$1B,$CC,$D1,$C0
-	dc.b	$24,$7C,$FF,$FF,$D3,$CC,$34,$3C,$00,$02,$11,$5A,$00,$01,$11,$5A
-	dc.b	$00,$03,$58,$48,$51,$CA,$FF,$F4,$5C,$4A,$3F,$38,$BF,$48,$31,$F8
-	dc.b	$BF,$50,$BF,$48,$42,$47,$74,$03,$76,$14,$22,$3C,$00,$00,$6E,$E8
-	dc.b	$4E,$B9,$00,$1D,$D7,$D4,$31,$DF,$BF,$48,$4C,$DF,$7F,$FF,$52,$79
-	dc.b	$00,$20,$1B,$B8,$08,$B8,$00,$06,$C3,$50,$4E,$B9,$00,$02,$41,$AA
-	dc.b	$61,$00,$FC,$A2,$4A,$79,$FF,$FF,$27,$10,$67,$00,$00,$08,$53,$79
-	dc.b	$FF,$FF,$27,$10,$60,$00,$FD,$1A,$60,$00,$FD,$94
+	jsr	(forceblack).l
+	jsr	(ReleaseGfx).l
+	movea.l	#ReleasePlayersSprites,a0
+	jsr	(DrawScreenSprite).l
+	jsr	(PStatsPalette2).l
+	bsr.w	DrawReleaseFooter
+	clr.w	(homelogochars).l
+	clr.w	(TeamSelectRedraw).l
+	move.w	#0,(HomeTeam).w
+	move.w	#0,(VisTeam).w
+	jsr	(clearTeamStats).l
+	bsr.w	DrawFreeAgentTeamHeader
+	move.w	#$18,(palcount).w
+	bclr	#2,(disflags).w
+.loop
+	move.w	(SaveRAM+$1BB8).l,d0
+	andi.w	#$FF,d0
+	cmp.w	#$14,d0
+	bge.w	DrawReleaseRosterClearD0
+	clr.w	(pstatsblockchars).l
+	move.w	(homelogochars).l,d7
+	jsr	(CheckTeamLines).l
+	move.w	d7,(HomeTeam).w
+	move.w	d7,(VisTeam).w
+	jsr	(clearTeamStats).l
+	jsr	(GetPlayerCountD7).l
+	subq.w	#1,d0
+	cmp.w	#9,d0
+	ble.w	.1
+	move.w	#9,d0
+.1
+	move.w	d0,(pstatscount).l
+	movea.l	#$FFFF3A98,a0
+	movea.l	#$FFFF2AF8,a1
+	bsr.w	FillTradeRosterList
+	bsr.w	SortReleaseList
+	move.w	#$FFFF,($FFFFD014).w
+ReleasePlayersWait	equ	*	;Wait for a frame and redraw the release screen
+	jsr	(WaitMenuFrame).l
+	bsr.w	DrawFreeAgentTeamHeader
+	jsr	(WaitMenuFrame).l
+	bsr.w	DrawReleaseRosterSaveSR
+	bsr.w	ReleaseArrows
+.loop2
+	cmpi.w	#$FFFF,($FFFFD014).w
+	beq.w	.loop3
+	jsr	(WaitMenuFrame).l
+	bsr.w	DrawFreeAgentTeamHeader
+	jsr	(WaitMenuFrame).l
+	bsr.w	DrawReleaseRosterSaveSR
+.loop3
+	move.w	#$FFFF,($FFFFD014).w
+	bsr.w	ReadReleasePads
+	tst.w	d1
+	beq.w	DrawReleaseRosterExit
+	btst	#0,d1
+	beq.w	.3
+	tst.w	(TeamSelectRedraw).l
+	beq.w	.2
+	subq.w	#1,(TeamSelectRedraw).l
+	bra.s	ReleasePlayersWait
+.2
+	tst.w	(pstatsblockchars).l
+	beq.s	.loop3
+	subq.w	#1,(pstatsblockchars).l
+	subq.w	#1,(pstatscount).l
+	bra.s	ReleasePlayersWait
+.3
+	btst	#1,d1
+	beq.w	.5
+	move.w	(TeamSelectRedraw).l,d0
+	add.w	(pstatsblockchars).l,d0
+	cmp.w	(pstatscount).l,d0
+	beq.w	.4
+	addq.w	#1,(TeamSelectRedraw).l
+	bra.w	ReleasePlayersWait
+.4
+	move.w	(homelogochars).l,d7
+	jsr	(GetPlayerCountD7).l
+	subq.w	#1,d0
+	cmp.w	(pstatscount).l,d0
+	ble.s	.loop3
+	addq.w	#1,(pstatsblockchars).l
+	addq.w	#1,(pstatscount).l
+	bra.w	ReleasePlayersWait
+.5
+	btst	#4,d1
+	beq.w	.6
+	clr.w	(TeamSelectRedraw).l
+	clr.w	(pstatsblockchars).l
+	move.w	#9,(pstatscount).l
+	addq.w	#1,(homelogochars).l
+	cmpi.w	#$1A,(homelogochars).l
+	blt.w	.loop
+	clr.w	(homelogochars).l
+	bra.w	.loop
+.6
+	btst	#6,d1
+	beq.w	.7
+	clr.w	(TeamSelectRedraw).l
+	clr.w	(pstatsblockchars).l
+	move.w	#9,(pstatscount).l
+	subq.w	#1,(homelogochars).l
+	bpl.w	.loop
+	move.w	#$19,(homelogochars).l
+	bra.w	.loop
+.7
+	btst	#7,d1
+	bne.w	DrawReleaseRosterExit
+	btst	#5,d1
+	beq.w	.11
+	move.w	(homelogochars).l,d7
+	jsr	(GetPlayerCountD7).l
+	cmp.w	#$11,d0
+	beq.w	DrawReleaseCursor
+	movea.l	#$FFFF3A98,a0
+	move.w	(pstatsblockchars).l,d0
+	add.w	(TeamSelectRedraw).l,d0
+	asl.w	#2,d0
+	adda.w	d0,a0
+	clr.w	d0
+	move.b	1(a0),d0
+	bne.w	.8
+	jsr	(CheckMinGoalies).l
+	beq.w	DrawReleaseCursor
+.8
+	movea.l	#$FFFF3A98,a0
+	move.w	(pstatsblockchars).l,d0
+	add.w	(TeamSelectRedraw).l,d0
+	asl.w	#2,d0
+	adda.w	d0,a0
+	move.b	1(a0),(TempWord1).w
+	move.b	2(a0),(TempWord1+1).w
+	move.w	(homelogochars).l,(TempRawSpd).w
+	movea.l	#nameentryvis+2,a2
+	jsr	(ExtractTradedPlayer).l
+	move.w	(homelogochars).l,($FFFFD016).w
+	move.w	(homelogochars).l,($FFFFD01E).w
+	movea.l	#$201B68,a0
+	clr.w	(rosterscroll).w
+.loop4
+	tst.b	1(a0)
+	bmi.w	.9
+	addq.l	#4,a0
+	addq.w	#1,(rosterscroll).w
+	bra.s	.loop4
+.9
+	move.w	(nameentryvis+2).w,d0
+	andi.w	#$1FFF,d0
+	move.b	(TempWord1).w,d1
+	andi.w	#3,d1
+	move.w	#$D,d2
+	lsl.w	d2,d1
+	or.w	d1,d0
+	move.w	d0,d1
+	lsr.w	#8,d1
+	andi.w	#$FF,d1
+	move.w	d1,(a0)
+	andi.w	#$FF,d0
+	move.w	d0,2(a0)
+	movem.l	d0-d7/a0-a6,-(sp)
+	move.w	(rosterscroll).w,d0
+	mulu.w	#$C,d0
+	movea.l	#$201BCC,a0
+	adda.l	d0,a0
+	movea.l	#nameentryvis+6,a2
+	move.w	#2,d2
+.loop5
+	move.b	(a2)+,1(a0)
+	move.b	(a2)+,3(a0)
+	addq.w	#4,a0
+	dbf	d2,.loop5
+	addq.w	#6,a2
+	move.w	(TempWord2).w,-(sp)
+	move.w	(rosterscroll).w,(TempWord2).w
+	clr.w	d7
+	moveq	#3,d2
+	moveq	#$14,d3
+	move.l	#$6EE8,d1
+	jsr	(InsertStatSlot).l
+	move.w	(sp)+,(TempWord2).w
+	movem.l	(sp)+,d0-d7/a0-a6
+	addq.w	#1,(SaveRAM+$1BB8).l
+	bclr	#6,(GameFlags).w
+	jsr	(MakeSRAMChecksum).l
+	bsr.w	EraseFreeAgentBoxes
+	tst.w	(TeamSelectRedraw).l
+	beq.w	.10
+	subq.w	#1,(TeamSelectRedraw).l
+.10
+	bra.w	.loop
+.11
+	bra.w	.loop2
 
 CheckMinGoalies						;Z if team d7 has only 2 goalies
 									;(GetGoalieCountD7), so none can be released
@@ -1757,49 +3111,150 @@ ReleaseArrows						;Draw scroll arrows ({ above / } below) beside the roster lis
 	String	$FE,7
 	movem.l	(sp)+,d0-d7/a0-a6
 	rts
-	dc.w	$6100,$FB22,$4EB9,$0001,$BA2E,$0024,$FE07,$FD18
-	dc.w	$FC06,$5649,$4F4C,$4154,$494F,$4E20,$4F46,$FD17
-	dc.w	$FA01,$524F,$5354,$4552,SPAturnr,$554C,$4553,$6100
-	dc.w	$0108,$6100,$03BE,$6000,$FCA8,$40E7
+DrawReleaseCursor	equ	*	;Draw the release screen cursor
+	bsr.w	BuildFreeAgentListHeader
+	jsr	(printsmallz).l
+	String	$FE,7,$FD,$18,$FC,6,'VIOLATION OF',$FD,$17,$FA,1,'ROSTER RULES'
+	bsr.w	ReadReleasePads
+	bsr.w	DrawReleaseFooter
+	bra.w	ReleasePlayersWait
+DrawReleaseRosterSaveSR	equ	*	;Save sr, then fall into DrawReleaseRoster
+	move.w	sr,-(sp)
 
 DrawReleaseRoster					;Draw the visible roster rows (pos letter, name, rating) with highlight on
 									;cursor row
-									;Code the listing does not decode: kept as bytes
-	dc.b	$3A,$39,$FF,$FF,$27,$10,$2A,$7C,$FF,$FF,$27,$12,$28,$7C,$FF,$FF
-	dc.b	$3A,$98,$31,$FC,$00,$10,$B0,$42,$3E,$39,$FF,$FF,$27,$16,$3F,$38
-	dc.b	$B0,$42,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$8F,$00,$00,$00,$31,$DF
-	dc.b	$B0,$42,$42,$46,$30,$15,$E5,$40,$48,$C0,$D9,$C0,$4E,$B9,$00,$01
-	dc.b	$BA,$2E,$00,$24,$FD,$02,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$FB,$02,$20,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$31,$FC,$00,$03,$B0,$40,$4E,$B9,$00,$01
-	dc.b	$BA,$2E,$00,$04,$FE,$07,$BC,$45,$66,$00,$00,$0C,$4E,$B9,$00,$01
-	dc.b	$BA,$2E,$00,$04,$FE,$06,$42,$40,$10,$2C,$00,$02,$4E,$B9,$00,$01
-	dc.b	$01,$7A,$4E,$B9,$00,$01,$BC,$84,$31,$FC,$00,$16,$B0,$40,$22,$7C
-	dc.b	$00,$1D,$D8,$FE,$42,$40,$10,$2C,$00,$01,$33,$C0,$FF,$FF,$27,$18
-	dc.b	$4E,$B9,$00,$01,$D7,$F2,$4E,$B9,$00,$01,$BC,$84,$31,$FC,$00,$1F
-	dc.b	$B0,$40,$42,$40,$10,$2C,$00,$03,$4E,$B9,$00,$1D,$93,$02,$32,$3C
-	dc.b	$00,$02,$4E,$B9,$00,$01,$BE,$1C,$4E,$B9,$00,$01,$BC,$84,$58,$8C
-	dc.b	$52,$78,$B0,$42,$52,$46,$30,$39,$FF,$FF,$27,$12,$D0,$46,$B0,$79
-	dc.b	$FF,$FF,$27,$14,$6F,$00,$FF,$46,$46,$DF,$4E,$75,$2C,$3C,$00,$00
-	dc.b	$54,$60,$3C,$3C,$00,$64,$32,$38,$B0,$52,$92,$78,$B0,$54,$67,$F2
-	dc.b	$31,$F8,$B0,$52,$B0,$54,$4E,$B9,$00,$01,$26,$40,$4E,$B9,$00,$01
-	dc.b	$B3,$48,$4E,$B9,$00,$01,$B3,$20,$4A,$41,$67,$00,$00,$06,$60,$00
-	dc.b	$00,$50,$4E,$B9,$00,$01,$B3,$60,$4E,$B9,$00,$01,$B3,$20,$4A,$41
-	dc.b	$67,$00,$00,$06,$60,$00,$00,$3A,$4A,$78,$D2,$50,$67,$00,$00,$2E
-	dc.b	$4E,$B9,$00,$01,$B3,$78,$4E,$B9,$00,$01,$B3,$20,$4A,$41,$67,$00
-	dc.b	$00,$06,$60,$00,$00,$1C,$4E,$B9,$00,$01,$B3,$90,$4E,$B9,$00,$01
-	dc.b	$B3,$20,$4A,$41,$67,$00,$00,$06,$60,$00,$00,$06,$51,$CE,$FF,$84
-	dc.b	$4E,$75,$4E,$75,$42,$40,$60,$00,$00,$02,$48,$A7,$E0,$00,$61,$00
-	dc.b	$F9,$58,$4C,$9F,$00,$07,$22,$7C,$00,$1E,$0A,$F6,$4E,$B9,$00,$01
-	dc.b	$D7,$F2,$4E,$B9,$00,$01,$BC,$84,$61,$00,$FF,$52,$60,$D4
+	move.w	(TeamSelectRedraw).l,d5
+	movea.l	#pstatsblockchars,a5
+	movea.l	#$FFFF3A98,a4
+	move.w	#$10,(printy).w
+	move.w	(homelogochars).l,d7
+	move.w	(printy).w,-(sp)
+	jsr	(printz).l
+	String	$8F,0,0
+	move.w	(sp)+,(printy).w
+	clr.w	d6
+	move.w	(a5),d0
+	asl.w	#2,d0
+	ext.l	d0
+	adda.l	d0,a4
+.loop
+	jsr	(printsmallz).l
+	String	$FD,2,'               ',$FB,2,'               '
+	move.w	#3,(printx).w
+	jsr	(printsmallz).l
+	String	$FE,7
+	cmp.w	d5,d6
+	bne.w	.1
+	jsr	(printsmallz).l
+	String	$FE,6
+.1
+	clr.w	d0
+	move.b	2(a4),d0
+	jsr	(FormatPlayerNameD7).l
+	jsr	(printcur).l
+	move.w	#$16,(printx).w
+	movea.l	#PositionLetters,a1
+	clr.w	d0
+	move.b	1(a4),d0
+	move.w	d0,(vislogochars).l
+	jsr	(SkipStrings).l
+	jsr	(printcur).l
+	move.w	#$1F,(printx).w
+	clr.w	d0
+	move.b	3(a4),d0
+	jsr	(SoftClampCoord).l
+	move.w	#2,d1
+	jsr	(PushNumberWidth).l
+	jsr	(printcur).l
+	addq.l	#4,a4
+	addq.w	#1,(printy).w
+	addq.w	#1,d6
+	move.w	(pstatsblockchars).l,d0
+	add.w	d6,d0
+	cmp.w	(pstatscount).l,d0
+	ble.w	.loop
+	move.w	(sp)+,sr
+	rts
+ReadReleasePads						;Release screen: wait one frame and read the pad
+	move.l	#$5460,d6
+.loop
+	move.w	#$64,d6
+	move.w	(Vcount).w,d1
+	sub.w	(OldVcount).w,d1
+	beq.s	.loop
+	move.w	(Vcount).w,(OldVcount).w
+	jsr	(SetMenuScroll).l
+	jsr	(ReadJoy1).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.1
+	bra.w	.5
+.1
+	jsr	(ReadJoy2).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.2
+	bra.w	.5
+.2
+	tst.w	(FourWayPlay).w
+	beq.w	.4
+	jsr	(ReadJoy3).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.3
+	bra.w	.5
+.3
+	jsr	(ReadJoy4).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.4
+	bra.w	.5
+.4
+	dbf	d6,.loop
+.5
+	rts
+DrawReleaseRosterExit	equ	*
+	rts
+DrawReleaseRosterClearD0	equ	*
+	clr.w	d0
+	bra.w	.6
+.6
+	movem.w	d0-d2,-(sp)
+	bsr.w	BuildFreeAgentListHeader
+	movem.w	(sp)+,d0-d2
+	movea.l	#ReleaseMsgText,a1
+	jsr	(SkipStrings).l
+	jsr	(printcur).l
+	bsr.w	ReadReleasePads
+	bra.s	DrawReleaseRosterExit
 
 ReleaseMsgText						;ReleasePlayers: the message when the free agent list is full
 	String	CC_Font1Pal3Pri,$18,$06,'Free agent list',CC_Font1Pal3Pri,$17,$07,'is full.',CC_Font1Pal3Pri,$16,$08,'Press any button',CC_Font1Pal3Pri,$15,$09,'to exit.'
-	dc.b	$48,$E7,$FF,$FE,$4E,$B9,$00,$01,$57,$B2,$55,$40,$3A,$00,$20,$7C
-	dc.b	$FF,$FF,$3A,$98,$38,$05,$42,$46,$10,$28,$00,$01,$B0,$28,$00,$05
-	dc.b	$6F,$00,$00,$10,$50,$C6,$20,$10,$24,$28,$00,$04,$21,$40,$00,$04
-	dc.b	$20,$82,$58,$48,$51,$CC,$FF,$E2,$4A,$46,$66,$D2,$4C,$DF,$7F,$FF
-	dc.b	$4E,$75
+SortReleaseList	equ	*	;Sort the release list by position
+	movem.l	d0-d7/a0-a6,-(sp)
+	jsr	(GetPlayerCountD7).l
+	subq.w	#2,d0
+	move.w	d0,d5
+.loop
+	movea.l	#$FFFF3A98,a0
+	move.w	d5,d4
+	clr.w	d6
+.loop2
+	move.b	1(a0),d0
+	cmp.b	5(a0),d0
+	ble.w	.1
+	st	d6
+	move.l	(a0),d0
+	move.l	4(a0),d2
+	move.l	d0,4(a0)
+	move.l	d2,(a0)
+.1
+	addq.w	#4,a0
+	dbf	d4,.loop2
+	tst.w	d6
+	bne.s	.loop
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 ReleaseGfx							;Release Player screen video set up: fonts, bitmaps and the pos / overall
 									;headers
@@ -1887,13 +3342,15 @@ ReleaseGfx							;Release Player screen video set up: fonts, bitmaps and the pos
 	String	$F8,4,1,$15,$C,'pos',$F8,4,1,$1C,$C,'overall'
 	move.w	#$2500,sr
 	rts
-	dc.w	$48E7,$FFFE,$6100,$F72C,$4EB9,$0001,$BC72,$0006
-	dc.w	$8F18,$0600,$4EB9,$0001,$BA2E,$0048,$7374,$6172
-	dc.w	$742D,$6578,$6974,$FD17,$FA01,$632D,$7265,$6C65
-	dc.w	$6173,$6520,$706C,$6179,$6572,$FD16,$FA01,$7B7D
-	dc.w	$7365,$6C65,$6374,$2070,$6C61,$7965,$72FD,$15FA
-	dc.w	$0161,$2F62,$2D73,$7769,$7463,$6820,$7465,$616D
-	dc.w	$7300,$4CDF,$7FFF,$4E75
+DrawReleaseFooter	equ	*	;Print the footer of the release screen
+	movem.l	d0-d7/a0-a6,-(sp)
+	bsr.w	BuildFreeAgentListHeader
+	jsr	(printcurz).l
+	String	$8F,$18,6
+	jsr	(printsmallz).l
+	String	'start-exit',$FD,$17,$FA,1,'c-release player',$FD,$16,$FA,1,'{}select player',$FD,$15,$FA,1,'a/b-switch teams'
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 PStatsPalette2						;The PStatsPalette palette to palfadenew+$40 (sign free agents and release
 									;screens)
@@ -1909,11 +3366,32 @@ PStatsPalette2						;The PStatsPalette palette to palfadenew+$40 (sign free agen
 
 CheckTeamLines						;Team d7: clear the $41-byte saved line block at 0 or $C39 if it belongs
 									;to that team. Called from ExecuteTrade, SignFreeAgents and ReleasePlayers.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$30,$39,$00,$20,$00,$00,$53,$00,$B0,$07,$66,$00
-	dc.b	$00,$06,$61,$00,$00,$2C,$30,$39,$00,$20,$18,$72,$53,$00,$B0,$07
-	dc.b	$66,$00,$00,$06,$61,$00,$00,$24,$4C,$DF,$7F,$FF,$4E,$75,$48,$E7
-	dc.b	$FF,$FE,$61,$00,$00,$0C,$61,$00,$00,$12,$4C,$DF,$7F,$FF,$4E,$75
-	dc.b	$70,$00,$72,$41,$4E,$F9,$00,$02,$42,$08,$20,$3C,$00,$00,$0C,$39
-	dc.b	$72,$41,$4E,$F9,$00,$02,$42,$08
+	movem.l	d0-d7/a0-a6,-(sp)
+	move.w	(SaveRAM).l,d0
+	subq.b	#1,d0
+	cmp.b	d7,d0
+	bne.w	.1
+	bsr.w	ClearSavedLinesA
+.1
+	move.w	(SaveRAM+$1872).l,d0
+	subq.b	#1,d0
+	cmp.b	d7,d0
+	bne.w	.2
+	bsr.w	ClearSavedLinesB
+.2
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+	movem.l	d0-d7/a0-a6,-(sp)
+	bsr.w	ClearSavedLinesA
+	bsr.w	ClearSavedLinesB
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+ClearSavedLinesA					;Clear $41 bytes of save RAM at 0 (ClearSRAMBytes)
+	moveq	#0,d0
+	moveq	#$41,d1
+	jmp	(ClearSRAMBytes).l
+ClearSavedLinesB					;Clear $41 bytes of save RAM at $C39 (ClearSRAMBytes)
+	move.l	#$C39,d0
+	moveq	#$41,d1
+	jmp	(ClearSRAMBytes).l
 

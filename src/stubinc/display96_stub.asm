@@ -46,6 +46,11 @@ cramfade = $01AFD6					;summary96_stub
 p_music_vblank = $024486			;summary96_stub
 print = $01BBA0						;goal96_box_stub
 sfx = $088470						;collide96_stub
+SPAfpunchfinal = $003300				;frames96
+SPAglide = $000856				;frames96
+SetSPA = $01A614				;collide96_stub
+forceblack = $01AF52				;pause96_stub
+printz = $01BB8E				;goal96_box_stub
 
 
 ; Main segment code

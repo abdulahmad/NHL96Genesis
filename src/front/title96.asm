@@ -63,12 +63,22 @@ TitleScreen							;Title screen: the picture TitleScreenImg and song 0, until st
 
 VBlank_LineScroll					;A vblank handler nothing sets: the line scroll table (SortCords),
 									;Vscroll, cramfade, Vcount, the music
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$2C,$30,$7C
-	dc.b	$B0,$5E,$32,$38,$B0,$00,$30,$3C,$01,$C0,$4E,$B9,$00,$01,$B3,$EC
-	dc.b	$20,$7C,$00,$C0,$00,$00,$21,$7C,$40,$00,$00,$10,$00,$04,$30,$B8
-	dc.b	$BD,$36,$4E,$B9,$00,$01,$AF,$D6,$52,$78,$B0,$52,$4E,$B9,$00,$02
-	dc.b	$44,$86,$4C,$DF,$7F,$FF,$4E,$73
+	movem.l	d0-d7/a0-a6,-(sp)
+	btst	#dfng,(disflags).w
+	bne.w	.1
+	movea.w	#(SortCords-M68K_RAM),a0
+	move.w	(VSCRLPM).w,d1
+	move.w	#$1C0,d0
+	jsr	(DoDMA).l
+	movea.l	#$C00000,a0
+	move.l	#$40000010,4(a0)
+	move.w	(Vscroll).w,(a0)
+	jsr	(cramfade).l
+.1
+	addq.w	#1,(Vcount).w
+	jsr	(p_music_vblank).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rte
 
 TitleWaitFrame						;TitleScreen: wait for the next frame (Vcount)
 	move.w	(Vcount).w,d0
@@ -211,12 +221,22 @@ PrintCreditsPage					;Print the CreditsPages page at setupvalues, one String a r
 	rts
 
 VBlank_LineScroll2					;A copy of VBlank_LineScroll; nothing sets it
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$2C,$30,$7C
-	dc.b	$B0,$5E,$32,$38,$B0,$00,$30,$3C,$01,$C0,$4E,$B9,$00,$01,$B3,$EC
-	dc.b	$20,$7C,$00,$C0,$00,$00,$21,$7C,$40,$00,$00,$10,$00,$04,$30,$B8
-	dc.b	$BD,$36,$4E,$B9,$00,$01,$AF,$D6,$52,$78,$B0,$52,$4E,$B9,$00,$02
-	dc.b	$44,$86,$4C,$DF,$7F,$FF,$4E,$73
+	movem.l	d0-d7/a0-a6,-(sp)
+	btst	#dfng,(disflags).w
+	bne.w	.1
+	movea.w	#(SortCords-M68K_RAM),a0
+	move.w	(VSCRLPM).w,d1
+	move.w	#$1C0,d0
+	jsr	(DoDMA).l
+	movea.l	#$C00000,a0
+	move.l	#$40000010,4(a0)
+	move.w	(Vscroll).w,(a0)
+	jsr	(cramfade).l
+.1
+	addq.w	#1,(Vcount).w
+	jsr	(p_music_vblank).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rte
 
 CreditsWaitFrame					;CreditsScreen: wait for the next frame (Vcount)
 	move.w	(Vcount).w,d0

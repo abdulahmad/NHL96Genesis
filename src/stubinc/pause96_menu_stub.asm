@@ -27,6 +27,18 @@ setplayercolors = $0215B2			;control96_team
 setupEASNmap = $0210B0				;display96
 setupIceRinkPal = $02109A			;display96
 Vmaddr = $01B678					;season96_stub
+AddPenalty2 = $01C1D2				;collide96_stub
+ClearMenuBox = $1E2EAA				;summary96
+GetGoalieCount = $0157A2				;goal96_box_stub
+GetPlayerInitial = $02304C				;middle96
+PauseMenuNoTimeout = $023890				;pause96_stub
+RestoreTeamEnergy = $01D380				;lines96_bar
+WaitVSyncAndReadInput = $015804				;players96_count
+printbigcur = $01BEE8				;pause96_stub
+printbigcurz = $01BEC4				;video96
+printz = $01BB8E				;goal96_box_stub
+setpersonel = $01FB52				;shootout96_stub
+waitx = $01B152				;hockey96_open_stub
 
 
 ; Main segment code

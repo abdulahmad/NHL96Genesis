@@ -51,6 +51,16 @@ SprSort = $0213AE					;display96
 StartArenaAnim = $1D8A86			;goal96_box_stub
 updatefaceoff = $019B16				;logic96_pull
 vtoa = $01A3EE						;collide96_stub
+ChooseSong = $088688				;collide96_stub
+PeriodOver = $0215DC				;hockey96_open
+PickFaceoffDirection = $1D9094				;code96_15
+ReturnGoalies = $0197EA				;shootout96_stub
+SetFaceoffAnim = $1D8AB4				;shootout96_path
+SetLCmode2 = $00EC6E				;lines96
+Stop4Pen = $01C784				;collide96_stub
+chkFgtBit1ShotsLead = $1D90E2				;code96_15
+clockcontPuckAssignments = $014BDC				;hockey96
+lcfound = $00EE92				;lines96
 
 
 ; Main segment code

@@ -322,15 +322,37 @@ EndShootout							;Shootout over: LockScroll, then the 5 skaters of player slots
 AddArenaAnimSprite					;Add the arena animation sprites; disabled in 96: the rts comes first and
 									;the body after it is dead
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$4A,$78,$D4,$74,$6B,$00,$01,$18,$4A,$B8,$D4,$7A,$67,$00,$01,$10
-	dc.b	$08,$38,$00,$04,$C3,$42,$66,$00,$01,$06,$08,$38,$00,$03,$C3,$3C
-	dc.b	$66,$00,$00,$FC,$08,$38,$00,$07,$C3,$3A,$66,$00,$00,$F2,$22,$78
-	dc.b	$D4,$7A,$D3,$E9,$00,$04,$38,$38,$BD,$32,$3A,$38,$BD,$2E,$30,$38
-	dc.b	$D4,$6E,$60,$00,$00,$22,$02,$42,$00,$0F,$B4,$7C,$00,$03,$63,$00
-	dc.b	$00,$04,$74,$03,$60,$00,$00,$0A,$30,$03,$D0,$42,$61,$00,$00,$08
-	dc.b	$51,$CA,$FF,$F6,$4E,$75
+	tst.w	(arenaanim).w
+	bmi.w	AddArenaAnimSpriteDone
+	tst.l	(arenaanim+6).w
+	beq.w	AddArenaAnimSpriteDone
+	btst	#4,(sflags4).w
+	bne.w	AddArenaAnimSpriteDone
+	btst	#3,(sflags2).w
+	bne.w	AddArenaAnimSpriteDone
+	btst	#7,(sflags).w
+	bne.w	AddArenaAnimSpriteDone
+	movea.l	(arenaanim+6).w,a1
+	adda.l	4(a1),a1
+	move.w	(Hpos).w,d4
+	move.w	(Vpos).w,d5
+	move.w	($FFFFD46E).w,d0
+	bra.w	AddArenaAnimSpriteFrame
+	andi.w	#$F,d2
+	cmp.w	#3,d2
+	bls.w	.4
+	moveq	#3,d2
+.4
+	bra.w	.5
+.loop2
+	move.w	d3,d0
+	add.w	d2,d0
+	bsr.w	AddArenaAnimSpriteFrame
+.5
+	dbf	d2,.loop2
+	rts
 
+AddArenaAnimSpriteFrame	equ	*			;Add the sprite of arena animation frame d0 (d6 < $40) to the sprite list
 .spr								;Add the arena animation sprites in view (the ShowCrowdFrame loop);
 									;reached only from the dead body above
 	ext.w	d0
@@ -394,6 +416,7 @@ AddArenaAnimSprite					;Add the arena animation sprites; disabled in 96: the rts
 	dbf	d4,.loop
 .2
 	movem.l	(sp)+,d0-d5
+AddArenaAnimSpriteDone	equ	*
 .3
 	rts
 	movem.l	d0-d7/a0/a2-a3,-(sp)
@@ -510,56 +533,97 @@ ManualGoalieMenu					;The "x Manual Goalie" pause menu item.
 RunArenaAnim						;Run the arena animation (load its frames and tiles, step the frames);
 									;disabled in 96 by the leading rts
 	rts
-; Code kept as bytes (decoded by decode_code.py).
-	dc.b	$4A,$78,$D4,$74,$6B,$00,$00,$56,$48,$E7,$FF,$FE,$4A,$B8,$D4,$7A
-	dc.b	$66,$00,$00,$36,$30,$38,$D4,$74,$E7,$40,$20,$7C,$00,$1D,$88,$20
-	dc.b	$21,$F0,$00,$00,$D4,$76,$21,$F0,$00,$04,$D4,$7A,$24,$70,$00,$04
-	dc.b	$50,$4A,$38,$38,$D4,$6C,$4E,$B9,$00,$01,$B7,$30,$42,$78,$D4,$70
-	dc.b	$61,$00,$00,$1C,$60,$00,$00,$12,$9F,$78,$D4,$72,$6A,$00,$00,$0A
-	dc.b	$52,$78,$D4,$70,$61,$00,$00,$08,$4C,$DF,$7F,$FF,$4E,$75,$20,$78
-	dc.b	$D4,$76,$30,$38,$D4,$70,$D0,$40,$12,$30,$00,$00,$48,$81,$31,$C1
-	dc.b	$D4,$6E,$12,$30,$00,$01,$48,$81,$31,$C1,$D4,$72,$0C,$78,$FF,$FF
-	dc.b	$D4,$6E,$66,$00,$00,$08,$42,$78,$D4,$70,$60,$D2,$0C,$78,$FF,$FE
-	dc.b	$D4,$6E,$66,$00,$00,$06,$61,$00,$02,$A4,$4E,$75,$00,$1D,$8A,$50
-	dc.b	$00,$14,$17,$B6,$00,$1D,$89,$88,$00,$14,$17,$B6,$00,$1D,$8A,$30
-	dc.b	$00,$14,$17,$B6,$00,$1D,$89,$E8,$00,$14,$17,$B6,$00,$1D,$89,$B6
-	dc.b	$00,$14,$17,$B6,$00,$1D,$8A,$30,$00,$14,$17,$B6,$00,$1D,$88,$92
-	dc.b	$00,$14,$17,$B6,$00,$1D,$88,$60,$00,$14,$17,$B6,$01,$0A,$02,$0A
-	dc.b	$03,$0A,$04,$0A,$05,$0A,$06,$0A,$07,$0A,$08,$0A,$01,$0A,$02,$0A
-	dc.b	$03,$0A,$04,$0A,$05,$0A,$06,$0A,$07,$0A,$08,$0A,$01,$0A,$02,$0A
-	dc.b	$03,$0A,$04,$0A,$05,$0A,$06,$0A,$07,$0A,$08,$0A,$FE,$00,$01,$0A
-	dc.b	$02,$0A,$03,$0A,$04,$0A,$05,$0A,$06,$0A,$07,$0A,$08,$0A,$FF,$00
-	dc.b	$01,$0A,$02,$0A,$03,$0A,$04,$0A,$05,$0A,$06,$0A,$07,$0A,$08,$0A
-	dc.b	$09,$0A,$0A,$0A,$0B,$0A,$0C,$0A,$0D,$0A,$0E,$0A,$0F,$0A,$10,$0A
-	dc.b	$11,$0A,$12,$0A,$13,$0A,$14,$0A,$15,$0A,$16,$0A,$17,$0A,$FE,$00
-	dc.b	$01,$08,$02,$08,$03,$3C,$04,$3C,$03,$3C,$04,$3C,$03,$3C,$04,$3C
-	dc.b	$03,$3C,$04,$3C,$03,$3C,$04,$3C,$03,$3C,$04,$3C,$03,$3C,$04,$3C
-	dc.b	$03,$3C,$04,$3C,$03,$3C,$04,$3C,$03,$3C,$04,$3C,$03,$3C,$04,$3C
-	dc.b	$03,$3C,$04,$3C,$03,$3C,$04,$3C,$03,$3C,$04,$3C,$03,$3C,$04,$3C
-	dc.b	$03,$3C,$04,$3C,$03,$3C,$04,$3C,$03,$3C,$04,$3C,$03,$3C,$04,$3C
-	dc.b	$02,$08,$01,$08,$FF,$00,$01,$08,$02,$08,$03,$08,$04,$08,$05,$08
-	dc.b	$06,$08,$07,$08,$08,$08,$FF,$00,$01,$08,$02,$08,$03,$08,$04,$1E
-	dc.b	$05,$08,$06,$08,$07,$08,$08,$1E,$05,$08,$06,$08,$07,$08,$08,$1E
-	dc.b	$09,$08,$0A,$08,$0B,$08,$0C,$08,$0D,$08,$0E,$08,$FE,$00,$0F,$08
-	dc.b	$10,$08,$11,$08,$12,$1E,$13,$08,$14,$08,$15,$08,$16,$1E,$13,$08
-	dc.b	$14,$08,$15,$08,$16,$1E,$17,$08,$18,$08,$19,$08,$1A,$08,$1B,$08
-	dc.b	$1C,$08,$FE,$00,$01,$08,$02,$08,$03,$08,$04,$08,$05,$08,$06,$08
-	dc.b	$07,$08,$08,$08,$09,$08,$0A,$08,$0B,$08,$0C,$08,$0D,$08,$0E,$08
-	dc.b	$0F,$08,$10,$08,$11,$08,$12,$08,$13,$08,$14,$08,$15,$08,$16,$08
-	dc.b	$FE,$00,$01,$08,$02,$08,$03,$08,$04,$08,$05,$08,$06,$08,$07,$08
-	dc.b	$08,$08,$09,$08,$0A,$08,$0B,$08,$0C,$08,$0D,$08,$0E,$08,$0F,$08
-	dc.b	$10,$08,$11,$08,$12,$08,$13,$08,$14,$08,$15,$08,$16,$08,$17,$08
-	dc.b	$18,$08,$18,$7F,$01,$08,$02,$08,$03,$08,$04,$08,$05,$08,$06,$08
-	dc.b	$07,$08,$08,$08,$09,$08,$0A,$08,$0B,$08,$0C,$08,$0D,$08,$0E,$08
-	dc.b	$0F,$08,$10,$08,$11,$08,$12,$08,$13,$08,$14,$08,$15,$08,$16,$08
-	dc.b	$17,$08,$18,$08,$19,$08,$1A,$08,$1B,$08,$1C,$08,$1D,$08,$1E,$08
-	dc.b	$1F,$08,$20,$08,$21,$08,$22,$08,$23,$08,$FE,$00,$01,$08,$02,$08
-	dc.b	$03,$08,$04,$08,$05,$08,$06,$08,$07,$08,$08,$08,$09,$08,$0A,$08
-	dc.b	$0B,$08,$0C,$08,$0D,$08,$0E,$08,$0F,$08,$FF,$00,$01,$0A,$02,$0A
-	dc.b	$03,$0A,$04,$0A,$05,$0A,$06,$0A,$07,$0A,$08,$0A,$08,$0A,$08,$0A
-	dc.b	$08,$0A,$08,$0A,$08,$0A,$08,$0A,$08,$7F,$08,$7F,$FE,$00,$08,$F8
-	dc.b	$00,$06,$C3,$3A,$31,$FC,$00,$00,$BF,$DC,$31,$FC,$01,$60,$BF,$DE
-	dc.b	$4E,$75
+	tst.w	(arenaanim).w			;any arena animation?
+	bmi.w	.3						;none running
+	movem.l	d0-d7/a0-a6,-(sp)
+	tst.l	(arenaanim+6).w			;first time?
+	bne.w	.1						;already loaded: run it
+	move.w	(arenaanim).w,d0
+	asl.w	#3,d0					;8 bytes per animation
+	movea.l	#$1D8820,a0
+	move.l	(a0,d0.w),(arenaanim+2).w	;frame list
+	move.l	4(a0,d0.w),(arenaanim+6).w
+	movea.l	4(a0,d0.w),a2
+	addq.w	#8,a2
+	move.w	($FFFFD46C).w,d4
+	jsr	(DecompressGraphicsPlain).l
+	clr.w	($FFFFD470).w			;start of the list
+	bsr.w	NextArenaFrame			;first frame
+	bra.w	.2
+	;arenaspritelist <> 0
+.1
+	sub.w	d7,($FFFFD472).w		;count down the frame time
+	bpl.w	.2						;frame time not out yet
+	addq.w	#1,($FFFFD470).w
+	bsr.w	NextArenaFrame			;read the next frame
+	;pop the d0-d7/a0-a6 saved above
+.2
+	movem.l	(sp)+,d0-d7/a0-a6
+	;exit (also the end of the code above)
+.3
+	rts
+NextArenaFrame						;Step the arena animation to the next frame of its frame list (wrap at the
+									;end marker)
+	movea.l	(arenaanim+2).w,a0		;frame list
+	move.w	($FFFFD470).w,d0
+	add.w	d0,d0					;2 bytes per entry
+	move.b	(a0,d0.w),d1			;frame byte
+	ext.w	d1
+	move.w	d1,($FFFFD46E).w		;frame number
+	move.b	1(a0,d0.w),d1
+	ext.w	d1
+	move.w	d1,($FFFFD472).w		;frame time
+	cmpi.w	#$FFFF,($FFFFD46E).w
+	bne.w	.1
+	clr.w	($FFFFD470).w
+	bra.s	NextArenaFrame			;$FF: back to the first frame
+	;end of the frame list?
+.1
+	cmpi.w	#$FFFE,($FFFFD46E).w
+	bne.w	.2
+	bsr.w	EndArenaAnim			;$FE: end the animation
+	;exit (also the end of the code above)
+.2
+	rts
+	dc.w	$001D,$8A50,$0014,$17B6,$001D,$8988,$0014,$17B6
+	dc.w	$001D,$8A30,$0014,$17B6,$001D,$89E8,$0014,$17B6
+	dc.w	$001D,$89B6,$0014,$17B6,$001D,$8A30,$0014,$17B6
+	dc.w	$001D,$8892,$0014,$17B6,$001D,$8860,$0014,$17B6
+	dc.w	$010A,$020A,$030A,$040A,$050A,$060A,$070A,$080A
+	dc.w	$010A,$020A,$030A,$040A,$050A,$060A,$070A,$080A
+	dc.w	$010A,$020A,$030A,$040A,$050A,$060A,$070A,$080A
+	dc.w	$FE00,$010A,$020A,$030A,$040A,$050A,$060A,$070A
+	dc.w	$080A,$FF00,$010A,$020A,$030A,$040A,$050A,$060A
+	dc.w	$070A,$080A,$090A,$0A0A,$0B0A,$0C0A,$0D0A,$0E0A
+	dc.w	$0F0A,$100A,$110A,$120A,$130A,$140A,$150A,$160A
+	dc.w	$170A,$FE00,$0108,$0208,$033C,$043C,$033C,$043C
+	dc.w	$033C,$043C,$033C,$043C,$033C,$043C,$033C,$043C
+	dc.w	$033C,$043C,$033C,$043C,$033C,$043C,$033C,$043C
+	dc.w	$033C,$043C,$033C,$043C,$033C,$043C,$033C,$043C
+	dc.w	$033C,$043C,$033C,$043C,$033C,$043C,$033C,$043C
+	dc.w	$033C,$043C,$0208,$0108,$FF00,$0108,$0208,$0308
+	dc.w	$0408,$0508,$0608,$0708,$0808,$FF00,$0108,$0208
+	dc.w	$0308,$041E,$0508,$0608,$0708,$081E,$0508,$0608
+	dc.w	$0708,$081E,$0908,$0A08,$0B08,$0C08,$0D08,$0E08
+	dc.w	$FE00,$0F08,$1008,$1108,$121E,$1308,$1408,$1508
+	dc.w	$161E,$1308,$1408,$1508,$161E,$1708,$1808,$1908
+	dc.w	$1A08,$1B08,$1C08,$FE00,$0108,$0208,$0308,$0408
+	dc.w	$0508,$0608,$0708,$0808,$0908,$0A08,$0B08,$0C08
+	dc.w	$0D08,$0E08,$0F08,$1008,$1108,$1208,$1308,$1408
+	dc.w	$1508,$1608,$FE00,$0108,$0208,$0308,$0408,$0508
+	dc.w	$0608,$0708,$0808,$0908,$0A08,$0B08,$0C08,$0D08
+	dc.w	$0E08,$0F08,$1008,$1108,$1208,$1308,$1408,$1508
+	dc.w	$1608,$1708,$1808,$187F,$0108,$0208,$0308,$0408
+	dc.w	$0508,$0608,$0708,$0808,$0908,$0A08,$0B08,$0C08
+	dc.w	$0D08,$0E08,$0F08,$1008,$1108,$1208,$1308,$1408
+	dc.w	$1508,$1608,$1708,$1808,$1908,$1A08,$1B08,$1C08
+	dc.w	$1D08,$1E08,$1F08,$2008,$2108,$2208,$2308,$FE00
+	dc.w	$0108,$0208,$0308,$0408,$0508,$0608,$0708,$0808
+	dc.w	$0908,$0A08,$0B08,$0C08,$0D08,$0E08,$0F08,$FF00
+	dc.w	$010A,$020A,$030A,$040A,$050A,$060A,$070A,$080A
+	dc.w	$080A,$080A,$080A,$080A,$080A,$080A,$087F,$087F
+	dc.w	$FE00,$08F8,$0006,$C33A,$31FC,$0000,$BFDC,$31FC
+	dc.w	$0160,$BFDE,$4E75
 
 StartArenaAnim						;Start arena animation d0; disabled in 96 by the leading rts
 	rts

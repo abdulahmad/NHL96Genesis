@@ -90,6 +90,13 @@ SmallLogoTOR = $16FDEC				;graphics96
 SmallLogoVAN = $1700EC				;graphics96
 SmallLogoWSH = $17040C				;graphics96
 SmallLogoWPG = $17074C				;graphics96
+DumpSpriteTable = $02031C				;display96
+SPAturnl = $002020				;frames96
+SPAturnr = $002052				;frames96
+SeasonMenuCountGoalie = $01261C				;season96
+cramfade = $01AFD6				;setup96_menu_stub
+p_music_vblank = $024486				;setup96_menu_stub
+PrintMenuList = $0143FE				;pause96_list
 
 
 ; Main segment code

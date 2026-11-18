@@ -1828,114 +1828,470 @@ wallcoll							;d0 = cosine, d1 = sine of angle of incidence with wall, a3 = obj
 	movem.l	(sp)+,d2-d3
 	rts
 	;After wallcoll: code that nothing in the listing reaches.
+wallcollsfx	equ	*			;Play the board hit sound when the flag was set
 	bclr	#2,(sflags4).w
 	beq.w	rtss2
 	move.w	#5,-(sp)
 	jmp	(sfx).l
-; Code kept as bytes (decoded by decode_code.py).
-	dc.w	$0C6B,$0190,$0014,$6E00,$000C,$0C6B,$FE70,$0014
-	dc.w	$6E00,$0006,$426B,$002A,$0C6B,$0010,$0018,$6ECC
-	dc.w	$302B,$0052,$E340,$307C,$B87E,$327C,$B89E,$347C
-	dc.w	$B85E,SPAfweaveend,$0000,$B27C,$000F,$6700,$0020,$4244
-	dc.w	$1831,$1001,$3A32,$4000,$9A6B,$0014,$BA7C,$0018
-	dc.w	$6E00,$000A,$6100,$002E,$5241,$60DA,SPAfweaveend,$0000
-	dc.w	$6700,$0020,$4244,$1831,$10FF,$3A2B,$0014,$9A72
-	dc.w	$4000,$BA7C,$0018,$6E00,$000A,$6100,$0008,$5341
-	dc.w	$66E2,$4E75,$48E7,$FFF0,$E24C,$B878,$B7BE,$6700
-	dc.w	$0106,$B87C,$000B,$6E00,$00FE,$EF44,$347C,$B05E
-	dc.w	$D4C4,$0838,$0002,$C340,$6700,$0014,$EE44,$B878
-	dc.w	$D2D4,$6700,$000A,$B878,$D2D6,$6600,$00DA,$082A
-	dc.w	$0002,$0062,$6600,$00D0,$4A2A,$005E,$6600,$00C8
-	dc.w	$082A,$0002,$0063,$6600,$006C,$0C6B,$0005,$0018
-	dc.w	$6E00,$0062,$0C6B,$0200,$002C,$6E00,$0058,$2F0A
-	dc.w	$6100,$B36C,$D052,$9053,$B07C,$0010,$6E00,$0046
-	dc.w	$B07C,$FFF0,$6D00,$003E,$D26A,$0014,$926B,$0014
-	dc.w	$B27C,$0010,$6E00,$002E,$B27C,$FFF0,$6D00,$0026
-	dc.w	$C1C0,$C3C1,$D081,$223C,$0000,$0100,$4A2B,$005E
-	dc.w	$6F00,$0004,$E449,$B081,$6200,$000A,$6100,$02B4
-	dc.w	$6000,$0054,$4A6A,$0034,$6700,$00D0,$082A,$0003
-	dc.w	$0064,$6600,$0042,$3012,$9053,$B07C,$0008,$6E00
-	dc.w	$0036,$B07C,$FFF8,$6D00,$002E,$322A,$0014,$926B
-	dc.w	$0014,$B27C,$0008,$6E00,$001E,$B27C,$FFF8,$6D00
-	dc.w	$0016,$C1C0,$C3C1,$D081,$B0BC,$0000,$0040,$6200
-	dc.w	$0006,$6100,$0620,$4CDF,$0FFF,$4E75,$0000,$0003
-	dc.w	$0003,$0004,$0004,$0004,$0005,$0005,$0005,$0005
+wallcollcheck	equ	*	;Wall collision: clip a skater's y velocity and check the crease height
+	cmpi.w	#$190,$14(a3)			;compare 190 hex to Ypos (back board?)
+	bgt.w	.2						;branch if greater than
+	cmpi.w	#$FE70,$14(a3)			;compare -190 to Ypos (back board?)
+	bgt.w	.4						;branch if greater than
+	;behind the boards: stop the y movement
+.2
+	clr.w	$2A(a3)
+	;puck on the ice (z 16 or less): check it against the players
+.4
+	cmpi.w	#$10,$18(a3)			;compare 10 hex to Zpos (feet in air)
+	bgt.s	wallcollsfx
+	move.w	$52(a3),d0				;move SCnum into d0
+	asl.w	#1,d0					;current obj number
+	movea.w	#(OOlistpos-M68K_RAM),a0
+	movea.w	#(OOlist-M68K_RAM),a1
+	movea.w	#(Ylist-M68K_RAM),a2
+	move.w	(a0,d0.w),d1			;current obj position in OOlist
+	;loop
+.loop
+	cmp.w	#$F,d1					;15 = Total sprites -1
+	beq.w	.5						;it is top sprite on screen
+	clr.w	d4
+	move.b	1(a1,d1.w),d4			;next higher object number
+	move.w	(a2,d4.w),d5			;Y pos of next higher object
+	sub.w	$14(a3),d5				;sub Ypos from d5
+	cmp.w	#$18,d5
+	bgt.w	.5						;no higher sprite coll
+	bsr.w	wallcollskater
+	addq.w	#1,d1
+	bra.s	.loop
+	;d1 = $F or d5 > $16
+.5
+	move.w	(a0,d0.w),d1
+	beq.w	.6
+	;loop
+.loop2
+	clr.w	d4						;loop: examine the next lower object
+	move.b	-$1(a1,d1.w),d4			;next lower object number
+	move.w	$14(a3),d5				;move Ypos into d5
+	sub.w	(a2,d4.w),d5			;sub Y pos of next lower object
+	cmp.w	#$18,d5
+	bgt.w	.6
+	bsr.w	wallcollskater
+	subq.w	#1,d1
+	bne.s	.loop2
+	;exit (also the end of the code above)
+.6
+	rts
+wallcollskater	equ	*	;Wall collision of one skater against the others (low confidence)
+	;local subroutine
+	movem.l	d0-d7/a0-a3,-(sp)		;d4 = object number * 2
+	lsr.w	#1,d4
+	cmp.w	(puckc).w,d4			;compare puckc to d4
+	beq.w	.loop3					;puck carrier
+	cmp.w	#$B,d4					;compare 11 to d4
+	bgt.w	.loop3
+	asl.w	#scsize,d4
+	movea.w	#(SortCords-M68K_RAM),a2
+	adda.w	d4,a2					;a2 now has address of player struct
+	btst	#2,(BA_PS_flags).w
+	beq.w	.7						;branch if not set
+	asr.w	#7,d4					;change d4 back to SCnum of puckc
+	cmp.w	(BA_Sktr_SCnum).w,d4	;check d4 with SCnum of breakaway skater
+	beq.w	.7						;branch if the same
+	cmp.w	(BA_Goalie_SCnum).w,d4	;check d4 with SCnum of breakaway goalie
+	bne.w	.loop3					;exit if not equal
+	;check the collision
+.7
+	btst	#pfnc,$62(a2)			;check if no player collision
+	bne.w	.loop3
+	tst.b	$5E(a2)					;check if nopuck collision
+	bne.w	.loop3					;branch if nopuck
+	btst	#pf2unav,$63(a2)		;check if player unavailable
+	bne.w	.9
+	cmpi.w	#5,$18(a3)				;compare 5 to Zpos
+	bgt.w	.9
+	cmpi.w	#$200,$2C(a3)			;compare 200 hex to Zvel
+	bgt.w	.9
+	move.l	a2,-(sp)
+	bsr.w	GetHot					;Get Hot Spot d0/d1 = x/y
+	add.w	(a2),d0					;add Xpos a2
+	sub.w	(a3),d0					;sub Xpos a3
+	cmp.w	#$10,d0
+	bgt.w	.9
+	cmp.w	#$FFF0,d0
+	blt.w	.9						;branch if less than
+	add.w	$14(a2),d1
+	sub.w	$14(a3),d1
+	cmp.w	#$10,d1
+	bgt.w	.9
+	cmp.w	#$FFF0,d1
+	blt.w	.9						;branch if less than
+	muls.w	d0,d0
+	muls.w	d1,d1					;puck within stick reach (smaller while nopuck counts down): puckstick
+	add.l	d1,d0					;add d1 to d0
+	move.l	#$100,d1
+	tst.b	$5E(a3)					;check nopuck - puck not ready to be caught
+	ble.w	.8						;branch if less than or equal
+	lsr.w	#2,d1					;not in stick reach: try the body (goalies use their own reach)
+	;stick reach check
+.8
+	cmp.l	d1,d0					;compare d1 to d0
+	bhi.w	.9
+	bsr.w	wallcollpuck
+	bra.w	.loop3
+	;body check
+.9
+	tst.w	$34(a2)
+	beq.w	.10
+	btst	#pf3onetimer,$64(a2)	;check if doing one timer
+	bne.w	.loop3
+	move.w	(a2),d0					;Xpos into d0
+	sub.w	(a3),d0					;sub Xpos a3
+	cmp.w	#8,d0
+	bgt.w	.loop3
+	cmp.w	#$FFF8,d0
+	blt.w	.loop3					;exit if less than
+	move.w	$14(a2),d1
+	sub.w	$14(a3),d1
+	cmp.w	#8,d1
+	bgt.w	.loop3
+	cmp.w	#$FFF8,d1
+	blt.w	.loop3					;exit if less than
+	muls.w	d0,d0					;done with this player
+	muls.w	d1,d1
+	add.l	d1,d0					;add d1 to d0
+	cmp.l	#$40,d0					;compare cbody squared to d0
+	bhi.w	.loop3
+	bsr.w	puckbody
+	;(not branched to)
+	;exit: restore the registers
+.loop3
+	movem.l	(sp)+,d0-d7/a0-a3
+	rts
+	dc.w	$0000,$0003,$0003,$0004,$0004,$0004,$0005,$0005
 	dc.w	$0005,$0005,$0005,$0005,$0005,$0005,$0005,$0005
-	dc.w	$0005,$0005,$0005,$0000,$0001,$0001,$0001,$0001
-	dc.w	$0001,$0001,$0001,$0002,$0002,$0002,$0002,$0002
+	dc.w	$0005,$0005,$0005,$0005,$0005,$0000,$0001,$0001
+	dc.w	$0001,$0001,$0001,$0001,$0001,$0002,$0002,$0002
 	dc.w	$0002,$0002,$0002,$0002,$0002,$0002,$0002,$0002
-	dc.w	$0000,$0002,$0002,$0003,$0003,$0003,$0003,$0003
-	dc.w	$0004,$0004,$0004,$0004,$0004,$0004,$0004,$0004
-	dc.w	$0004,$0004,$0004,$0004,$0004,$2F08,$207C,$0001
-	dc.w	$F196,$0C78,$0001,$D268,$6700,$0086,$0C78,$0002
-	dc.w	$D268,$6600,$0046,$303C,$0001,$323C,$0002,$082A
-	dc.w	$0006,$0062,$6700,$000A,$303C,$0002,$323C,$0001
-	dc.w	$B078,$C390,$6700,$002E,$B078,$C392,$6700,$0026
-	dc.w	$B078,$C394,$6700,$001E,$B078,$C396,$6700,$0016
-	dc.w	$207C,$0001,$F1C0,$6000,$0038,$207C,$0001,$F1EA
-	dc.w	$6000,$002E,$207C,$0001,$F1C0,$B278,$C390,$6700
-	dc.w	$0020,$B278,$C392,$6700,$0018,$B278,$C394,$6700
-	dc.w	$0010,$B278,$C396,$6700,$0008,$207C,$0001,$F196
-	dc.w	$4240,$4241,$102A,$0074,$122A,$006F,$D041,$122A
-	dc.w	$0071,$D041,$122A,$0073,$D041,$E640,$0240,$000F
-	dc.w	$D040,$31F0,$0000,$BF9E,$205F,$0C52,$0015,$6E00
-	dc.w	$0042,$0C52,$FFEB,$6D00,$003A,$082A,$0007,$0062
-	dc.w	$6700,$0016,$3038,$B772,SPAgstackr,$FEE0,$322A,$0014
-	dc.w	$0441,$FEE0,$6000,$0012,$3038,$B772,SPAgstackr,$0120
-	dc.w	$322A,$0014,$0441,$0120,$B340,$6A00,$0006,$6000
-	dc.w	$00AE,$31F8,$BF9E,$BFA4,$5E78,$BFA4,$3012,$322A
-	dc.w	$0014,$6100,$007A,$6F00,$0060,$B07C,$0028,$6C00
-	dc.w	$008E,$B27C,$0028,$6C00,$0086,$2F0A,$4EB9,$0001
-	dc.w	$A4B2,$31F8,$BF9E,$BFA4,$5C78,$BFA4,$6100,$0050
-	dc.w	$6F00,$0036,$2F0A,$4EB9,$0001,$A528,$31F8,$BF9E
-	dc.w	$BFA4,$5678,$BFA4,$6100,$0036,$6F00,$001C,$2F0A
-	dc.w	$4EB9,$0001,$A59E,$31F8,$BF9E,$BFA4,$5678,$BFA4
-	dc.w	$6100,$001C,$6E00,$0038,$3012,$9053,$322A,$0014
-	dc.w	$926B,$0014,$4EB9,$0001,$F84C,$6000,$FDEA,$9053
-	dc.w	$6A00,$0004,$4440,$926B,$0014,$6A00,$0004,$4441
-	dc.w	$B078,$BFA4,$6E00,$0006,$B278,$BFA4,$4E75,$08B8
-	dc.w	$0002,$C342,$6700,$FDC0,$3038,$B7BE,$B06A,$0052
-	dc.w	$6700,$FDB4,$3F3C,$0005,$4EB9,$0008,$8470,$6000
-	dc.w	$FDA6,$4A6A,$0034,$6600,$000C,$0838,$0004,$C338
-	dc.w	$6600,$044E,$08AA,$0000,$0062,$3238,$B7BE,$6B00
-	dc.w	$00DE,$EF41,$307C,$B05E,$D0C1,$1228,$0062,$142A
-	dc.w	$0062,$B342,$0802,$0006,$6700,$0426,$0838,$0005
-	dc.w	$C346,$6700,$0010,$B0BC,$0000,$0040,$6200,$0412
-	dc.w	$6000,$000C,$B0BC,$0000,$0024,$6200,$0404,$4A6A
-	dc.w	$0034,$6700,$004E,$4A68,$0034,$6700,$03F4,$1028
-	dc.w	$0072,$E208,$6100,$069A,$3F00,$C14A,$1028,$0072
-	dc.w	$E208,$6100,$068C,$C14A,$4440,$D05F,SPAgskate,$0024
-	dc.w	$6100,$BC2A,$0838,$0005,$C346,$6700,$000E,$B07C
-	dc.w	$0004,$6200,SPA03BC,$6000,$000A,$B07C,$0002,$6200
-	dc.w	$03B0,$1028,$0072,$E208,$6100,$0656,SPAgskate,$0014
-	dc.w	$1140,$005E,$C14A,$1028,$0072,$E208,$6100,$0642
-	dc.w	SPAgskate,$0014,$1140,$005E,$C14A,$31E8,$0052,$BF0C
-	dc.w	$08B8,$0002,$C33A,$08B8,$0003,$C33A,$3F3C,$0006
-	dc.w	$4EB9,$0008,$8470,$6100,$A8C0,$6000,$05E8,$4A6A
-	dc.w	$0034,$6600,$000C,$B0BC,$0000,$0040,$6200,$0352
-	dc.w	$082A,$0003,$0064,$6700,$002C,$B0BC,$0000,$0064
-	dc.w	$6200,$008C,$0838,$0003,$C350,$6600,$0012,$0C6A
-	dc.w	$0018,$005A,$6C00,$000E,$357C,$0018,$005A,$08F8
-	dc.w	$0007,$C34C,$3038,$B786,$3238,$B788,$C1C0,$C3C1
-	dc.w	$D081,$4241,$0838,$0004,$C33C,$6600,$0014,$082A
-	dc.w	$0003,$0064,$6600,$003C,$122A,$0072,$C2FC,$015E
-	dc.w	$0681,$0000,$32C8,$48A7,$2000,$3438,$BF12,$B46A
-	dc.w	$0052,$4C9F,$0004,$6600,$0008,$0681,$0000,$32C8
-	dc.w	$C2C1,$B081,$6300,$003E,$157C,$0008,$005E,$6000
-	dc.w	$FF4C,$C54B,$4EB9,$001D,$6BE6,$C54B,$4E75,$B0BC
-	dc.w	$0000,$0144,$6200,$001C,$0838,$0003,$C350,$6600
-	dc.w	$0012,$0C6A,$0018,$005A,$6C00,$0008,$357C,$0018
-	dc.w	$005A,$4E75,$3F3C,$0007,$302A,$0052,$31C0,$B7BE
-	dc.w	$307C,$C726,$43E8,$039E,$082A,$0006,$0062,$6600
-	dc.w	$0004,$C149,$50E8,$001A,$50E8,$001C,$08E8,$0003
-	dc.w	$0030,$08B8,$0004,$C33E,$6700,$0026,$5269,$000E
-	dc.w	$0678,$00C8,$B8B2,$5A78,$C4C4,$3EBC,$000C,$B2FC
-	dc.w	$C726,$6600,$000C,$0678,$000A,$B8B8,$3EBC,$000B
-	dc.w	$4EB9,$0008,$8586,$302A,$0052,$B078,$BF12,$6600
-	dc.w	$0006,$5269,$0014,$50F8,$BF12,$08B8,$0002,$C33A
-	dc.w	$08B8,$0003,$C33A,$4A6A,$0034,$6600,$001C,$6100
-	dc.w	$DBCE,$357C,$008C,$0048,$0C6A,SPAgdive,$0058,$6600
-	dc.w	$0008,$357C,$0005,$0048
+	dc.w	$0002,$0002,$0000,$0002,$0002,$0003,$0003,$0003
+	dc.w	$0003,$0003,$0004,$0004,$0004,$0004,$0004,$0004
+	dc.w	$0004,$0004,$0004,$0004,$0004,$0004,$0004
+	;goalie: body reach from agility
+.10
+	move.l	a0,-(sp)
+	movea.l	#$1F196,a0
+	cmpi.w	#1,(OptSkill).w
+	beq.w	.14
+	cmpi.w	#2,(OptSkill).w
+	bne.w	.12
+	move.w	#1,d0
+	move.w	#2,d1
+	btst	#pfteam,pflags(a2)
+	beq.w	.11
+	move.w	#2,d0
+	move.w	#1,d1
+.11
+	cmp.w	(cont1team).w,d0
+	beq.w	.13
+	cmp.w	(cont2team).w,d0
+	beq.w	.13
+	cmp.w	(cont3team).w,d0
+	beq.w	.13
+	cmp.w	(cont4team).w,d0
+	beq.w	.13
+	movea.l	#$1F1C0,a0
+	bra.w	.14
+.12
+	movea.l	#$1F1EA,a0
+	bra.w	.14
+.13
+	movea.l	#$1F1C0,a0
+	cmp.w	(cont1team).w,d1
+	beq.w	.14
+	cmp.w	(cont2team).w,d1
+	beq.w	.14
+	cmp.w	(cont3team).w,d1
+	beq.w	.14
+	cmp.w	(cont4team).w,d1
+	beq.w	.14
+	movea.l	#$1F196,a0
+.14
+	clr.w	d0
+	clr.w	d1
+	move.b	$74(a2),d0
+	move.b	$6F(a2),d1
+	add.w	d1,d0
+	move.b	$71(a2),d1
+	add.w	d1,d0
+	move.b	$73(a2),d1
+	add.w	d1,d0
+	asr.w	#3,d0
+	andi.w	#$F,d0
+	add.w	d0,d0
+	move.w	(a0,d0.w),($FFFFBF9E).w
+	movea.l	(sp)+,a0
+	cmpi.w	#$15,(a2)
+	bgt.w	.17
+	cmpi.w	#$FFEB,(a2)
+	blt.w	.17
+	btst	#pfgoal,pflags(a2)
+	beq.w	.15
+	move.w	(pucky).w,d0
+	subi.w	#$FEE0,d0
+	move.w	$14(a2),d1
+	subi.w	#$FEE0,d1
+	bra.w	.16
+.15
+	move.w	(pucky).w,d0
+	subi.w	#$120,d0
+	move.w	$14(a2),d1
+	subi.w	#$120,d1
+.16
+	eor.w	d1,d0
+	bpl.w	.17
+	bra.w	.22
+.17
+	move.w	($FFFFBF9E).w,($FFFFBFA4).w
+	addq.w	#7,($FFFFBFA4).w
+	move.w	(a2),d0
+	move.w	$14(a2),d1
+	bsr.w	wallcolldist
+	ble.w	.18
+	cmp.w	#$28,d0
+	bge.w	.22
+	cmp.w	#$28,d1
+	bge.w	.22
+	move.l	a2,-(sp)
+	jsr	(GetHot2a).l
+	move.w	($FFFFBF9E).w,($FFFFBFA4).w
+	addq.w	#6,($FFFFBFA4).w
+	bsr.w	wallcolldist
+	ble.w	.18
+	move.l	a2,-(sp)
+	jsr	(GetHot2b).l
+	move.w	($FFFFBF9E).w,($FFFFBFA4).w
+	addq.w	#3,($FFFFBFA4).w
+	bsr.w	wallcolldist
+	ble.w	.18
+	move.l	a2,-(sp)
+	jsr	(GetHot2c).l
+	move.w	($FFFFBF9E).w,($FFFFBFA4).w
+	addq.w	#3,($FFFFBFA4).w
+	bsr.w	wallcolldist
+	bgt.w	.22
+.18
+	move.w	(a2),d0
+	sub.w	(a3),d0
+	move.w	$14(a2),d1
+	sub.w	$14(a3),d1
+	jsr	(puckgoalie).l
+	bra.w	.loop3
+wallcolldist	equ	*	;Distance check between two skaters (low confidence)
+	sub.w	(a3),d0
+	bpl.w	.19
+	neg.w	d0
+.19
+	sub.w	$14(a3),d1
+	bpl.w	.20
+	neg.w	d1
+.20
+	cmp.w	($FFFFBFA4).w,d0
+	bgt.w	.21
+	cmp.w	($FFFFBFA4).w,d1
+.21
+	rts
+	;missed the goalie
+.22
+	bclr	#2,(sflags4).w
+	beq.w	.loop3					;exit if it was cleared already
+	move.w	(puckc).w,d0			;move puckc into d0
+	cmp.w	$52(a2),d0				;compare SCnum to d0
+	beq.w	.loop3
+	move.w	#SFXshotwiff,-(sp)
+	jsr	(sfx).l
+	bra.w	.loop3
+wallcollpuck	equ	*	;Skater and puck contact check
+	tst.w	$34(a2)					;a2 = player who collided
+	bne.w	.23						;branch if not goalie
+	btst	#gmhl,(gmode).w
+	bne.w	rtss2					;exit if so (goalie always lets the shot in)
+	;clear offside
+.23
+	bclr	#pfdoff,$62(a2)
+	move.w	(puckc).w,d1			;move puckc into d1
+	bmi.w	.28						;branch if no puck carrier
+	asl.w	#7,d1
+	movea.w	#(SortCords-M68K_RAM),a0
+	adda.w	d1,a0					;a0 = Struct of puck carrier
+	move.b	$62(a0),d1
+	move.b	$62(a2),d2
+	eor.w	d1,d2					;compare pflags of each player
+	btst	#pfteam,d2				;check if on same team
+	beq.w	rtss2					;no stealing from teammate
+	btst	#5,(sflags6).w			;check if puckc is in slot
+	beq.w	.24
+	cmp.l	#$40,d0					;steal range met: goalies always steal, nobody steals from a goalie
+	bhi.w	rtss2
+	bra.w	.25
+	;bit 5 of sflags6 clear
+.24
+	cmp.l	#$24,d0
+	bhi.w	rtss2
+	;in range: goalie or skater
+.25
+	tst.w	$34(a2)					;check if colliding player is goalie
+	beq.w	.27
+	tst.w	$34(a0)
+	beq.w	rtss2					;no stealing from goalie
+	move.b	$72(a0),d0
+	lsr.b	#1,d0
+	bsr.w	makepde					;adjust for energy level
+	move.w	d0,-(sp)
+	exg	a0,a2						;swap a2 and a0 (a0 now collider)
+	move.b	$72(a0),d0
+	lsr.b	#1,d0					;divie by 2
+	bsr.w	makepde					;adjust for energy
+	exg	a0,a2						;swap back (a0 now puckc)
+	neg.w	d0
+	add.w	(sp)+,d0				;add puckc modified Stk
+	addi.w	#$24,d0					;add 24 hex (36 decimal)
+	bsr.w	randomd0
+	btst	#5,(sflags6).w			;check if puckc is in slot
+	beq.w	.26
+	cmp.w	#4,d0					;steal: the carrier cannot touch the puck for a while (stick handling,
+	bhi.w	rtss2					;exit if higher (not losing puck)
+	bra.w	.27
+	;bit 5 of sflags6 clear
+.26
+	cmp.w	#2,d0					;compare 2 to d0
+	bhi.w	rtss2					;exit if higher (not losing puck)
+.27
+	move.b	$72(a0),d0
+	lsr.b	#1,d0
+	bsr.w	makepde					;adj for energy
+	addi.w	#$14,d0					;add 14 hex (20 dec)
+	move.b	d0,$5E(a0)				;move result into nopuck (cant get puck timer)
+	exg	a0,a2						;swap a0 and a2 (a0 now collider)
+	move.b	$72(a0),d0
+	lsr.b	#1,d0
+	bsr.w	makepde					;adj for energy
+	addi.w	#$14,d0					;add 14 hex (20 dec)
+	move.b	d0,$5E(a0)				;move result into nopuck
+	exg	a0,a2
+	move.w	$52(a0),(lastplayer).w	;SCNum of puckc into lastplayer
+	bclr	#sfspdir,(sflags).w		;clear pass dir mode
+	bclr	#sfssdir,(sflags).w		;clear shot dir mode
+	;loop
+.loop4
+	move.w	#SFXstdef,-(sp)
+	jsr	(sfx).l
+	bsr.w	a2touchpuck				;deflect
+	bra.w	puckgoaliescatter		;no carrier (goalie in the smaller range): one-timer check
+	;d1 negative
+.28
+	tst.w	$34(a2)
+	bne.w	.29
+	cmp.l	#$40,d0
+	bhi.w	rtss2					;smaller range for stealing puck
+	;one timer?
+.29
+	btst	#pf3onetimer,$64(a2)
+	beq.w	.31
+	cmp.l	#$64,d0					;not a one-timer, or past its frame: catch or deflect by puck speed
+	bhi.w	.35
+	btst	#3,(GameFlags).w
+	bne.w	.30
+	cmpi.w	#$18,$5A(a2)
+	bge.w	.31
+	move.w	#$18,$5A(a2)
+.30
+	bset	#7,(sflags8).w
+	;no steal: catch check
+.31
+	move.w	(puckvx).w,d0			;d0 = puck speed^2, d1 = catch limit
+	move.w	(puckvy).w,d1
+	muls.w	d0,d0
+	muls.w	d1,d1
+	add.l	d1,d0
+	clr.w	d1
+	btst	#sf2shot,(sflags2).w	;check if shot was taken
+	bne.w	.32
+	btst	#pf3onetimer,$64(a2)	;check if one timer
+	bne.w	.34
+	move.b	$72(a2),d1
+	mulu.w	#$15E,d1
+.32
+	addi.l	#$32C8,d1
+	movem.w	d2,-(sp)
+	move.w	(passplayer).w,d2
+	cmp.w	$52(a2),d2
+	movem.w	(sp)+,d2
+	bne.w	.33
+	addi.l	#$32C8,d1
+.33
+	mulu.w	d1,d1
+	cmp.l	d1,d0
+	bls.w	wallcollhit
+	move.b	#8,$5E(a2)
+	bra.w	.loop4
+	;pf3onetimer set
+.34
+	exg	a2,a3
+	jsr	(onetimershot).l
+	exg	a2,a3
+	rts
+	;d0 > $64
+.35
+	cmp.l	#$144,d0
+	bhi.w	.36
+	btst	#3,(GameFlags).w
+	bne.w	.36
+	cmpi.w	#$18,$5A(a2)
+	bge.w	.36
+	move.w	#$18,$5A(a2)
+	;exit (also the end of the code above)
+.36
+	rts
+wallcollhit	equ	*	;A skater hits the puck: take the puck and flag the hit
+	move.w	#SFXpuckget,-(sp)
+	move.w	$52(a2),d0
+	move.w	d0,(puckc).w
+	movea.w	#(tmstruct-M68K_RAM),a0
+	lea	$39E(a0),a1
+	btst	#pfteam,$62(a2)
+	bne.w	.tm
+	exg	a0,a1
+.tm
+	st	$1A(a0)						;a0 = other team, a1 = a2's team
+	st	$1C(a0)
+	bset	#3,$30(a0)				;tmflast: other team did not touch it last
+	bclr	#4,(sflags3).w
+	beq.w	.snd					;no
+	addq.w	#1,$E(a1)				;tmfowon + 1
+	addi.w	#$C8,(Crowdlevel).w
+	addq.w	#5,(ChkCnt).w
+	move.w	#SFXcrowdboo,(sp)
+	cmpa.w	#(tmstruct-M68K_RAM),a1
+	bne.w	.snd					;away team
+	addi.w	#$A,(CwdExciteLvl).w
+	move.w	#SFXcrowdcheer,(sp)		;home team
+.snd
+	jsr	(song).l					;play the chosen sound effect
+	move.w	$52(a2),d0
+	cmp.w	(passplayer).w,d0
+	bne.w	.nrec
+	addq.w	#1,$14(a1)				;pass reached its receiver: tmpasscomp + 1
+.nrec
+	st	(passplayer).w				;no pass pending any more
+	bclr	#sfspdir,(sflags).w
+	bclr	#sfssdir,(sflags).w
+	tst.w	$34(a2)
+	bne.w	setd0player
+	bsr.w	ChkShotStat
+	move.w	#$8C,$48(a2)			;temp5 = 140, count down for faceoff (92 120)
+	cmpi.w	#SPAgdive,SPA(a2)
+	bne.w	setd0player
+	move.w	#5,$48(a2)				;temp5 = 5 for SPAgdive
 
 setd0player							;Player d0 becomes the player of a pad of his team (setc1player ...
 									;setc4player), unless a pad has him already
@@ -2085,50 +2441,149 @@ rtss2								;The shared rts many routines branch to
 
 puckgoalie							;Puck hits goalie a2 (a3 = puck, d0 / d1 = goalie - puck x / y): a save
 									;bounces it, a slow puck is held
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$38,$00,$04,$C3,$38,$66,$F6,$42,$42,$0C,$6B,$00,$08,$00,$18
-	dc.b	$6E,$00,$00,$04,$54,$42,$44,$40,$44,$41,$61,$00,$AB,$86,$90,$6A
-	dc.b	$00,$54,$02,$40,$00,$07,$32,$00,$02,$41,$00,$03,$66,$00,$00,$08
-	dc.b	$30,$39,$00,$C0,$00,$08,$02,$40,$00,$04,$E4,$48,$0A,$40,$00,$01
-	dc.b	$D4,$40,$D4,$42,$41,$FA,$01,$68,$30,$30,$20,$00,$72,$0F,$D2,$32
-	dc.b	$00,$00,$41,$FA,$01,$62,$08,$2A,$00,$03,$00,$04,$67,$00,$00,$06
-	dc.b	$0A,$42,$00,$02,$30,$2A,$00,$06,$08,$B8,$00,$02,$C3,$42,$61,$00
-	dc.b	$D9,$5C,$61,$00,$A4,$E2,$0C,$78,$30,$00,$B7,$88,$6E,$00,$00,$0C
-	dc.b	$0C,$78,$D0,$00,$B7,$88,$6E,$00,$00,$1A,$3F,$3C,$00,$0B,$08,$2A
-	dc.b	$00,$06,$00,$62,$67,$00,$00,$06,$3E,$BC,$00,$0D,$4E,$B9,$00,$08
-	dc.b	$85,$86,$3F,$3C,$00,$24,$4E,$B9,$00,$08,$84,$70,$34,$38,$B7,$BE
-	dc.b	$6B,$00,$00,$60,$50,$F8,$B7,$BE,$EF,$42,$30,$7C,$B0,$5E,$D0,$C2
-	dc.b	$11,$7C,$00,$14,$00,$5E,$31,$E8,$00,$52,$BF,$0C,$08,$B8,$00,$02
-	dc.b	$C3,$3A,$08,$B8,$00,$03,$C3,$3A,$42,$6B,$00,$2C,$15,$7C,$00,$0A
-	dc.b	$00,$5E,$35,$7C,$00,$04,$00,$46,$30,$13,$90,$52,$32,$2B,$00,$14
-	dc.b	$92,$6A,$00,$14,$66,$00,$00,$08,$2F,$0A,$61,$00,$AB,$10,$17,$40
-	dc.b	$00,$28,$17,$41,$00,$2A,$60,$00,$A5,$EA,$08,$F8,$00,$02,$C3,$42
-	dc.b	$4E,$75,$0C,$6A,$04,$9A,$00,$58,$67,$BE,$70,$02,$D0,$2A,$00,$6D
-	dc.b	$E1,$40,$E3,$40,$61,$00,$B7,$34,$06,$40,$0C,$00,$D0,$40,$6A,$00
-	dc.b	$00,$06,$30,$3C,$7F,$FF,$08,$2A,$00,$01,$00,$63,$66,$00,$00,$3C
-	dc.b	$0C,$53,$00,$2C,$6E,$00,$00,$34,$0C,$53,$FF,$D4,$6D,$00,$00,$2C
-	dc.b	$0C,$6B,$01,$24,$00,$14,$6E,$00,$00,$22,$0C,$6B,$FE,$DC,$00,$14
-	dc.b	$6D,$00,$00,$18,$0C,$6B,$00,$E8,$00,$14,$6E,$00,$00,$0C,$0C,$6B
-	dc.b	$FF,$18,$00,$14,$6E,$00,$00,$04,$E4,$40,$B0,$78,$B7,$86,$6D,$00
-	dc.b	$FF,$58,$B0,$78,$B7,$88,$6D,$00,$FF,$50,$44,$40,$B0,$78,$B7,$86
-	dc.b	$6E,$00,$FF,$46,$B0,$78,$B7,$88,$6E,$00,$FF,$3E,$08,$2A,$00,$02
-	dc.b	$00,$63,$66,$00,$FF,$34,$42,$6B,$00,$2C,$60,$00,$FB,$C6,$00,$74
-	dc.b	$00,$6F,$00,$71,$00,$73,$55,$9D,$67,$55,$9D,$67,$55,$9D,$67,$55
-	dc.b	$9D,$67,$55,$9D,$67,$55,$9D,$67,$55,$9D,$67,$55,$9D,$67,$55,$55
-	dc.b	$55,$55,$55,$55,$55,$55,$55,$55,$55,$55,$55,$55,$55,$55,$55,$F0
-	dc.b	$55,$F0,$55,$F0,$55,$F0,$55,$F0,$55,$F0,$55,$F0,$55,$F0,$55,$F0
-	dc.b	$55,$F0,$55,$F0,$55,$F0,$D5,$75,$D5,$75,$D5,$75,$D5,$75,$D5,$75
-	dc.b	$D5,$75,$D5,$75,$D5,$75,$55,$55,$55,$55,$55,$55,$55,$55,$55,$55
-	dc.b	$55,$55,$55,$55,$55,$55,$55,$55,$55,$55,$55,$55,$55,$55,$55,$55
-	dc.b	$55,$55,$55,$55,$55,$55,$F0,$F0,$F0,$F0,$F0,$F0,$F0,$F0,$F0,$F0
-	dc.b	$F0,$F0,$F0,$F0,$F0,$F0,$57,$57,$57,$57,$A5,$A5,$A5,$A5,$A5,$A5
-	dc.b	$A5,$A5,$A5,$A5,$A5,$A5,$A5,$A5,$A5,$A5,$A5,$A5,$A5,$A5,$A5,$A5
-	dc.b	$A5,$A5,$9D,$67,$9D,$67,$9D,$67,$9D,$67,$9D,$67,$9D,$67,$9D,$67
-	dc.b	$9D,$67,$D5,$D5,$75,$75,$D5,$D5,$75,$75,$D5,$D5,$75,$75,$D5,$D5
-	dc.b	$75,$75,$D5,$D5,$75,$75,$D5,$D5,$75,$75,$D5,$D5,$75,$75,$D5,$D5
-	dc.b	$75,$75,$50,$F8,$B7,$BE,$30,$3C,$10,$00,$61,$00,$B5,$C2,$37,$40
-	dc.b	$00,$2A,$30,$3C,$10,$00,$61,$00,$B5,$B6,$37,$40,$00,$28,$30,$3C
-	dc.b	$10,$00,$61,$00,$B5,$B6,$37,$40,$00,$2C,$60,$00,$A4,$46
+	btst	#gmhl,(gmode).w			;check if highlight
+	bne.s	rtss2					;exit if highlight
+	clr.w	d2						;puck region
+	cmpi.w	#8,$18(a3)				;compare to Zpos
+	bgt.w	.1
+	addq.w	#2,d2					;add 2 to d2
+.1
+	neg.w	d0						;negate d0
+	neg.w	d1						;negate d1
+	bsr.w	vtoa					;convert directions
+	sub.w	$54(a2),d0				;sub facedir into d0
+	andi.w	#7,d0					;pass first 3 bits to d0
+	;0 = puck straight in front of G
+	;1-3 = puck to G right
+	;4 = puck straight behind G
+	;5-7 = puck to G left
+	move.w	d0,d1					;move d0 into d1
+	andi.w	#3,d1					;pass first 2 bits of d1
+	bne.w	.2						;will branch if puck is to the left or right of G
+	move.w	(HVcount).l,d0			;just for random bit
+.2
+	andi.w	#4,d0					;pass 3rd bit of d0. d0 will be either 4 (left) or 0 (right)
+	lsr.w	#2,d0					;divide by 4. d0 will be either 1 (left) or 0 (right)
+	eori.w	#1,d0					;XOR d0 - will make 1 a 0 (left), and 0 a 1 (right)
+	add.w	d0,d2					;add to d2. d2 will now be 0 or 1 (Zpos > 8) or 2 or 3 (Zpos <= 8)
+	add.w	d2,d2					;add d2 to itself. 0 Glove L, 2 Glove R, 4 Stick L, 6 Stick R
+	lea	.table(pc),a0				;contains offsets for save attributes
+	move.w	(a0,d2.w),d0			;move from list into d0
+	moveq	#$F,d1					;move F into d1
+	add.b	(a2,d0.w),d1			;save odds = save attribute + F (15 dec)
+	lea	.table2(pc),a0
+	btst	#3,4(a2)				;attribute a2 - x flip?
+	beq.w	.3
+	eori.w	#2,d2					;XOR d2 with 2
+.3
+	move.w	6(a2),d0				;move frame into d0 (95: not used)
+	bclr	#2,(sflags4).w			;clear bit 2 - this is not used anywhere, might have been a debug flag
+	bsr.w	ChkShotStat
+	bsr.w	a2touchpuck
+	cmpi.w	#$3000,(puckvy).w		;compare with puck velocity y
+	bgt.w	.4						;branch if greater
+	cmpi.w	#$D000,(puckvy).w		;compare -3000 with puckvy
+	bgt.w	.6						;branch if greater
+.4
+	move.w	#$B,-(sp)				;home song
+	btst	#pfteam,$62(a2)			;check home or away
+	beq.w	.5						;branch if home
+	move.w	#$D,(sp)				;away song
+.5
+	jsr	(song).l
+.6
+	move.w	#SFXpuckbody,-(sp)		;#SFXpuckbody
+	jsr	(sfx).l
+	move.w	(puckc).w,d2			;move puckc into d2
+	bmi.w	.8						;branch if no puckc
+	st	(puckc).w
+	asl.w	#7,d2
+	movea.w	#(SortCords-M68K_RAM),a0
+	adda.w	d2,a0
+	move.b	#$14,$5E(a0)
+	move.w	$52(a0),(lastplayer).w
+	bclr	#sfspdir,(sflags).w
+	bclr	#sfssdir,(sflags).w
+.loop
+	clr.w	$2C(a3)					;clear puck Zvel
+	move.b	#$A,$5E(a2)				;move A into nopuck collision
+	move.w	#4,$46(a2)				;move 4 into temp4
+	move.w	(a3),d0					;move puck Xpos into d0
+	sub.w	(a2),d0					;sub Xpos of goalie from d0
+	move.w	$14(a3),d1				;move puck Ypos into d1
+	sub.w	$14(a2),d1				;sub Ypos of goalie from d1
+	bne.w	.7						;branch if not equal
+	move.l	a2,-(sp)				;pop onto stack
+	bsr.w	GetHot
+.7
+	move.b	d0,$28(a3)				;move d0 into puck Xvel
+	move.b	d1,$2A(a3)				;move d1 into puck Yvel
+	bra.w	puckflip				;flip puck
+	bset	#2,(sflags4).w			;not reached (after jmp puckflip)
+	rts
+.8
+	cmpi.w	#SPAgdive,SPA(a2)		;goalie dive animation
+	beq.s	.loop					;branch if equal
+	moveq	#2,d0					;move 2 into d0
+	add.b	$6D(a2),d0
+	asl.w	#8,d0					;mult by 256
+	asl.w	#1,d0					;mult by 2
+	bsr.w	randomd0				;random
+	addi.w	#$C00,d0
+	add.w	d0,d0					;double d0
+	bpl.w	.9						;branch if positive
+	move.w	#$7FFF,d0				;make max positive
+.9
+	btst	#pf2aip,$63(a2)			;check if in animation
+	bne.w	.11						;branch if so
+	cmpi.w	#$2C,(a3)				;compare 2C to Xpos of puck
+	bgt.w	.11						;branch if greater than
+	cmpi.w	#$FFD4,(a3)
+	blt.w	.11						;branch if less than -2C
+	cmpi.w	#$124,$14(a3)
+	bgt.w	.11						;branch if greater than
+	cmpi.w	#$FEDC,$14(a3)
+	blt.w	.11						;branch if less than
+	cmpi.w	#$E8,$14(a3)
+	bgt.w	.10						;branch if greater than
+	cmpi.w	#$FF18,$14(a3)
+	bgt.w	.11						;branch if greater than
+.10
+	asr.w	#2,d0					;divide by 4
+.11
+	cmp.w	(puckvx).w,d0			;compare puckvx with d0
+	blt.w	.loop					;branch if less than
+	cmp.w	(puckvy).w,d0			;compare puckvy to d0
+	blt.w	.loop					;branch if less than
+	neg.w	d0						;negate d0, compare if shot going down
+	cmp.w	(puckvx).w,d0
+	bgt.w	.loop					;branch if greater than
+	cmp.w	(puckvy).w,d0
+	bgt.w	.loop					;branch if greater than
+	btst	#pf2unav,$63(a2)		;check if player unavailable
+	bne.w	.loop					;branch if so
+	clr.w	$2C(a3)					;clear puck Zvel
+	bra.w	wallcollhit
+.table
+	dc.w	$0074,$006F,$0071,$0073
+.table2
+	dc.w	$559D,$6755,$9D67,$559D,$6755,$9D67,$559D,$6755
+	dc.w	$9D67,$559D,$6755,$9D67,$5555,$5555,$5555,$5555
+	dc.w	$5555,$5555,$5555,$5555,$55F0,$55F0,$55F0,$55F0
+	dc.w	$55F0,$55F0,$55F0,$55F0,$55F0,$55F0,$55F0,$55F0
+	dc.w	$D575,$D575,$D575,$D575,$D575,$D575,$D575,$D575
+	dc.w	$5555,$5555,$5555,$5555,$5555,$5555,$5555,$5555
+	dc.w	$5555,$5555,$5555,$5555,$5555,$5555,$5555,$5555
+	dc.w	$F0F0,$F0F0,$F0F0,$F0F0,$F0F0,$F0F0,$F0F0,$F0F0
+	dc.w	$5757,$5757,$A5A5,$A5A5,$A5A5,$A5A5,$A5A5,$A5A5
+	dc.w	$A5A5,$A5A5,$A5A5,$A5A5,$A5A5,$A5A5,$9D67,$9D67
+	dc.w	$9D67,$9D67,$9D67,$9D67,$9D67,$9D67,$D5D5,$7575
+	dc.w	$D5D5,$7575,$D5D5,$7575,$D5D5,$7575,$D5D5,$7575
+	dc.w	$D5D5,$7575,$D5D5,$7575,$D5D5,$7575
+puckgoaliescatter	equ	*	;Scatter the puck in random directions after a goalie hit
+	dc.w	$50F8,$B7BE,$303C,$1000,$6100,$B5C2,$3740,$002A
+	dc.w	$303C,$1000,$6100,$B5B6,$3740,$0028,$303C,$1000
+	dc.w	$6100,$B5B6,$3740,$002C,$6000,$A446
 
 makepde								;Pass d0 as value to be scaled by player a0's energy level (full energy
 									;while sflags7 bit 4 is set). Return d0

@@ -55,6 +55,12 @@ ZeroLong = $000772					;main96
 Penaltylist = $00E818				;logic96
 PenShotPenalties = $00EBC2			;logic96
 DoubleMinorPenalties = $00EBF8		;logic96
+ConvertByteToDigits = $0230C4				;trade96_stub
+DigitFontMap = $1B9ED8				;graphics96
+ExitStatsScreenReload = $0154D8				;pause96_menu
+GetRosterName = $0101E6				;players96_stub
+SprSort = $0213AE				;display96
+xyVmMap = $01B94A				;video96
 
 
 ; Main segment code

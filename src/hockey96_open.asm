@@ -330,11 +330,28 @@ EASportsScreen						;Called from Begin. Show the EA Sports screen until a button
 	rts
 
 UpdatePlayoffLevel					;Set pojoy from the number of players for the playoff modes.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$0C,$78,$00,$02,$D2,$54,$6D,$00,$DD,$46,$0C,$78,$00,$04,$D2,$54
-	dc.b	$67,$00,$DD,$3C,$70,$07,$4A,$78,$D2,$50,$67,$00,$00,$06,$30,$3C
-	dc.b	$00,$0B,$90,$78,$D2,$56,$31,$C0,$CF,$CE,$4E,$75,$61,$00,$00,$0E
-	dc.b	$70,$0C,$72,$02,$34,$3C,$07,$FF,$60,$00,$9E,$40,$61,$00,$A0,$54
-	dc.b	$00,$06,$BF,$02,$0A,$00,$B4,$FC,$C7,$26,$66,$00,$DD,$02,$31,$FC
-	dc.b	$00,$1A,$B0,$40,$4E,$75
+	cmpi.w	#2,(OptPlayMode).w
+	blt.w	rtss2
+	cmpi.w	#4,(OptPlayMode).w
+	beq.w	rtss2
+	moveq	#7,d0
+	tst.w	(FourWayPlay).w
+	beq.w	.1
+	move.w	#$B,d0					;4 way play
+.1
+	sub.w	(OptNOP).w,d0
+	move.w	d0,(pojoy).w
+	rts
+	bsr.w	PrintPlayoffLevelRow
+	moveq	#$C,d0
+	moveq	#2,d1
+	move.w	#$7FF,d2
+	bra.w	eraser
+PrintPlayoffLevelRow				;Print the playoff level string; for the second team set printx $1A
+	bsr.w	printz
+	String	-(TXPRI+TXMAP1),2,$A
+	cmpa.w	#(tmstruct-M68K_RAM),a2	;home team struct?
+	bne.w	rtss2
+	move.w	#$1A,(printx).w
+	rts
 

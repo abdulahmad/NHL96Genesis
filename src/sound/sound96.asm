@@ -70,26 +70,90 @@ SndLoadZ80							;Command 0: copy the Z80 program a0 (d1 bytes; it must start wi
 									;$00xx) to Z80 RAM, reset the Z80, wait
 									;for it to set Z80_RAM+$4F, clear the song slots and notes, and turn the
 									;driver on. Carry set and d0 = 6 for a bad program.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$40,$E0,$40,$E7,$46,$FC,$27,$00,$33,$FC,$01,$00,$00,$A1
-	dc.b	$11,$00,$33,$FC,$01,$00,$00,$A1,$12,$00,$0C,$10,$00,$C3,$66,$12
-	dc.b	$43,$F9,$00,$A0,$00,$00,$04,$41,$00,$01,$12,$D8,$51,$C9,$FF,$FC
-	dc.b	$60,$08,$30,$3C,$00,$06,$60,$00,$00,$E2,$33,$FC,$00,$00,$00,$A1
-	dc.b	$12,$00,$33,$FC,$00,$00,$00,$A1,$11,$00,$30,$3C,$01,$F4,$51,$C8
-	dc.b	$FF,$FE,$33,$FC,$01,$00,$00,$A1,$12,$00,$61,$00,$0F,$5C,$0C,$39
-	dc.b	$00,$FF,$00,$A0,$00,$4F,$67,$0E,$61,$00,$0F,$62,$30,$3C,$13,$88
-	dc.b	$51,$C8,$FF,$FE,$60,$E4,$61,$00,$0F,$54,$41,$F9,$FF,$FF,$FF,$DC
-	dc.b	$30,$3C,$00,$03,$20,$FC,$FF,$FF,$FF,$FF,$51,$C8,$FF,$F8,$41,$F9
-	dc.b	$FF,$FF,$FD,$FE,$30,$3C,$00,$07,$20,$FC,$FF,$FF,$FF,$FF,$51,$C8
-	dc.b	$FF,$F8,$41,$F9,$FF,$FF,$FE,$1E,$30,$3C,$00,$07,$20,$FC,$00,$00
-	dc.b	$00,$00,$51,$C8,$FF,$F8,$41,$F9,$FF,$FF,$FE,$3E,$30,$3C,$00,$07
-	dc.b	$30,$FC,$FF,$FF,$51,$C8,$FF,$FA,$41,$F9,$FF,$FF,$FE,$7E,$30,$3C
-	dc.b	$00,$07,$20,$FC,$00,$00,$00,$00,$51,$C8,$FF,$F8,$61,$00,$09,$18
-	dc.b	$41,$F9,$FF,$FF,$FF,$4E,$30,$3C,$00,$1F,$42,$98,$51,$C8,$FF,$FC
-	dc.b	$41,$F9,$FF,$FF,$FF,$CE,$42,$50,$41,$F9,$FF,$FF,$FF,$D0,$42,$50
-	dc.b	$41,$F9,$FF,$FF,$FD,$FC,$30,$BC,$12,$34,$41,$F9,$FF,$FF,$FF,$4C
-	dc.b	$42,$50,$02,$3C,$00,$FE,$42,$40,$60,$04,$00,$3C,$00,$01,$46,$DF
-	dc.b	$4C,$DF,$07,$02,$4E,$75
+	movem.l	d1/a0-a2,-(sp)
+	move.w	sr,-(sp)
+	move.w	#$2700,sr
+	move.w	#$100,(IO_Z80BUS).l
+	move.w	#$100,(IO_Z80RES).l
+	cmpi.b	#$C3,(a0)
+	bne.s	.1
+	lea	(Z80_RAM).l,a1
+	opt	osq-
+	subi.w	#1,d1
+.loop
+	opt	osq+
+	move.b	(a0)+,(a1)+
+	dbf	d1,.loop
+	bra.s	.2
+.1
+	move.w	#6,d0
+	bra.w	.4
+.2
+	move.w	#0,(IO_Z80RES).l
+	move.w	#0,(IO_Z80BUS).l
+	move.w	#$1F4,d0
+.loop2
+	dbf	d0,.loop2
+	move.w	#$100,(IO_Z80RES).l
+.loop3
+	bsr.w	Z80BusRequest
+	cmpi.b	#$FF,(Z80_RAM+$4F).l
+	beq.s	.3
+	bsr.w	Z80BusRelease
+	move.w	#$1388,d0
+.loop4
+	dbf	d0,.loop4
+	bra.s	.loop3
+.3
+	bsr.w	Z80BusRelease
+	lea	($FFFFFFDC).l,a0
+	move.w	#3,d0
+.loop5
+	move.l	#$FFFFFFFF,(a0)+
+	dbf	d0,.loop5
+	lea	(SndSeqPtr).l,a0
+	move.w	#7,d0
+.loop6
+	move.l	#$FFFFFFFF,(a0)+
+	dbf	d0,.loop6
+	lea	($FFFFFE1E).l,a0
+	move.w	#7,d0
+.loop7
+	move.l	#$0,(a0)+
+	dbf	d0,.loop7
+	lea	(SndSeqId).l,a0
+	move.w	#7,d0
+.loop8
+	move.w	#$FFFF,(a0)+
+	dbf	d0,.loop8
+	lea	($FFFFFE7E).l,a0
+	move.w	#7,d0
+.loop9
+	move.l	#$0,(a0)+
+	dbf	d0,.loop9
+	bsr.w	SndClearNotes
+	lea	($FFFFFF4E).l,a0
+	move.w	#$1F,d0
+.loop10
+	clr.l	(a0)+
+	dbf	d0,.loop10
+	lea	($FFFFFFCE).l,a0
+	clr.w	(a0)
+	lea	($FFFFFFD0).l,a0
+	clr.w	(a0)
+	lea	(SndDrvRAM).l,a0
+	move.w	#$1234,(a0)
+	lea	($FFFFFF4C).l,a0
+	clr.w	(a0)
+	andi.b	#$FE,ccr
+	clr.w	d0
+	bra.s	.5
+.4
+	ori.b	#1,ccr
+.5
+	move.w	(sp)+,sr
+	movem.l	(sp)+,d1/a0-a2
+	rts
 
 SndUpdate							;Command 1, once a frame: note timers (SndUpdateNotes), sample streaming
 									;(SndStreamZ80), then step the 8 song
@@ -529,79 +593,276 @@ SndStopSeq							;Command 5: stop the slot playing song id d1 and release its no
 SndPutZ80Cmd						;Queue the 4 byte Z80 command d0 (Z80_RAM+$D + 4 * count, count at +$C,
 									;waits while +$B is busy). d0 = -1 when
 									;it is full.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$40,$80,$41,$F9,$FF,$FF,$FD,$FC,$3F,$28,$00,$00,$31,$7C
-	dc.b	$00,$00,$00,$00,$61,$00,$09,$A6,$41,$F9,$00,$A0,$00,$0B,$4A,$10
-	dc.b	$67,$14,$33,$FC,$00,$00,$00,$A1,$11,$00,$32,$3C,$00,$64,$04,$41
-	dc.b	$00,$01,$66,$FA,$60,$DE,$D1,$FC,$00,$00,$00,$01,$0C,$10,$00,$10
-	dc.b	$6D,$06,$30,$3C,$FF,$FF,$60,$26,$42,$41,$12,$10,$E5,$49,$11,$80
-	dc.b	$10,$01,$E0,$48,$11,$80,$10,$02,$48,$40,$11,$80,$10,$03,$E0,$48
-	dc.b	$11,$80,$10,$04,$12,$10,$06,$01,$00,$01,$10,$81,$42,$40,$61,$00
-	dc.b	$09,$60,$41,$F9,$FF,$FF,$FD,$FC,$31,$5F,$00,$00,$4C,$DF,$01,$02
-	dc.b	$4E,$75
+	movem.l	d1/a0,-(sp)
+	lea	(SndDrvRAM).l,a0
+	opt	oz-
+	move.w	0(a0),-(sp)
+	move.w	#0,0(a0)
+.loop
+	opt	oz+
+	bsr.w	Z80BusRequest
+	lea	(Z80_RAM+$B).l,a0
+	tst.b	(a0)
+	beq.s	.1
+	move.w	#0,(IO_Z80BUS).l
+	move.w	#$64,d1
+.loop2
+	opt	osq-
+	subi.w	#1,d1
+	opt	osq+
+	bne.s	.loop2
+	bra.s	.loop
+.1
+	adda.l	#$1,a0
+	cmpi.b	#$10,(a0)
+	blt.s	.2
+	move.w	#$FFFF,d0
+	bra.s	.3
+.2
+	clr.w	d1
+	move.b	(a0),d1
+	lsl.w	#2,d1
+	move.b	d0,1(a0,d1.w)
+	lsr.w	#8,d0
+	move.b	d0,2(a0,d1.w)
+	swap	d0
+	move.b	d0,3(a0,d1.w)
+	lsr.w	#8,d0
+	move.b	d0,4(a0,d1.w)
+	move.b	(a0),d1
+	opt	oaq-
+	addi.b	#1,d1
+	opt	oaq+
+	move.b	d1,(a0)
+	clr.w	d0
+.3
+	bsr.w	Z80BusRelease
+	lea	(SndDrvRAM).l,a0
+	opt	oz-
+	move.w	(sp)+,0(a0)
+	opt	oz+
+	movem.l	(sp)+,d1/a0
+	rts
 
 SndUploadBlock						;Copy d1 bytes from a0 to free Z80 RAM as block d0 (the 42 six byte
 									;entries at Z80_RAM+$100). Carry set: no
 									;room (d0 = 4), already there (d0 = 3) or no free entry (d0 = 7).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$60,$C0,$43,$F9,$FF,$FF,$FD,$FC,$3F,$11,$32,$BC,$00,$00
-	dc.b	$61,$00,$09,$28,$14,$39,$00,$A0,$00,$05,$E1,$4A,$14,$39,$00,$A0
-	dc.b	$00,$06,$D4,$41,$0C,$42,$1F,$00,$65,$18,$61,$00,$09,$22,$43,$F9
-	dc.b	$FF,$FF,$FD,$FC,$32,$9F,$30,$3C,$00,$04,$00,$3C,$00,$01,$60,$00
-	dc.b	$00,$D6,$43,$F9,$00,$A0,$01,$00,$34,$3C,$00,$29,$0C,$11,$00,$00
-	dc.b	$66,$1E,$B0,$29,$00,$01,$66,$18,$61,$00,$08,$F4,$43,$F9,$FF,$FF
-	dc.b	$FD,$FC,$32,$9F,$30,$3C,$00,$03,$00,$3C,$00,$01,$60,$00,$00,$A8
-	dc.b	$D3,$FC,$00,$00,$00,$06,$51,$CA,$FF,$D4,$43,$F9,$00,$A0,$01,$00
-	dc.b	$34,$3C,$00,$29,$0C,$11,$00,$FF,$67,$22,$D3,$FC,$00,$00,$00,$06
-	dc.b	$51,$CA,$FF,$F2,$61,$00,$08,$B8,$43,$F9,$FF,$FF,$FD,$FC,$32,$9F
-	dc.b	$30,$3C,$00,$07,$00,$3C,$00,$01,$60,$00,$00,$6C,$12,$BC,$00,$00
-	dc.b	$13,$40,$00,$01,$34,$01,$13,$42,$00,$03,$E0,$4A,$13,$42,$00,$02
-	dc.b	$14,$39,$00,$A0,$00,$05,$13,$42,$00,$04,$14,$39,$00,$A0,$00,$06
-	dc.b	$13,$42,$00,$05,$43,$F9,$00,$A0,$00,$00,$42,$82,$14,$39,$00,$A0
-	dc.b	$00,$05,$E1,$4A,$14,$39,$00,$A0,$00,$06,$04,$41,$00,$01,$13,$98
-	dc.b	$20,$00,$06,$42,$00,$01,$51,$C9,$FF,$F6,$13,$C2,$00,$A0,$00,$06
-	dc.b	$E0,$4A,$13,$C2,$00,$A0,$00,$05,$61,$00,$08,$44,$43,$F9,$FF,$FF
-	dc.b	$FD,$FC,$32,$9F,$42,$40,$4C,$DF,$03,$06,$4E,$75
+	movem.l	d1-d2/a0-a1,-(sp)
+	lea	(SndDrvRAM).l,a1
+	move.w	(a1),-(sp)
+	move.w	#0,(a1)
+	bsr.w	Z80BusRequest
+	move.b	(Z80_RAM+$5).l,d2
+	lsl.w	#8,d2
+	move.b	(Z80_RAM+$6).l,d2
+	add.w	d1,d2
+	cmpi	#$1F00,d2
+	bcs.s	.1
+	bsr.w	Z80BusRelease
+	lea	(SndDrvRAM).l,a1
+	move.w	(sp)+,(a1)
+	move.w	#4,d0
+	ori.b	#1,ccr
+	bra.w	.4
+.1
+	lea	(Z80_RAM+$100).l,a1
+	move.w	#$29,d2
+.loop
+	cmpi.b	#0,(a1)
+	bne.s	.2
+	cmp.b	1(a1),d0
+	bne.s	.2
+	bsr.w	Z80BusRelease
+	lea	(SndDrvRAM).l,a1
+	move.w	(sp)+,(a1)
+	move.w	#3,d0
+	ori.b	#1,ccr
+	bra.w	.4
+.2
+	adda.l	#$6,a1
+	dbf	d2,.loop
+	lea	(Z80_RAM+$100).l,a1
+	move.w	#$29,d2
+.loop2
+	cmpi.b	#$FF,(a1)
+	beq.s	.3
+	adda.l	#$6,a1
+	dbf	d2,.loop2
+	bsr.w	Z80BusRelease
+	lea	(SndDrvRAM).l,a1
+	move.w	(sp)+,(a1)
+	move.w	#7,d0
+	ori.b	#1,ccr
+	bra.w	.4
+.3
+	move.b	#0,(a1)
+	move.b	d0,1(a1)
+	move.w	d1,d2
+	move.b	d2,3(a1)
+	lsr.w	#8,d2
+	move.b	d2,2(a1)
+	move.b	(Z80_RAM+$5).l,d2
+	move.b	d2,4(a1)
+	move.b	(Z80_RAM+$6).l,d2
+	move.b	d2,5(a1)
+	lea	(Z80_RAM).l,a1
+	clr.l	d2
+	move.b	(Z80_RAM+$5).l,d2
+	lsl.w	#8,d2
+	move.b	(Z80_RAM+$6).l,d2
+	opt	osq-
+	subi.w	#1,d1
+.loop3
+	opt	osq+
+	move.b	(a0)+,(a1,d2.w)
+	opt	oaq-
+	addi.w	#1,d2
+	opt	oaq+
+	dbf	d1,.loop3
+	move.b	d2,(Z80_RAM+$6).l
+	lsr.w	#8,d2
+	move.b	d2,(Z80_RAM+$5).l
+	bsr.w	Z80BusRelease
+	lea	(SndDrvRAM).l,a1
+	move.w	(sp)+,(a1)
+	clr.w	d0
+.4
+	movem.l	(sp)+,d1-d2/a0-a1
+	rts
 
 SndReadBlock						;Command $B: copy Z80 block d1 to a0. Carry set and d0 = 3 when there is
 									;no such block.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$70,$C0,$43,$F9,$FF,$FF,$FD,$FC,$3F,$11,$32,$BC,$00,$00
-	dc.b	$61,$00,$08,$0C,$43,$F9,$00,$A0,$01,$00,$34,$3C,$00,$29,$0C,$11
-	dc.b	$00,$00,$66,$06,$B2,$29,$00,$01,$67,$22,$D3,$FC,$00,$00,$00,$06
-	dc.b	$51,$CA,$FF,$EC,$61,$00,$07,$FC,$43,$F9,$FF,$FF,$FD,$FC,$32,$9F
-	dc.b	$30,$3C,$00,$03,$00,$3C,$00,$01,$60,$00,$00,$3A,$14,$29,$00,$03
-	dc.b	$E1,$4A,$14,$29,$00,$02,$04,$42,$00,$01,$16,$29,$00,$04,$E1,$4B
-	dc.b	$16,$29,$00,$05,$43,$F9,$00,$A0,$00,$00,$10,$F1,$30,$00,$06,$43
-	dc.b	$00,$01,$51,$CA,$FF,$F6,$61,$00,$07,$BA,$43,$F9,$FF,$FF,$FD,$FC
-	dc.b	$32,$9F,$42,$40,$4C,$DF,$03,$0E,$4E,$75
+	movem.l	d1-d3/a0-a1,-(sp)
+	lea	(SndDrvRAM).l,a1
+	move.w	(a1),-(sp)
+	move.w	#0,(a1)
+	bsr.w	Z80BusRequest
+	lea	(Z80_RAM+$100).l,a1
+	move.w	#$29,d2
+.loop
+	cmpi.b	#0,(a1)
+	bne.s	.1
+	cmp.b	1(a1),d1
+	beq.s	.2
+.1
+	adda.l	#$6,a1
+	dbf	d2,.loop
+	bsr.w	Z80BusRelease
+	lea	(SndDrvRAM).l,a1
+	move.w	(sp)+,(a1)
+	move.w	#3,d0
+	ori.b	#1,ccr
+	bra.w	.3
+.2
+	move.b	3(a1),d2
+	lsl.w	#8,d2
+	move.b	2(a1),d2
+	opt	osq-
+	subi.w	#1,d2
+	opt	osq+
+	move.b	4(a1),d3
+	lsl.w	#8,d3
+	move.b	5(a1),d3
+	lea	(Z80_RAM).l,a1
+.loop2
+	move.b	(a1,d3.w),(a0)+
+	opt	oaq-
+	addi.w	#1,d3
+	opt	oaq+
+	dbf	d2,.loop2
+	bsr.w	Z80BusRelease
+	lea	(SndDrvRAM).l,a1
+	move.w	(sp)+,(a1)
+	clr.w	d0
+.3
+	movem.l	(sp)+,d1-d3/a0-a1
+	rts
 
 SndWriteBlock						;Command $C: copy a0 over Z80 block d1. Carry set and d0 = 3 when there is
 									;no such block.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$70,$C0,$43,$F9,$FF,$FF,$FD,$FC,$3F,$11,$32,$BC,$00,$00
-	dc.b	$61,$00,$07,$82,$43,$F9,$00,$A0,$01,$00,$34,$3C,$00,$29,$0C,$11
-	dc.b	$00,$00,$66,$06,$B2,$29,$00,$01,$67,$22,$D3,$FC,$00,$00,$00,$06
-	dc.b	$51,$CA,$FF,$EC,$61,$00,$07,$72,$43,$F9,$FF,$FF,$FD,$FC,$32,$9F
-	dc.b	$30,$3C,$00,$03,$00,$3C,$00,$01,$60,$00,$00,$3A,$14,$29,$00,$03
-	dc.b	$E1,$4A,$14,$29,$00,$02,$04,$42,$00,$01,$16,$29,$00,$04,$E1,$4B
-	dc.b	$16,$29,$00,$05,$43,$F9,$00,$A0,$00,$00,$13,$98,$30,$00,$06,$43
-	dc.b	$00,$01,$51,$CA,$FF,$F6,$61,$00,$07,$30,$43,$F9,$FF,$FF,$FD,$FC
-	dc.b	$32,$9F,$42,$40,$4C,$DF,$03,$0E,$4E,$75
+	movem.l	d1-d3/a0-a1,-(sp)
+	lea	(SndDrvRAM).l,a1
+	move.w	(a1),-(sp)
+	move.w	#0,(a1)
+	bsr.w	Z80BusRequest
+	lea	(Z80_RAM+$100).l,a1
+	move.w	#$29,d2
+.loop
+	cmpi.b	#0,(a1)
+	bne.s	.1
+	cmp.b	1(a1),d1
+	beq.s	.2
+.1
+	adda.l	#$6,a1
+	dbf	d2,.loop
+	bsr.w	Z80BusRelease
+	lea	(SndDrvRAM).l,a1
+	move.w	(sp)+,(a1)
+	move.w	#3,d0
+	ori.b	#1,ccr
+	bra.w	.3
+.2
+	move.b	3(a1),d2
+	lsl.w	#8,d2
+	move.b	2(a1),d2
+	opt	osq-
+	subi.w	#1,d2
+	opt	osq+
+	move.b	4(a1),d3
+	lsl.w	#8,d3
+	move.b	5(a1),d3
+	lea	(Z80_RAM).l,a1
+.loop2
+	move.b	(a0)+,(a1,d3.w)
+	opt	oaq-
+	addi.w	#1,d3
+	opt	oaq+
+	dbf	d2,.loop2
+	bsr.w	Z80BusRelease
+	lea	(SndDrvRAM).l,a1
+	move.w	(sp)+,(a1)
+	clr.w	d0
+.3
+	movem.l	(sp)+,d1-d3/a0-a1
+	rts
 
 SndPauseZ80							;Command $D: Z80_RAM+$50 = $FF (pause).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$2F,$08,$41,$F9,$FF,$FF,$FD,$FC,$3F,$10,$30,$BC,$00,$00,$08,$39
-	dc.b	$00,$08,$00,$A1,$11,$00,$66,$0E,$13,$FC,$00,$FF,$00,$A0,$00,$50
-	dc.b	$30,$9F,$20,$5F,$4E,$75,$61,$00,$06,$E2,$13,$FC,$00,$FF,$00,$A0
-	dc.b	$00,$50,$61,$00,$06,$EA,$30,$9F,$20,$5F,$4E,$75
+	move.l	a0,-(sp)
+	lea	(SndDrvRAM).l,a0
+	move.w	(a0),-(sp)
+	move.w	#0,(a0)
+	btst	#8,(IO_Z80BUS).l
+	bne.s	.1
+	move.b	#$FF,(Z80_RAM+$50).l
+	move.w	(sp)+,(a0)
+	movea.l	(sp)+,a0
+	rts
+.1
+	bsr.w	Z80BusRequest
+	move.b	#$FF,(Z80_RAM+$50).l
+	bsr.w	Z80BusRelease
+	move.w	(sp)+,(a0)
+	movea.l	(sp)+,a0
+	rts
 
 SndResumeZ80						;Command $E: Z80_RAM+$50 = 0 (resume).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$2F,$08,$41,$F9,$FF,$FF,$FD,$FC,$3F,$10,$30,$BC,$00,$00,$08,$39
-	dc.b	$00,$08,$00,$A1,$11,$00,$66,$0E,$13,$FC,$00,$00,$00,$A0,$00,$50
-	dc.b	$30,$9F,$20,$5F,$4E,$75,$61,$00,$06,$A6,$13,$FC,$00,$00,$00,$A0
-	dc.b	$00,$50,$61,$00,$06,$AE,$30,$9F,$20,$5F,$4E,$75
+	move.l	a0,-(sp)
+	lea	(SndDrvRAM).l,a0
+	move.w	(a0),-(sp)
+	move.w	#0,(a0)
+	btst	#8,(IO_Z80BUS).l
+	bne.s	.1
+	move.b	#0,(Z80_RAM+$50).l
+	move.w	(sp)+,(a0)
+	movea.l	(sp)+,a0
+	rts
+.1
+	bsr.w	Z80BusRequest
+	move.b	#0,(Z80_RAM+$50).l
+	bsr.w	Z80BusRelease
+	move.w	(sp)+,(a0)
+	movea.l	(sp)+,a0
+	rts
 
 SndStopAll							;Command $F (SoundOff): free every song slot, send Z80 command $FF and
 									;clear the notes.
@@ -796,29 +1057,98 @@ SndStreamZ80						;Answer the Z80's sample request (Z80_RAM+$4D: 1 start sample 
 									;2 / 3 next 256 bytes) by copying
 									;from the sample (bank item type 1) to the Z80 buffer, looping or ending
 									;it.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$60,$80,$61,$00,$04,$8E,$4A,$39,$00,$A0,$00,$4D,$67,$00
-	dc.b	$01,$3E,$0C,$39,$00,$01,$00,$A0,$00,$4D,$66,$70,$42,$41,$12,$39
-	dc.b	$00,$A0,$00,$4E,$30,$3C,$00,$01,$61,$00,$01,$36,$65,$00,$01,$20
-	dc.b	$B1,$FC,$FF,$FF,$FF,$FF,$67,$00,$01,$16,$43,$F9,$FF,$FF,$FD,$FC
-	dc.b	$23,$48,$01,$46,$10,$10,$B0,$10,$66,$FA,$E1,$48,$D1,$FC,$00,$00
-	dc.b	$00,$01,$10,$10,$B0,$10,$66,$FA,$33,$40,$01,$4E,$D1,$FC,$00,$00
-	dc.b	$00,$01,$20,$69,$01,$46,$D1,$FC,$00,$00,$00,$02,$23,$48,$01,$4A
-	dc.b	$42,$80,$10,$39,$00,$A0,$00,$07,$E1,$48,$10,$39,$00,$A0,$00,$08
-	dc.b	$06,$80,$00,$A0,$00,$00,$22,$40,$60,$00,$00,$6A,$0C,$39,$00,$02
-	dc.b	$00,$A0,$00,$4D,$66,$2A,$20,$79,$FF,$FF,$FF,$46,$B1,$FC,$00,$00
-	dc.b	$00,$00,$67,$00,$00,$AA,$42,$80,$10,$39,$00,$A0,$00,$07,$E1,$48
-	dc.b	$10,$39,$00,$A0,$00,$08,$06,$80,$00,$A0,$00,$00,$22,$40,$60,$34
-	dc.b	$0C,$39,$00,$03,$00,$A0,$00,$4D,$66,$00,$00,$84,$20,$79,$FF,$FF
-	dc.b	$FF,$46,$B1,$FC,$00,$00,$00,$00,$67,$00,$00,$74,$42,$80,$10,$39
-	dc.b	$00,$A0,$00,$09,$E1,$48,$10,$39,$00,$A0,$00,$0A,$06,$80,$00,$A0
-	dc.b	$00,$00,$22,$40,$32,$3C,$00,$FF,$12,$D8,$57,$C9,$FF,$FC,$67,$10
-	dc.b	$43,$F9,$FF,$FF,$FD,$FC,$06,$A9,$00,$00,$01,$00,$01,$4A,$60,$3E
-	dc.b	$93,$FC,$00,$00,$00,$01,$42,$80,$30,$39,$FF,$FF,$FF,$4A,$0C,$40
-	dc.b	$FF,$FF,$67,$1C,$12,$BC,$00,$FF,$43,$F9,$FF,$FF,$FD,$FC,$20,$69
-	dc.b	$01,$46,$D1,$FC,$00,$00,$00,$02,$D1,$C0,$23,$48,$01,$4A,$60,$0E
-	dc.b	$43,$F9,$FF,$FF,$FD,$FC,$23,$7C,$00,$00,$00,$00,$01,$4A,$13,$FC
-	dc.b	$00,$00,$00,$A0,$00,$4D,$61,$00,$03,$50,$4C,$DF,$01,$06,$4E,$75
+	movem.l	d1-d2/a0,-(sp)
+	bsr.w	Z80BusRequest
+	tst.b	(Z80_RAM+$4D).l
+	beq.w	.6
+	cmpi.b	#1,(Z80_RAM+$4D).l
+	bne.s	.1
+	clr.w	d1
+	move.b	(Z80_RAM+$4E).l,d1
+	move.w	#1,d0
+	bsr.w	SndFindBankItem
+	bcs.w	.6
+	cmpa.l	#$FFFFFFFF,a0
+	beq.w	.6
+	lea	(SndDrvRAM).l,a1
+	move.l	a0,$146(a1)
+.loop
+	move.b	(a0),d0
+	cmp.b	(a0),d0
+	bne.s	.loop
+	lsl.w	#8,d0
+	adda.l	#$1,a0
+.loop2
+	move.b	(a0),d0
+	cmp.b	(a0),d0
+	bne.s	.loop2
+	move.w	d0,$14E(a1)
+	adda.l	#$1,a0
+	movea.l	$146(a1),a0
+	adda.l	#$2,a0
+	move.l	a0,$14A(a1)
+	clr.l	d0
+	move.b	(Z80_RAM+$7).l,d0
+	lsl.w	#8,d0
+	move.b	(Z80_RAM+$8).l,d0
+	addi.l	#Z80_RAM,d0
+	movea.l	d0,a1
+	bra.w	.3
+.1
+	cmpi.b	#2,(Z80_RAM+$4D).l
+	bne.s	.2
+	movea.l	($FFFFFF46).l,a0
+	cmpa.l	#$0,a0
+	beq.w	.6
+	clr.l	d0
+	move.b	(Z80_RAM+$7).l,d0
+	lsl.w	#8,d0
+	move.b	(Z80_RAM+$8).l,d0
+	addi.l	#Z80_RAM,d0
+	movea.l	d0,a1
+	bra.s	.3
+.2
+	cmpi.b	#3,(Z80_RAM+$4D).l
+	bne.w	.6
+	movea.l	($FFFFFF46).l,a0
+	cmpa.l	#$0,a0
+	beq.w	.6
+	clr.l	d0
+	move.b	(Z80_RAM+$9).l,d0
+	lsl.w	#8,d0
+	move.b	(Z80_RAM+$A).l,d0
+	addi.l	#Z80_RAM,d0
+	movea.l	d0,a1
+.3
+	move.w	#$FF,d1
+.loop3
+	move.b	(a0)+,(a1)+
+	dbeq	d1,.loop3
+	beq.s	.4
+	lea	(SndDrvRAM).l,a1
+	addi.l	#$100,$14A(a1)
+	bra.s	.6
+.4
+	suba.l	#$1,a1
+	clr.l	d0
+	move.w	($FFFFFF4A).l,d0
+	cmpi	#$FFFF,d0
+	beq.s	.5
+	move.b	#$FF,(a1)
+	lea	(SndDrvRAM).l,a1
+	movea.l	$146(a1),a0
+	adda.l	#$2,a0
+	adda.l	d0,a0
+	move.l	a0,$14A(a1)
+	bra.s	.6
+.5
+	lea	(SndDrvRAM).l,a1
+	move.l	#$0,$14A(a1)
+.6
+	move.b	#0,(Z80_RAM+$4D).l
+	bsr.w	Z80BusRelease
+	movem.l	(sp)+,d1-d2/a0
+	rts
 
 SndFindBankItem						;Find bank item type d0, id d1 in the 4 banks (SndBanks): a0 = its data,
 									;d0 = its size. Carry set and d0 = 3
@@ -872,13 +1202,35 @@ SndFindBankItem						;Find bank item type d0, id d1 in the 4 banks (SndBanks): a
 
 SndSetBank							;Command 6: bank d1 (0-3) is at a0; tell the Z80 too (Z80_RAM+$51). Carry
 									;set and d0 = 3 for d1 above 3.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$40,$60,$0C,$41,$00,$04,$65,$0A,$30,$3C,$00,$03,$00,$3C
-	dc.b	$00,$01,$60,$42,$E5,$49,$43,$F9,$FF,$FF,$FF,$DC,$23,$88,$10,$00
-	dc.b	$43,$F9,$FF,$FF,$FD,$FC,$3F,$11,$32,$BC,$00,$00,$61,$00,$02,$88
-	dc.b	$45,$F9,$00,$A0,$00,$51,$20,$08,$15,$80,$10,$00,$E0,$88,$15,$80
-	dc.b	$10,$01,$E0,$88,$15,$80,$10,$02,$E0,$88,$15,$80,$10,$03,$61,$00
-	dc.b	$02,$7A,$32,$9F,$42,$40,$4C,$DF,$06,$02,$4E,$75
+	movem.l	d1/a1-a2,-(sp)
+	cmpi	#4,d1
+	bcs.s	.1
+	move.w	#3,d0
+	ori.b	#1,ccr
+	bra.s	.2
+.1
+	lsl.w	#2,d1
+	lea	($FFFFFFDC).l,a1
+	move.l	a0,(a1,d1.w)
+	lea	(SndDrvRAM).l,a1
+	move.w	(a1),-(sp)
+	move.w	#0,(a1)
+	bsr.w	Z80BusRequest
+	lea	(Z80_RAM+$51).l,a2
+	move.l	a0,d0
+	move.b	d0,(a2,d1.w)
+	lsr.l	#8,d0
+	move.b	d0,1(a2,d1.w)
+	lsr.l	#8,d0
+	move.b	d0,2(a2,d1.w)
+	lsr.l	#8,d0
+	move.b	d0,3(a2,d1.w)
+	bsr.w	Z80BusRelease
+	move.w	(sp)+,(a1)
+	clr.w	d0
+.2
+	movem.l	(sp)+,d1/a1-a2
+	rts
 
 SndLoadList							;Command 7: upload the patches (types 0 and 4) of load list d1 (bank item
 									;type $B, pairs ended by $FF) to the
@@ -919,34 +1271,118 @@ SndLoadList							;Command 7: upload the patches (types 0 and 4) of load list d1
 
 SndFreeBlocks						;Command 8: free the Z80 blocks of list a0 (word pairs ended by -1) and
 									;move the blocks after them down.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$70,$E0,$43,$F9,$FF,$FF,$FD,$FC,$3F,$11,$32,$BC,$00,$00
-	dc.b	$61,$00,$01,$F4,$0C,$50,$FF,$FF,$67,$00,$00,$E8,$43,$F9,$00,$A0
-	dc.b	$01,$00,$30,$10,$32,$28,$00,$02,$34,$3C,$00,$29,$B0,$11,$66,$06
-	dc.b	$B2,$29,$00,$01,$67,$0E,$D3,$FC,$00,$00,$00,$06,$51,$CA,$FF,$EE
-	dc.b	$60,$00,$00,$B6,$10,$29,$00,$02,$E1,$48,$10,$29,$00,$03,$42,$41
-	dc.b	$12,$29,$00,$04,$E1,$49,$12,$29,$00,$05,$34,$01,$D4,$40,$45,$F9
-	dc.b	$00,$A0,$00,$00,$0C,$42,$1F,$00,$67,$10,$15,$B2,$20,$00,$10,$00
-	dc.b	$06,$42,$00,$01,$06,$41,$00,$01,$60,$EA,$42,$41,$12,$29,$00,$04
-	dc.b	$E1,$49,$12,$29,$00,$05,$12,$BC,$00,$FF,$13,$7C,$00,$FF,$00,$01
-	dc.b	$13,$7C,$00,$FF,$00,$02,$13,$7C,$00,$FF,$00,$03,$13,$7C,$00,$FF
-	dc.b	$00,$04,$13,$7C,$00,$FF,$00,$05,$43,$F9,$00,$A0,$01,$00,$34,$3C
-	dc.b	$00,$29,$0C,$11,$00,$FF,$67,$1C,$42,$43,$16,$29,$00,$04,$E1,$4B
-	dc.b	$16,$29,$00,$05,$B6,$41,$65,$0C,$96,$40,$13,$43,$00,$05,$E0,$4B
-	dc.b	$13,$43,$00,$04,$D3,$FC,$00,$00,$00,$06,$51,$CA,$FF,$D6,$43,$F9
-	dc.b	$00,$A0,$00,$05,$42,$41,$12,$11,$E1,$49,$12,$29,$00,$01,$92,$40
-	dc.b	$13,$41,$00,$01,$E0,$49,$12,$81,$D1,$FC,$00,$00,$00,$04,$60,$00
-	dc.b	$FF,$14,$61,$00,$01,$16,$43,$F9,$FF,$FF,$FD,$FC,$32,$9F,$42,$40
-	dc.b	$4C,$DF,$07,$0E,$4E,$75
+	movem.l	d1-d3/a0-a2,-(sp)
+	lea	(SndDrvRAM).l,a1
+	move.w	(a1),-(sp)
+	move.w	#0,(a1)
+	bsr.w	Z80BusRequest
+.loop
+	cmpi.w	#$FFFF,(a0)
+	beq.w	.6
+	lea	(Z80_RAM+$100).l,a1
+	move.w	(a0),d0
+	move.w	2(a0),d1
+	move.w	#$29,d2
+.loop2
+	cmp.b	(a1),d0
+	bne.s	.1
+	cmp.b	1(a1),d1
+	beq.s	.2
+.1
+	adda.l	#$6,a1
+	dbf	d2,.loop2
+	bra.w	.5
+.2
+	move.b	2(a1),d0
+	lsl.w	#8,d0
+	move.b	3(a1),d0
+	clr.w	d1
+	move.b	4(a1),d1
+	lsl.w	#8,d1
+	move.b	5(a1),d1
+	move.w	d1,d2
+	add.w	d0,d2
+	lea	(Z80_RAM).l,a2
+.loop3
+	cmpi	#$1F00,d2
+	beq.s	.3
+	move.b	(a2,d2.w),(a2,d1.w)
+	opt	oaq-
+	addi.w	#1,d2
+	addi.w	#1,d1
+	opt	oaq+
+	bra.s	.loop3
+.3
+	clr.w	d1
+	move.b	4(a1),d1
+	lsl.w	#8,d1
+	move.b	5(a1),d1
+	move.b	#$FF,(a1)
+	move.b	#$FF,1(a1)
+	move.b	#$FF,2(a1)
+	move.b	#$FF,3(a1)
+	move.b	#$FF,4(a1)
+	move.b	#$FF,5(a1)
+	lea	(Z80_RAM+$100).l,a1
+	move.w	#$29,d2
+.loop4
+	cmpi.b	#$FF,(a1)
+	beq.s	.4
+	clr.w	d3
+	move.b	4(a1),d3
+	lsl.w	#8,d3
+	move.b	5(a1),d3
+	cmp.w	d1,d3
+	bcs.s	.4
+	sub.w	d0,d3
+	move.b	d3,5(a1)
+	lsr.w	#8,d3
+	move.b	d3,4(a1)
+.4
+	adda.l	#$6,a1
+	dbf	d2,.loop4
+	lea	(Z80_RAM+$5).l,a1
+	clr.w	d1
+	move.b	(a1),d1
+	lsl.w	#8,d1
+	move.b	1(a1),d1
+	sub.w	d0,d1
+	move.b	d1,1(a1)
+	lsr.w	#8,d1
+	move.b	d1,(a1)
+.5
+	adda.l	#$4,a0
+	bra.w	.loop
+.6
+	bsr.w	Z80BusRelease
+	lea	(SndDrvRAM).l,a1
+	move.w	(sp)+,(a1)
+	clr.w	d0
+	movem.l	(sp)+,d1-d3/a0-a2
+	rts
 
 SndResetBlocks						;Command 9: free all Z80 blocks (Z80_RAM+$100 all $FF, free pointer back
 									;to the start at Z80_RAM+3).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$00,$C0,$41,$F9,$FF,$FF,$FD,$FC,$3F,$10,$30,$BC,$00,$00
-	dc.b	$61,$00,$00,$DE,$41,$F9,$00,$A0,$01,$00,$30,$3C,$00,$FB,$10,$FC
-	dc.b	$00,$FF,$51,$C8,$FF,$FA,$41,$F9,$00,$A0,$00,$03,$43,$F9,$00,$A0
-	dc.b	$00,$05,$12,$D8,$12,$90,$61,$00,$00,$CC,$41,$F9,$FF,$FF,$FD,$FC
-	dc.b	$30,$9F,$42,$40,$4C,$DF,$03,$00,$4E,$75
+	movem.l	a0-a1,-(sp)
+	lea	(SndDrvRAM).l,a0
+	move.w	(a0),-(sp)
+	move.w	#0,(a0)
+	bsr.w	Z80BusRequest
+	lea	(Z80_RAM+$100).l,a0
+	move.w	#$FB,d0
+.loop
+	move.b	#$FF,(a0)+
+	dbf	d0,.loop
+	lea	(Z80_RAM+$3).l,a0
+	lea	(Z80_RAM+$5).l,a1
+	move.b	(a0)+,(a1)+
+	move.b	(a0),(a1)
+	bsr.w	Z80BusRelease
+	lea	(SndDrvRAM).l,a0
+	move.w	(sp)+,(a0)
+	clr.w	d0
+	movem.l	(sp)+,a0-a1
+	rts
 
 SndSendZ80							;Command $12: queue Z80 command d1 with interrupts off.
 	move.w	sr,-(sp)

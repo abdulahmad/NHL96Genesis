@@ -3,85 +3,302 @@
 
 check4bench							;Check if player a3 should go to the bench (called from the assignment
 									;code).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$38,$00,$02,$C3,$40,$66,$F6,$08,$2B,$00,$03,$00,$62,$66,$EE
-	dc.b	$08,$2B,$00,$04,$00,$63,$66,$E6,$4A,$2B,$00,$60,$6A,$00,$00,$08
-	dc.b	$4A,$2B,$00,$61,$6B,$D8,$10,$2B,$00,$61,$B0,$2B,$00,$67,$67,$00
-	dc.b	$00,$2A,$30,$2B,$00,$36,$0C,$33,$00,$0B,$00,$38,$67,$C0,$30,$2B
-	dc.b	$00,$52,$B0,$78,$B7,$BE,$67,$B6,$58,$4F,$08,$EB,$00,$02,$00,$63
-	dc.b	$42,$6B,$00,$40,$70,$0B,$60,$00,$35,$D4,$58,$4F,$08,$AB,$00,$02
-	dc.b	$00,$63,$08,$AB,$00,$02,$00,$62,$50,$EB,$00,$61,$50,$EB,$00,$60
-	dc.b	$30,$2B,$00,$34,$4A,$2B,$00,$60,$6A,$00,$00,$08,$4E,$F9,$00,$01
-	dc.b	$FE,$58,$10,$2B,$00,$60,$48,$80,$37,$40,$00,$34,$4E,$F9,$00,$01
-	dc.b	$FE,$58
+	btst	#2,(BA_PS_flags).w
+	bne.s	setpadsExit
+	btst	#pfjoycon,$62(a3)
+	bne.s	setpadsExit
+	btst	#pf2pen,$63(a3)
+	bne.s	setpadsExit
+	tst.b	$60(a3)
+	bpl.w	.1
+	tst.b	$61(a3)
+	bmi.s	setpadsExit
+.1
+	move.b	$61(a3),d0
+	cmp.b	$67(a3),d0
+	beq.w	.2
+	move.w	$36(a3),d0
+	cmpi.b	#$B,$38(a3,d0.w)
+	beq.s	setpadsExit
+	move.w	$52(a3),d0
+	cmp.w	(puckc).w,d0
+	beq.s	setpadsExit
+	addq.w	#4,sp
+	bset	#pf2unav,$63(a3)		;set player unavailable (pf2unav)
+	clr.w	$40(a3)
+	moveq	#$B,d0
+	bra.w	assreplace
+.2
+	addq.w	#4,sp
+	bclr	#pf2unav,$63(a3)
+	bclr	#pfnc,$62(a3)
+	st	$61(a3)
+	st	$60(a3)
+	move.w	$34(a3),d0
+	tst.b	$60(a3)
+	bpl.w	.3
+	jmp	(AssignByPosition).l
+.3
+	move.b	$60(a3),d0
+	ext.w	d0
+	move.w	d0,$34(a3)
+	jmp	(AssignByPosition).l
 
 assbench							;asstab entry: player a3 should go to the bench.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$FF,$64,$0C,$6B,$00,$64,$00,$40
-	dc.b	$67,$00,$01,$0E,$61,$00,$FF,$58,$08,$2B,$00,$04,$00,$63,$66,$00
-	dc.b	$35,$5E,$08,$AB,$00,$01,$00,$62,$67,$00,$00,$2C,$37,$7C,$00,$08
-	dc.b	$00,$42,$70,$50,$08,$2B,$00,$06,$00,$62,$66,$00,$00,$04,$44,$40
-	dc.b	$37,$40,$00,$46,$37,$7C,$00,$96,$00,$44,$44,$6B,$00,$44,$51,$6B
-	dc.b	$00,$44,$42,$6B,$00,$40,$10,$2B,$00,$61,$B0,$2B,$00,$67,$67,$00
-	dc.b	$01,$0E,$9F,$6B,$00,$40,$6A,$00,$00,$EC,$50,$6B,$00,$40,$30,$2B
-	dc.b	$00,$14,$90,$6B,$00,$46,$B0,$7C,$00,$28,$6E,$00,$00,$D8,$B0,$7C
-	dc.b	$FF,$D8,$6D,$00,$00,$D0,$30,$13,$90,$6B,$00,$44,$B0,$7C,$00,$20
-	dc.b	$6E,$00,$00,$C2,$32,$3C,$08,$56,$4A,$6B,$00,$34,$66,$00,$00,$06
-	dc.b	$32,$3C,$06,$40,$61,$00,$37,$2E,$08,$EB,$00,$02,$00,$62,$0C,$6B
-	dc.b	$00,$04,$00,$54,$67,$00,$00,$0C,$52,$6B,$00,$54,$02,$6B,$00,$07
-	dc.b	$00,$54,$42,$6B,$00,$2A,$37,$7C,$F8,$00,$00,$28,$B0,$7C,$00,$10
-	dc.b	$6E,$00,$00,$4C,$42,$6B,$00,$28,$0C,$6B,$00,$04,$00,$54,$66,$00
-	dc.b	$00,$3E,$37,$7C,$F8,$00,$00,$28,$37,$7C,$00,$02,$00,$54,$32,$3C
-	dc.b	$0D,$BC,$36,$BC,$FF,$62,$42,$6B,$00,$28,$4A,$6B,$00,$34,$66,$00
-	dc.b	$00,$0E,$32,$3C,$0E,$40,$36,$BC,$FF,$62,$42,$6B,$00,$28,$61,$00
-	dc.b	$36,$C4,$08,$EB,$00,$05,$00,$62,$37,$7C,$00,$64,$00,$40,$4E,$75
-	dc.b	$42,$6B,$00,$06,$42,$40,$10,$2B,$00,$67,$D0,$40,$20,$7C,$FF,$FF
-	dc.b	$C7,$26,$08,$2B,$00,$06,$00,$62,$67,$00,$00,$06,$D0,$FC,$03,$9E
-	dc.b	$31,$BC,$FF,$FE,$00,$6C,$16,$2B,$00,$61,$61,$00,$00,$28,$4E,$F9
-	dc.b	$00,$01,$FE,$A0,$08,$2B,$00,$02,$00,$62,$66,$C2,$30,$2B,$00,$44
-	dc.b	$32,$2B,$00,$46,$20,$7C,$00,$01,$87,$3A,$60,$00,$30,$A4,$08,$AB
-	dc.b	$00,$02,$00,$63,$10,$2B,$00,$60,$48,$80,$37,$40,$00,$34,$4E,$B9
-	dc.b	$00,$01,$FE,$58,$50,$EB,$00,$61,$50,$EB,$00,$60,$4E,$75
+	btst	#pfalock,$62(a3)
+	bne.w	setpadsExit
+	cmpi.w	#$64,$40(a3)			;temp1 = 100 flag: at the bench door
+	beq.w	.done
+	;may switch to a position change or reassign to abench
+	bsr.w	check4bench
+	btst	#pf2pen,$63(a3)			;pf2pen
+	bne.w	assexit
+	;first time: target = bench spot, x = -(Sideline+8), y = +-80 by team
+	bclr	#pfna,$62(a3)
+	beq.w	.nna
+	move.w	#8,$42(a3)
+	moveq	#$50,d0					;80
+	btst	#pfteam,$62(a3)
+	bne.w	.1
+	neg.w	d0
+.1
+	move.w	d0,$46(a3)				;temp4 = bench y
+	move.w	#$96,$44(a3)
+	neg.w	$44(a3)
+	subq.w	#8,$44(a3)				;temp3 = bench x
+	clr.w	$40(a3)
+.nna
+	move.b	$61(a3),d0				;same player? just change position
+	cmp.b	$67(a3),d0
+	beq.w	.nobench				;same player, just change position
+	;temp1 counts frames; re-check arrival every 8
+	sub.w	d7,$40(a3)
+	bpl.w	.nodec
+	addq.w	#8,$40(a3)
+	;within 40 px of bench y and 32 px of bench x?
+	move.w	$14(a3),d0
+	sub.w	$46(a3),d0
+	cmp.w	#$28,d0
+	bgt.w	.nodec
+	cmp.w	#$FFD8,d0
+	blt.w	.nodec
+	move.w	(a3),d0
+	sub.w	$44(a3),d0
+	cmp.w	#$20,d0
+	bgt.w	.nodec
+	move.w	#SPAglide,d1
+	tst.w	$34(a3)
+	bne.w	.gli
+	move.w	#$640,d1
+.gli
+	bsr.w	SetSPA					;glide (goalie: ready) animation
+	;no collisions; turn step by step toward facedir 4
+	bset	#pfnc,$62(a3)
+	cmpi.w	#4,$54(a3)
+	beq.w	.ok
+	addq.w	#1,$54(a3)				;turn toward the bench
+	andi.w	#7,$54(a3)
+.ok
+	clr.w	$2A(a3)					;drift left (Xvel -$800)
+	move.w	#$F800,$28(a3)			;-$800
+	;within 16 px of the wall: stop and climb over (SPAwallleft)
+	cmp.w	#$10,d0
+	bgt.w	.loop
+	clr.w	$28(a3)
+	cmpi.w	#4,$54(a3)
+	bne.w	.loop
+	move.w	#$F800,$28(a3)
+	move.w	#2,$54(a3)
+	move.w	#SPAwallleft,d1
+	move.w	#$FF62,(a3)
+	clr.w	$28(a3)
+	tst.w	$34(a3)
+	bne.w	.5
+	move.w	#$E40,d1
+	move.w	#$FF62,(a3)
+	clr.w	$28(a3)
+.5
+	bsr.w	SetSPA
+	bset	#pfalock,$62(a3)
+	move.w	#$64,$40(a3)			;100
+.loop
+	rts
+.done
+	clr.w	6(a3)					;at the bench door: mark this roster slot on the bench (tmpdst -2),
+	clr.w	d0
+	move.b	$67(a3),d0
+	add.w	d0,d0
+	movea.l	#tmstruct,a0
+	btst	#pfteam,$62(a3)
+	beq.w	.t0
+	adda.w	#$39E,a0
+.t0
+	move.w	#$FFFE,$6C(a0,d0.w)		;tmpdst: put used player on bench
+	move.b	$61(a3),d3
+	bsr.w	assbenchTakeNewPos
+	jmp	(setplayer).l
+.nodec
+	btst	#pfnc,$62(a3)			;skate toward bench spot (temp3,temp4), unless already over the wall
+	bne.s	.loop
+	move.w	$44(a3),d0
+	move.w	$46(a3),d1
+	movea.l	#EvadePC,a0
+	bra.w	skateto
+.nobench
+	bclr	#pf2unav,$63(a3)		;pf2unav
+assbenchTakeNewPos					;Set position from newpos, assign by position, clear newpos and newpnum
+	move.b	$60(a3),d0				;position = newpos; clear newpos and newpnum
+	ext.w	d0
+	move.w	d0,$34(a3)
+	jsr	(AssignByPosition).l
+	st	$61(a3)
+	st	$60(a3)
+assbenchExit	equ	*	;Shared return of assbench
+	rts
 
 asseben								;asstab entry: player a3 should exit the bench area.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$F6,$08,$AB,$00,$01,$00,$62,$67,$00
-	dc.b	$00,$54,$42,$6B,$00,$28,$42,$6B,$00,$2A,$30,$2B,$00,$52,$5D,$40
-	dc.b	$6B,$00,$00,$04,$52,$40,$C1,$FC,$00,$0E,$37,$40,$00,$14,$36,$BC
-	dc.b	$00,$96,$44,$53,$37,$7C,$00,$02,$00,$54,$08,$EB,$00,$05,$00,$62
-	dc.b	$32,$3C,$0D,$7A,$36,$BC,$FF,$62,$42,$6B,$00,$28,$4A,$6B,$00,$34
-	dc.b	$66,$00,$00,$0E,$32,$3C,$0D,$FE,$36,$BC,$FF,$62,$42,$6B,$00,$28
-	dc.b	$60,$00,$35,$E4,$37,$7C,$00,$04,$00,$54,$08,$AB,$00,$02,$00,$62
-	dc.b	$08,$AB,$00,$05,$00,$63,$08,$AB,$00,$02,$00,$63,$42,$6B,$00,$58
-	dc.b	$37,$7C,$10,$00,$00,$28,$60,$00,$33,$68
+	btst	#pfalock,$62(a3)
+	bne.s	assbenchExit
+	bclr	#pfna,$62(a3)
+	beq.w	.3
+	clr.w	$28(a3)
+	clr.w	$2A(a3)
+	move.w	$52(a3),d0
+	subq.w	#6,d0
+	bmi.w	.1
+	addq.w	#1,d0
+.1
+	muls.w	#$E,d0
+	move.w	d0,$14(a3)
+	move.w	#$96,(a3)
+	neg.w	(a3)
+	move.w	#2,$54(a3)
+	bset	#pfalock,$62(a3)
+	move.w	#$D7A,d1
+	move.w	#$FF62,(a3)
+	clr.w	$28(a3)
+	tst.w	$34(a3)
+	bne.w	.2
+	move.w	#$DFE,d1
+	move.w	#$FF62,(a3)
+	clr.w	$28(a3)
+.2
+	bra.w	SetSPA
+.3
+	move.w	#4,$54(a3)
+	bclr	#pfnc,$62(a3)
+	bclr	#pf2npc,$63(a3)
+	bclr	#pf2unav,$63(a3)
+	clr.w	$58(a3)
+	move.w	#$1000,$28(a3)
+	bra.w	assexit
 
 asspenalty							;asstab entry: player a3 goes to the penalty box.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$FF,$6C,$08,$AB,$00,$01,$00,$62
-	dc.b	$67,$00,$00,$70,$08,$EB,$00,$02,$00,$63,$61,$00,$01,$36,$78,$FE
-	dc.b	$61,$00,$FC,$F0,$37,$7C,$00,$08,$00,$42,$70,$0B,$12,$38,$C3,$EC
-	dc.b	$08,$2B,$00,$06,$00,$62,$66,$00,$00,$06,$E8,$49,$44,$40,$02,$41
-	dc.b	$00,$0F,$B2,$7C,$00,$02,$63,$00,$00,$04,$72,$02,$56,$41,$C3,$C0
-	dc.b	$37,$41,$00,$46,$32,$3C,$00,$26,$08,$2B,$00,$06,$00,$62,$66,$00
-	dc.b	$00,$06,$32,$3C,$FF,$BE,$37,$41,$00,$46,$37,$7C,$00,$8E,$00,$44
-	dc.b	$42,$6B,$00,$40,$08,$EB,$00,$05,$00,$63,$42,$6B,$00,$4E,$42,$6B
-	dc.b	$00,$50,$30,$2B,$00,$14,$90,$6B,$00,$46,$B0,$7C,$00,$0C,$6E,$00
-	dc.b	$00,$B0,$B0,$7C,$FF,$F4,$6D,$00,$00,$A8,$30,$13,$90,$6B,$00,$44
-	dc.b	$B0,$7C,$FF,$E8,$6D,$00,$00,$9A,$9F,$6B,$00,$40,$6A,$00,$FE,$C6
-	dc.b	$50,$6B,$00,$40,$08,$EB,$00,$02,$00,$62,$32,$3C,$08,$56,$61,$00
-	dc.b	$34,$FC,$74,$06,$08,$2B,$00,$00,$00,$77,$67,$00,$00,$04,$74,$02
-	dc.b	$B4,$6B,$00,$54,$67,$00,$00,$0C,$52,$6B,$00,$54,$02,$6B,$00,$07
-	dc.b	$00,$54,$42,$6B,$00,$2A,$37,$7C,$10,$00,$00,$28,$B0,$7C,$FF,$F8
-	dc.b	$6D,$00,$FE,$82,$42,$6B,$00,$28,$B4,$6B,$00,$54,$66,$00,$FE,$76
-	dc.b	$08,$EB,$00,$05,$00,$62,$37,$7C,$00,$02,$00,$54,$36,$BC,$00,$8E
-	dc.b	$37,$7C,$00,$26,$00,$14,$08,$2B,$00,$06,$00,$62,$66,$00,$00,$08
-	dc.b	$37,$7C,$FF,$BE,$00,$14,$08,$AB,$00,$03,$00,$04,$32,$3C,$0A,$A2
-	dc.b	$61,$00,$34,$8A,$08,$AB,$00,$04,$00,$63,$70,$0D,$60,$00,$32,$44
-	dc.b	$30,$2B,$00,$44,$32,$2B,$00,$46,$20,$7C,$00,$01,$F8,$4A,$60,$00
-	dc.b	$2E,$A8,$08,$2B,$00,$03,$00,$62,$67,$00,$FE,$1A,$42,$44,$30,$2B
-	dc.b	$00,$52,$B0,$78,$C3,$84,$67,$00,$F8,$86,$78,$02,$B0,$78,$C3,$86
-	dc.b	$67,$00,$F8,$7C,$38,$3C,$00,$04,$B0,$78,$C3,$88,$67,$00,$F8,$70
-	dc.b	$38,$3C,$00,$06,$60,$00,$F8,$68
+	btst	#pfalock,$62(a3)
+	bne.w	assbenchExit
+	bclr	#pfna,$62(a3)
+	beq.w	.4
+	bset	#pf2unav,$63(a3)		;set player unavailable (pf2unav)
+	bsr.w	ReleasePadFromPlayer
+	moveq	#-$2,d4					;move -2 into d4
+	bsr.w	setpads					;moves player number into a temp value so graphics know who it is
+	move.w	#8,$42(a3)				;move 8 into temp2
+	moveq	#$B,d0					;move 11 dec into d0
+	move.b	(PBnum).w,d1			;gets number of players in PB. 00HV (H=Home, V=Visitors)
+	btst	#pfteam,$62(a3)			;checks if player is home or away
+	bne.w	.1						;branch if away
+	lsr.w	#4,d1					;shift 4 bits to get Home players in PB
+	neg.w	d0						;make d0 negative (different box)
+.1
+	andi.w	#$F,d1					;pass the first 4 bits of d1 (the team's player total in PB)
+	cmp.w	#2,d1					;compare to 2
+	bls.w	.2						;branch if less than (1 player in box or less)
+	moveq	#2,d1					;add 2 if more than 1 player in box
+.2
+	addq.w	#3,d1					;add 3 to d1
+	muls.w	d0,d1					;mult d0 with d1, store result in d1
+	move.w	d1,$46(a3)
+	move.w	#$26,d1
+	btst	#pfteam,pflags(a3)
+	bne.w	.3
+	move.w	#$FFBE,d1
+.3
+	move.w	d1,$46(a3)				;move d1 into temp4 (skateto YPos)
+	move.w	#$8E,$44(a3)
+	clr.w	$40(a3)					;clear temp1
+	bset	#pf2npc,$63(a3)			;set bit for no player collision
+	clr.w	$4E(a3)					;clear wallCos (angle of last collision)
+	clr.w	$50(a3)					;clear wallSin (angle of last collision)
+.4
+	move.w	$14(a3),d0				;Current Ypos of player
+	sub.w	$46(a3),d0				;sub temp4 (Y pos to skate to) from Ypos
+	cmp.w	#$C,d0					;compare to 13 decimal
+	bgt.w	.8						;branch if greater than (still skateto)
+	;If its within 13 decimal, it will start the animation for hopping over the board
+	cmp.w	#$FFF4,d0
+	blt.w	.8
+	move.w	(a3),d0
+	sub.w	$44(a3),d0
+	cmp.w	#$FFE8,d0
+	blt.w	.8
+	sub.w	d7,$40(a3)
+	bpl.w	assbenchExit
+	addq.w	#8,$40(a3)
+	bset	#pfnc,$62(a3)
+	move.w	#SPAglide,d1			;94 $50C
+	bsr.w	SetSPA
+	moveq	#6,d2
+	btst	#0,$77(a3)
+	beq.w	.5
+	moveq	#2,d2
+.5
+	cmp.w	$54(a3),d2
+	beq.w	.6
+	addq.w	#1,$54(a3)
+	andi.w	#7,$54(a3)
+.6
+	clr.w	$2A(a3)
+	move.w	#$1000,$28(a3)
+	cmp.w	#$FFF8,d0
+	blt.w	assbenchExit
+	clr.w	$28(a3)
+	cmp.w	$54(a3),d2
+	bne.w	assbenchExit
+	bset	#pfalock,$62(a3)
+	move.w	#2,$54(a3)
+	move.w	#$8E,(a3)
+	move.w	#$26,$14(a3)
+	btst	#pfteam,pflags(a3)
+	bne.w	.7
+	move.w	#$FFBE,$14(a3)
+.7
+	bclr	#3,4(a3)
+	move.w	#$AA2,d1
+	bsr.w	SetSPA
+	bclr	#pf2pen,$63(a3)
+	moveq	#$D,d0
+	bra.w	assreplace
+.8
+	move.w	$44(a3),d0
+	move.w	$46(a3),d1
+	movea.l	#rtss2,a0
+	bra.w	skateto
+ReleasePadFromPlayer				;Take the joystick off player a3 (chgplayer for the pad that controls it)
+	;Take the joystick off player a3
+	btst	#pfjoycon,$62(a3)
+	beq.w	assbenchExit
+	clr.w	d4
+	move.w	$52(a3),d0
+	cmp.w	(c1playernum).w,d0
+	beq.w	chgplayer
+	moveq	#2,d4
+	cmp.w	(c2playernum).w,d0		;pads 3 and 4 too
+	beq.w	chgplayer
+	move.w	#4,d4
+	cmp.w	(c3playernum).w,d0
+	beq.w	chgplayer
+	move.w	#6,d4
+	bra.w	chgplayer
 
 assdopen							;asstab entry: player a3 serves his penalty.
 	btst	#pfalock,pflags(a3)
@@ -100,19 +317,47 @@ assdopen							;asstab entry: player a3 serves his penalty.
 	rts
 
 assepen								;asstab entry: player a3 leaves the penalty box.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$FD,$B4,$08,$AB,$00,$01,$00,$62
-	dc.b	$67,$00,$00,$68,$08,$EB,$00,$02,$00,$62,$08,$EB,$00,$02,$00,$63
-	dc.b	$70,$10,$72,$C4,$08,$2B,$00,$06,$00,$62,$67,$00,$00,$06,$70,$01
-	dc.b	$44,$41,$91,$38,$C3,$EC,$37,$41,$00,$14,$42,$6B,$00,$28,$42,$6B
-	dc.b	$00,$2A,$36,$BC,$00,$94,$36,$BC,$00,$8E,$37,$7C,$00,$26,$00,$14
-	dc.b	$08,$2B,$00,$06,$00,$62,$66,$00,$00,$08,$37,$7C,$FF,$BE,$00,$14
-	dc.b	$37,$7C,$00,$04,$00,$54,$08,$EB,$00,$05,$00,$62,$32,$3C,$0A,$F4
-	dc.b	$61,$00,$33,$92,$4E,$F9,$00,$02,$13,$AE,$32,$3C,$08,$56,$61,$00
-	dc.b	$33,$84,$37,$7C,$00,$04,$00,$54,$50,$EB,$00,$61,$50,$EB,$00,$60
-	dc.b	$08,$AB,$00,$03,$00,$62,$08,$AB,$00,$02,$00,$62,$08,$AB,$00,$05
-	dc.b	$00,$63,$08,$AB,$00,$02,$00,$63,$37,$7C,$F0,$00,$00,$28,$60,$00
-	dc.b	$30,$FE
+	btst	#pfalock,$62(a3)
+	bne.w	assbenchExit
+	bclr	#pfna,$62(a3)
+	beq.w	.3
+	bset	#pfnc,$62(a3)			;set player in no collision mode
+	bset	#pf2unav,$63(a3)		;set player unavailable
+	moveq	#$10,d0
+	moveq	#-$3C,d1
+	btst	#pfteam,$62(a3)
+	beq.w	.1
+	moveq	#1,d0
+	neg.w	d1
+.1
+	sub.b	d0,(PBnum).w
+	move.w	d1,$14(a3)
+	clr.w	$28(a3)
+	clr.w	$2A(a3)
+	move.w	#$94,(a3)
+	move.w	#$8E,(a3)
+	move.w	#$26,$14(a3)
+	btst	#pfteam,pflags(a3)
+	bne.w	.2
+	move.w	#$FFBE,$14(a3)
+.2
+	move.w	#4,$54(a3)
+	bset	#pfalock,$62(a3)
+	move.w	#$AF4,d1
+	bsr.w	SetSPA
+	jmp	(SprSort).l
+.3
+	move.w	#$856,d1
+	bsr.w	SetSPA
+	move.w	#4,$54(a3)
+	st	$61(a3)
+	st	$60(a3)
+	bclr	#pfjoycon,$62(a3)
+	bclr	#pfnc,$62(a3)
+	bclr	#pf2npc,$63(a3)
+	bclr	#pf2unav,$63(a3)
+	move.w	#$F000,$28(a3)
+	bra.w	assexit
 
 assgoaliebreakwait					;asstab entry: in a shootout or penalty shot park the idle goalie off the
 									;ice.
@@ -140,166 +385,703 @@ assgoaliebreakwait					;asstab entry: in a shootout or penalty shot park the idl
 	movem.l	(sp)+,d0/a0
 .3
 	rts
+assgoaliebreakwaitEnd	equ	*
 	rts
 
 donothing							;Unless locked or pad controlled, player a3 just skates (jumped to from
 									;the fight and assignment code).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$F6,$08,$2B,$00,$03,$00,$62,$66,$EE
-	dc.b	$70,$08,$60,$00,$32,$F8
+	btst	#pfalock,$62(a3)		;#pfalock
+	bne.s	assgoaliebreakwaitEnd
+	btst	#pfjoycon,$62(a3)		;#pfjoycon
+	bne.s	assgoaliebreakwaitEnd
+	moveq	#8,d0
+	bra.w	doplayeracc
 
 assstanley							;asstab entry: player a3 skates with the Stanley Cup overhead.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$E0,$08,$AB,$00,$01,$00,$62,$67,$00
-	dc.b	$00,$22,$37,$7C,$00,$5A,$00,$44,$4A,$78,$BD,$32,$6A,$00,$00,$06
-	dc.b	$44,$6B,$00,$44,$37,$78,$BD,$2E,$00,$46,$32,$3C,$0C,$A0,$61,$00
-	dc.b	$32,$B0,$30,$2B,$00,$44,$90,$53,$32,$2B,$00,$46,$92,$6B,$00,$14
-	dc.b	$61,$00,$30,$78,$B0,$7C,$00,$07,$6E,$9E,$34,$00,$37,$42,$00,$54
-	dc.b	$60,$00,$37,$D0
+	btst	#pfalock,$62(a3)
+	bne.s	assgoaliebreakwaitEnd
+	bclr	#pfna,$62(a3)
+	beq.w	.2
+	move.w	#$5A,$44(a3)			;90
+	tst.w	(Hpos).w
+	bpl.w	.1
+	neg.w	$44(a3)
+	;target Y from Vpos
+.1
+	move.w	(Vpos).w,$46(a3)		;temp4 = y from Vpos
+	move.w	#SPAstanley,d1
+	bsr.w	SetSPA
+	;skate toward the target
+.2
+	move.w	$44(a3),d0				;face and accelerate toward the target
+	sub.w	(a3),d0
+	move.w	$46(a3),d1
+	sub.w	$14(a3),d1
+	bsr.w	vtoa
+	cmp.w	#7,d0
+	bgt.s	assgoaliebreakwaitEnd
+	move.w	d0,d2
+	move.w	d2,$54(a3)
+	bra.w	playeracc
 
 assscore							;asstab entry: player a3 celebrates a goal.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$8C,$08,$AB,$00,$01,$00,$62,$67,$00
-	dc.b	$00,$24,$61,$00,$00,$A2,$37,$7C,$00,$08,$00,$42,$37,$7C,$00,$5A
-	dc.b	$00,$44,$4A,$78,$BD,$32,$6A,$00,$00,$06,$44,$6B,$00,$44,$37,$78
-	dc.b	$BD,$2E,$00,$46,$20,$7C,$00,$01,$F8,$4A,$30,$2B,$00,$44,$32,$2B
-	dc.b	$00,$46,$08,$38,$00,$00,$C3,$48,$67,$00,$00,$2A,$4A,$78,$DC,$C4
-	dc.b	$67,$00,$00,$10,$53,$78,$DC,$C4,$66,$00,$00,$08,$08,$F8,$00,$02
-	dc.b	$C3,$3C,$0C,$53,$00,$96,$6E,$00,$00,$0A,$0C,$53,$FF,$6A,$6E,$00
-	dc.b	$00,$04,$42,$41,$9F,$6B,$00,$40,$6A,$00,$00,$48,$08,$EB,$00,$05
-	dc.b	$00,$62,$32,$3C,$0C,$7E,$08,$38,$00,$00,$D2,$79,$67,$00,$00,$06
-	dc.b	$32,$3C,$0D,$0E,$30,$38,$BF,$0A,$B0,$6B,$00,$52,$66,$00,$00,$14
-	dc.b	$32,$3C,$0C,$30,$08,$38,$00,$03,$D2,$79,$66,$00,$00,$06,$32,$3C
-	dc.b	$0D,$28,$61,$00,$31,$D8,$70,$78,$61,$00,$3C,$64,$37,$40,$00,$40
-	dc.b	$4E,$75,$08,$2B,$00,$03,$00,$62,$67,$00,$2B,$FE,$4E,$75,$4E,$75
-	dc.b	$4E,$75
+	btst	#pfalock,$62(a3)
+	bne.s	assgoaliebreakwaitEnd
+	bclr	#pfna,$62(a3)
+	beq.w	.2
+	bsr.w	assscoreRandomTemp1
+	move.w	#8,$42(a3)
+	move.w	#$5A,$44(a3)
+	tst.w	(Hpos).w
+	bpl.w	.1
+	neg.w	$44(a3)
+.1
+	move.w	(Vpos).w,$46(a3)
+.2
+	movea.l	#rtss2,a0
+	move.w	$44(a3),d0
+	move.w	$46(a3),d1
+	btst	#0,(gmode2).w			;shootout? count down the shootout delay and keep the players near center
+	beq.w	.5
+	tst.w	(shootoutdelay).w
+	beq.w	.3
+	subq.w	#1,(shootoutdelay).w
+	bne.w	.3
+	bset	#sf2drec,(sflags2).w
+.3
+	cmpi.w	#$96,(a3)
+	bgt.w	.4
+	cmpi.w	#$FF6A,(a3)
+	bgt.w	.5
+.4
+	clr.w	d1
+.5
+	sub.w	d7,$40(a3)
+	bpl.w	assscoreSkateOrReturn
+	bset	#pfalock,$62(a3)
+	move.w	#SPAcelebrate,d1		;94 $E8A
+	btst	#0,(seed+1).w
+	beq.w	.6
+	move.w	#$D0E,d1
+.6
+	move.w	(shotplayer).w,d0
+	cmp.w	$52(a3),d0
+	bne.w	.7
+	move.w	#$C30,d1
+	btst	#3,(seed+1).w
+	bne.w	.7
+	move.w	#$D28,d1
+.7
+	bsr.w	SetSPA
+assscoreRandomTemp1					;temp1 = random 0..$77 (wait time before the player moves)
+	moveq	#$78,d0
+	bsr.w	randomd0
+	move.w	d0,$40(a3)
+	rts
+assscoreSkateOrReturn	equ	*	;Part of assscore: when pflags bit 3 is clear go to skateto, else return
+	btst	#pfjoycon,$62(a3)
+	beq.w	skateto
+	rts
+	rts
+	rts
 
 assgoaliectrl						;asstab entry: the goalie of a pad.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$03,$00,$62,$66,$00,$00,$06,$60,$00,$2F,$58,$08,$2B
-	dc.b	$00,$01,$00,$62,$66,$00,$00,$94,$48,$A7,$C0,$00,$30,$13,$32,$2B
-	dc.b	$00,$14,$B2,$7C,$00,$AA,$6E,$00,$00,$22,$B2,$7C,$FF,$56,$6D,$00
-	dc.b	$00,$1A,$08,$38,$00,$00,$C3,$38,$66,$00,$00,$10,$3F,$00,$30,$3C
-	dc.b	$00,$08,$4E,$B9,$00,$01,$C1,$D2,$30,$1F,$90,$78,$BD,$32,$92,$78
-	dc.b	$BD,$2E,$08,$AB,$00,$02,$00,$64,$B0,$7C,$00,$74,$6D,$00,$00,$0C
-	dc.b	$08,$EB,$00,$02,$00,$64,$60,$00,$00,$34,$B0,$7C,$FF,$8C,$6E,$00
-	dc.b	$00,$0C,$08,$EB,$00,$02,$00,$64,$60,$00,$00,$22,$B2,$7C,$00,$64
-	dc.b	$6D,$00,$00,$0C,$08,$EB,$00,$02,$00,$64,$60,$00,$00,$10,$B2,$7C
-	dc.b	$FF,$9C,$6E,$00,$00,$08,$08,$EB,$00,$02,$00,$64,$4C,$9F,$00,$03
-	dc.b	$08,$2B,$00,$02,$00,$64,$66,$00,$00,$C6,$08,$2B,$00,$05,$00,$62
-	dc.b	$66,$00,$00,$B0,$61,$00,$F8,$9E,$08,$AB,$00,$01,$00,$62,$67,$00
-	dc.b	$00,$10,$42,$6B,$00,$40,$37,$7C,$00,$08,$00,$42,$50,$EB,$00,$46
-	dc.b	$4E,$B9,$00,$02,$44,$1E,$66,$00,$00,$08,$4E,$B9,$00,$02,$43,$DA
-	dc.b	$08,$2B,$00,$01,$00,$63,$66,$00,$00,$7A,$08,$38,$00,$00,$C3,$38
-	dc.b	$66,$00,$00,$70,$4A,$6B,$00,$48,$6B,$00,$00,$3A,$30,$2B,$00,$52
-	dc.b	$B0,$78,$B7,$BE,$67,$00,$00,$0A,$50,$EB,$00,$48,$60,$00,$00,$26
-	dc.b	$9F,$6B,$00,$48,$6A,$00,$00,$1E,$08,$38,$00,$02,$C3,$40,$67,$00
-	dc.b	$00,$0C,$08,$F8,$00,$04,$C3,$40,$60,$00,$00,$0A,$70,$08,$4E,$B9
-	dc.b	$00,$01,$C1,$D2,$9F,$2B,$00,$40,$6A,$00,$00,$28,$10,$2B,$00,$6C
-	dc.b	$67,$00,$00,$0E,$08,$38,$00,$06,$C3,$4A,$67,$00,$00,$04,$53,$00
-	dc.b	$E4,$08,$17,$40,$00,$40,$30,$2B,$00,$52,$B0,$78,$B7,$BE,$67,$00
-	dc.b	$00,$02,$4E,$75
+	btst	#pfjoycon,$62(a3)		;is player joystick controlled?
+	bne.w	.1						;branch is so
+	bra.w	assexit
+.1
+	btst	#pfna,$62(a3)			;check if new assignment
+	bne.w	.7						;branch if new assignment
+	movem.w	d0-d1,-(sp)				;push to stack
+	move.w	(a3),d0					;Xpos
+	move.w	$14(a3),d1				;Ypos
+	cmp.w	#$AA,d1					;compare $AA to Ypos
+	bgt.w	.2
+	cmp.w	#$FF56,d1				;check -$AA to Ypos
+	blt.w	.2						;branch if less than
+	btst	#gmclock,(gmode).w		;check if clock stopped
+	bne.w	.2						;branch if so
+	move.w	d0,-(sp)				;push to stack
+	move.w	#8,d0					;clock stoppage due to goalie out of range
+	jsr	(AddPenalty2).l
+	move.w	(sp)+,d0				;pop from stack
+.2
+	sub.w	(Hpos).w,d0				;sub ice rink horiz position from Xpos
+	sub.w	(Vpos).w,d1				;sub ice rink vert position from Ypos
+	bclr	#pf3gctrl,$64(a3)		;clear goalie control bit?
+	cmp.w	#$74,d0					;'t'   ; compare $74 to Xpos diff
+	blt.w	.3						;branch if less than
+	bset	#pf3gctrl,$64(a3)		;set goalie control bit?
+	bra.w	.6
+.3
+	cmp.w	#$FF8C,d0				;compare -$74 to Xpos diff
+	bgt.w	.4						;branch if greater than
+	bset	#pf3gctrl,$64(a3)		;set goalie control bit?
+	bra.w	.6
+.4
+	cmp.w	#$64,d1					;'d'   ; compare $64 to Ypos diff
+	blt.w	.5						;branch if less than
+	bset	#pf3gctrl,$64(a3)		;set goalie control bit?
+	bra.w	.6
+.5
+	cmp.w	#$FF9C,d1				;compare -$64 to Ypos diff
+	bgt.w	.6						;branch if greater than
+	bset	#pf3gctrl,$64(a3)		;set goalie control bit?
+.6
+	movem.w	(sp)+,d0-d1				;pop from stack
+	btst	#pf3gctrl,$64(a3)		;check goalie ctrl bit
+	bne.w	assgoaliepuckx			;branch if set
+.7
+	btst	#pfalock,$62(a3)		;check if anim lock
+	bne.w	.14						;exit if so
+	bsr.w	check4bench
+	bclr	#pfna,$62(a3)			;clear new assignment bit
+	beq.w	.8						;branch if already cleared
+	clr.w	$40(a3)					;clear temp1
+	move.w	#8,$42(a3)				;move 8 into temp2
+	st	$46(a3)						;FFFF to temp4
+.8
+	jsr	(GoalieInCrease).l
+	bne.w	.9
+	jsr	(TurnGoalieFromNet).l
+.9
+	btst	#pf2aip,$63(a3)			;check if anim in progress
+	bne.w	.14						;exit if so
+	btst	#gmclock,(gmode).w		;check if clock stopped
+	bne.w	.14						;exit if so
+	tst.w	$48(a3)					;test temp5
+	bmi.w	.12						;branch if less than 0
+	move.w	$52(a3),d0				;move SCnum into d0
+	cmp.w	(puckc).w,d0			;check if puckc is goalie
+	beq.w	.10						;branch if equal
+	st	$48(a3)						;set temp5 to -1
+	bra.w	.12
+.10
+	sub.w	d7,$48(a3)				;subtract d7(frames elapsed) from temp5
+	bpl.w	.12						;branch if more than 0
+	btst	#2,(BA_PS_flags).w		;check bit 2
+	beq.w	.11						;branch if not set
+	bset	#4,(BA_PS_flags).w
+	bra.w	.12
+.11
+	moveq	#8,d0
+	jsr	(AddPenalty2).l
+.12
+	sub.b	d7,$40(a3)				;sub d7(frames elapsed) from temp1
+	bpl.w	.14						;branch if positive
+	move.b	$6C(a3),d0
+	beq.w	.13						;branch if value was 0
+	btst	#6,(sflags7).w			;check if crowd meter broken
+	beq.w	.13						;jump if not
+	subq.b	#1,d0					;sub 1 from d0
+.13
+	lsr.b	#2,d0					;divide by 4
+	move.b	d0,$40(a3)				;move d0 into temp1
+	move.w	$52(a3),d0				;move SCnum into d0
+	cmp.w	(puckc).w,d0			;compare puckc to d0
+	beq.w	.14						;jump to assgoaliecpu if the same
+.14
+	rts
 
 assgoaliecpu						;asstab entry: the computer goalie.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$03,$00,$62,$66,$00,$FE,$94,$31,$F8,$B7,$5E,$DC,$AA
-	dc.b	$08,$38,$00,$00,$C3,$42,$67,$00,$00,$60,$08,$2B,$00,$01,$00,$63
-	dc.b	$66,$00,$00,$56,$08,$38,$00,$01,$C3,$42,$67,$00,$00,$34,$08,$38
-	dc.b	$00,$03,$C3,$42,$66,$00,$00,$42,$0C,$6B,$00,$89,$00,$06,$66,$00
-	dc.b	$00,$38,$0C,$6B,$00,$8D,$00,$06,$66,$00,$00,$2E,$08,$F8,$00,$03
-	dc.b	$C3,$42,$3F,$3C,$00,$1C,$4E,$B9,$00,$08,$84,$70,$60,$00,$00,$1A
-	dc.b	$32,$3C,$03,$7A,$08,$38,$00,$01,$C3,$56,$66,$00,$00,$0C,$61,$00
-	dc.b	$2F,$E6,$08,$EB,$00,$01,$00,$63,$08,$2B,$00,$05,$00,$62,$66,$00
-	dc.b	$00,$78,$61,$00,$F7,$6C,$08,$AB,$00,$01,$00,$62,$67,$00,$00,$10
-	dc.b	$42,$6B,$00,$40,$37,$7C,$00,$08,$00,$42,$50,$EB,$00,$46,$0C,$53
-	dc.b	$00,$34,$6E,$00,$00,$32,$0C,$53,$FF,$CC,$6D,$00,$00,$2A,$0C,$6B
-	dc.b	$01,$24,$00,$14,$6E,$00,$00,$20,$0C,$6B,$FE,$DC,$00,$14,$6D,$00
-	dc.b	$00,$16,$0C,$6B,$00,$E8,$00,$14,$6E,$00,$00,$30,$0C,$6B,$FF,$18
-	dc.b	$00,$14,$6D,$00,$00,$26,$41,$FA,$00,$20,$70,$04,$4A,$53,$6A,$00
-	dc.b	$00,$04,$44,$40,$32,$3C,$00,$FA,$08,$2B,$00,$07,$00,$62,$67,$00
-	dc.b	$29,$A2,$44,$41,$60,$00,$29,$9C,$4E,$75,$08,$2B,$00,$01,$00,$63
-	dc.b	$66,$F6,$08,$38,$00,$00,$C3,$42,$67,$00,$00,$26,$0C,$6B,$00,$8A
-	dc.b	$00,$06,$67,$00,$00,$16,$0C,$6B,$00,$8E,$00,$06,$66,$00,$00,$12
-	dc.b	$37,$7C,$00,$04,$00,$54,$60,$00,$00,$08,$37,$7C,$00,$00,$00,$54
-	dc.b	$32,$3C,$07,$12,$48,$A7,$80,$00,$30,$38,$B7,$72,$90,$6B,$00,$14
-	dc.b	$6A,$00,$00,$04,$44,$40,$B0,$7C,$01,$94,$6E,$00,$00,$16,$B0,$7C
-	dc.b	$00,$A8,$6E,$00,$00,$06,$60,$00,$00,$0E,$32,$3C,$05,$7E,$60,$00
-	dc.b	$00,$06,$32,$3C,$00,$CE,$4C,$9F,$00,$01,$61,$00,$2E,$EA,$08,$38
-	dc.b	$00,$02,$C3,$40,$66,$00,$00,$0C,$08,$38,$00,$00,$C3,$38,$66,$00
-	dc.b	$FF,$78,$4A,$6B,$00,$48,$6B,$00,$00,$3A,$30,$2B,$00,$52,$B0,$78
-	dc.b	$B7,$BE,$67,$00,$00,$0A,$50,$EB,$00,$48,$60,$00,$00,$26,$9F,$6B
-	dc.b	$00,$48,$6A,$00,$00,$1E,$08,$38,$00,$02,$C3,$40,$67,$00,$00,$0C
-	dc.b	$08,$F8,$00,$04,$C3,$40,$60,$00,$00,$0A,$70,$08,$4E,$B9,$00,$01
-	dc.b	$C1,$D2,$9F,$2B,$00,$40,$6A,$00,$03,$C0,$10,$2B,$00,$6C,$67,$00
-	dc.b	$00,$0E,$08,$38,$00,$06,$C3,$4A,$67,$00,$00,$04,$53,$00,$E4,$08
-	dc.b	$17,$40,$00,$40,$08,$2B,$00,$03,$00,$62,$67,$00,$00,$12,$08,$2B
-	dc.b	$00,$02,$00,$64,$66,$00,$00,$08,$70,$1D,$60,$00,$2C,$16,$30,$38
-	dc.b	$B7,$72,$32,$2B,$00,$14,$B1,$41,$6A,$00,$00,$18,$42,$40,$34,$3C
-	dc.b	$01,$0A,$08,$2B,$00,$07,$00,$62,$67,$00,$03,$22,$44,$42,$60,$00
-	dc.b	$03,$1C,$53,$6B,$00,$46,$6A,$00,$00,$08,$37,$7C,$FF,$FF,$00,$46
-	dc.b	$30,$2B,$00,$52,$B0,$78,$B7,$BE,$66,$00,$00,$8E,$4A,$6B,$00,$48
-	dc.b	$6A,$00,$00,$08,$37,$7C,$00,$5A,$00,$48,$50,$EB,$00,$46,$0C,$6B
-	dc.b	$00,$5A,$00,$48,$6E,$00,$01,$0A,$30,$39,$00,$C0,$00,$08,$02,$40
-	dc.b	$00,$03,$66,$00,$00,$FC,$70,$05,$30,$7C,$B0,$5E,$08,$2B,$00,$06
-	dc.b	$00,$62,$66,$00,$00,$06,$D0,$FC,$03,$00,$08,$28,$00,$02,$00,$63
-	dc.b	$66,$00,$00,$30,$32,$38,$B7,$72,$92,$68,$00,$14,$B2,$7C,$00,$1C
-	dc.b	$6E,$00,$00,$20,$B2,$7C,$FF,$E4,$6D,$00,$00,$18,$32,$38,$B7,$5E
-	dc.b	$92,$50,$B2,$7C,$00,$19,$6E,$00,$00,$0A,$B2,$7C,$FF,$E7,$6E,$00
-	dc.b	$00,$B0,$D0,$FC,$00,$80,$51,$C8,$FF,$C2,$31,$FC,$00,$01,$BF,$18
-	dc.b	$61,$00,$0D,$68,$60,$00,$00,$9A,$4A,$6B,$00,$46,$66,$00,$00,$92
-	dc.b	$4A,$78,$B7,$BE,$6A,$00,$00,$8A,$30,$38,$B7,$5E,$90,$53,$B0,$7C
-	dc.b	$00,$14,$6E,$00,$00,$7C,$B0,$7C,$FF,$EC,$6D,$00,$00,$74,$32,$38
-	dc.b	$B7,$72,$B2,$7C,$01,$1E,$6E,$00,$00,$68,$B2,$7C,$FE,$E2,$6D,$00
-	dc.b	$00,$60,$92,$6B,$00,$14,$B2,$7C,$00,$1E,$6E,$00,$00,$54,$B2,$7C
-	dc.b	$FF,$E2,$6D,$00,$00,$4C,$48,$A7,$C0,$00,$30,$38,$B7,$86,$6A,$00
-	dc.b	$00,$04,$44,$40,$32,$38,$B7,$88,$6A,$00,$00,$04,$44,$41,$D0,$41
-	dc.b	$B0,$7C,$10,$00,$4C,$9F,$00,$03,$6E,$00,$00,$26,$61,$00,$2A,$F2
-	dc.b	$37,$40,$00,$54,$17,$7C,$00,$08,$00,$5E,$32,$3C,$04,$9A,$61,$00
-	dc.b	$2D,$06,$08,$EB,$00,$01,$00,$63,$06,$78,$00,$96,$B8,$B2,$4E,$75
-	dc.b	$30,$7C,$BF,$1A,$36,$3C,$01,$1A,$08,$2B,$00,$07,$00,$62,$67,$00
-	dc.b	$00,$06,$58,$48,$44,$43,$0C,$6B,$01,$1A,$00,$14,$6E,$00,$00,$0C
-	dc.b	$0C,$6B,$FE,$E6,$00,$14,$6E,$00,$00,$26,$42,$42,$42,$40,$0C,$53
-	dc.b	$00,$2C,$6E,$00,$01,$A8,$0C,$53,$FF,$D4,$6D,$00,$01,$A0,$30,$3C
-	dc.b	$00,$96,$4A,$53,$6A,$00,$01,$96,$44,$40,$60,$00,$01,$90,$4A,$78
-	dc.b	$B7,$BE,$6B,$00,$00,$2E,$30,$2B,$00,$52,$B0,$78,$B7,$BE,$67,$00
-	dc.b	$00,$22,$2F,$08,$20,$7C,$FF,$FF,$B0,$5E,$30,$38,$B7,$BE,$EF,$40
-	dc.b	$D0,$C0,$30,$38,$B7,$5E,$90,$50,$E2,$40,$D0,$50,$31,$C0,$DC,$AA
-	dc.b	$20,$5F,$30,$38,$DC,$AA,$32,$38,$B7,$72,$61,$00,$02,$32,$61,$00
-	dc.b	$2A,$40,$61,$00,$02,$54,$30,$38,$C4,$BE,$02,$40,$00,$07,$E9,$40
-	dc.b	$06,$40,$00,$A0,$0C,$78,$00,$F1,$B7,$72,$6E,$00,$00,$0C,$0C,$78
-	dc.b	$FF,$0F,$B7,$72,$6E,$00,$00,$06,$04,$40,$00,$40,$32,$00,$C1,$F8
-	dc.b	$B7,$86,$48,$40,$D0,$78,$DC,$AA,$C3,$F8,$B7,$88,$48,$41,$D2,$78
-	dc.b	$B7,$72,$61,$00,$01,$EA,$48,$A7,$C0,$00,$C1,$C0,$C3,$C1,$D0,$81
-	dc.b	$B0,$BC,$00,$00,$03,$84,$62,$00,$00,$0A,$4C,$9F,$00,$03,$60,$00
-	dc.b	$00,$26,$61,$00,$36,$CC,$74,$01,$D4,$40,$78,$12,$08,$38,$00,$03
-	dc.b	$C3,$3A,$67,$00,$00,$04,$50,$44,$4C,$9F,$00,$03,$C3,$C4,$50,$44
-	dc.b	$C1,$C4,$81,$C2,$83,$C2,$D2,$43,$34,$01,$08,$38,$00,$00,$C3,$48
-	dc.b	$66,$00,$00,$50,$08,$38,$00,$02,$C3,$40,$66,$00,$00,$46,$60,$00
-	dc.b	$00,$42,$08,$38,$00,$03,$C3,$3A,$67,$00,$00,$38,$0C,$78,$00,$D0
-	dc.b	$B7,$72,$6E,$00,$00,$10,$0C,$78,$FF,$30,$B7,$72,$6D,$00,$00,$06
-	dc.b	$60,$00,$00,$20,$0C,$53,$00,$14,$6E,$00,$00,$18,$0C,$53,$FF,$EC
-	dc.b	$6D,$00,$00,$10,$08,$38,$00,$01,$C4,$BF,$66,$00,$00,$06,$60,$00
-	dc.b	$00,$26,$0C,$68,$00,$22,$00,$02,$62,$00,$00,$62,$0C,$50,$00,$18
-	dc.b	$6E,$00,$00,$B8,$0C,$50,$FF,$E8,$6D,$00,$00,$B0,$0C,$68,$00,$0C
-	dc.b	$00,$02,$62,$00,$00,$26,$0C,$78,$01,$1E,$B7,$72,$6E,$00,$00,$1C
-	dc.b	$0C,$78,$FE,$E2,$B7,$72,$6D,$00,$00,$12,$08,$EB,$00,$01,$00,$63
-	dc.b	$66,$00,$00,$08,$4E,$B9,$00,$01,$7C,$58,$30,$10,$0C,$78,$01,$12
-	dc.b	$B7,$72,$6E,$00,$00,$0C,$0C,$78,$FE,$EE,$B7,$72,$6E,$00,$00,$0E
-	dc.b	$70,$18,$4A,$78,$DC,$AA,$6A,$00,$00,$04,$44,$40,$32,$02,$48,$A7
-	dc.b	$C0,$00,$10,$2B,$00,$28,$48,$80,$44,$40,$D0,$5F,$90,$53,$12,$2B
-	dc.b	$00,$2A,$48,$81,$44,$41,$D2,$5F,$92,$6B,$00,$14,$B0,$7C,$00,$04
-	dc.b	$6E,$00,$00,$1E,$B0,$7C,$FF,$FC,$6D,$00,$00,$16,$B2,$7C,$00,$04
-	dc.b	$6E,$00,$00,$0E,$B2,$7C,$FF,$FC,$6D,$00,$00,$06,$42,$40,$42,$41
-	dc.b	$61,$00,$28,$AE,$17,$40,$00,$43,$14,$2B,$00,$43,$48,$82,$B4,$7C
-	dc.b	$00,$07,$6F,$00,$30,$04,$60,$00,$32,$C0,$4A,$78,$B7,$BE,$6A,$9C
-	dc.b	$08,$38,$00,$02,$BF,$BA,$66,$94,$32,$7C,$C7,$26,$45,$E9,$03,$9E
-	dc.b	$08,$2B,$00,$06,$00,$62,$67,$00,$00,$04,$C3,$4A,$0C,$A9,$00,$00
-	dc.b	$13,$24,$00,$2A,$6D,$00,$FF,$76,$0C,$AA,$00,$00,$09,$C4,$00,$2A
-	dc.b	$6D,$00,$FF,$6A,$0C,$78,$00,$F6,$B7,$72,$6E,$00,$00,$0C,$0C,$78
-	dc.b	$FF,$0A,$B7,$72,$6E,$00,$FF,$56,$4A,$78,$B7,$88,$08,$2B,$00,$07
-	dc.b	$00,$62,$67,$00,$00,$06,$0A,$3C,$00,$08,$6B,$00,$FF,$40,$30,$38
-	dc.b	$B7,$86,$6A,$00,$00,$04,$44,$40,$32,$38,$B7,$88,$6A,$00,$00,$04
-	dc.b	$44,$41,$B2,$40,$6D,$00,$FF,$26,$70,$0F,$60,$00,$27,$F6,$34,$38
-	dc.b	$B7,$BE,$B4,$6B,$00,$52,$66,$00,$00,$04,$42,$40,$B2,$7C,$01,$19
-	dc.b	$6D,$00,$00,$06,$32,$3C,$01,$19,$B2,$7C,$FE,$E7,$6E,$00,$00,$06
-	dc.b	$32,$3C,$FE,$E7,$92,$43,$4E,$75
+	btst	#pfjoycon,pflags(a3)
+	bne.w	assgoaliectrl
+assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
+	move.w	(puckx).w,(OptPad+4).w
+	btst	#0,(sflags4).w			;test bit 0
+	beq.w	.2
+	btst	#pf2aip,$63(a3)			;check if animation in progress
+	bne.w	.2						;branch if so
+	btst	#1,(sflags4).w			;test bit 1
+	beq.w	.1						;branch if 0
+	btst	#3,(sflags4).w			;test bit 3
+	bne.w	.2						;branch if set
+	cmpi.w	#$89,6(a3)				;compare to alice frame number
+	bne.w	.2						;branch if not equal
+	cmpi.w	#$8D,6(a3)				;compare to alice frame number
+	bne.w	.2						;branch if not equal
+	bset	#3,(sflags4).w			;set bit 3
+	move.w	#SFXcheck,-(sp)			;SFX
+	jsr	(sfx).l
+	bra.w	.2						;set bit 3
+.1
+	move.w	#$37A,d1
+	btst	#1,(sflags12).w
+	bne.w	.2
+	;slam animation set
+	bsr.w	SetSPA					;set animation of d1
+	bset	#pf2aip,$63(a3)			;set anim in progress
+	;goalie assignment proper: bench check and new assignment setup
+.2
+	btst	#pfalock,$62(a3)		;check if locked in animation
+	bne.w	.loop					;exit if so
+	bsr.w	check4bench
+	bclr	#pfna,$62(a3)			;clear new assignment
+	beq.w	.3						;jump if it was cleared already
+	clr.w	$40(a3)					;clear temp1
+	move.w	#8,$42(a3)				;move 8 into temp2
+	st	$46(a3)						;set temp5 (FFFF)
+	;count down the timer
+.3
+	cmpi.w	#$34,(a3)				;compare 34 hex with Xpos
+	bgt.w	.4						;branch if greater
+	cmpi.w	#$FFCC,(a3)				;compare -34 hex with Xpos
+	blt.w	.4						;branch if less than
+	cmpi.w	#$124,$14(a3)
+	bgt.w	.4
+	cmpi.w	#$FEDC,$14(a3)
+	blt.w	.4
+	cmpi.w	#$E8,$14(a3)
+	bgt.w	.6
+	cmpi.w	#$FF18,$14(a3)
+	blt.w	.6
+	;near the net: skate back to the middle of the crease
+.4
+	lea	.loop(pc),a0				;goalie will skate back to middle position
+	moveq	#4,d0
+	tst.w	(a3)					;test Xpos
+	bpl.w	.5						;branch if positive
+	neg.w	d0
+.5
+	move.w	#$FA,d1
+	btst	#pfgoal,$62(a3)			;check what goal shooting at
+	beq.w	skateto					;branch if bottom
+	neg.w	d1
+	bra.w	skateto
+.loop
+	rts
+	;in position: ready stance, facing up or down the ice
+.6
+	btst	#pf2aip,$63(a3)			;check if anim in progress
+	bne.s	.loop					;exit if so
+	btst	#0,(sflags4).w			;check bit 0
+	beq.w	.8						;branch if not set
+	cmpi.w	#$8A,6(a3)				;check alice frame
+	beq.w	.7						;branch if equal
+	cmpi.w	#$8E,6(a3)				;check alice frame
+	bne.w	.8						;branch if not equal
+	move.w	#4,$54(a3)				;set 4 to facedir - face down
+	bra.w	.8
+	;facing the top net
+.7
+	move.w	#0,$54(a3)				;set 0 to facedir - face up
+	;ready stance; a penalty shot keeps the goalie set
+.8
+	move.w	#SPAgready,d1
+	movem.w	d0,-(sp)
+	move.w	(pucky).w,d0
+	sub.w	$14(a3),d0
+	bpl.w	.9
+	neg.w	d0
+.9
+	cmp.w	#$194,d0
+	bgt.w	.11
+	cmp.w	#$A8,d0
+	bgt.w	.10
+	bra.w	.12
+.10
+	move.w	#$57E,d1
+	bra.w	.12
+.11
+	move.w	#$CE,d1
+.12
+	movem.w	(sp)+,d0
+	bsr.w	SetSPA
+	btst	#2,(BA_PS_flags).w		;check bit 2
+	bne.w	.13						;branch if set
+	btst	#gmclock,(gmode).w		;check if clock
+	bne.w	.loop					;exit if clock stopped
+	;skate to the spot
+.13
+	tst.w	$48(a3)					;temp5
+	bmi.w	.16						;branch if minus
+	move.w	$52(a3),d0				;move SCnum to d0
+	cmp.w	(puckc).w,d0			;check if puckc
+	beq.w	.14						;branch if so
+	st	$48(a3)						;set temp5 to FFFF
+	bra.w	.16
+	;d0 = puckc
+.14
+	sub.w	d7,$48(a3)				;subtract frames from temp5
+	bpl.w	.16						;branch if positive
+	btst	#2,(BA_PS_flags).w		;check if bit 2 set
+	beq.w	.15						;branch if not
+	bset	#4,(BA_PS_flags).w		;set bit 4
+	bra.w	.16
+	;bit 2 of BA_PS_flags clear
+.15
+	moveq	#PenGhold,d0
+	jsr	(AddPenalty2).l				;blow whistle for FO
+	;no faceoff: count down the reaction timer
+.16
+	sub.b	d7,$40(a3)				;sub d7 from temp1
+	bpl.w	.42						;branch if still positive
+	move.b	$6C(a3),d0
+	beq.w	.17						;branch if 0
+	btst	#6,(sflags7).w			;check if crowd meter broken
+	beq.w	.17						;branch if not
+	subq.b	#1,d0					;sub from d0
+	;faceoff odds
+.17
+	lsr.b	#2,d0					;divide by 4
+	move.b	d0,$40(a3)				;move d0 into temp1
+	btst	#pfjoycon,$62(a3)		;check if joy controlled
+	beq.w	.18						;branch if not
+	btst	#pf3gctrl,$64(a3)		;check bit 2
+	bne.w	.18						;branch if set
+	moveq	#$1D,d0					;assignment assgoaliectrl
+	bra.w	assinsert
+	;pfjoycon clear or pf3gctrl set
+.18
+	move.w	(pucky).w,d0			;move pucky into d0
+	move.w	$14(a3),d1				;move Ypos into d1
+	eor.w	d0,d1					;XOR
+	bpl.w	.19						;branch if positive
+	clr.w	d0
+	move.w	#$10A,d2
+	btst	#pfgoal,$62(a3)			;check which net shooting at
+	beq.w	.loop3					;branch if bottom
+	neg.w	d2
+	bra.w	.loop3
+	;timer out: count temp4 down to -1
+.19
+	subq.w	#1,$46(a3)				;sub 1 from temp4
+	bpl.w	.20						;branch if positive
+	move.w	#$FFFF,$46(a3)			;move -1 into temp4
+	;is the goalie the puck carrier?
+.20
+	move.w	$52(a3),d0				;SCnum into d0
+	cmp.w	(puckc).w,d0			;check if puckc
+	bne.w	.23						;branch if not
+	tst.w	$48(a3)					;check temp5
+	bpl.w	.21						;branch if positive
+	move.w	#$5A,$48(a3)			;move 5A into temp5
+	;goalie holding the puck: freeze timer at 90, then pass or whistle
+.21
+	st	$46(a3)						;FFFF into temp4
+	cmpi.w	#$5A,$48(a3)			;compare to temp5
+	bgt.w	.26						;branch if greater
+	move.w	(HVcount).l,d0
+	andi.w	#3,d0					;pass first 2 bits
+	bne.w	.26						;branch if not 0
+	moveq	#5,d0
+	movea.w	#(SortCords-M68K_RAM),a0
+	btst	#pfteam,$62(a3)			;check home or away
+	bne.w	.loop2					;branch if away
+	adda.w	#$300,a0
+	;each player of the other team
+.loop2
+	btst	#pf2unav,$63(a0)		;check if player unavailable
+	bne.w	.22						;branch if so
+	move.w	(pucky).w,d1			;pucky into d1
+	sub.w	$14(a0),d1				;sub Ypos a0 from d1
+	cmp.w	#$1C,d1					;compare 1C to difference
+	bgt.w	.22						;branch if greater
+	cmp.w	#$FFE4,d1				;compare -1C
+	blt.w	.22						;branch if less than
+	move.w	(puckx).w,d1			;puckx into d1
+	sub.w	(a0),d1					;sub Xpos a0 from d1
+	cmp.w	#$19,d1					;compare 19 to difference
+	bgt.w	.22						;branch if greater
+	cmp.w	#$FFE7,d1				;compare -19 to diff
+	bgt.w	.26						;branch if greater
+	;next opponent; none close: look for a pass
+.22
+	adda.w	#$80,a0					;move to next struct
+	dbf	d0,.loop2
+	move.w	#1,(glovecords+4).w		;dir of threat on puck handler
+	bsr.w	chk4pass
+	bra.w	.26
+	;d0 <> puckc
+.23
+	tst.w	$46(a3)					;check temp4
+	bne.w	.26						;branch if not 0
+	tst.w	(puckc).w				;check puckc
+	bpl.w	.26						;branch if there is a puckc
+	move.w	(puckx).w,d0
+	sub.w	(a3),d0					;sub Xpos
+	cmp.w	#$14,d0					;compare 14 to diff
+	bgt.w	.26						;branch if greater
+	cmp.w	#$FFEC,d0				;-14
+	blt.w	.26						;branch if less
+	move.w	(pucky).w,d1
+	cmp.w	#$11E,d1
+	bgt.w	.26						;branch if past goalline
+	cmp.w	#$FEE2,d1
+	blt.w	.26						;branch if past
+	sub.w	$14(a3),d1				;sub Ypos from d1
+	cmp.w	#$1E,d1					;compare to 1E
+	bgt.w	.26						;branch if greater
+	cmp.w	#$FFE2,d1				;compare to -1E
+	blt.w	.26						;branch if less
+	movem.w	d0-d1,-(sp)
+	move.w	(puckvx).w,d0
+	bpl.w	.24
+	neg.w	d0
+	;|puckvx|
+.24
+	move.w	(puckvy).w,d1
+	bpl.w	.25
+	neg.w	d1
+	;|puckvy|
+.25
+	add.w	d1,d0					;add puckvx and vy
+	cmp.w	#$1000,d0				;compare to 1000
+	movem.w	(sp)+,d0-d1
+	bgt.w	.26						;branch if greater
+	bsr.w	vtoa
+	move.w	d0,$54(a3)				;d0 into facedir. Goalie will face puck
+	move.b	#8,$5E(a3)				;move 8 to nopuck collision
+	move.w	#SPAgdive,d1			;goalie dive anim.
+	bsr.w	SetSPA					;set animation
+	bset	#pf2aip,$63(a3)			;set anim in progress
+	addi.w	#$96,(Crowdlevel).w
+	rts
+	;not holding the puck: play the shot (puckcross at the goal line)
+.26
+	movea.w	#(puckcross-M68K_RAM),a0	;puckcross = xcord/frames top to bottom for goalies to react to
+	move.w	#$11A,d3
+	btst	#pfgoal,$62(a3)			;check what net shooting at
+	beq.w	.27						;branch if bottom
+	addq.w	#4,a0
+	neg.w	d3
+.27
+	cmpi.w	#$11A,$14(a3)
+	bgt.w	.28
+	cmpi.w	#$FEE6,$14(a3)
+	bgt.w	.29
+	;far from the goal line: stand in the crease middle
+.28
+	clr.w	d2
+	clr.w	d0
+	cmpi.w	#$2C,(a3)
+	bgt.w	.loop3
+	cmpi.w	#$FFD4,(a3)
+	blt.w	.loop3
+	move.w	#$96,d0
+	tst.w	(a3)
+	bpl.w	.loop3
+	neg.w	d0
+	bra.w	.loop3
+	;near the goal line: follow the puck
+.29
+	tst.w	(puckc).w
+	bmi.w	.30
+	move.w	$52(a3),d0
+	cmp.w	(puckc).w,d0
+	beq.w	.30
+	move.l	a0,-(sp)
+	movea.l	#SortCords,a0
+	move.w	(puckc).w,d0
+	asl.w	#7,d0
+	adda.w	d0,a0
+	move.w	(puckx).w,d0
+	sub.w	(a0),d0
+	asr.w	#1,d0
+	add.w	(a0),d0
+	move.w	d0,(OptPad+4).w
+	movea.l	(sp)+,a0
+	;target X set
+.30
+	move.w	(OptPad+4).w,d0
+	move.w	(pucky).w,d1
+	bsr.w	ClampYPosition
+	bsr.w	vtoa
+	bsr.w	AdjustFacingDirection
+	move.w	(gameclock).w,d0
+	andi.w	#7,d0
+	asl.w	#4,d0
+	addi.w	#$A0,d0
+	cmpi.w	#$F1,(pucky).w
+	bgt.w	.31
+	cmpi.w	#$FF0F,(pucky).w
+	bgt.w	.32
+	;puck outside the zone
+.31
+	subi.w	#$40,d0
+	;d0 = lead time (shorter near the ends): where the puck will be
+.32
+	move.w	d0,d1
+	muls.w	(puckvx).w,d0
+	swap	d0
+	add.w	(OptPad+4).w,d0
+	muls.w	(puckvy).w,d1
+	swap	d1
+	add.w	(pucky).w,d1
+	bsr.w	ClampYPosition
+	movem.w	d0-d1,-(sp)
+	muls.w	d0,d0
+	muls.w	d1,d1
+	add.l	d1,d0
+	cmp.l	#$384,d0
+	bhi.w	.33
+	movem.w	(sp)+,d0-d1
+	bra.w	.35
+	;d0 > $384
+.33
+	bsr.w	Sroot
+	moveq	#1,d2
+	add.w	d0,d2
+	moveq	#$12,d4
+	btst	#sfssdir,(sflags).w
+	beq.w	.34
+	addq.w	#8,d4
+	;pop the d0-d1 saved above
+.34
+	movem.w	(sp)+,d0-d1
+	muls.w	d4,d1
+	addq.w	#8,d4
+	muls.w	d4,d0
+	divs.w	d2,d0
+	divs.w	d2,d1
+	;target set: d2 = goal line; shootouts skip the next test
+.35
+	add.w	d3,d1
+	move.w	d1,d2
+	btst	#0,(gmode2).w
+	bne.w	.37
+	btst	#2,(BA_PS_flags).w
+	bne.w	.37
+	bra.w	.37
+	btst	#sfssdir,(sflags).w
+	beq.w	.37
+	cmpi.w	#$D0,(pucky).w
+	bgt.w	.36
+	cmpi.w	#$FF30,(pucky).w
+	blt.w	.36
+	bra.w	.37
+	;puck in front of the net: stay in the crease width
+.36
+	cmpi.w	#$14,(a3)
+	bgt.w	.37
+	cmpi.w	#$FFEC,(a3)
+	blt.w	.37
+	btst	#1,(gameclock+1).w
+	bne.w	.37
+	bra.w	.38
+	;crossing point near enough: try a save
+.37
+	cmpi.w	#$22,2(a0)
+	bhi.w	.loop3
+	cmpi.w	#$18,(a0)
+	bgt.w	.43
+	cmpi.w	#$FFE8,(a0)
+	blt.w	.43
+	cmpi.w	#$C,2(a0)
+	bhi.w	.39
+.38
+	cmpi.w	#$11E,(pucky).w
+	bgt.w	.39
+	cmpi.w	#$FEE2,(pucky).w
+	blt.w	.39
+	bset	#pf2aip,$63(a3)
+	bne.w	.39
+	jsr	(goaliesave).l
+	;follow the crossing x along the goal line
+.39
+	move.w	(a0),d0
+	cmpi.w	#$112,(pucky).w
+	bgt.w	.40
+	cmpi.w	#$FEEE,(pucky).w
+	bgt.w	.loop3
+	;puck in the zone
+.40
+	moveq	#$18,d0
+	tst.w	(OptPad+4).w
+	bpl.w	.loop3
+	neg.w	d0
+	;d0/d1 = the spot; turn the goalie toward it
+.loop3
+	move.w	d2,d1
+	movem.w	d0-d1,-(sp)
+	move.b	$28(a3),d0
+	ext.w	d0
+	neg.w	d0
+	add.w	(sp)+,d0
+	sub.w	(a3),d0
+	move.b	$2A(a3),d1
+	ext.w	d1
+	neg.w	d1
+	add.w	(sp)+,d1
+	sub.w	$14(a3),d1
+	cmp.w	#4,d0
+	bgt.w	.41
+	cmp.w	#$FFFC,d0
+	blt.w	.41
+	cmp.w	#4,d1
+	bgt.w	.41
+	cmp.w	#$FFFC,d1
+	blt.w	.41
+	clr.w	d0
+	clr.w	d1
+	;direction to the spot (zero when close)
+.41
+	bsr.w	vtoa
+	move.b	d0,$43(a3)				;move d0 into temp2+1
+	;d2 = wanted direction: accelerate (or stop for 8)
+.42
+	move.b	$43(a3),d2				;temp2+1
+	ext.w	d2
+	cmp.w	#7,d2
+	ble.w	playeracc
+	bra.w	stopna2
+	;nobody has the puck and no icing: follow it
+.43
+	tst.w	(puckc).w
+	bpl.s	.loop3
+	btst	#ifok,(lty+2).w
+	bne.s	.loop3
+	movea.w	#(tmstruct-M68K_RAM),a1
+	lea	$39E(a1),a2
+	btst	#pfteam,$62(a3)
+	beq.w	.44
+	exg	a1,a2
+	;team structs chosen
+.44
+	cmpi.l	#$1324,$2A(a1)
+	blt.w	.loop3
+	cmpi.l	#$9C4,$2A(a2)
+	blt.w	.loop3
+	cmpi.w	#$F6,(pucky).w
+	bgt.w	.45
+	cmpi.w	#$FF0A,(pucky).w
+	bgt.w	.loop3
+	;puck past the circles
+.45
+	tst.w	(puckvy).w
+	btst	#pfgoal,$62(a3)
+	beq.w	.46
+	eori.b	#8,ccr
+	;puck direction check
+.46
+	bmi.w	.loop3
+	move.w	(puckvx).w,d0
+	bpl.w	.47
+	neg.w	d0
+	;|puckvx|
+.47
+	move.w	(puckvy).w,d1
+	bpl.w	.48
+	neg.w	d1
+	;|puckvy|
+.48
+	cmp.w	d0,d1
+	blt.w	.loop3
+	moveq	#$F,d0					;assignment DD2E?
+	bra.w	assinsert
+ClampYPosition						;Clamp d1 to the goal line range ($FEE7..$119) and subtract d3
+	move.w	(puckc).w,d2
+	cmp.w	$52(a3),d2
+	bne.w	.1
+	clr.w	d0
+.1
+	cmp.w	#$119,d1
+	blt.w	.2
+	move.w	#$119,d1
+.2
+	cmp.w	#$FEE7,d1
+	bgt.w	.3
+	move.w	#$FEE7,d1
+.3
+	sub.w	d3,d1
+	rts

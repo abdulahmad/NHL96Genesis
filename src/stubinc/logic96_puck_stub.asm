@@ -35,6 +35,25 @@ SetShotMode = $00F496				;input96_stub
 sfx = $088470						;collide96_stub
 ShotMode = $00F530					;input96_stub
 skateto = $01A050					;fight96_stub
+AvgCline = $01D1DE				;lines96_bar
+CanBlock = $1D98EE				;code96_15
+CompLine = $019868				;faceoff96_stub
+GetHot = $01A458				;collide96_stub
+HoldplayerImpact = $0169A6				;control96
+PuckLeadPosition = $01A210				;logic96_vec
+ReadGoaliePulled = $1D9352				;code96_15
+ShootoutShootCheck = $1D8CF6				;shootout96_path
+SkatePath = $1D8C6E				;shootout96_path
+assgoaliecpu = $0175BE				;logic96_stub
+assinsert = $01A3D0				;collide96_stub
+burst = $016934				;control96
+check4bench = $016DAE				;logic96_ass
+dopass = $00F8F6				;code96_14_stub
+printscores1 = $01D062				;collide96_stub
+randomd0s = $01B09A				;collide96_stub
+setpersonel = $01FB52				;shootout96_stub
+shotdirmathAssShoot = $00F466				;input96_shot
+skatetoIntercept = $01A24A				;logic96_vec
 
 
 ; Main segment code

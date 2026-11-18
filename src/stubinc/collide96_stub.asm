@@ -79,6 +79,10 @@ SPAfweaveend = $3230				;frames96
 SPAgdive = $49A						;frames96
 SPAgskate = $640					;frames96
 SPAgstackr = $440					;frames96
+GetHot2a = $01A4B2				;logic96_vec
+GetHot2b = $01A528				;logic96_vec
+GetHot2c = $01A59E				;logic96_vec
+onetimershot = $1D6BE6				;code96_14
 
 
 ; Main segment code

@@ -66,6 +66,8 @@ vb2 = $0202C4						;display96
 ContinuePlayoffs = $021BB0			;playoff96
 NewPO = $021C28						;playoff96
 forceblack = $01AF52				;pause96_stub
+eraser = $01B976				;goal96_box_stub
+rtss2 = $01F84A				;playoff96_stub
 
 
 ; Main segment code

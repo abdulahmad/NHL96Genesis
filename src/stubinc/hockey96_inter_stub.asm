@@ -39,6 +39,11 @@ printbig = $01BEEC					;stats96_stub
 printsmall = $01BA40				;create96_stub
 SPAgskate = $640					;frames96
 SPAturnl = $2020					;frames96
+Framer = $01B9B0				;goal96_box_stub
+PerLabels = $023384				;middle96_per
+PushNumberWidth = $01BE1C				;goal96_box_stub
+print = $01BBA0				;goal96_box_stub
+printz = $01BB8E				;goal96_box_stub
 
 
 ; Main segment code
