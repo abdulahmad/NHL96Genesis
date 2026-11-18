@@ -57,7 +57,7 @@ EASNmap								;The EASN logo map (EASNLogo); +8 the tiles
 	incbin	..\Extracted\NHL96\Graphics\EASNmap.map.jim
 
 EASportsMap							;The EA Sports screen map (EASportsScreen)
-	incbin	..\Extracted\NHL96\Graphics\EASportsMap.map.jim
+	incbin	..\Extracted\NHL96\Graphics\EASportsSplash.map.jim
 
 RevRinkTilelist						;The ice rink map rows of a reverse angle replay (updatescroll)
 	incbin	..\Extracted\NHL96\Graphics\RevRinkTilelist.bin
