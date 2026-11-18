@@ -20,7 +20,7 @@ See START_HERE.md. ROM `lst/nhl96.bin` (SHA-1 7204633fbb9966ac637e7966d02ba15c5a
 IDA listing `lst/nhl96.bin.lst` are in the repo for now (the listing is about 53 MB; GitHub warns above
 50 MB). If they are removed later, put them back at exactly those paths; the prebuild message names
 the path, SHA-1 and size.
-Windows: `npm run build:retail`, `npm run seg:<name>`. Linux (wine): `tools/build_rom.sh`,
+Windows: `npm run build:retail`. Linux (wine): `tools/build_rom.sh`,
 `tools/verify_segment.sh <name>`, `tools/verify_all.sh`. All logs go to `output/`.
 
 ## Tools
@@ -47,15 +47,13 @@ Windows: `npm run build:retail`, `npm run seg:<name>`. Linux (wine): `tools/buil
   positives go in `tools/code_as_data_ok.txt`); `tools/mark_code_as_data.py --apply` puts the "Code kept as bytes" marker
   above each flagged run; `tools/decode_code.py [--apply] [--structs --structregs 2,3] [FILE]` turns each marked run into
   instructions, local labels, `String` macros and names from `tools/decode_names.csv` (`addr,name,comment`) and from the
-  95G/94G/93G/92G sources (`tools/lineage.py`, `--parents DIR`); `tools/fix_stub.py SEG` adds the stub equates a segment
-  needs; `tools/reflow_comments.py` re-wraps comments to the layout rules.
+  95G/94G/93G/92G sources (`tools/lineage.py`, `--parents DIR`); `tools/reflow_comments.py` re-wraps comments to the layout rules.
   How the last blocks were done: `tools/split_runs.py [--apply]` cuts a run where `tools/decode_hints.csv` says `block,ADDR` and
   puts the marker there (`data,START,END` makes a range a data pocket); `tools/insert_labels.py [--apply] [--data] LIST` puts
   `Name equ *` in front of the line that starts at an address of already decoded code (the label does not start a new local
   scope and may be used before it is defined; a plain `Name` label would reset the local labels, a `Name = *` one cannot be
-  used before its line); `tools/fix_stubs.py` adds the stub equates a segment needs after a decode (reads the failed segment
-  logs); `tools/check_names.py` checks every csv name sits at its address. Order: build, split_runs, rebuild (the listing
-  must match the rows), decode_code --apply, fix_stubs, verify_all. `tools/m68kdis.py` is the disassembler.
+  used before its line); `tools/check_names.py` checks every csv name sits at its address. Order: build, split_runs, rebuild (the listing
+  must match the rows), decode_code --apply, verify_all. `tools/m68kdis.py` is the disassembler.
   `tools/check_code_as_data_x86.py REPO` (PC) and `tools/check_code_as_data_snes.py REPO` (SNES) are the exact checks for
   the other ports: a label in the data files that code calls or jumps to.
 
@@ -70,8 +68,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
 ## Setup friction fixed
 - The main96 test needed the 95G ROM to find matching routines; tools/find95.py fetches it from the public repo.
 - Linux: wine was not installed in a fresh cloud container (`apt-get install wine wine32` after `dpkg --add-architecture i386`).
-- Linux: `buildseg.bat` stopped at `cd /d ... || exit /b 1` (wine 9 cmd takes the `||` branch even when cd works), so
-  every segment build wrote no log; it now uses `if errorlevel 1 exit /b 1`.
+- The segment stubs and segment builds were removed 2026-11-18 (`src/inc/` keeps `ports.inc` and `equals.inc`); `tools/verify_all.sh` builds and checks the full ROM.
 - Matching 96 code to 95G: the 95G repo has its IDA listing (lst/nhl95.bin.lst). Aligning the two listings by
   instruction shape (addresses masked) finds renamed and moved routines that find95.py (exact bytes) misses.
 

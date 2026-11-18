@@ -181,7 +181,7 @@ def load_parents(base):
         d = os.path.join(base, repo, 'src')
         if not os.path.isdir(d): continue
         for f in sorted(glob.glob(os.path.join(d, '**', '*.asm'), recursive=True)):
-            if '/stubinc/' in f or '/macros/' in f: continue
+            if '/macros/' in f: continue
             for r in parse_file(repo, f):
                 r.norms = [l.norm for l in r.lines if l.norm and l.norm != 'dc']
                 if len(r.norms) >= 3:

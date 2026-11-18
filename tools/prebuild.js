@@ -1,4 +1,4 @@
-// prebuild.js: run before every build (npm run build:*, seg:*, build96.bat, buildseg.bat).
+// prebuild.js: run before every build (npm run build:*, build96.bat).
 // Usage: node tools/prebuild.js [retail]
 // The ROM must be present (and the right version); then makes sure Extracted/ is complete, and runs
 // the extractor if it is not. If the ROM is missing or wrong, stops with the path, file name, SHA-1
@@ -109,7 +109,7 @@ if (!romPath) {
 
 // The licensed names: src/teamdata96.asm holds placeholders instead of the NHLPA player names and the NHL team nicknames. The
 // extractor writes the real ones to Extracted/PlayerNames.txt and Extracted/TeamNicknames.txt (one per line, in source order);
-// this copies the file to output/obj/names/ with each placeholder replaced, and nhl96.asm and the teamdata96 segment stub include
+// this copies the file to output/obj/names/ with each placeholder replaced, and nhl96.asm and the teamdata96 build include
 // the copy. A name must have the length of its placeholder (the Player macro writes the row length). Player rows are replaced
 // in order; a nickname placeholder is 'N' + its two-digit number in TeamNicknames.txt, padded with '_'.
 function writeNames() {

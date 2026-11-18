@@ -83,7 +83,7 @@ A comment-only or rename-only change must not change a single byte. Never commit
 
 ## 6. Where things go
 
-- `nhl96.asm` includes the modules in ROM order. A segment stub in `src/stubinc/<file>_stub.asm` assembles one file on its own, so a constant or address a file uses must be defined in `ram96.asm`, `externs96.asm` or in the stub's outside-address list.
+- `nhl96.asm` includes the modules in ROM order. A constant or address a file uses must be defined in `ram96.asm`, `externs96.asm` or in `src/inc/`.
 - The RAM equates are included before `main96.asm`, so `InitialSP` (the reset vector value) keeps its own name; 92 reuses `Stack` for it.
 - Use the 95 name (then 94, 93, 92) for what already exists; a routine that is new in 96 says so in its comment.
 

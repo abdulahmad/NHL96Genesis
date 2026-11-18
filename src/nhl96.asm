@@ -1,15 +1,13 @@
 ;	Top level of the ROM build. It includes the equates and then every module in ROM order, and
-;	each file assembles right after the one before it. Only this file sets the start address; a
-;	segment build sets its own in its stub. The include comments are the ROM map.
+;	each file assembles right after the one before it. Only this file sets the start address. The include comments are the ROM map.
 
-	include	stubinc\ports.inc		;IO_* / VDP_* ports. Equates only
-	include	stubinc\equals.inc		;VDP status bits. Equates only
+	include	inc\ports.inc		;IO_* / VDP_* ports. Equates only
+	include	inc\equals.inc		;VDP status bits. Equates only
 	include	ram96.asm				;RAM map. Equates only
 	include	externs96.asm			;outside addresses still in incbin segments. Equates only
 	include	macros\genesis.mac		;String, Player and the other data macros
 
 	org	0							;the ROM starts at 0. Without an org SNASM writes a short, misaligned bin
-									;(the stubs carry their own org)
 	include	main96.asm				; $000000  code
 	include	..\output\obj\names\teamdata96.asm	; $000776  VBjsr, TeamList and the team blocks, playoffseats
 	include	credits96.asm			; $0056F0  Credits, CreditsPages
