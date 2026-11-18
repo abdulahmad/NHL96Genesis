@@ -14,6 +14,7 @@
 ; External addresses outside, read from lst/nhl96.bin.
 HotList = $13938E					;graphics96
 SetSPA = $01A614					;skate96
+SPApflip = $2BBA					;SPA value (frames96)
 
 
 ; Main segment code

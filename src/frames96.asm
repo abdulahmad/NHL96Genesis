@@ -1761,7 +1761,7 @@ SPA2B88_table:
 
 .0	dc.w	1850,8,1851,8,1852,8,1853,8,1854,8,1855,8,1856,8,1857,-1000
 
-SPA2BBA	=	*-SPAlist
+SPApflip	=	*-SPAlist
 SPA2BBA_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
@@ -1857,7 +1857,7 @@ SPA2E40_table:
 .7	dc.w	802,4,801,4,800,4,799,4,800,4,801,4,802,4,802,4
 	dc.w	802,-10
 
-SPA2F72	=	*-SPAlist
+SPAshotf	=	*-SPAlist
 SPA2F72_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
