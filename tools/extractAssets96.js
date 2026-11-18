@@ -278,7 +278,7 @@ const assets = [
     { name: 'FaceOffSprites.map.jim', folder: 'NHL96/Graphics', start: 0x0013bcb0, end: 0x0013d290 }, // FaceOffSprites
     { name: 'EnergyBarMap.map.jim', folder: 'NHL96/Graphics', start: 0x0013d290, end: 0x0013d59e }, // EnergyBarMap
     { name: 'EASNmap.map.jim', folder: 'NHL96/Graphics', start: 0x0013d59e, end: 0x0013da74 }, // EASNmap
-    { name: 'EASportsMap.map.jim', folder: 'NHL96/Graphics', start: 0x0013da74, end: 0x0013e99a }, // EASportsMap
+    { name: 'EASportsSplash.map.jim', folder: 'NHL96/Graphics', start: 0x0013da74, end: 0x0013e99a }, // EASportsMap
     { name: 'RevRinkTilelist.bin', folder: 'NHL96/Graphics', start: 0x0013e99a, end: 0x00140afe }, // RevRinkTilelist
     { name: 'ReplayIconMap.map.jim', folder: 'NHL96/Graphics', start: 0x00140afe, end: 0x00141228 }, // ReplayIconMap
     { name: 'ReplayBannerMap.map.jim', folder: 'NHL96/Graphics', start: 0x00141228, end: 0x001417b6 }, // ReplayBannerMap
