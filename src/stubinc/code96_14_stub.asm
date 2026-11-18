@@ -24,6 +24,16 @@ WriteSRAM = $024188					;sram96
 MakeSRAMChecksum = $0241AA			;sram96
 ReadSRAM = $0241E8					;sram96
 MinOverallRating = $1DF9C2			;create96
+a2offsides = $019D4C				;logic96_pull
+appstring = $01BE80					;middle96_stub
+ArmIcing = $019E6E					;logic96_pull
+dopass = $00F8F6					;input96_shot
+doshot = $00F5F8					;input96_shot
+Findhittype = $016D36				;control96
+ReadJoy1 = $01B348					;pause96_stub
+ReadJoy2 = $01B360					;pause96_stub
+ReadJoy3 = $01B378					;pause96_stub
+ReadJoy4 = $01B390					;pause96_stub
 
 
 ; Main segment code

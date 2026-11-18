@@ -3,8 +3,10 @@
 
 p_music_vblank						;Read the pads (ReadJoyData), then SoundCmd 1: the sound driver's vblank
 									;update. Called from the vblank handlers.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$FD,$9E,$30,$3C,$00,$01,$4E,$B9,$00,$08,$83,$9E,$4E,$75
+	bsr.w	ReadJoyData
+	move.w	#1,d0
+	jsr	(SoundCmd).l
+	rts
 
 SndDriver							;Sound driver entry (SoundCmd). d0 = command 0-$12 through SndJumpTable;
 									;carry set and d0 = 1 for a bad command
@@ -49,13 +51,20 @@ SndJumpTable						;The command handlers: 0 SndLoadZ80, 1 SndUpdate, 2 off, 3 on,
 	bra.w	SndSendZ80
 
 SndDriverOn							;Command 3: the driver on (SndDrvRAM = $1234).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$2F,$08,$41,$F9,$FF,$FF,$FD,$FC,$30,$BC,$12,$34,$20,$5F,$42,$40
-	dc.b	$4E,$75
+	move.l	a0,-(sp)
+	lea	(SndDrvRAM).l,a0
+	move.w	#$1234,(a0)
+	movea.l	(sp)+,a0
+	clr.w	d0
+	rts
 
 SndDriverOff						;Command 2: the driver off (SndDrvRAM = 0).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$2F,$08,$41,$F9,$FF,$FF,$FD,$FC,$42,$50,$20,$5F,$42,$40,$4E,$75
+	move.l	a0,-(sp)
+	lea	(SndDrvRAM).l,a0
+	clr.w	(a0)
+	movea.l	(sp)+,a0
+	clr.w	d0
+	rts
 
 SndLoadZ80							;Command 0: copy the Z80 program a0 (d1 bytes; it must start with JP
 									;$00xx) to Z80 RAM, reset the Z80, wait
@@ -87,95 +96,435 @@ SndUpdate							;Command 1, once a frame: note timers (SndUpdateNotes), sample s
 									;slots: wait out each slot's delay, then send its events ($9x note on, $Bx
 									;controller, $Cx program, $Ex pitch bend) to the Z80 until the next delay.
 									;Controller $75 loops the song; status $FF ends it. Code the listing does
-									;not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$41,$F9,$FF,$FF,$FF,$4C,$06,$50,$00,$01,$0C,$50
-	dc.b	$00,$01,$66,$00,$03,$4C,$41,$F9,$FF,$FF,$FD,$FC,$0C,$50,$12,$34
-	dc.b	$66,$00,$03,$3E,$61,$00,$0E,$20,$61,$00,$09,$58,$61,$00,$09,$D0
-	dc.b	$41,$F9,$FF,$FF,$FF,$40,$30,$BC,$00,$00,$4D,$F9,$FF,$FF,$FD,$FE
-	dc.b	$4B,$F9,$FF,$FF,$FE,$1E,$49,$F9,$FF,$FF,$FE,$4E,$47,$F9,$FF,$FF
-	dc.b	$FE,$5E,$45,$F9,$FF,$FF,$FE,$6E,$43,$F9,$FF,$FF,$FE,$7E,$3C,$39
-	dc.b	$FF,$FF,$FF,$40,$E3,$4E,$3E,$06,$E3,$4F,$0C,$B6,$FF,$FF,$FF,$FF
-	dc.b	$70,$00,$67,$00,$02,$DA,$4A,$74,$60,$00,$67,$42,$32,$33,$60,$00
-	dc.b	$D2,$72,$60,$00,$34,$01,$02,$42,$00,$FF,$E0,$49,$D2,$71,$70,$00
-	dc.b	$33,$BC,$00,$00,$70,$00,$B2,$74,$60,$00,$64,$12,$36,$34,$60,$00
-	dc.b	$96,$41,$39,$83,$60,$00,$35,$82,$60,$00,$60,$00,$02,$A2,$92,$74
-	dc.b	$60,$00,$E1,$49,$82,$42,$35,$81,$60,$00,$42,$74,$60,$00,$20,$76
-	dc.b	$70,$00,$2A,$35,$70,$00,$4A,$30,$58,$00,$6A,$08,$06,$85,$00,$00
-	dc.b	$00,$01,$60,$F2,$06,$85,$00,$00,$00,$01,$4A,$30,$58,$00,$6A,$0C
-	dc.b	$13,$B0,$58,$00,$70,$02,$06,$85,$00,$00,$00,$01,$10,$31,$70,$02
-	dc.b	$02,$00,$00,$F0,$0C,$00,$00,$90,$66,$00,$00,$8C,$30,$39,$FF,$FF
-	dc.b	$FF,$40,$E1,$48,$E9,$48,$10,$30,$58,$01,$48,$40,$10,$30,$58,$00
-	dc.b	$E1,$48,$10,$31,$70,$02,$61,$00,$03,$BE,$4A,$40,$67,$0A,$06,$71
-	dc.b	$00,$01,$70,$00,$60,$00,$02,$28,$14,$30,$58,$00,$E1,$4A,$42,$80
-	dc.b	$06,$85,$00,$00,$00,$01,$06,$85,$00,$00,$00,$01,$EF,$88,$12,$30
-	dc.b	$58,$00,$02,$01,$00,$7F,$80,$01,$08,$30,$00,$07,$58,$00,$66,$E6
-	dc.b	$06,$85,$00,$00,$00,$01,$E1,$88,$36,$33,$60,$00,$B0,$43,$64,$06
-	dc.b	$30,$3C,$00,$01,$60,$02,$80,$C3,$48,$40,$30,$02,$32,$39,$FF,$FF
-	dc.b	$FF,$40,$E9,$49,$10,$31,$70,$02,$02,$00,$00,$0F,$80,$01,$61,$00
-	dc.b	$07,$D4,$60,$00,$01,$9C,$0C,$00,$00,$B0,$66,$00,$01,$18,$0C,$30
-	dc.b	$00,$12,$58,$00,$66,$04,$60,$00,$00,$D6,$0C,$30,$00,$75,$58,$00
-	dc.b	$66,$36,$42,$80,$10,$30,$58,$01,$E3,$88,$06,$80,$00,$00,$00,$02
-	dc.b	$42,$81,$12,$30,$08,$00,$E1,$89,$12,$30,$08,$01,$42,$80,$10,$10
-	dc.b	$E1,$88,$10,$28,$00,$01,$E3,$88,$06,$80,$00,$00,$00,$02,$D2,$80
-	dc.b	$2B,$81,$70,$00,$60,$00,$FE,$88,$0C,$30,$00,$77,$58,$00,$66,$56
-	dc.b	$41,$F9,$FF,$FF,$FE,$9E,$42,$80,$30,$39,$FF,$FF,$FF,$40,$E5,$88
-	dc.b	$D1,$C0,$20,$05,$06,$80,$00,$00,$00,$02,$20,$80,$42,$80,$20,$76
-	dc.b	$70,$00,$10,$30,$58,$01,$E3,$88,$06,$80,$00,$00,$00,$02,$42,$81
-	dc.b	$12,$30,$08,$00,$E1,$89,$12,$30,$08,$01,$42,$80,$10,$10,$E1,$88
-	dc.b	$10,$28,$00,$01,$E3,$88,$06,$80,$00,$00,$00,$02,$D2,$80,$2B,$81
-	dc.b	$70,$00,$60,$00,$FE,$2A,$0C,$30,$00,$78,$58,$00,$66,$30,$41,$F9
-	dc.b	$FF,$FF,$FE,$9E,$42,$80,$30,$39,$FF,$FF,$FF,$40,$E5,$88,$D1,$C0
-	dc.b	$0C,$90,$FF,$FF,$FF,$FF,$66,$0C,$2D,$BC,$FF,$FF,$FF,$FF,$70,$00
-	dc.b	$60,$00,$00,$EC,$2A,$10,$20,$76,$70,$00,$60,$00,$00,$B4,$30,$39
-	dc.b	$FF,$FF,$FF,$40,$E1,$48,$E9,$48,$10,$30,$58,$01,$48,$40,$10,$30
-	dc.b	$58,$00,$E1,$48,$10,$31,$70,$02,$61,$00,$02,$4C,$4A,$40,$67,$0A
-	dc.b	$06,$71,$00,$01,$70,$00,$60,$00,$00,$B6,$06,$85,$00,$00,$00,$02
-	dc.b	$60,$00,$00,$7E,$0C,$00,$00,$C0,$66,$30,$30,$39,$FF,$FF,$FF,$40
-	dc.b	$E1,$48,$E9,$48,$48,$40,$10,$30,$58,$00,$E1,$48,$10,$31,$70,$02
-	dc.b	$61,$00,$02,$14,$4A,$40,$67,$0A,$06,$71,$00,$01,$70,$00,$60,$00
-	dc.b	$00,$7E,$06,$85,$00,$00,$00,$01,$60,$46,$0C,$00,$00,$E0,$66,$2E
-	dc.b	$30,$39,$FF,$FF,$FF,$40,$E1,$48,$E9,$48,$48,$40,$10,$30,$58,$00
-	dc.b	$E1,$48,$10,$31,$70,$02,$61,$00,$01,$DE,$4A,$40,$67,$08,$06,$71
-	dc.b	$00,$01,$70,$00,$60,$48,$06,$85,$00,$00,$00,$01,$60,$12,$0C,$31
-	dc.b	$00,$FF,$70,$02,$66,$0A,$2D,$BC,$FF,$FF,$FF,$FF,$70,$00,$60,$2E
-	dc.b	$2B,$85,$70,$00,$42,$82,$EF,$8A,$12,$30,$58,$00,$02,$01,$00,$7F
-	dc.b	$84,$01,$08,$30,$00,$07,$58,$00,$67,$08,$06,$85,$00,$00,$00,$01
-	dc.b	$60,$E4,$39,$82,$60,$00,$4A,$42,$66,$04,$60,$00,$FD,$12,$41,$F9
-	dc.b	$FF,$FF,$FF,$40,$06,$50,$00,$01,$0C,$50,$00,$07,$6D,$00,$FD,$00
-	dc.b	$41,$F9,$FF,$FF,$FF,$4C,$04,$50,$00,$01,$02,$3C,$00,$FE,$4C,$DF
-	dc.b	$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	lea	($FFFFFF4C).l,a0
+	opt	oaq-
+	addi.w	#1,(a0)
+	opt	oaq+
+	cmpi.w	#1,(a0)
+	bne.w	.23
+	lea	(SndDrvRAM).l,a0
+	cmpi.w	#$1234,(a0)
+	bne.w	.23
+	bsr.w	SndFlushZ80Queue
+	bsr.w	SndUpdateNotes
+	bsr.w	SndStreamZ80
+	lea	($FFFFFF40).l,a0
+	move.w	#0,(a0)
+	lea	(SndSeqPtr).l,a6
+	lea	($FFFFFE1E).l,a5
+	lea	($FFFFFE4E).l,a4
+	lea	($FFFFFE5E).l,a3
+	lea	($FFFFFE6E).l,a2
+	lea	($FFFFFE7E).l,a1
+.loop
+	move.w	($FFFFFF40).l,d6
+	lsl.w	#1,d6
+	move.w	d6,d7
+	lsl.w	#1,d7
+	cmpi.l	#$FFFFFFFF,(a6,d7.w)
+	beq.w	.22
+	tst.w	(a4,d6.w)
+	beq.s	.2
+	move.w	(a3,d6.w),d1
+	add.w	(a2,d6.w),d1
+	move.w	d1,d2
+	andi.w	#$FF,d2
+	lsr.w	#8,d1
+	add.w	(a1,d7.w),d1
+	move.w	#0,(a1,d7.w)
+	cmp.w	(a4,d6.w),d1
+	bcc.s	.1
+	move.w	(a4,d6.w),d3
+	sub.w	d1,d3
+	move.w	d3,(a4,d6.w)
+	move.w	d2,(a2,d6.w)
+	bra.w	.22
+.1
+	sub.w	(a4,d6.w),d1
+	lsl.w	#8,d1
+	or.w	d2,d1
+	move.w	d1,(a2,d6.w)
+	clr.w	(a4,d6.w)
+.2
+	movea.l	(a6,d7.w),a0
+	move.l	(a5,d7.w),d5
+.loop2
+	tst.b	(a0,d5.l)
+	bpl.s	.3
+	opt	oaq-
+	addi.l	#$1,d5
+	opt	oaq+
+	bra.s	.loop2
+.3
+	opt	oaq-
+	addi.l	#$1,d5
+	opt	oaq+
+	tst.b	(a0,d5.l)
+	bpl.s	.4
+	move.b	(a0,d5.l),2(a1,d7.w)
+	opt	oaq-
+	addi.l	#$1,d5
+.4
+	opt	oaq+
+	move.b	2(a1,d7.w),d0
+	andi.b	#$F0,d0
+	cmpi.b	#$90,d0
+	bne.w	.8
+	move.w	($FFFFFF40).l,d0
+	lsl.w	#8,d0
+	lsl.w	#4,d0
+	move.b	1(a0,d5.l),d0
+	swap	d0
+	move.b	(a0,d5.l),d0
+	lsl.w	#8,d0
+	move.b	2(a1,d7.w),d0
+	bsr.w	SndPutZ80Cmd
+	tst.w	d0
+	beq.s	.5
+	opt	oaq-
+	addi.w	#1,(a1,d7.w)
+	opt	oaq+
+	bra.w	.22
+.5
+	move.b	(a0,d5.l),d2
+	lsl.w	#8,d2
+	clr.l	d0
+	opt	oaq-
+	addi.l	#$1,d5
+.loop3
+	addi.l	#$1,d5
+	opt	oaq+
+	lsl.l	#7,d0
+	move.b	(a0,d5.l),d1
+	andi.b	#$7F,d1
+	or.b	d1,d0
+	btst	#7,(a0,d5.l)
+	bne.s	.loop3
+	opt	oaq-
+	addi.l	#$1,d5
+	opt	oaq+
+	lsl.l	#8,d0
+	move.w	(a3,d6.w),d3
+	cmp.w	d3,d0
+	bcc.s	.6
+	move.w	#1,d0
+	bra.s	.7
+.6
+	divu.w	d3,d0
+.7
+	swap	d0
+	move.w	d2,d0
+	move.w	($FFFFFF40).l,d1
+	lsl.w	#4,d1
+	move.b	2(a1,d7.w),d0
+	andi.b	#$F,d0
+	or.b	d1,d0
+	bsr.w	SndAddNote
+	bra.w	.20
+.8
+	cmpi.b	#$B0,d0
+	bne.w	.15
+	cmpi.b	#$12,(a0,d5.l)
+	bne.s	.9
+	bra.w	.13
+.9
+	cmpi.b	#$75,(a0,d5.l)
+	bne.s	.10
+	clr.l	d0
+	move.b	1(a0,d5.l),d0
+	lsl.l	#1,d0
+	opt	oaq-
+	addi.l	#$2,d0
+	opt	oaq+
+	clr.l	d1
+	move.b	(a0,d0.l),d1
+	lsl.l	#8,d1
+	move.b	1(a0,d0.l),d1
+	clr.l	d0
+	move.b	(a0),d0
+	lsl.l	#8,d0
+	move.b	1(a0),d0
+	lsl.l	#1,d0
+	opt	oaq-
+	addi.l	#$2,d0
+	opt	oaq+
+	add.l	d0,d1
+	move.l	d1,(a5,d7.w)
+	bra.w	.loop
+.10
+	cmpi.b	#$77,(a0,d5.l)
+	bne.s	.11
+	lea	($FFFFFE9E).l,a0
+	clr.l	d0
+	move.w	($FFFFFF40).l,d0
+	lsl.l	#2,d0
+	adda.l	d0,a0
+	move.l	d5,d0
+	opt	oaq-
+	addi.l	#$2,d0
+	opt	oaq+
+	move.l	d0,(a0)
+	clr.l	d0
+	movea.l	(a6,d7.w),a0
+	move.b	1(a0,d5.l),d0
+	lsl.l	#1,d0
+	opt	oaq-
+	addi.l	#$2,d0
+	opt	oaq+
+	clr.l	d1
+	move.b	(a0,d0.l),d1
+	lsl.l	#8,d1
+	move.b	1(a0,d0.l),d1
+	clr.l	d0
+	move.b	(a0),d0
+	lsl.l	#8,d0
+	move.b	1(a0),d0
+	lsl.l	#1,d0
+	opt	oaq-
+	addi.l	#$2,d0
+	opt	oaq+
+	add.l	d0,d1
+	move.l	d1,(a5,d7.w)
+	bra.w	.loop
+.11
+	cmpi.b	#$78,(a0,d5.l)
+	bne.s	.13
+	lea	($FFFFFE9E).l,a0
+	clr.l	d0
+	move.w	($FFFFFF40).l,d0
+	lsl.l	#2,d0
+	adda.l	d0,a0
+	cmpi.l	#$FFFFFFFF,(a0)
+	bne.s	.12
+	move.l	#$FFFFFFFF,(a6,d7.w)
+	bra.w	.22
+.12
+	move.l	(a0),d5
+	movea.l	(a6,d7.w),a0
+	bra.w	.20
+.13
+	move.w	($FFFFFF40).l,d0
+	lsl.w	#8,d0
+	lsl.w	#4,d0
+	move.b	1(a0,d5.l),d0
+	swap	d0
+	move.b	(a0,d5.l),d0
+	lsl.w	#8,d0
+	move.b	2(a1,d7.w),d0
+	bsr.w	SndPutZ80Cmd
+	tst.w	d0
+	beq.s	.14
+	opt	oaq-
+	addi.w	#1,(a1,d7.w)
+	opt	oaq+
+	bra.w	.22
+.14
+	opt	oaq-
+	addi.l	#$2,d5
+	opt	oaq+
+	bra.w	.20
+.15
+	cmpi.b	#$C0,d0
+	bne.s	.17
+	move.w	($FFFFFF40).l,d0
+	lsl.w	#8,d0
+	lsl.w	#4,d0
+	swap	d0
+	move.b	(a0,d5.l),d0
+	lsl.w	#8,d0
+	move.b	2(a1,d7.w),d0
+	bsr.w	SndPutZ80Cmd
+	tst.w	d0
+	beq.s	.16
+	opt	oaq-
+	addi.w	#1,(a1,d7.w)
+	opt	oaq+
+	bra.w	.22
+.16
+	opt	oaq-
+	addi.l	#$1,d5
+	opt	oaq+
+	bra.s	.20
+.17
+	cmpi.b	#$E0,d0
+	bne.s	.19
+	move.w	($FFFFFF40).l,d0
+	lsl.w	#8,d0
+	lsl.w	#4,d0
+	swap	d0
+	move.b	(a0,d5.l),d0
+	lsl.w	#8,d0
+	move.b	2(a1,d7.w),d0
+	bsr.w	SndPutZ80Cmd
+	tst.w	d0
+	beq.s	.18
+	opt	oaq-
+	addi.w	#1,(a1,d7.w)
+	opt	oaq+
+	bra.s	.22
+.18
+	opt	oaq-
+	addi.l	#$1,d5
+	opt	oaq+
+	bra.s	.20
+.19
+	cmpi.b	#$FF,2(a1,d7.w)
+	bne.s	.20
+	move.l	#$FFFFFFFF,(a6,d7.w)
+	bra.s	.22
+.20
+	move.l	d5,(a5,d7.w)
+	clr.l	d2
+.loop4
+	lsl.l	#7,d2
+	move.b	(a0,d5.l),d1
+	andi.b	#$7F,d1
+	or.b	d1,d2
+	btst	#7,(a0,d5.l)
+	beq.s	.21
+	opt	oaq-
+	addi.l	#$1,d5
+	opt	oaq+
+	bra.s	.loop4
+.21
+	move.w	d2,(a4,d6.w)
+	tst.w	d2
+	bne.s	.22
+	bra.w	.loop
+.22
+	lea	($FFFFFF40).l,a0
+	opt	oaq-
+	addi.w	#1,(a0)
+	opt	oaq+
+	cmpi.w	#7,(a0)
+	blt.w	.loop
+.23
+	lea	($FFFFFF4C).l,a0
+	opt	osq-
+	subi.w	#1,(a0)
+	opt	osq+
+	andi.b	#$FE,ccr
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 SndStartSeq							;Command 4: play song d1 (bank item type 3) in the first free slot, with
 									;d2-d4 (d4 = tempo). Carry set for no
 									;free slot (d0 = 7) or no such song.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$78,$C0,$41,$F9,$FF,$FF,$FD,$FC,$31,$41,$01,$D8,$31,$42
-	dc.b	$01,$DA,$31,$43,$01,$DC,$31,$44,$01,$DE,$0C,$44,$00,$00,$66,$08
-	dc.b	$30,$3C,$00,$05,$60,$00,$00,$D0,$43,$F9,$FF,$FF,$FD,$FE,$42,$40
-	dc.b	$0C,$99,$FF,$FF,$FF,$FF,$67,$12,$06,$40,$00,$01,$0C,$40,$00,$07
-	dc.b	$66,$EE,$30,$3C,$00,$07,$60,$00,$00,$AE,$31,$40,$01,$D6,$3F,$01
-	dc.b	$E1,$48,$E9,$48,$48,$40,$30,$3C,$01,$FF,$22,$00,$61,$00,$0A,$2A
-	dc.b	$32,$1F,$30,$3C,$00,$03,$61,$00,$07,$82,$65,$00,$00,$8A,$42,$81
-	dc.b	$12,$10,$E1,$49,$12,$28,$00,$01,$E3,$49,$06,$41,$00,$02,$43,$F9
-	dc.b	$FF,$FF,$FD,$FC,$3F,$29,$00,$00,$33,$7C,$00,$00,$00,$00,$30,$29
-	dc.b	$01,$D6,$E5,$48,$23,$88,$00,$02,$23,$81,$00,$22,$41,$F9,$FF,$FF
-	dc.b	$FE,$7E,$21,$BC,$00,$00,$00,$00,$00,$00,$41,$F9,$FF,$FF,$FE,$9E
-	dc.b	$21,$BC,$FF,$FF,$FF,$FF,$00,$00,$30,$29,$01,$D6,$E3,$48,$33,$A9
-	dc.b	$01,$DE,$00,$62,$33,$BC,$00,$00,$00,$52,$33,$BC,$00,$00,$00,$72
-	dc.b	$33,$A9,$01,$D8,$00,$42,$30,$29,$01,$D6,$E1,$48,$E9,$48,$80,$69
-	dc.b	$01,$DC,$48,$40,$30,$3C,$10,$B0,$22,$00,$61,$00,$09,$9C,$33,$5F
-	dc.b	$00,$00,$42,$40,$60,$04,$00,$3C,$00,$01,$4C,$DF,$03,$1E,$4E,$75
+	movem.l	d1-d4/a0-a1,-(sp)
+	lea	(SndDrvRAM).l,a0
+	move.w	d1,$1D8(a0)
+	move.w	d2,$1DA(a0)
+	move.w	d3,$1DC(a0)
+	move.w	d4,$1DE(a0)
+	cmpi	#0,d4
+	bne.s	.1
+	move.w	#5,d0
+	bra.w	.3
+.1
+	lea	(SndSeqPtr).l,a1
+	clr.w	d0
+.loop
+	cmpi.l	#$FFFFFFFF,(a1)+
+	beq.s	.2
+	opt	oaq-
+	addi.w	#1,d0
+	opt	oaq+
+	cmpi	#7,d0
+	bne.s	.loop
+	move.w	#7,d0
+	bra.w	.3
+.2
+	move.w	d0,$1D6(a0)
+	move.w	d1,-(sp)
+	lsl.w	#8,d0
+	lsl.w	#4,d0
+	swap	d0
+	move.w	#$1FF,d0
+	move.l	d0,d1
+	bsr.w	SndQueueZ80Cmd
+	move.w	(sp)+,d1
+	move.w	#3,d0
+	bsr.w	SndFindBankItem
+	bcs.w	.3
+	clr.l	d1
+	move.b	(a0),d1
+	lsl.w	#8,d1
+	move.b	1(a0),d1
+	lsl.w	#1,d1
+	opt	oaq-
+	addi.w	#2,d1
+	opt	oaq+
+	lea	(SndDrvRAM).l,a1
+	opt	oz-
+	move.w	0(a1),-(sp)
+	move.w	#0,0(a1)
+	opt	oz+
+	move.w	$1D6(a1),d0
+	lsl.w	#2,d0
+	move.l	a0,2(a1,d0.w)
+	move.l	d1,$22(a1,d0.w)
+	lea	($FFFFFE7E).l,a0
+	move.l	#$0,(a0,d0.w)
+	lea	($FFFFFE9E).l,a0
+	move.l	#$FFFFFFFF,(a0,d0.w)
+	move.w	$1D6(a1),d0
+	lsl.w	#1,d0
+	move.w	$1DE(a1),$62(a1,d0.w)
+	move.w	#0,$52(a1,d0.w)
+	move.w	#0,$72(a1,d0.w)
+	move.w	$1D8(a1),$42(a1,d0.w)
+	move.w	$1D6(a1),d0
+	lsl.w	#8,d0
+	lsl.w	#4,d0
+	or.w	$1DC(a1),d0
+	swap	d0
+	move.w	#$10B0,d0
+	move.l	d0,d1
+	bsr.w	SndQueueZ80Cmd
+	opt	oz-
+	move.w	(sp)+,0(a1)
+	opt	oz+
+	clr.w	d0
+	bra.s	.4
+.3
+	ori.b	#1,ccr
+.4
+	movem.l	(sp)+,d1-d4/a0-a1
+	rts
 
 SndStopSeq							;Command 5: stop the slot playing song id d1 and release its notes. Carry
 									;set and d0 = 3 when none plays it.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$60,$80,$41,$F9,$FF,$FF,$FE,$3E,$42,$40,$B2,$58,$67,$14
-	dc.b	$06,$40,$00,$01,$0C,$40,$00,$07,$66,$F2,$30,$3C,$00,$03,$00,$3C
-	dc.b	$00,$01,$60,$38,$41,$F9,$FF,$FF,$FD,$FC,$31,$40,$01,$D6,$E3,$48
-	dc.b	$41,$F9,$FF,$FF,$FE,$3E,$31,$BC,$FF,$FF,$00,$00,$E3,$48,$41,$F9
-	dc.b	$FF,$FF,$FD,$FE,$21,$BC,$FF,$FF,$FF,$FF,$00,$00,$41,$F9,$FF,$FF
-	dc.b	$FD,$FC,$30,$28,$01,$D6,$61,$00,$04,$3E,$42,$40,$4C,$DF,$01,$06
-	dc.b	$4E,$75
+	movem.l	d1-d2/a0,-(sp)
+	lea	(SndSeqId).l,a0
+	clr.w	d0
+.loop
+	cmp.w	(a0)+,d1
+	beq.s	.1
+	opt	oaq-
+	addi.w	#1,d0
+	opt	oaq+
+	cmpi	#7,d0
+	bne.s	.loop
+	move.w	#3,d0
+	ori.b	#1,ccr
+	bra.s	.2
+.1
+	lea	(SndDrvRAM).l,a0
+	move.w	d0,$1D6(a0)
+	lsl.w	#1,d0
+	lea	(SndSeqId).l,a0
+	move.w	#$FFFF,(a0,d0.w)
+	lsl.w	#1,d0
+	lea	(SndSeqPtr).l,a0
+	move.l	#$FFFFFFFF,(a0,d0.w)
+	lea	(SndDrvRAM).l,a0
+	move.w	$1D6(a0),d0
+	bsr.w	SndReleaseNotes
+	clr.w	d0
+.2
+	movem.l	(sp)+,d1-d2/a0
+	rts
 
 SndPutZ80Cmd						;Queue the 4 byte Z80 command d0 (Z80_RAM+$D + 4 * count, count at +$C,
 									;waits while +$B is busy). d0 = -1 when
@@ -256,61 +605,192 @@ SndResumeZ80						;Command $E: Z80_RAM+$50 = 0 (resume).
 
 SndStopAll							;Command $F (SoundOff): free every song slot, send Z80 command $FF and
 									;clear the notes.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$80,$C0,$41,$F9,$FF,$FF,$FD,$FC,$3F,$10,$30,$BC,$00,$00
-	dc.b	$43,$F9,$FF,$FF,$FD,$FE,$30,$3C,$00,$07,$22,$FC,$FF,$FF,$FF,$FF
-	dc.b	$51,$C8,$FF,$F8,$30,$3C,$00,$FF,$61,$00,$FC,$AC,$61,$00,$00,$A2
-	dc.b	$30,$9F,$4C,$DF,$03,$01,$4E,$75
+	movem.l	d0/a0-a1,-(sp)
+	lea	(SndDrvRAM).l,a0
+	move.w	(a0),-(sp)
+	move.w	#0,(a0)
+	lea	(SndSeqPtr).l,a1
+	move.w	#7,d0
+.loop
+	move.l	#$FFFFFFFF,(a1)+
+	dbf	d0,.loop
+	move.w	#$FF,d0
+	bsr.w	SndPutZ80Cmd
+	bsr.w	SndClearNotes
+	move.w	(sp)+,(a0)
+	movem.l	(sp)+,d0/a0-a1
+	rts
 
 SndSongControl						;Command $10: Z80 command $10B0 with d2 for each slot that plays song d1.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$70,$C0,$41,$F9,$FF,$FF,$FE,$3E,$43,$F9,$FF,$FF,$FD,$FE
-	dc.b	$42,$43,$0C,$91,$FF,$FF,$FF,$FF,$67,$16,$B2,$50,$66,$12,$30,$03
-	dc.b	$E1,$48,$E9,$48,$10,$02,$48,$40,$30,$3C,$10,$B0,$61,$00,$FC,$70
-	dc.b	$D1,$FC,$00,$00,$00,$02,$D3,$FC,$00,$00,$00,$04,$06,$43,$00,$01
-	dc.b	$0C,$43,$00,$07,$66,$CC,$42,$40,$4C,$DF,$03,$0E,$4E,$75
+	movem.l	d1-d3/a0-a1,-(sp)
+	lea	(SndSeqId).l,a0
+	lea	(SndSeqPtr).l,a1
+	clr.w	d3
+.loop
+	cmpi.l	#$FFFFFFFF,(a1)
+	beq.s	.1
+	cmp.w	(a0),d1
+	bne.s	.1
+	move.w	d3,d0
+	lsl.w	#8,d0
+	lsl.w	#4,d0
+	move.b	d2,d0
+	swap	d0
+	move.w	#$10B0,d0
+	bsr.w	SndPutZ80Cmd
+.1
+	adda.l	#$2,a0
+	adda.l	#$4,a1
+	opt	oaq-
+	addi.w	#1,d3
+	opt	oaq+
+	cmpi	#7,d3
+	bne.s	.loop
+	clr.w	d0
+	movem.l	(sp)+,d1-d3/a0-a1
+	rts
 
 SndFindSong							;Command $11: carry clear and d0 = d2 when a slot plays song d1, else
 									;carry set and d0 = 3.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$60,$C0,$41,$F9,$FF,$FF,$FE,$3E,$43,$F9,$FF,$FF,$FD,$FE
-	dc.b	$42,$42,$0C,$91,$FF,$FF,$FF,$FF,$66,$0C,$B2,$50,$66,$08,$30,$02
-	dc.b	$02,$3C,$00,$FE,$60,$1E,$D1,$FC,$00,$00,$00,$02,$D3,$FC,$00,$00
-	dc.b	$00,$04,$06,$42,$00,$01,$0C,$42,$00,$07,$66,$D6,$30,$3C,$00,$03
-	dc.b	$00,$3C,$00,$01,$4C,$DF,$03,$06,$4E,$75
+	movem.l	d1-d2/a0-a1,-(sp)
+	lea	(SndSeqId).l,a0
+	lea	(SndSeqPtr).l,a1
+	clr.w	d2
+.loop
+	cmpi.l	#$FFFFFFFF,(a1)
+	bne.s	.1
+	cmp.w	(a0),d1
+	bne.s	.1
+	move.w	d2,d0
+	andi.b	#$FE,ccr
+	bra.s	.2
+.1
+	adda.l	#$2,a0
+	adda.l	#$4,a1
+	opt	oaq-
+	addi.w	#1,d2
+	opt	oaq+
+	cmpi	#7,d2
+	bne.s	.loop
+	move.w	#3,d0
+	ori.b	#1,ccr
+.2
+	movem.l	(sp)+,d1-d2/a0-a1
+	rts
 
 SndClearNotes						;No notes: SndNoteCount 0, SndNotes all -1.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$C0,$C0,$41,$F9,$FF,$FF,$FD,$FC,$3F,$28,$00,$00,$31,$7C
-	dc.b	$00,$00,$00,$00,$31,$7C,$00,$00,$01,$42,$43,$F9,$FF,$FF,$FE,$BE
-	dc.b	$32,$3C,$00,$1F,$20,$3C,$FF,$FF,$FF,$FF,$22,$C0,$51,$C9,$FF,$FC
-	dc.b	$31,$5F,$00,$00,$4C,$DF,$03,$03,$4E,$75
+	movem.l	d0-d1/a0-a1,-(sp)
+	lea	(SndDrvRAM).l,a0
+	opt	oz-
+	move.w	0(a0),-(sp)
+	move.w	#0,0(a0)
+	opt	oz+
+	move.w	#0,$142(a0)
+	lea	($FFFFFEBE).l,a1
+	move.w	#$1F,d1
+	move.l	#$FFFFFFFF,d0
+.loop
+	move.l	d0,(a1)+
+	dbf	d1,.loop
+	opt	oz-
+	move.w	(sp)+,0(a0)
+	opt	oz+
+	movem.l	(sp)+,d0-d1/a0-a1
+	rts
 
 SndReleaseNotes						;Set the timer of every note of slot d0 to 1 (released next frame).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$E0,$C0,$41,$F9,$FF,$FF,$FD,$FC,$3F,$28,$00,$00,$31,$7C
-	dc.b	$00,$00,$00,$00,$43,$F9,$FF,$FF,$FE,$BE,$32,$28,$01,$42,$42,$42
-	dc.b	$0C,$41,$00,$00,$67,$1A,$14,$29,$00,$03,$E8,$0A,$B4,$40,$66,$04
-	dc.b	$32,$BC,$00,$01,$D3,$FC,$00,$00,$00,$04,$04,$41,$00,$01,$60,$E0
-	dc.b	$31,$5F,$00,$00,$4C,$DF,$03,$07,$4E,$75
+	movem.l	d0-d2/a0-a1,-(sp)
+	lea	(SndDrvRAM).l,a0
+	opt	oz-
+	move.w	0(a0),-(sp)
+	move.w	#0,0(a0)
+	opt	oz+
+	lea	($FFFFFEBE).l,a1
+	move.w	$142(a0),d1
+	clr.w	d2
+.loop
+	cmpi	#0,d1
+	beq.s	.2
+	move.b	3(a1),d2
+	lsr.b	#4,d2
+	cmp.w	d0,d2
+	bne.s	.1
+	move.w	#1,(a1)
+.1
+	adda.l	#$4,a1
+	opt	osq-
+	subi.w	#1,d1
+	opt	osq+
+	bra.s	.loop
+.2
+	opt	oz-
+	move.w	(sp)+,0(a0)
+	opt	oz+
+	movem.l	(sp)+,d0-d2/a0-a1
+	rts
 
 SndAddNote							;Add note d0 (timer word, then the note) to SndNotes.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$C0,$80,$41,$F9,$FF,$FF,$FD,$FC,$32,$28,$01,$42,$E5,$49
-	dc.b	$41,$F9,$FF,$FF,$FE,$BE,$21,$80,$10,$00,$41,$F9,$FF,$FF,$FD,$FC
-	dc.b	$06,$68,$00,$01,$01,$42,$42,$40,$4C,$DF,$01,$03,$4E,$75
+	movem.l	d0-d1/a0,-(sp)
+	lea	(SndDrvRAM).l,a0
+	move.w	$142(a0),d1
+	lsl.w	#2,d1
+	lea	($FFFFFEBE).l,a0
+	move.l	d0,(a0,d1.w)
+	lea	(SndDrvRAM).l,a0
+	opt	oaq-
+	addi.w	#1,$142(a0)
+	opt	oaq+
+	clr.w	d0
+	movem.l	(sp)+,d0-d1/a0
+	rts
 
 SndUpdateNotes						;Count down the note timers; at 0 send the note off ($8x) and remove the
 									;note.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$C0,$E0,$45,$F9,$FF,$FF,$FD,$FC,$0C,$6A,$00,$00,$01,$42
-	dc.b	$67,$64,$41,$F9,$FF,$FF,$FE,$BE,$0C,$50,$FF,$FF,$67,$58,$04,$50
-	dc.b	$00,$01,$66,$4C,$10,$28,$00,$03,$02,$00,$00,$F0,$E1,$48,$48,$40
-	dc.b	$30,$28,$00,$02,$02,$00,$00,$0F,$00,$00,$00,$80,$61,$00,$FB,$16
-	dc.b	$4A,$40,$67,$06,$06,$50,$00,$01,$60,$26,$43,$F9,$FF,$FF,$FE,$BE
-	dc.b	$30,$39,$FF,$FF,$FF,$3E,$04,$40,$00,$01,$E5,$48,$20,$B1,$00,$00
-	dc.b	$23,$BC,$FF,$FF,$FF,$FF,$00,$00,$04,$6A,$00,$01,$01,$42,$60,$A8
-	dc.b	$D0,$FC,$00,$04,$60,$A2,$4C,$DF,$07,$03,$4E,$75
+	movem.l	d0-d1/a0-a2,-(sp)
+	lea	(SndDrvRAM).l,a2
+	cmpi.w	#0,$142(a2)
+	beq.s	.3
+	lea	($FFFFFEBE).l,a0
+.loop
+	cmpi.w	#$FFFF,(a0)
+	beq.s	.3
+	opt	osq-
+	subi.w	#1,(a0)
+	opt	osq+
+	bne.s	.2
+	move.b	3(a0),d0
+	andi.b	#$F0,d0
+	lsl.w	#8,d0
+	swap	d0
+	move.w	2(a0),d0
+	andi.b	#$F,d0
+	ori.b	#$80,d0
+	bsr.w	SndPutZ80Cmd
+	tst.w	d0
+	beq.s	.1
+	opt	oaq-
+	addi.w	#1,(a0)
+	opt	oaq+
+	bra.s	.2
+.1
+	lea	($FFFFFEBE).l,a1
+	move.w	($FFFFFF3E).l,d0
+	opt	osq-
+	subi.w	#1,d0
+	opt	osq+
+	lsl.w	#2,d0
+	move.l	(a1,d0.w),(a0)
+	move.l	#$FFFFFFFF,(a1,d0.w)
+	opt	osq-
+	subi.w	#1,$142(a2)
+	opt	osq+
+	bra.s	.loop
+.2
+	adda.w	#4,a0
+	bra.s	.loop
+.3
+	movem.l	(sp)+,d0-d1/a0-a2
+	rts
 
 SndStreamZ80						;Answer the Z80's sample request (Z80_RAM+$4D: 1 start sample Z80_RAM+$4E,
 									;2 / 3 next 256 bytes) by copying
@@ -343,15 +823,52 @@ SndStreamZ80						;Answer the Z80's sample request (Z80_RAM+$4D: 1 start sample 
 SndFindBankItem						;Find bank item type d0, id d1 in the 4 banks (SndBanks): a0 = its data,
 									;d0 = its size. Carry set and d0 = 3
 									;when there is none.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$78,$60,$43,$F9,$FF,$FF,$FF,$DC,$34,$3C,$00,$03,$0C,$91
-	dc.b	$FF,$FF,$FF,$FF,$67,$00,$00,$50,$20,$51,$24,$48,$42,$83,$16,$18
-	dc.b	$E1,$4B,$16,$18,$28,$03,$E5,$4C,$D5,$C4,$D5,$FC,$00,$00,$00,$02
-	dc.b	$B0,$10,$66,$18,$B2,$28,$00,$01,$66,$12,$10,$28,$00,$02,$E1,$48
-	dc.b	$10,$28,$00,$03,$20,$4A,$02,$3C,$00,$FE,$60,$2C,$42,$84,$18,$28
-	dc.b	$00,$02,$E1,$4C,$18,$28,$00,$03,$D5,$C4,$D1,$FC,$00,$00,$00,$04
-	dc.b	$04,$43,$00,$01,$66,$CA,$D3,$FC,$00,$00,$00,$04,$51,$CA,$FF,$A0
-	dc.b	$30,$3C,$00,$03,$00,$3C,$00,$01,$4C,$DF,$06,$1E,$4E,$75
+	movem.l	d1-d4/a1-a2,-(sp)
+	lea	($FFFFFFDC).l,a1
+	move.w	#3,d2
+.loop
+	cmpi.l	#$FFFFFFFF,(a1)
+	beq.w	.2
+	movea.l	(a1),a0
+	movea.l	a0,a2
+	clr.l	d3
+	move.b	(a0)+,d3
+	lsl.w	#8,d3
+	move.b	(a0)+,d3
+	move.l	d3,d4
+	lsl.w	#2,d4
+	adda.l	d4,a2
+	adda.l	#$2,a2
+.loop2
+	cmp.b	(a0),d0
+	bne.s	.1
+	cmp.b	1(a0),d1
+	bne.s	.1
+	move.b	2(a0),d0
+	lsl.w	#8,d0
+	move.b	3(a0),d0
+	movea.l	a2,a0
+	andi.b	#$FE,ccr
+	bra.s	.3
+.1
+	clr.l	d4
+	move.b	2(a0),d4
+	lsl.w	#8,d4
+	move.b	3(a0),d4
+	adda.l	d4,a2
+	adda.l	#$4,a0
+	opt	osq-
+	subi.w	#1,d3
+	opt	osq+
+	bne.s	.loop2
+.2
+	adda.l	#$4,a1
+	dbf	d2,.loop
+	move.w	#3,d0
+	ori.b	#1,ccr
+.3
+	movem.l	(sp)+,d1-d4/a1-a2
+	rts
 
 SndSetBank							;Command 6: bank d1 (0-3) is at a0; tell the Z80 too (Z80_RAM+$51). Carry
 									;set and d0 = 3 for d1 above 3.
@@ -366,13 +883,39 @@ SndSetBank							;Command 6: bank d1 (0-3) is at a0; tell the Z80 too (Z80_RAM+$
 SndLoadList							;Command 7: upload the patches (types 0 and 4) of load list d1 (bank item
 									;type $B, pairs ended by $FF) to the
 									;Z80.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$40,$C0,$30,$3C,$00,$0B,$61,$00,$FF,$1C,$65,$00,$00,$40
-	dc.b	$22,$48,$0C,$11,$00,$FF,$66,$04,$42,$40,$60,$32,$42,$40,$10,$11
-	dc.b	$42,$41,$12,$29,$00,$01,$61,$00,$FE,$FE,$65,$22,$0C,$11,$00,$00
-	dc.b	$67,$06,$0C,$11,$00,$04,$66,$0E,$32,$00,$42,$40,$10,$29,$00,$01
-	dc.b	$61,$00,$F8,$DE,$65,$08,$D3,$FC,$00,$00,$00,$02,$60,$C4,$4C,$DF
-	dc.b	$03,$02,$4E,$75
+	movem.l	d1/a0-a1,-(sp)
+	move.w	#$B,d0
+	bsr.w	SndFindBankItem
+	bcs.w	.4
+	movea.l	a0,a1
+.loop
+	cmpi.b	#$FF,(a1)
+	bne.s	.1
+	clr.w	d0
+	bra.s	.4
+.1
+	clr.w	d0
+	move.b	(a1),d0
+	clr.w	d1
+	move.b	1(a1),d1
+	bsr.w	SndFindBankItem
+	bcs.s	.4
+	cmpi.b	#0,(a1)
+	beq.s	.2
+	cmpi.b	#4,(a1)
+	bne.s	.3
+.2
+	move.w	d0,d1
+	clr.w	d0
+	move.b	1(a1),d0
+	bsr.w	SndUploadBlock
+	bcs.s	.4
+.3
+	adda.l	#$2,a1
+	bra.s	.loop
+.4
+	movem.l	(sp)+,d1/a0-a1
+	rts
 
 SndFreeBlocks						;Command 8: free the Z80 blocks of list a0 (word pairs ended by -1) and
 									;move the blocks after them down.
@@ -406,35 +949,78 @@ SndResetBlocks						;Command 9: free all Z80 blocks (Z80_RAM+$100 all $FF, free 
 	dc.b	$30,$9F,$42,$40,$4C,$DF,$03,$00,$4E,$75
 
 SndSendZ80							;Command $12: queue Z80 command d1 with interrupts off.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$40,$E7,$46,$FC,$27,$00,$20,$01,$61,$00,$F6,$E0,$46,$DF,$4E,$75
+	move.w	sr,-(sp)
+	move.w	#$2700,sr
+	move.l	d1,d0
+	bsr.w	SndPutZ80Cmd
+	move.w	(sp)+,sr
+	rts
 
 SndQueueZ80Cmd						;Command $A: put Z80 command d1 in a free entry of the command queue (sent
 									;by SndFlushZ80Queue).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$60,$80,$41,$F9,$FF,$FF,$FF,$4E,$30,$39,$FF,$FF,$FF,$CE
-	dc.b	$34,$3C,$00,$1F,$08,$F0,$00,$07,$00,$03,$66,$10,$21,$81,$00,$00
-	dc.b	$41,$F9,$FF,$FF,$FF,$CE,$30,$80,$42,$40,$60,$18,$06,$40,$00,$04
-	dc.b	$0C,$40,$00,$80,$65,$02,$42,$40,$51,$CA,$FF,$DA,$30,$3C,$00,$07
-	dc.b	$00,$3C,$00,$01,$4C,$DF,$01,$06,$4E,$75
+	movem.l	d1-d2/a0,-(sp)
+	lea	($FFFFFF4E).l,a0
+	move.w	($FFFFFFCE).l,d0
+	move.w	#$1F,d2
+.loop
+	bset	#7,3(a0,d0.w)
+	bne.s	.1
+	move.l	d1,(a0,d0.w)
+	lea	($FFFFFFCE).l,a0
+	move.w	d0,(a0)
+	clr.w	d0
+	bra.s	.3
+.1
+	opt	oaq-
+	addi.w	#4,d0
+	opt	oaq+
+	cmpi	#$80,d0
+	bcs.s	.2
+	clr.w	d0
+.2
+	dbf	d2,.loop
+	move.w	#7,d0
+	ori.b	#1,ccr
+.3
+	movem.l	(sp)+,d1-d2/a0
+	rts
 
 SndFlushZ80Queue					;Send the queued Z80 commands (SndPutZ80Cmd) and clear their entries.
 									;Called from SndUpdate.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$C0,$80,$41,$F9,$FF,$FF,$FF,$4E,$32,$39,$FF,$FF,$FF,$D0
-	dc.b	$0C,$B0,$00,$00,$00,$00,$10,$00,$67,$24,$0C,$B0,$00,$00,$00,$80
-	dc.b	$10,$00,$67,$1A,$20,$30,$10,$00,$61,$00,$F6,$66,$42,$B0,$10,$00
-	dc.b	$06,$41,$00,$04,$0C,$41,$00,$80,$65,$D6,$42,$41,$60,$D2,$41,$F9
-	dc.b	$FF,$FF,$FF,$D0,$30,$81,$4C,$DF,$01,$03,$4E,$75
+	movem.l	d0-d1/a0,-(sp)
+	lea	($FFFFFF4E).l,a0
+	move.w	($FFFFFFD0).l,d1
+.loop
+	cmpi.l	#$0,(a0,d1.w)
+	beq.s	.1
+	cmpi.l	#$80,(a0,d1.w)
+	beq.s	.1
+	move.l	(a0,d1.w),d0
+	bsr.w	SndPutZ80Cmd
+	clr.l	(a0,d1.w)
+	opt	oaq-
+	addi.w	#4,d1
+	opt	oaq+
+	cmpi	#$80,d1
+	bcs.s	.loop
+	clr.w	d1
+	bra.s	.loop
+.1
+	lea	($FFFFFFD0).l,a0
+	move.w	d1,(a0)
+	movem.l	(sp)+,d0-d1/a0
+	rts
 
 Z80BusRequest						;Stop the Z80 and wait for the bus.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$33,$FC,$01,$00,$00,$A1,$11,$00,$08,$39,$00,$00,$00,$A1,$11,$00
-	dc.b	$66,$F6,$4E,$75
+	move.w	#$100,(IO_Z80BUS).l
+.loop
+	btst	#0,(IO_Z80BUS).l
+	bne.s	.loop
+	rts
 
 Z80BusRelease						;Give the bus back to the Z80.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$33,$FC,$00,$00,$00,$A1,$11,$00,$4E,$75
+	move.w	#0,(IO_Z80BUS).l
+	rts
 
 Z80Program							;The Z80 sound program. Starts JP $0533
 	incbin	..\Extracted\NHL96\Sound\z80_snd_drv96.bin
@@ -1160,16 +1746,25 @@ stop_current_song					;Stop the song in progress (PlayingSong, sound driver comm
 
 stop_current_song2					;Unreferenced. A copy of stop_current_song that skips the saving when no
 									;song plays.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$4A,$78,$D2,$A2,$6B,$00,$00,$22,$48,$E7,$FF,$FE,$30,$3C,$00,$05
-	dc.b	$32,$38,$D2,$A2,$34,$3C,$FF,$FF,$4E,$B9,$00,$08,$83,$9E,$4C,$DF
-	dc.b	$7F,$FF,$31,$FC,$FF,$FF,$D2,$A2,$4E,$75
+	tst.w	(PlayingSong).w
+	bmi.w	.1						;no song playing
+	movem.l	d0-d7/a0-a6,-(sp)
+	move.w	#5,d0
+	move.w	(PlayingSong).w,d1
+	move.w	#$FFFF,d2
+	jsr	(SoundCmd).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	move.w	#$FFFF,(PlayingSong).w
+.1
+	rts
 
 KillCrowd2							;Unreferenced. A copy of KillCrowd: silence the crowd noise (psg).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$13,$FC,$00,$E7,$00,$C0,$00,$11,$13,$FC,$00,$DF,$00,$C0,$00,$11
-	dc.b	$13,$FC,$00,$C8,$00,$C0,$00,$11,$13,$FC,$00,$01,$00,$C0,$00,$11
-	dc.b	$13,$FC,$00,$FF,$00,$C0,$00,$11,$4E,$75
+	move.b	#$E7,(Asound).l
+	move.b	#$DF,(Asound).l
+	move.b	#$C8,(Asound).l
+	move.b	#1,(Asound).l
+	move.b	#$FF,(Asound).l
+	rts
 
 SoundOff							;Sound driver command $F, every song off
 	movem.l	d0-d7/a0-a6,-(sp)
@@ -1241,16 +1836,25 @@ RandomSongs							;8 songs ChooseSong picks from at random
 	dc.b	$33,$3D,$3E,$41,$33,$47,$4E,$4F
 
 p_initialZ80						;Unreferenced. ClearAllTrackAndSFXSlots, then reset the Z80.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$E0,$E0,$61,$00,$00,$42,$33,$FC,$01,$00,$00,$A1,$12,$00
-	dc.b	$33,$FC,$01,$00,$00,$A1,$11,$00,$08,$39,$00,$00,$00,$A1,$11,$00
-	dc.b	$66,$F6,$33,$FC,$00,$00,$00,$A1,$12,$00,$33,$FC,$00,$00,$00,$A1
-	dc.b	$11,$00,$30,$3C,$01,$F4,$51,$C8,$FF,$FE,$33,$FC,$01,$00,$00,$A1
-	dc.b	$12,$00,$4C,$DF,$07,$07,$4E,$75
+	movem.l	d0-d2/a0-a2,-(sp)
+	bsr.w	ClearAllTrackAndSFXSlots
+	move.w	#$100,(IO_Z80RES).l
+	move.w	#$100,(IO_Z80BUS).l
+.loop
+	btst	#0,(IO_Z80BUS).l
+	bne.s	.loop
+	move.w	#0,(IO_Z80RES).l		;Assert Z80 reset line
+	move.w	#0,(IO_Z80BUS).l		;Release Z80 bus
+	move.w	#$1F4,d0				;Set delay counter to 500
+.loop2
+	dbf	d0,.loop2					;Loop to delay for synchronization
+	move.w	#$100,(IO_Z80RES).l		;Deassert Z80 reset to start Z80
+	movem.l	(sp)+,d0-d2/a0-a2		;Restore registers d0 and a0
+	rts								;Return
 
 ClearAllTrackAndSFXSlots			;PlayingSong = -1.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$31,$FC,$FF,$FF,$D2,$A2,$4E,$75
+	move.w	#$FFFF,(PlayingSong).w
+	rts
 
 newcheck							;Start a new check sound: one of 4 sounds
 									;$1C-$1F, never the last one again

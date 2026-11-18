@@ -62,7 +62,13 @@ GetPlayerCount						;d0 = players on team a2 (GetPlayerCountD7 with d7 = the tea
 
 WaitVSyncAndReadInput				;Wait for the next vblank, read the menu pad (ReadMenuJoy) until a new
 									;button press.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$32,$38,$B0,$52,$B2,$78,$B0,$52,$67,$FA,$61,$00,$04,$C8,$61,$00
-	dc.b	$5A,$E4,$4A,$01,$67,$EA,$4E,$75
+	move.w	(Vcount).w,d1
+.loop
+	cmp.w	(Vcount).w,d1
+	beq.s	.loop
+	bsr.w	ReadMenuJoy
+	bsr.w	nodiag
+	tst.b	d1
+	beq.s	WaitVSyncAndReadInput
+	rts
 

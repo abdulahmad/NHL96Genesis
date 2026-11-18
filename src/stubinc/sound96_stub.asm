@@ -13,6 +13,7 @@
 
 ; External addresses outside, read from lst/nhl96.bin.
 randomd0 = $01B0A6					;video96
+ReadJoyData = $024226				;video96_pad
 
 
 ; Main segment code

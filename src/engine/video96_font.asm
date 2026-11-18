@@ -20,9 +20,23 @@ LoadBigFonts						;Load the fonts at char d4: BigFontMap+8 (bigfont1chars), then
 
 TurnGoalieFromNet					;A pad goalie in his crease facing back at his net turns one step to the
 									;side
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$2B,$00,$07,$00,$62,$67,$00,$00,$2A,$0C,$6B,$00,$03,$00,$54
-	dc.b	$67,$00,$00,$10,$0C,$6B,$00,$05,$00,$54,$67,$00,$00,$0E,$60,$00
-	dc.b	$00,$22,$53,$6B,$00,$54,$60,$00,$00,$1A,$52,$6B,$00,$54,$60,$00
-	dc.b	$00,$12,$0C,$6B,$00,$07,$00,$54,$67,$E8,$0C,$6B,$00,$01,$00,$54
-	dc.b	$67,$E8,$4E,$75
+	btst	#pfgoal,pflags(a3)
+	beq.w	.1
+	cmpi.w	#3,facedir(a3)
+	beq.w	.loop
+	cmpi.w	#5,facedir(a3)
+	beq.w	.loop2
+	bra.w	.2
+.loop
+	subq.w	#1,facedir(a3)
+	bra.w	.2
+.loop2
+	addq.w	#1,facedir(a3)
+	bra.w	.2
+.1
+	cmpi.w	#7,facedir(a3)
+	beq.s	.loop
+	cmpi.w	#1,facedir(a3)
+	beq.s	.loop2
+.2
+	rts

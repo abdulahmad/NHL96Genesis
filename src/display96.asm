@@ -3,27 +3,76 @@
 
 VBlank								;The game vertical blank handler (VBint): the dma list, sprites, scroll,
 									;palette fade, pads.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$14,$08,$B8
-	dc.b	$00,$00,$BF,$B2,$67,$00,$00,$06,$61,$00,$00,$F0,$61,$00,$AD,$DC
-	dc.b	$08,$38,$00,$00,$C3,$3A,$66,$00,$00,$8E,$08,$38,$00,$02,$C3,$48
-	dc.b	$66,$00,$00,$0C,$08,$38,$00,$00,$C3,$38,$66,$00,$00,$7A,$08,$38
-	dc.b	$00,$01,$C3,$48,$66,$00,$00,$80,$4A,$78,$C4,$BE,$67,$00,$00,$68
-	dc.b	$04,$78,$0A,$AA,$C4,$C0,$64,$00,$00,$5E,$08,$F8,$00,$03,$BF,$B2
-	dc.b	$53,$78,$C4,$BE,$52,$78,$C4,$C6,$4A,$78,$C4,$BC,$67,$00,$00,$10
-	dc.b	$0C,$78,$00,$28,$C4,$C6,$6D,$00,$00,$20,$60,$00,$00,$0C,$0C,$78
-	dc.b	$00,$14,$C4,$C6,$6D,$00,$00,$12,$42,$78,$C4,$C6,$4A,$78,$C4,$C4
-	dc.b	$67,$00,$00,$06,$53,$78,$C4,$C4,$0C,$78,$00,$3D,$C4,$BE,$6E,$00
-	dc.b	$00,$16,$0C,$78,$00,$3C,$C4,$BE,$6D,$00,$00,$0C,$3F,$3C,$00,$02
-	dc.b	$4E,$B9,$00,$08,$84,$70,$52,$78,$B0,$52,$4E,$B9,$00,$02,$44,$86
-	dc.b	$4C,$DF,$7F,$FF,$4E,$73,$4A,$78,$D3,$26,$67,$EA,$04,$78,$0A,$AA
-	dc.b	$D3,$28,$64,$E2,$08,$F8,$00,$03,$BF,$B2,$08,$38,$00,$07,$C3,$48
-	dc.b	$66,$D4,$53,$78,$D3,$26,$60,$CE
+	movem.l	d0-d7/a0-a6,-(sp)
+	btst	#dfng,(disflags).w		;dfng: don't touch the vdp
+	bne.w	.2
+	bclr	#dfok,(disflags).w
+	beq.w	.1
+	bsr.w	DumpSprites
+.1
+	bsr.w	cramfade
+.2
+	btst	#sfpz,(sflags).w
+	bne.w	.loop
+	btst	#2,(gmode2).w
+	bne.w	.3
+	btst	#gmclock,(gmode).w		;gmclock: game clock stopped
+	bne.w	.loop
+.3
+	btst	#1,(gmode2).w			;penalty shot / shootout clock
+	bne.w	.7
+	tst.w	(gameclock).w
+	beq.w	.loop
+	subi.w	#jiffy,(gameclock+2).w	;jiffy
+	bcc.w	.loop
+	bset	#dfclock,(disflags).w
+	subq.w	#1,(gameclock).w
+	addq.w	#1,(ChkCnt2).w
+	tst.w	(gsp).w
+	beq.w	.4
+	cmpi.w	#$28,(ChkCnt2).w
+	blt.w	.6
+	bra.w	.5
+.4
+	cmpi.w	#$14,(ChkCnt2).w
+	blt.w	.6
+.5
+	clr.w	(ChkCnt2).w
+	tst.w	(ChkCnt).w
+	beq.w	.6
+	subq.w	#1,(ChkCnt).w
+.6
+	cmpi.w	#$3D,(gameclock).w		;61
+	bgt.w	.loop
+	cmpi.w	#$3C,(gameclock).w		;60
+	blt.w	.loop
+	move.w	#SFXbeep2,-(sp)			;SFXbeep2, played when gameclock reaches 60
+	jsr	(sfx).l						;jsr (94: bsr.w)
+.loop
+	addq.w	#1,(Vcount).w
+	jsr	(p_music_vblank).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rte
+.7
+	tst.w	(shootoutclock).w
+	beq.s	.loop
+	subi.w	#$AAA,(shootoutclock+2).w
+	bcc.s	.loop
+	bset	#dfclock,(disflags).w
+	btst	#7,(gmode2).w
+	bne.s	.loop
+	subq.w	#1,(shootoutclock).w
+	bra.s	.loop
 
 vb2									;The vertical blank handler for fades only (forcefade, EASportsScreen).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$02,$BF,$B2,$66,$00,$00,$06,$61,$00
-	dc.b	$AD,$02,$52,$78,$B0,$52,$4E,$B9,$00,$02,$44,$86,$4C,$DF,$7F,$FF
+	movem.l	d0-d7/a0-a6,-(sp)
+	btst	#dfng,(disflags).w
+	bne.w	.1
+	bsr.w	cramfade
+.1
+	addq.w	#1,(Vcount).w
+	jsr	(p_music_vblank).l
+	movem.l	(sp)+,d0-d7/a0-a6
 
 IRQ7								;Unused interrupts: return
 	rte
@@ -269,13 +318,36 @@ checkfo								;Check for faceoff sprites: the fofdata2 entries (frame, flags) a
 	dbf	d0,.loop
 	rts
 	;After checkfo: code that nothing in the listing reaches.
-	;Code the listing does not decode: kept as bytes
-	dc.b	$BC,$7C,$00,$40,$6C,$00,$F2,$94,$48,$E7,$FC,$80,$D1,$E8,$00,$04
-	dc.b	$D4,$42,$38,$30,$20,$02,$98,$70,$20,$00,$E6,$4C,$53,$44,$D0,$F0
-	dc.b	$20,$00,$3C,$A8,$00,$02,$D3,$5E,$1C,$E8,$00,$07,$1C,$C6,$34,$28
-	dc.b	$00,$06,$02,$42,$F8,$00,$D4,$68,$00,$04,$D4,$43,$3C,$C2,$3C,$90
-	dc.b	$D1,$5E,$52,$46,$BC,$7C,$00,$40,$67,$00,$00,$08,$50,$48,$51,$CC
-	dc.b	$FF,$D2,$4C,$DF,$01,$3F,$4E,$75
+	cmp.w	#$40,d6
+	bge.w	rtss2
+	movem.l	d0-d5/a0,-(sp)
+	adda.l	4(a0),a0
+	add.w	d2,d2
+	move.w	2(a0,d2.w),d4
+	sub.w	(a0,d2.w),d4
+	lsr.w	#3,d4
+	subq.w	#1,d4
+	adda.w	(a0,d2.w),a0
+.loop2
+	move.w	2(a0),(a6)
+	add.w	d1,(a6)+
+	move.b	7(a0),(a6)+
+	move.b	d6,(a6)+
+	move.w	6(a0),d2
+	andi.w	#$F800,d2
+	add.w	4(a0),d2
+	add.w	d3,d2
+	move.w	d2,(a6)+
+	move.w	(a0),(a6)
+	add.w	d0,(a6)+
+	addq.w	#1,d6
+	cmp.w	#$40,d6
+	beq.w	.ex
+	addq.w	#8,a0
+	dbf	d4,.loop2
+.ex
+	movem.l	(sp)+,d0-d5/a0
+	rts
 
 showcrowd							;Crowd sprites: the penalty box frames per PBnum nibble (ShowCrowdPb),
 									;then the Crowdframe frame
@@ -394,9 +466,11 @@ JumpToShowClock						;setvideo enters showclock here
 	dc.b	$BD,$0D,$05,$00,$4E,$75
 
 .digit								;A clock digit for the dead clock code above (.digits) Code the listing
-									;does not decode: kept as bytes
-	dc.b	$22,$7C,$00,$02,$07,$C0,$E5,$40,$D2,$C0,$4E,$B9,$00,$01,$BB,$A0
-	dc.b	$4E,$75
+	movea.l	#$207C0,a1
+	asl.w	#2,d0
+	adda.w	d0,a1
+	jsr	(print).l
+	rts
 
 .digits								;.digit: the digit chars
 	dc.b	$00,$04,$30,$00,$00,$04,$31,$00,$00,$04,$32,$00,$00,$04,$33,$00

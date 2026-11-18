@@ -265,10 +265,19 @@ AwardsScreenSetup					;Awards screen setup: vram, fonts and the background bitma
 
 GetAwardWinnerTeam					;d7 = the team of the winner of award PlayerScrollCtr (its save RAM award
 									;record)
-									;Code the listing does not decode: kept as bytes
-	dc.b	$20,$7C,$FF,$FF,$D1,$30,$20,$3C,$00,$00,$0D,$94,$32,$38,$D0,$34
-	dc.b	$B2,$7C,$00,$08,$66,$00,$00,$04,$42,$41,$C2,$FC,$00,$04,$D0,$81
-	dc.b	$32,$3C,$00,$04,$4E,$B9,$00,$02,$41,$E8,$3E,$28,$00,$02,$4E,$75
+	movea.l	#CalTeam,a0
+	move.l	#$D94,d0
+	move.w	(PlayerScrollCtr).w,d1
+	cmp.w	#8,d1
+	bne.w	.1
+	clr.w	d1
+.1
+	mulu.w	#4,d1
+	add.l	d1,d0
+	move.w	#4,d1
+	jsr	(ReadSRAM).l
+	move.w	2(a0),d7
+	rts
 
 GetAwardWinner						;d0 = the 4-byte winner record of award PlayerScrollCtr (save RAM $D94 +
 									;award * 4, read to ThreeStars)

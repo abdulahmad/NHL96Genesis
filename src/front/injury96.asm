@@ -73,8 +73,13 @@ SetSeasonInjuries					;The players of team a2 with injury games left (save RAM b
 	rts
 
 GetInjuryGames						;d0 = the injury games of player d1 of team d7 (save RAM bits) Code the
-									;listing does not decode: kept as bytes
-	dc.b	$48,$E7,$61,$00,$CE,$FC,$00,$51,$C2,$FC,$00,$03,$06,$81,$00,$00
-	dc.b	$ED,$F0,$D2,$87,$74,$03,$4E,$B9,$00,$00,$97,$5A,$4C,$DF,$00,$86
-	dc.b	$4E,$75
+	movem.l	d1-d2/d7,-(sp)
+	mulu.w	#$51,d7
+	mulu.w	#3,d1
+	addi.l	#$EDF0,d1
+	add.l	d7,d1
+	moveq	#3,d2
+	jsr	(ReadSRAMBits).l
+	movem.l	(sp)+,d1-d2/d7
+	rts
 

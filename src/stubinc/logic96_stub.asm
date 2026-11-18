@@ -42,6 +42,7 @@ rtss2 = $01F84A						;collide96
 assonetimer = $1D6872				;logic96_timer
 assfight = $00B988					;fight96
 assfwatch = $00C1C8					;fight96
+assreplace = $01A3DA				;collide96_stub
 
 
 ; Main segment code

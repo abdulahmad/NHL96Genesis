@@ -33,6 +33,7 @@ SPAboardmidl = $2084				;SPA value (frames96)
 SPAboardmidr = $24C4				;SPA value (frames96)
 SPAboardtop = $22AE					;SPA value (frames96)
 SPAglide = $856						;SPA value (frames96)
+vtoa = $01A3EE						;collide96_stub
 
 
 ; Main segment code

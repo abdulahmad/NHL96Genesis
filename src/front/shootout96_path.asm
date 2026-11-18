@@ -94,13 +94,26 @@ ShootoutInit						;Clear the player structs (SortCords) and the shootout state, 
 
 NextShooter							;Shootout: the next shooter (BA_Team, BA_Goalie_SCnum, StartShootoutPath),
 									;or the end (ExitToOpening).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$38,$00,$03,$C3,$48,$67,$00,$00,$08,$4E,$F9,$00,$02,$16,$EE
-	dc.b	$48,$E7,$FF,$FE,$61,$00,$09,$98,$31,$F8,$D4,$54,$D2,$D2,$31,$FC
-	dc.b	$00,$0B,$D2,$D6,$20,$7C,$FF,$FF,$D4,$3A,$4A,$78,$D4,$54,$67,$00
-	dc.b	$00,$0E,$31,$FC,$00,$05,$D2,$D6,$20,$7C,$FF,$FF,$D4,$48,$30,$38
-	dc.b	$D4,$46,$D0,$40,$31,$F0,$00,$00,$D2,$D8,$08,$B8,$00,$02,$B7,$C0
-	dc.b	$4C,$DF,$7F,$FF,$4E,$75
+	btst	#3,(gmode2).w
+	beq.w	.1
+	jmp	(ExitToOpening).l
+.1
+	movem.l	d0-d7/a0-a6,-(sp)
+	bsr.w	StartShootoutPath
+	move.w	(shootoutteam).w,(BA_Team).w
+	move.w	#$B,(BA_Goalie_SCnum).w
+	movea.l	#shootoutround+2,a0
+	tst.w	(shootoutteam).w
+	beq.w	.2
+	move.w	#5,(BA_Goalie_SCnum).w
+	movea.l	#homeshootnum+2,a0
+.2
+	move.w	(homeshootnum).w,d0
+	add.w	d0,d0
+	move.w	(a0,d0.w),(BA_Skater_Offset).w
+	bclr	#pfnc,(puckc+2).w
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 CountShootoutGoals					;Shootout: count the goals and end it when one team cannot catch up
 									;(EndShootout)
@@ -188,11 +201,21 @@ ShootoutWonBy						;Shootout: "SHOOTOUT WON BY" and the winning team (printbig1)
 
 GetTeamNickname						;a1 = the nickname String of team a2, or HomeTxt / VisitorsTxt when it is
 									;empty.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$80,$A0,$22,$4A,$22,$69,$00,$1E,$D2,$E9,$00,$04,$D2,$D1
-	dc.b	$D2,$D1,$0C,$51,$00,$02,$66,$00,$00,$18,$22,$7C,$00,$1D,$83,$7C
-	dc.b	$B5,$FC,$FF,$FF,$C7,$26,$67,$00,$00,$08,$22,$7C,$00,$1D,$83,$82
-	dc.b	$4C,$DF,$05,$01,$4E,$75
+	movem.l	d0/a0/a2,-(sp)
+	movea.l	a2,a1
+	movea.l	$1E(a1),a1				;tmdata
+	adda.w	4(a1),a1				;city
+	adda.w	(a1),a1					;abbreviation
+	adda.w	(a1),a1					;nickname
+	cmpi.w	#2,(a1)					;empty String?
+	bne.w	.1
+	movea.l	#HomeTxt,a1
+	cmpa.l	#tmstruct,a2
+	beq.w	.1
+	movea.l	#VisitorsTxt,a1
+.1
+	movem.l	(sp)+,d0/a0/a2
+	rts
 
 HomeTxt								;GetTeamNickname: the home team without a nickname
 	String	'Home'
@@ -201,10 +224,18 @@ VisitorsTxt							;GetTeamNickname: the away team without a nickname
 	String	'Visitors'
 
 GetTeamArena						;a1 = the arena String of team a2.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$80,$A0,$22,$4A,$22,$69,$00,$1E,$D2,$E9,$00,$04,$D2,$D1
-	dc.b	$D2,$D1,$D2,$D1,$4C,$DF,$05,$01,$4E,$75,$48,$E7,$FF,$FE,$4C,$DF
-	dc.b	$7F,$FF,$4E,$75
+	movem.l	d0/a0/a2,-(sp)
+	movea.l	a2,a1
+	movea.l	$1E(a1),a1				;tmdata
+	adda.w	4(a1),a1				;city
+	adda.w	(a1),a1
+	adda.w	(a1),a1
+	adda.w	(a1),a1					;arena
+	movem.l	(sp)+,d0/a0/a2
+	rts
+	movem.l	d0-d7/a0-a6,-(sp)
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 EndShootout							;Shootout over: LockScroll, then the 5 skaters of player slots 1-5
 									;(homeshootgoals > awayshootgoals) or 7-$B
@@ -272,21 +303,79 @@ AddArenaAnimSprite					;Add the arena animation sprites; disabled in 96: the rts
 
 .spr								;Add the arena animation sprites in view (the ShowCrowdFrame loop);
 									;reached only from the dead body above
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$80,$67,$00,$00,$B4,$BC,$7C,$00,$40,$6C,$00,$00,$AC,$48,$E7
-	dc.b	$FC,$00,$D0,$40,$20,$49,$32,$30,$00,$02,$92,$70,$00,$00,$E6,$49
-	dc.b	$53,$41,$3F,$01,$D0,$F0,$00,$00,$30,$04,$06,$40,$00,$C0,$32,$00
-	dc.b	$04,$40,$00,$90,$06,$41,$00,$80,$34,$3C,$01,$70,$94,$45,$36,$02
-	dc.b	$04,$42,$00,$80,$06,$43,$00,$70,$38,$1F,$B4,$50,$6E,$00,$00,$60
-	dc.b	$B6,$50,$6D,$00,$00,$5A,$B0,$68,$00,$06,$6E,$00,$00,$52,$B2,$68
-	dc.b	$00,$06,$6D,$00,$00,$4A,$3A,$10,$06,$45,$00,$70,$9A,$42,$3C,$C5
-	dc.b	$1C,$E8,$00,$02,$02,$2E,$00,$0F,$FF,$FF,$1C,$C6,$1A,$28,$00,$04
-	dc.b	$02,$45,$00,$F8,$E1,$4D,$3F,$05,$3A,$28,$00,$04,$02,$45,$07,$FF
-	dc.b	$DA,$78,$D4,$6C,$8A,$5F,$3C,$C5,$3A,$28,$00,$06,$06,$45,$00,$70
-	dc.b	$9A,$40,$3C,$C5,$52,$46,$BC,$7C,$00,$40,$67,$00,$00,$08,$50,$48
-	dc.b	$51,$CC,$FF,$98,$4C,$DF,$00,$3F,$4E,$75,$48,$E7,$FF,$B0,$4E,$B9
-	dc.b	$00,$02,$2F,$44,$30,$11,$55,$40,$33,$40,$00,$02,$54,$49,$4C,$DF
-	dc.b	$0D,$FF,$4E,$75,$00,$06,$20,$2E,$20,$00,$4E,$75
+	ext.w	d0
+	beq.w	.3
+	cmp.w	#$40,d6
+	bge.w	.3
+	movem.l	d0-d5,-(sp)
+	add.w	d0,d0
+	movea.l	a1,a0
+	move.w	2(a0,d0.w),d1
+	sub.w	(a0,d0.w),d1
+	lsr.w	#3,d1
+	subq.w	#1,d1
+	move.w	d1,-(sp)
+	adda.w	(a0,d0.w),a0
+	move.w	d4,d0
+	addi.w	#$C0,d0
+	move.w	d0,d1
+	subi.w	#$90,d0
+	addi.w	#$80,d1
+	move.w	#$170,d2
+	sub.w	d5,d2
+	move.w	d2,d3
+	subi.w	#$80,d2
+	addi.w	#$70,d3
+	move.w	(sp)+,d4
+.loop
+	cmp.w	(a0),d2
+	bgt.w	.1
+	cmp.w	(a0),d3
+	blt.w	.1
+	cmp.w	6(a0),d0
+	bgt.w	.1
+	cmp.w	6(a0),d1
+	blt.w	.1
+	move.w	(a0),d5
+	addi.w	#$70,d5
+	sub.w	d2,d5
+	move.w	d5,(a6)+
+	move.b	2(a0),(a6)+
+	andi.b	#$F,-$1(a6)
+	move.b	d6,(a6)+
+	move.b	4(a0),d5
+	andi.w	#$F8,d5
+	lsl.w	#8,d5
+	move.w	d5,-(sp)
+	move.w	4(a0),d5
+	andi.w	#$7FF,d5
+	add.w	($FFFFD46C).w,d5
+	or.w	(sp)+,d5
+	move.w	d5,(a6)+
+	move.w	6(a0),d5
+	addi.w	#$70,d5
+	sub.w	d0,d5
+	move.w	d5,(a6)+
+	addq.w	#1,d6
+	cmp.w	#$40,d6
+	beq.w	.2
+.1
+	addq.w	#8,a0
+	dbf	d4,.loop
+.2
+	movem.l	(sp)+,d0-d5
+.3
+	rts
+	movem.l	d0-d7/a0/a2-a3,-(sp)
+	jsr	(FormatPlayerNumInitial).l
+	move.w	(a1),d0
+	subq.w	#2,d0
+	move.w	d0,2(a1)				;2 characters shorter
+	addq.w	#2,a1					;length word moved up
+	movem.l	(sp)+,d0-d7/a0/a2-a3
+	rts
+	dc.w	$0006,$202E,$2000
+	rts
 
 updatePPTeamTime					;Power play time of the teams, once a second. Called from updatepentime
 	btst	#sf2pwrplay,(sflags2).w
@@ -321,21 +410,66 @@ ShortenMsgTimer						;Cap the message timer at 2, unless a second pad is on and 
 	rts
 
 ManualGoalieMenu					;The "x Manual Goalie" pause menu item.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$4A,$78,$D2,$56,$67,$00,$00,$20,$61,$00,$11,$92
-	dc.b	$08,$38,$00,$01,$C3,$3A,$67,$00,$00,$0C,$0A,$78,$00,$01,$D2,$6E
-	dc.b	$60,$00,$00,$08,$0A,$78,$00,$01,$D2,$6C,$08,$38,$00,$00,$C3,$48
-	dc.b	$66,$00,$00,$0C,$08,$38,$00,$02,$C3,$40,$67,$00,$00,$9C,$08,$38
-	dc.b	$00,$01,$C3,$3A,$66,$00,$00,$5A,$0C,$78,$00,$02,$D2,$56,$66,$00
-	dc.b	$00,$10,$0C,$78,$00,$05,$D2,$D4,$6E,$00,$00,$7E,$60,$00,$00,$0C
-	dc.b	$0C,$78,$00,$05,$D2,$D4,$6F,$00,$00,$70,$30,$3C,$00,$00,$0C,$78
-	dc.b	$00,$02,$D2,$56,$66,$00,$00,$06,$30,$3C,$00,$06,$4A,$78,$D2,$6C
-	dc.b	$66,$00,$00,$14,$30,$3C,$00,$05,$0C,$78,$00,$02,$D2,$56,$66,$00
-	dc.b	$00,$06,$30,$3C,$00,$0B,$4E,$B9,$00,$01,$6C,$52,$60,$00,$00,$3A
-	dc.b	$0C,$78,$00,$02,$D2,$56,$66,$00,$00,$10,$0C,$78,$00,$05,$D2,$D4
-	dc.b	$6F,$00,$00,$26,$60,$00,$00,$0C,$0C,$78,$00,$05,$D2,$D4,$6E,$00
-	dc.b	$00,$18,$30,$3C,$00,$06,$4A,$78,$D2,$6E,$66,$00,$00,$06,$30,$3C
-	dc.b	$00,$0B,$4E,$B9,$00,$01,$6C,$5C,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	tst.w	(OptNOP).w
+	beq.w	.2
+	bsr.w	SetMenuPadSide
+	btst	#1,(sflags).w
+	beq.w	.1
+	eori.w	#1,(goaliemode2).w
+	bra.w	.2
+.1
+	eori.w	#1,(goaliemode1).w
+.2
+	btst	#0,(gmode2).w
+	bne.w	.3
+	btst	#2,(BA_PS_flags).w
+	beq.w	.12
+.3
+	btst	#1,(sflags).w
+	bne.w	.8
+	cmpi.w	#2,(OptNOP).w
+	bne.w	.4
+	cmpi.w	#5,(BA_Sktr_SCnum).w
+	bgt.w	.12
+	bra.w	.5
+.4
+	cmpi.w	#5,(BA_Sktr_SCnum).w
+	ble.w	.12
+.5
+	move.w	#0,d0
+	cmpi.w	#2,(OptNOP).w
+	bne.w	.6
+	move.w	#6,d0
+.6
+	tst.w	(goaliemode1).w
+	bne.w	.7
+	move.w	#5,d0
+	cmpi.w	#2,(OptNOP).w
+	bne.w	.7
+	move.w	#$B,d0
+.7
+	jsr	(setc1player).l
+	bra.w	.12
+.8
+	cmpi.w	#2,(OptNOP).w
+	bne.w	.9
+	cmpi.w	#5,(BA_Sktr_SCnum).w
+	ble.w	.12
+	bra.w	.10
+.9
+	cmpi.w	#5,(BA_Sktr_SCnum).w
+	bgt.w	.12
+.10
+	move.w	#6,d0
+	tst.w	(goaliemode2).w
+	bne.w	.11
+	move.w	#$B,d0
+.11
+	jsr	(setc2player).l
+.12
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 RunArenaAnim						;Run the arena animation (load its frames and tiles, step the frames);
 									;disabled in 96 by the leading rts
@@ -397,23 +531,39 @@ StartArenaAnim						;Start arena animation d0; disabled in 96 by the leading rts
 	dc.b	$D4,$70,$50,$F8,$D4,$7E,$4C,$DF,$7F,$FF,$4E,$75
 
 SetFaceoffAnim						;Set the faceoff animation d0 (sflags7 bit 0)
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$F8,$00,$00,$C3,$4A,$31,$C0,$D4,$7E,$4E,$75
+	bset	#0,(sflags7).w
+	move.w	d0,(faceoffanim).w
+	rts
 
 EndArenaAnim						;End the arena animation (none running, sflags7 bit 0 cleared) Code the
-									;listing does not decode: kept as bytes
-	dc.b	$31,$FC,$FF,$FF,$D4,$74,$08,$B8,$00,$00,$C3,$4A,$4E,$75
+	move.w	#$FFFF,(arenaanim).w
+	bclr	#0,(sflags7).w
+	rts
 
 ClearWinRecords						;Clear bytes 8-$B (wins, games) of the 8 ThreeStars records and write the
 									;$80 bytes to save RAM SRTeamRecords
 									;(WriteSRAM, MakeSRAMChecksum).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$D1,$30,$3E,$3C,$00,$07,$42,$28
-	dc.b	$00,$08,$42,$28,$00,$09,$42,$28,$00,$0A,$42,$28,$00,$0B,$42,$10
-	dc.b	$42,$28,$00,$04,$42,$28,$00,$0C,$42,$28,$00,$0D,$D0,$FC,$00,$10
-	dc.b	$51,$CF,$FF,$DC,$20,$3C,$00,$00,$0E,$CE,$22,$3C,$00,$00,$00,$80
-	dc.b	$20,$7C,$FF,$FF,$D1,$30,$4E,$B9,$00,$02,$41,$88,$4E,$B9,$00,$02
-	dc.b	$41,$AA,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	#ThreeStars,a0
+	move.w	#7,d7
+.loop
+	clr.b	8(a0)
+	clr.b	9(a0)
+	clr.b	$A(a0)
+	clr.b	$B(a0)
+	clr.b	(a0)
+	clr.b	4(a0)
+	clr.b	$C(a0)
+	clr.b	$D(a0)
+	adda.w	#$10,a0
+	dbf	d7,.loop
+	move.l	#$ECE,d0
+	move.l	#$80,d1
+	movea.l	#ThreeStars,a0
+	jsr	(WriteSRAM).l
+	jsr	(MakeSRAMChecksum).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 PSandSOpassdir						;Penalty shot / shootout: passdir = sopathdir (the end of the skate path
 									;NextPathPoint), turned by passdirlist
@@ -436,11 +586,19 @@ passdirlist							;PSandSOpassdir: passdir for the other net
 
 StartShootoutPath					;Shootout: pick one of the 7 skate paths (ShootoutPaths) at random
 									;(sopath) and start it (NextPathPoint).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$30,$3C,$00,$07,$4E,$B9,$00,$01,$B0,$A6,$B0,$7C
-	dc.b	$00,$06,$6E,$F0,$31,$C0,$D8,$14,$08,$B8,$00,$03,$C3,$4A,$31,$FC
-	dc.b	$FF,$FF,$D8,$16,$42,$78,$D8,$18,$61,$00,$00,$7C,$4C,$DF,$7F,$FF
-	dc.b	$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+.loop
+	move.w	#7,d0
+	jsr	(randomd0).l
+	cmp.w	#6,d0
+	bgt.s	.loop
+	move.w	d0,($FFFFD814).w
+	bclr	#3,(sflags7).w
+	move.w	#$FFFF,($FFFFD816).w
+	clr.w	($FFFFD818).w
+	bsr.w	NextPathPoint
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 ShootoutPaths						;The 7 shootout skate paths (NextPathPoint)
 	dc.l	ShootoutPath1
@@ -482,60 +640,193 @@ ShootoutPath7						;ShootoutPaths path: x, y points; $80 in the high byte ends i
 NextPathPoint						;Next point of shootout path sopath: sopathx / sopathy = x (turned by bit
 									;0 of $76(a3)) / y; at the end ($80)
 									;sflags7 bit 3, sopathend and sopathdir.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$0C,$38,$00,$80,$D8,$18,$67,$00,$00,$56,$52,$78
-	dc.b	$D8,$16,$30,$38,$D8,$16,$E5,$40,$20,$7C,$00,$1D,$8B,$92,$32,$38
-	dc.b	$D8,$14,$E5,$41,$20,$70,$10,$00,$31,$F0,$00,$00,$D8,$18,$08,$2B
-	dc.b	$00,$00,$00,$77,$67,$00,$00,$06,$44,$78,$D8,$18,$31,$F0,$00,$02
-	dc.b	$D8,$1A,$0C,$30,$00,$80,$00,$04,$66,$00,$00,$18,$08,$F8,$00,$03
-	dc.b	$C3,$4A,$42,$78,$D8,$1E,$11,$F0,$00,$05,$D8,$1F,$31,$F0,$00,$06
-	dc.b	$D8,$1C,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	cmpi.b	#$80,($FFFFD818).w
+	beq.w	.2
+	addq.w	#1,($FFFFD816).w
+	move.w	($FFFFD816).w,d0
+	asl.w	#2,d0
+	movea.l	#ShootoutPaths,a0
+	move.w	($FFFFD814).w,d1
+	asl.w	#2,d1
+	movea.l	(a0,d1.w),a0
+	move.w	(a0,d0.w),($FFFFD818).w
+	btst	#0,$77(a3)
+	beq.w	.1
+	neg.w	($FFFFD818).w
+.1
+	move.w	2(a0,d0.w),($FFFFD81A).w
+	cmpi.b	#$80,4(a0,d0.w)
+	bne.w	.2
+	bset	#3,(sflags7).w
+	clr.w	(sopathdir+2).w
+	move.b	5(a0,d0.w),(sopathdir+3).w
+	move.w	6(a0,d0.w),(sopathdir).w
+.2
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 SkatePath							;Shootout skate path: d0 / d1 = the point (mirrored for the bottom net);
 									;within $A of it ($12 while $28 /
 									;$2A(a3) are 0) take the next one (NextPathPoint).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$3F,$FE,$0C,$38,$00,$80,$D8,$18,$67,$00,$00,$76,$30,$38
-	dc.b	$D8,$18,$32,$38,$D8,$1A,$08,$2B,$00,$07,$00,$62,$66,$00,$00,$06
-	dc.b	$44,$40,$44,$41,$90,$53,$6A,$00,$00,$04,$44,$40,$4A,$6B,$00,$28
-	dc.b	$66,$00,$00,$12,$4A,$6B,$00,$2A,$66,$00,$00,$0A,$B0,$7C,$00,$12
-	dc.b	$6F,$00,$00,$0A,$B0,$7C,$00,$0A,$6E,$00,$00,$30,$92,$6B,$00,$14
-	dc.b	$6A,$00,$00,$04,$44,$41,$4A,$6B,$00,$28,$66,$00,$00,$12,$4A,$6B
-	dc.b	$00,$2A,$66,$00,$00,$0A,$B2,$7C,$00,$12,$6F,$00,$00,$0A,$B2,$7C
-	dc.b	$00,$0A,$6E,$00,$00,$06,$61,$00,$FF,$20,$30,$38,$D8,$18,$32,$38
-	dc.b	$D8,$1A,$4C,$DF,$7F,$FC,$4E,$75
+	movem.l	d2-d7/a0-a6,-(sp)
+	cmpi.b	#$80,($FFFFD818).w
+	beq.w	.9
+	move.w	($FFFFD818).w,d0
+	move.w	($FFFFD81A).w,d1
+	btst	#pfgoal,pflags(a3)
+	bne.w	.1
+	neg.w	d0
+	neg.w	d1
+.1
+	sub.w	(a3),d0
+	bpl.w	.2
+	neg.w	d0
+.2
+	tst.w	Xvel(a3)
+	bne.w	.3
+	tst.w	Yvel(a3)
+	bne.w	.3
+	cmp.w	#$12,d0
+	ble.w	.4
+.3
+	cmp.w	#$A,d0
+	bgt.w	.8
+.4
+	sub.w	Ypos(a3),d1
+	bpl.w	.5
+	neg.w	d1
+.5
+	tst.w	Xvel(a3)
+	bne.w	.6
+	tst.w	Yvel(a3)
+	bne.w	.6
+	cmp.w	#$12,d1
+	ble.w	.7
+.6
+	cmp.w	#$A,d1
+	bgt.w	.8
+.7
+	bsr.w	NextPathPoint
+.8
+	move.w	($FFFFD818).w,d0
+	move.w	($FFFFD81A).w,d1
+.9
+	movem.l	(sp)+,d2-d7/a0-a6
+	rts
 
 ShootoutShootCheck					;Shootout, skater a3 has the puck (gmode2 bit 1): Z set (d0 is restored) =
 									;shoot now after 3 (shootoutclock)
 									;at the path end, within sopathend of its last point, or with the puck
 									;stopped before $F.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$08,$38,$00,$01,$C3,$48,$67,$00,$00,$88,$30,$2B
-	dc.b	$00,$52,$B0,$78,$B7,$BE,$66,$00,$00,$7C,$0C,$78,$00,$03,$D3,$26
-	dc.b	$6F,$00,$00,$6C,$0C,$38,$00,$80,$D8,$18,$67,$00,$00,$62,$08,$38
-	dc.b	$00,$03,$C3,$4A,$66,$00,$00,$20,$4A,$78,$B7,$86,$66,$00,$00,$56
-	dc.b	$4A,$78,$B7,$88,$66,$00,$00,$4E,$0C,$78,$00,$0F,$D3,$26,$6D,$00
-	dc.b	$00,$3E,$60,$00,$00,$40,$30,$38,$D8,$18,$32,$38,$D8,$1A,$08,$2B
-	dc.b	$00,$07,$00,$62,$66,$00,$00,$06,$44,$40,$44,$41,$90,$53,$6A,$00
-	dc.b	$00,$04,$44,$40,$92,$6B,$00,$14,$6A,$00,$00,$04,$44,$41,$B0,$78
-	dc.b	$D8,$1E,$6E,$00,$00,$10,$B2,$78,$D8,$1E,$6E,$00,$00,$08,$42,$40
-	dc.b	$60,$00,$00,$06,$30,$3C,$00,$01,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	btst	#1,(gmode2).w
+	beq.w	.6
+	move.w	SCnum(a3),d0
+	cmp.w	(puckc).w,d0
+	bne.w	.6
+	cmpi.w	#3,(shootoutclock).w
+	ble.w	.5
+	cmpi.b	#$80,($FFFFD818).w
+	beq.w	.5
+	btst	#3,(sflags7).w
+	bne.w	.1
+	tst.w	(puckvx).w
+	bne.w	.6
+	tst.w	(puckvy).w
+	bne.w	.6
+	cmpi.w	#$F,(shootoutclock).w
+	blt.w	.5
+	bra.w	.6
+.1
+	move.w	($FFFFD818).w,d0
+	move.w	($FFFFD81A).w,d1
+	btst	#pfgoal,pflags(a3)
+	bne.w	.2
+	neg.w	d0
+	neg.w	d1
+.2
+	sub.w	(a3),d0
+	bpl.w	.3
+	neg.w	d0
+.3
+	sub.w	Ypos(a3),d1
+	bpl.w	.4
+	neg.w	d1
+.4
+	cmp.w	(sopathdir+2).w,d0
+	bgt.w	.6
+	cmp.w	(sopathdir+2).w,d1
+	bgt.w	.6
+.5
+	clr.w	d0
+	bra.w	.7
+.6
+	move.w	#1,d0
+.7
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 UnpackPicture						;Unpack a picture a2: count.w, then 3 bytes per row of 8 pixels to 4 bit
 									;pixels + 5 at picturebuf (count
 									;first). Called from DrawPictureBox DrawMatchupPicture and
 									;PlayerCardScreen.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$20,$7C,$FF,$FF,$D8,$20,$22,$7C,$FF,$FF,$DC,$A2
-	dc.b	$30,$1A,$30,$C0,$E7,$40,$53,$40,$42,$90,$42,$91,$12,$9A,$13,$5A
-	dc.b	$00,$01,$13,$5A,$00,$02,$2F,$3C,$00,$00,$00,$00,$24,$11,$02,$82
-	dc.b	$E0,$00,$00,$00,$E2,$8A,$06,$82,$50,$00,$00,$00,$85,$97,$24,$11
-	dc.b	$02,$82,$1C,$00,$00,$00,$E4,$8A,$06,$82,$05,$00,$00,$00,$85,$97
-	dc.b	$24,$11,$02,$82,$03,$80,$00,$00,$E6,$8A,$06,$82,$00,$50,$00,$00
-	dc.b	$85,$97,$24,$11,$02,$82,$00,$70,$00,$00,$E8,$8A,$06,$82,$00,$05
-	dc.b	$00,$00,$85,$97,$24,$11,$02,$82,$00,$0E,$00,$00,$EA,$8A,$06,$82
-	dc.b	$00,$00,$50,$00,$85,$97,$24,$11,$02,$82,$00,$01,$C0,$00,$EC,$8A
-	dc.b	$06,$82,$00,$00,$05,$00,$85,$97,$24,$11,$02,$82,$00,$00,$38,$00
-	dc.b	$EE,$8A,$06,$82,$00,$00,$00,$50,$85,$97,$24,$11,$02,$82,$00,$00
-	dc.b	$07,$00,$3A,$3C,$00,$08,$EA,$AA,$5A,$82,$85,$97,$20,$DF,$51,$C8
-	dc.b	$FF,$58,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	#sopathdir+4,a0
+	movea.l	#$FFFFDCA2,a1
+	move.w	(a2)+,d0
+	move.w	d0,(a0)+
+	asl.w	#3,d0
+	subq.w	#1,d0
+.loop
+	clr.l	(a0)
+	clr.l	(a1)
+	move.b	(a2)+,(a1)
+	move.b	(a2)+,1(a1)
+	move.b	(a2)+,2(a1)
+	move.l	#$0,-(sp)
+	move.l	(a1),d2
+	andi.l	#$E0000000,d2
+	lsr.l	#1,d2
+	addi.l	#$50000000,d2
+	or.l	d2,(sp)
+	move.l	(a1),d2
+	andi.l	#$1C000000,d2
+	lsr.l	#2,d2
+	addi.l	#$5000000,d2
+	or.l	d2,(sp)
+	move.l	(a1),d2
+	andi.l	#$3800000,d2
+	lsr.l	#3,d2
+	addi.l	#$500000,d2
+	or.l	d2,(sp)
+	move.l	(a1),d2
+	andi.l	#$700000,d2
+	lsr.l	#4,d2
+	addi.l	#$50000,d2
+	or.l	d2,(sp)
+	move.l	(a1),d2
+	andi.l	#$E0000,d2
+	lsr.l	#5,d2
+	addi.l	#$5000,d2
+	or.l	d2,(sp)
+	move.l	(a1),d2
+	andi.l	#$1C000,d2
+	lsr.l	#6,d2
+	addi.l	#$500,d2
+	or.l	d2,(sp)
+	move.l	(a1),d2
+	andi.l	#$3800,d2
+	lsr.l	#7,d2
+	addi.l	#$50,d2
+	or.l	d2,(sp)
+	move.l	(a1),d2
+	andi.l	#$700,d2
+	move.w	#8,d5
+	lsr.l	d5,d2
+	addq.l	#5,d2
+	or.l	d2,(sp)
+	move.l	(sp)+,(a0)+
+	dbf	d0,.loop
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts

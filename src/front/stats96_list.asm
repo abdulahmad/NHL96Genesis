@@ -1,8 +1,7 @@
 ;	The player stats list for one team, this game or the playoffs.
 
 PlayerStatsScreen					;Pause menu Player Stats: PlayerStatsList with d7 = 0 (this game) Code the
-									;listing does not decode: kept as bytes
-	dc.b	$42,$47
+	clr.w	d7
 
 PlayerStatsList						;Stats screen for team a2, d7 = 0 game / 1 playoff (plistplayoff): skaters
 									;or goalies sorted by category DispAttribCtr; up / down scroll, left /

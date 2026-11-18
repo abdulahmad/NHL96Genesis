@@ -22,6 +22,9 @@ RosterFont = $179168				;graphics96
 SmallFontMap = $179A76				;graphics96
 BigFontMap2 = $17AA72				;graphics96
 BigFontMap4 = $17B680				;graphics96
+HandleMenuInput = $014FA8			;hockey96_inter_stub
+PrintSmallListItem = $01D7EA		;hockey96_inter
+setvideo = $02034A					;display96
 
 
 ; Main segment code

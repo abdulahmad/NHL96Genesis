@@ -395,13 +395,31 @@ GoalieItem							;Options menu row: goalies
 	dc.b	$4E,$B9,$00,$01,$D7,$F2,$4E,$75
 
 PerLenItem							;Options menu row: period length
-									;Code the listing does not decode: kept as bytes
-	dc.b	$0C,$78,$00,$06,$D2,$54,$6D,$00,$00,$0A,$22,$7C,$00,$1E,$16,$CC
-	dc.b	$4E,$75,$0C,$78,$00,$04,$D2,$54,$67,$F0,$0C,$78,$00,$05,$D2,$54
-	dc.b	$67,$E8,$0C,$78,$00,$04,$D2,$54,$67,$E0,$30,$38,$D2,$5C,$B0,$7C
-	dc.b	$00,$03,$6D,$00,$00,$04,$42,$40,$4A,$40,$6A,$00,$00,$06,$30,$3C
-	dc.b	$00,$02,$31,$C0,$D2,$5C,$22,$7C,$00,$1E,$17,$0C,$4E,$B9,$00,$01
-	dc.b	$D7,$F2,$4E,$75
+	cmpi.w	#6,(OptPlayMode).w
+	blt.w	.1
+.loop
+	movea.l	#NotApplicableText,a1
+	rts
+.1
+	cmpi.w	#4,(OptPlayMode).w
+	beq.s	.loop
+	cmpi.w	#5,(OptPlayMode).w
+	beq.s	.loop
+	cmpi.w	#4,(OptPlayMode).w
+	beq.s	.loop
+	move.w	(Optperlen).w,d0
+	cmp.w	#3,d0
+	blt.w	.2
+	clr.w	d0
+.2
+	tst.w	d0
+	bpl.w	.3
+	move.w	#2,d0
+.3
+	move.w	d0,(Optperlen).w
+	movea.l	#PerLenText,a1
+	jsr	(SkipStrings).l
+	rts
 
 RostersItem							;Options menu row: rosters
 									;Code the listing does not decode: kept as bytes
@@ -413,18 +431,52 @@ RostersItem							;Options menu row: rosters
 	dc.b	$16,$E4,$4E,$B9,$00,$01,$D7,$F2,$4E,$75
 
 PlayModeItem						;Options menu row: play mode
-									;Code the listing does not decode: kept as bytes
-	dc.b	$30,$38,$D2,$54,$6A,$00,$00,$06,$30,$3C,$00,$07,$B0,$7C,$00,$07
-	dc.b	$6F,$00,$00,$04,$42,$40,$B0,$7C,$00,$07,$66,$00,$00,$24,$08,$38
-	dc.b	$00,$02,$DD,$80,$67,$00,$00,$1A,$08,$38,$00,$02,$DC,$A6,$67,$00
-	dc.b	$00,$0A,$31,$FC,$00,$06,$D2,$54,$60,$C6,$42,$78,$D2,$54,$60,$C0
-	dc.b	$B0,$7C,$00,$01,$66,$00,$00,$20,$32,$38,$CF,$CA,$82,$78,$CF,$C8
-	dc.b	$66,$00,$00,$14,$30,$3C,$00,$02,$08,$38,$00,$02,$DC,$A6,$67,$00
-	dc.b	$00,$06,$30,$3C,$00,$00,$B0,$7C,$00,$04,$66,$00,$00,$26,$08,$38
-	dc.b	$00,$01,$C3,$58,$66,$00,$00,$0A,$4A,$38,$DD,$84,$6A,$00,$00,$14
-	dc.b	$30,$3C,$00,$05,$08,$38,$00,$02,$DC,$A6,$67,$00,$00,$06,$30,$3C
-	dc.b	$00,$03,$31,$C0,$D2,$54,$22,$7C,$00,$1E,$18,$74,$4E,$B9,$00,$01
-	dc.b	$D7,$F2,$4E,$75
+	move.w	(OptPlayMode).w,d0
+	bpl.w	.1
+	move.w	#7,d0
+.1
+	cmp.w	#7,d0
+	ble.w	.2
+	clr.w	d0
+.2
+	cmp.w	#7,d0
+	bne.w	.4
+	btst	#2,(SeasonDay+2).w
+	beq.w	.4
+	btst	#2,(OptPad).w
+	beq.w	.3
+	move.w	#6,(OptPlayMode).w
+	bra.s	PlayModeItem
+.3
+	clr.w	(OptPlayMode).w
+	bra.s	PlayModeItem
+.4
+	cmp.w	#1,d0
+	bne.w	.5
+	move.w	(gamelevel).w,d1
+	or.w	(bosgames).w,d1
+	bne.w	.5
+	move.w	#2,d0
+	btst	#2,(OptPad).w
+	beq.w	.5
+	move.w	#0,d0
+.5
+	cmp.w	#4,d0
+	bne.w	.7
+	btst	#1,(sflags13).w
+	bne.w	.6
+	tst.b	(SeasonTeam).w
+	bpl.w	.7
+.6
+	move.w	#5,d0
+	btst	#2,(OptPad).w
+	beq.w	.7
+	move.w	#3,d0
+.7
+	move.w	d0,(OptPlayMode).w
+	movea.l	#PlayModeText,a1
+	jsr	(SkipStrings).l
+	rts
 
 NotApplicableText					;Options menu: an option the play mode does not use
 	String	CC_SetAttribute,$03,'not applicable    ',CC_SetAttribute,$07

@@ -644,10 +644,26 @@ dirtab2								;The same with runspeed2 (playeracc uses it while SPA is $2052 or
 	dc.w	0,-runspeed2,-runspeed2*1000/1414,-runspeed2*1000/1414,-runspeed2,0,-runspeed2*1000/1414,runspeed2*1000/1414
 	dc.w	0,0
 	;After dirtab2: code that nothing in the listing reaches.
-	;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$E0,$C0,$32,$7C,$D2,$30,$42,$42,$60,$00,$00,$16,$12,$18
-	dc.b	$08,$42,$00,$00,$66,$00,$00,$06,$53,$48,$E8,$49,$02,$41,$00,$0F
-	dc.b	$32,$C1,$51,$C8,$FF,$EA,$4C,$DF,$03,$07,$4E,$75
+	movem.l	d0-d2/a0-a1,-(sp)
+	movea.w	#(nibblebuffer-M68K_RAM),a1	;a1 = output words
+	clr.w	d2						;d2 bit 0 = which nibble is next
+	bra.w	.2
+	;each nibble
+.loop
+	move.b	(a0)+,d1				;next nibble (one count per pass)
+	bchg	#0,d2					;toggle high/low nibble
+	bne.w	.1						;low nibble?
+	subq.w	#1,a0					;high nibble: read the same byte again next time
+	lsr.w	#4,d1					;high nibble down
+	;nibble in the low bits
+.1
+	andi.w	#$F,d1
+	move.w	d1,(a1)+
+	;loop d0 times
+.2
+	dbf	d0,.loop					;loop count in d0
+	movem.l	(sp)+,d0-d2/a0-a1
+	rts
 
 WeightedRandomSelect				;d0 = number of word weights at nibblebuffer:
 									;return a weighted random index

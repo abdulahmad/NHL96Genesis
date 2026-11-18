@@ -12,6 +12,15 @@
 	include	macros\genesis.mac		;String
 
 ; External addresses outside, read from lst/nhl96.bin.
+eraser = $01B976					;goal96_box_stub
+FinalizeTextBuffer = $0230AA		;trade96_stub
+GetNameandAttrib = $0151FA			;setup96
+GetPlayerNamePointer = $0101C6		;middle96_stub
+MakeSRAMChecksum = $0241AA			;sram96
+PAttribColumns = $02342E			;setup96_attr
+printbig = $01BEEC					;season96_stub
+printsmallz = $01BA2E				;pause96_stub
+printz = $01BB8E					;goal96_box_stub
 
 
 ; Main segment code

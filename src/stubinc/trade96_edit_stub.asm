@@ -15,6 +15,22 @@
 SignFreeAgents = $1DFBAC			;create96
 ReleasePlayers = $1E0536			;create96
 CreatePlayer = $1DD916				;create96
+eraser = $01B976					;goal96_box_stub
+GetPlayerCountD7 = $0157B2			;create96_stub
+MakeSRAMChecksum = $0241AA			;sram96
+Opening2 = $02174A					;hockey96_open
+ProcessInputWithRepeat = $01B320	;pause96_stub
+ReadJoy1 = $01B348					;pause96_stub
+ReadJoy2 = $01B360					;pause96_stub
+ReadJoy3 = $01B378					;pause96_stub
+ReadJoy4 = $01B390					;pause96_stub
+ReadSRAM = $0241E8					;sram96
+ReadSRAMBitWords = $010F02			;playoff96_stub
+SetMenuScroll = $012640				;options96_stub
+SPAboardbot = $2412					;frames96
+SPAfpunchBhit1 = $35B8				;frames96
+WriteSRAM = $024188					;sram96
+WriteSRAMBitWords = $010F22			;playoff96_stub
 
 
 ; Main segment code

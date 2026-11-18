@@ -377,10 +377,18 @@ SetupPlayoffs						;Start the playoffs: save the season header (SRSeasonHeaderSa
 	rts
 
 RestoreSeasonHeader					;Put back the season header saved by SetupPlayoffs. Nothing calls it.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$20,$7C,$00,$20,$00,$82,$22,$7C,$00,$20,$00,$CE
-	dc.b	$30,$3C,$00,$0C,$53,$40,$30,$D9,$51,$C8,$FF,$FC,$4E,$B9,$00,$01
-	dc.b	$14,$9E,$4E,$B9,$00,$02,$41,$AA,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	#$200082,a0
+	movea.l	#$2000CE,a1
+	move.w	#$C,d0
+	subq.w	#1,d0
+.loop
+	move.w	(a1)+,(a0)+
+	dbf	d0,.loop
+	jsr	(ReadSeasonHeader).l
+	jsr	(MakeSRAMChecksum).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 GetTeamPOSlot						;d7 = the seed slot of team d7 (save RAM SRPOSlots)
 	move.l	a0,-(sp)

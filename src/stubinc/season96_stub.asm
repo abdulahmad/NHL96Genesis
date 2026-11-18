@@ -57,6 +57,14 @@ Create_HotCold_Table = $1D6F24		;code96_14
 InitShooters = $1D8262				;shootout96_path
 SetSframe = $1DA6C0					;season96_menu
 ZeroLong = $000772					;main96
+appstring = $01BE80					;middle96_stub
+IceBgMap = $170B0C					;graphics96
+LeagueOptionsBgMap = $17C2CE		;graphics96
+LeagueOptionsSprites = $17E3FC		;graphics96
+LeagueOptionsTitleMap = $17DBDC		;graphics96
+printcurz = $01BC72					;create96_stub
+SmallLogoPtrs = $012CDE				;teamgfx96
+SPAturnl = $2020					;frames96
 
 
 ; Main segment code

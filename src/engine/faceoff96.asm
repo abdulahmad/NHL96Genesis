@@ -30,10 +30,15 @@ faceoffinput						;The faceoff player (assignment $17): store the dpad pull (fod
 	jmp	SetSPA
 
 assfaceoff							;Assignment: wait for the faceoff to end (sflags2 bit 0), then assexit.
-									;Not decoded in the listing: kept as bytes, as the faceoff routines up to
 									;puckfaceoff2
-	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$00,$0C,$08,$38,$00,$00,$C3,$3C
-	dc.b	$67,$00,$00,$04,$4E,$75,$4E,$F9,$00,$01,$A3,$BE
+	btst	#pfalock,pflags(a3)
+	bne.w	.1
+	btst	#0,(sflags2).w
+	beq.w	.2
+.1
+	rts
+.2
+	jmp	(assexit).l
 
 assfaceoffpl						;Assignment: the faceoff player
 	dc.b	$08,$2B,$00,$05,$00,$62,$66,$00,$00,$8C,$08,$38,$00,$00,$C3,$3C
@@ -293,24 +298,70 @@ rtss7								;The shared rts of faceoffinput and doinput
 	rts
 
 Endfaceoff							;Drop the puck: pick the winner (.ftab) and the puck direction.
-									;Not decoded in the listing:
-									;kept as bytes
-	dc.b	$3F,$3C,$00,$2C,$4E,$B9,$00,$08,$84,$70,$08,$B8,$00,$00,$C3,$3C
-	dc.b	$31,$FC,$00,$3C,$D2,$E0,$38,$38,$B0,$3A,$24,$7C,$00,$09,$7E,$7A
-	dc.b	$4E,$B9,$00,$01,$B7,$30,$08,$B8,$00,$02,$C3,$3C,$08,$B8,$00,$00
-	dc.b	$C3,$38,$08,$AB,$00,$00,$00,$63,$42,$78,$C3,$68,$08,$F8,$00,$04
-	dc.b	$C3,$3E,$36,$38,$BF,$E6,$38,$3C,$08,$00,$20,$7C,$00,$00,$A4,$D6
-	dc.b	$32,$7C,$BD,$BE,$74,$10,$32,$11,$94,$30,$10,$FF,$32,$29,$00,$04
-	dc.b	$D4,$30,$10,$FF,$70,$21,$4E,$B9,$00,$01,$B0,$A6,$B4,$00,$63,$00
-	dc.b	$00,$04,$58,$49,$08,$29,$00,$03,$00,$02,$67,$00,$00,$08,$36,$38
-	dc.b	$BF,$E8,$44,$44,$30,$03,$08,$00,$00,$03,$66,$00,$00,$14,$02,$40
-	dc.b	$00,$07,$32,$39,$00,$C0,$00,$08,$02,$41,$00,$03,$66,$00,$00,$1A
-	dc.b	$70,$05,$4E,$B9,$00,$01,$B0,$A6,$55,$40,$02,$40,$00,$07,$4A,$44
-	dc.b	$6B,$00,$00,$06,$0A,$40,$00,$04,$E5,$40,$20,$7C,$00,$01,$AE,$60
-	dc.b	$32,$30,$00,$00,$EB,$41,$37,$41,$00,$28,$32,$30,$00,$02,$EB,$41
-	dc.b	$D2,$44,$37,$41,$00,$2A,$30,$3C,$08,$00,$4E,$B9,$00,$01,$B0,$A6
-	dc.b	$37,$40,$00,$2C,$42,$78,$B7,$76,$08,$AB,$00,$02,$00,$62,$20,$3C
-	dc.b	$00,$00,$00,$18,$4E,$F9,$00,$01,$A3,$DA
+	move.w	#SFXpuckice,-(sp)
+	jsr	(sfx).l
+	bclr	#sf2faceoff,(sflags2).w
+	move.w	#$3C,(holdreset).w
+	move.w	(ExtraChars).w,d4
+	movea.l	#$97E7A,a2
+	jsr	(DecompressGraphicsPlain).l
+	bclr	#sf2drec,(sflags2).w
+	bclr	#gmclock,(gmode).w
+	bclr	#pf2fight,pflags2(a3)
+	clr.w	(crowdnoisedelay).w
+	bset	#4,(sflags3).w
+	move.w	(fodir1).w,d3
+	move.w	#$800,d4
+	movea.l	#$A4D6,a0
+	movea.w	#(fofdata2-M68K_RAM),a1
+	moveq	#$10,d2
+	move.w	(a1),d1
+	sub.b	-$1(a0,d1.w),d2
+	move.w	4(a1),d1
+	add.b	-$1(a0,d1.w),d2
+	moveq	#$21,d0
+	jsr	(randomd0).l
+	cmp.b	d0,d2
+	bls.w	.1
+	addq.w	#4,a1
+.1
+	btst	#3,2(a1)
+	beq.w	.2
+	move.w	(fodir2).w,d3
+	neg.w	d4
+.2
+	move.w	d3,d0
+	btst	#3,d0
+	bne.w	.3
+	andi.w	#7,d0
+	move.w	(HVcount).l,d1
+	andi.w	#3,d1
+	bne.w	.4
+.3
+	moveq	#5,d0
+	jsr	(randomd0).l
+	subq.w	#2,d0
+	andi.w	#7,d0
+	tst.w	d4
+	bmi.w	.4
+	eori.w	#4,d0
+.4
+	asl.w	#2,d0
+	movea.l	#dirtab,a0
+	move.w	(a0,d0.w),d1
+	asl.w	#5,d1
+	move.w	d1,Xvel(a3)
+	move.w	2(a0,d0.w),d1
+	asl.w	#5,d1
+	add.w	d4,d1
+	move.w	d1,Yvel(a3)
+	move.w	#$800,d0
+	jsr	(randomd0).l
+	move.w	d0,Zvel(a3)
+	clr.w	(puckz).w
+	bclr	#pfnc,pflags(a3)
+	move.l	#$18,d0
+	jmp	(assreplace).l
 .ftab
 	dc.b	0,8,$10,0,8,$10
 

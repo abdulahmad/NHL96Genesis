@@ -10,15 +10,40 @@ puckflip							;Flip the puck
 	bra.w	SetSPA
 
 puckshadow							;asstab entry: the puck shadow.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$0C,$6B,$2B,$88,$00,$58,$67,$00,$00,$2C,$0C,$6B,$02,$99,$00,$06
-	dc.b	$66,$00,$00,$24,$36,$AB,$FF,$80,$37,$6B,$FF,$94,$00,$14,$42,$6B
-	dc.b	$00,$18,$70,$14,$08,$38,$00,$07,$C3,$3A,$67,$00,$00,$04,$70,$00
-	dc.b	$52,$73,$00,$00,$4E,$75,$4A,$6B,$00,$06,$67,$00,$58,$B6,$42,$53
-	dc.b	$37,$7C,$01,$4B,$00,$14,$37,$7C,$00,$0E,$00,$18,$4A,$6B,$FF,$94
-	dc.b	$6A,$00,$00,$22,$37,$7C,$80,$00,$00,$04,$08,$38,$00,$00,$C3,$5A
-	dc.b	$67,$00,$00,$08,$37,$7C,$00,$00,$00,$04,$37,$7C,$FE,$B1,$00,$14
-	dc.b	$53,$6B,$00,$18,$4E,$75
+	cmpi.w	#SPAbglass,SPA(a3)
+	beq.w	.2
+	cmpi.w	#$299,frame(a3)
+	bne.w	.3						;shadow turns into siren on goals
+	move.w	-$80(a3),(a3)			;Xpos-SCstruct, Xpos
+	move.w	-$6C(a3),Ypos(a3)		;Ypos-SCstruct, Ypos
+	clr.w	Zpos(a3)				;Zpos
+	moveq	#Ypos,d0				;Ypos
+	btst	#sfhor,(sflags).w		;#sfhor - check if horizontal mode
+	beq.w	.1
+	moveq	#Xpos,d0				;Xpos
+	;coordinate chosen
+.1
+	addq.w	#1,(a3,d0.w)
+.2
+	rts
+	;the goal light: only when it is lit
+.3
+	tst.w	frame(a3)				;frame
+	beq.w	rtss2
+	clr.w	(a3)					;Xpos
+	move.w	#$14B,Ypos(a3)
+	move.w	#$E,Zpos(a3)			;Zpos
+	tst.w	-$6C(a3)				;Ypos-SCstruct
+	bpl.w	.5						;puck y >= 0: siren at the top, as set
+	move.w	#$8000,attribute(a3)	;attribute
+	btst	#0,(sflags14).w
+	beq.w	.4
+	move.w	#0,attribute(a3)
+.4
+	move.w	#$FEB1,Ypos(a3)
+	subq.w	#1,Zpos(a3)
+.5
+	rts
 
 findpc								;Where and when the puck crosses each goal line (puckcross).
 									;Code the listing does not decode: kept as bytes
@@ -89,11 +114,24 @@ skateto								;Skate a3 to d0 / d1, a0 = an extra collision routine (EvadePC); 
 	dc.b	$60,$00,$02,$A8
 
 FacePuck							;Turn a3's facedir one step toward the puck (vtoa); d0 / d1 kept Code the
-									;listing does not decode: kept as bytes
-	dc.b	$48,$A7,$C0,$00,$30,$38,$B7,$5E,$32,$38,$B7,$72,$90,$53,$92,$6B
-	dc.b	$00,$14,$61,$00,$00,$56,$90,$6B,$00,$54,$67,$00,$00,$18,$44,$40
-	dc.b	$02,$40,$00,$04,$E2,$48,$53,$40,$D0,$6B,$00,$54,$02,$40,$00,$07
-	dc.b	$37,$40,$00,$54,$4C,$9F,$00,$03,$4E,$75
+	movem.w	d0-d1,-(sp)
+	move.w	(puckx).w,d0
+	move.w	(pucky).w,d1
+	sub.w	(a3),d0
+	sub.w	Ypos(a3),d1
+	bsr.w	vtoa
+	sub.w	facedir(a3),d0
+	beq.w	.1
+	neg.w	d0
+	andi.w	#4,d0
+	lsr.w	#1,d0
+	subq.w	#1,d0
+	add.w	facedir(a3),d0
+	andi.w	#7,d0
+	move.w	d0,facedir(a3)
+.1
+	movem.w	(sp)+,d0-d1
+	rts
 
 assexit								;Exit the current assignment of player a3
 	addq.w	#1,$36(a3)				;add 1 to current assignment index
@@ -186,36 +224,138 @@ GetHot								;Push long address of structure to get hot spot from; hot spot x/y
 
 GetHot2a							;Push a struct: d0 / d1 = rink x / y of its first HotList2 hot spot for
 									;its frame (0 / 0 with no frame)
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$00,$C0,$20,$6F,$00,$0C,$42,$40,$42,$41,$4A,$68,$00,$06
-	dc.b	$6F,$00,$00,$58,$22,$7C,$00,$13,$A2,$12,$30,$28,$00,$06,$32,$19
-	dc.b	$53,$41,$90,$41,$6B,$00,$00,$4C,$E5,$40,$D0,$68,$00,$06,$D0,$68
-	dc.b	$00,$06,$12,$31,$00,$01,$48,$81,$10,$31,$00,$00,$48,$80,$08,$28
-	dc.b	$00,$03,$00,$04,$67,$00,$00,$04,$44,$40,$08,$28,$00,$04,$00,$04
-	dc.b	$66,$00,$00,$04,$44,$41,$08,$38,$00,$07,$C3,$3A,$67,$00,$00,$06
-	dc.b	$C1,$41,$44,$41,$D2,$68,$00,$14,$D0,$50,$4C,$DF,$03,$00,$2E,$9F
-	dc.b	$4E,$75,$4E,$71,$60,$FC
+	movem.l	a0-a1,-(sp)				;$C(sp) = the address the caller pushed (above 2 longs and the return
+	movea.l	$C(sp),a0				;move stored address before sub routine call into a0
+	clr.w	d0						;clear d0
+	clr.w	d1						;clear d1
+	tst.w	6(a0)
+	ble.w	.4						;branch if <= 0
+	movea.l	#HotList2,a1			;move HotList address into a1
+	move.w	6(a0),d0				;move frame into d0
+	move.w	(a1)+,d1
+	subq.w	#1,d1
+	sub.w	d1,d0
+	bmi.w	.loop
+	asl.w	#2,d0
+	add.w	6(a0),d0
+	add.w	6(a0),d0
+	move.b	1(a1,d0.w),d1			;SprStrHot Y byte
+	ext.w	d1						;extend d1
+	move.b	(a1,d0.w),d0			;SprStrHot X byte
+	ext.w	d0						;extend d0
+	btst	#3,4(a0)				;check attribute for X flip
+	beq.w	.1						;branch if equal
+	neg.w	d0						;negate d0 (flip)
+	;x flipped sprites mirror the hot spot x
+.1
+	btst	#4,4(a0)				;check attribute for Y flip
+	bne.w	.2						;branch if no flip
+	neg.w	d1						;negate d1 (flip)
+	;y flipped sprites mirror the hot spot y; horizontal mode swaps x and y
+.2
+	btst	#sfhor,(sflags).w		;check if horizontal mode
+	beq.w	.3						;branch if not
+	exg	d0,d1						;swap d0 and d1
+	neg.w	d1						;ngate d1 (x now)
+.3
+	add.w	$14(a0),d1
+	add.w	(a0),d0
+.4
+	movem.l	(sp)+,a0-a1
+	move.l	(sp)+,(sp)
+	rts
+.loop
+	nop
+	bra.s	.loop
 
 GetHot2b							;Push a struct: d0 / d1 = rink x / y of its second HotList2 hot spot for
 									;its frame
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$00,$C0,$20,$6F,$00,$0C,$42,$40,$42,$41,$4A,$68,$00,$06
-	dc.b	$6F,$00,$00,$58,$22,$7C,$00,$13,$A2,$12,$30,$28,$00,$06,$32,$19
-	dc.b	$53,$41,$90,$41,$6B,$00,$00,$4C,$E5,$40,$D0,$68,$00,$06,$D0,$68
-	dc.b	$00,$06,$12,$31,$00,$03,$48,$81,$10,$31,$00,$02,$48,$80,$08,$28
-	dc.b	$00,$03,$00,$04,$67,$00,$00,$04,$44,$40,$08,$28,$00,$04,$00,$04
-	dc.b	$66,$00,$00,$04,$44,$41,$08,$38,$00,$07,$C3,$3A,$67,$00,$00,$06
-	dc.b	$C1,$41,$44,$41,$D2,$68,$00,$14,$D0,$50,$4C,$DF,$03,$00,$2E,$9F
-	dc.b	$4E,$75,$4E,$71,$60,$FC
+	movem.l	a0-a1,-(sp)				;$C(sp) = the address the caller pushed (above 2 longs and the return
+	movea.l	$C(sp),a0				;move stored address before sub routine call into a0
+	clr.w	d0						;clear d0
+	clr.w	d1						;clear d1
+	tst.w	6(a0)
+	ble.w	.4						;branch if <= 0
+	movea.l	#HotList2,a1			;move HotList address into a1
+	move.w	6(a0),d0				;move frame into d0
+	move.w	(a1)+,d1
+	subq.w	#1,d1
+	sub.w	d1,d0
+	bmi.w	.loop
+	asl.w	#2,d0
+	add.w	6(a0),d0
+	add.w	6(a0),d0
+	move.b	3(a1,d0.w),d1			;SprStrHot Y byte
+	ext.w	d1						;extend d1
+	move.b	2(a1,d0.w),d0			;SprStrHot X byte
+	ext.w	d0						;extend d0
+	btst	#3,4(a0)				;check attribute for X flip
+	beq.w	.1						;branch if equal
+	neg.w	d0						;negate d0 (flip)
+	;x flipped sprites mirror the hot spot x
+.1
+	btst	#4,4(a0)				;check attribute for Y flip
+	bne.w	.2						;branch if no flip
+	neg.w	d1						;negate d1 (flip)
+	;y flipped sprites mirror the hot spot y; horizontal mode swaps x and y
+.2
+	btst	#sfhor,(sflags).w		;check if horizontal mode
+	beq.w	.3						;branch if not
+	exg	d0,d1						;swap d0 and d1
+	neg.w	d1						;ngate d1 (x now)
+.3
+	add.w	$14(a0),d1
+	add.w	(a0),d0
+.4
+	movem.l	(sp)+,a0-a1
+	move.l	(sp)+,(sp)
+	rts
+.loop
+	nop
+	bra.s	.loop
 
 GetHot2c							;Push a struct: d0 / d1 = rink x / y of its third HotList2 hot spot for
 									;its frame
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$00,$C0,$20,$6F,$00,$0C,$42,$40,$42,$41,$4A,$68,$00,$06
-	dc.b	$6F,$00,$00,$58,$22,$7C,$00,$13,$A2,$12,$30,$28,$00,$06,$32,$19
-	dc.b	$53,$41,$90,$41,$6B,$00,$00,$4C,$E5,$40,$D0,$68,$00,$06,$D0,$68
-	dc.b	$00,$06,$12,$31,$00,$05,$48,$81,$10,$31,$00,$04,$48,$80,$08,$28
-	dc.b	$00,$03,$00,$04,$67,$00,$00,$04,$44,$40,$08,$28,$00,$04,$00,$04
-	dc.b	$66,$00,$00,$04,$44,$41,$08,$38,$00,$07,$C3,$3A,$67,$00,$00,$06
-	dc.b	$C1,$41,$44,$41,$D2,$68,$00,$14,$D0,$50,$4C,$DF,$03,$00,$2E,$9F
-	dc.b	$4E,$75,$4E,$71,$60,$FC
+	movem.l	a0-a1,-(sp)				;$C(sp) = the address the caller pushed (above 2 longs and the return
+	movea.l	$C(sp),a0				;move stored address before sub routine call into a0
+	clr.w	d0						;clear d0
+	clr.w	d1						;clear d1
+	tst.w	6(a0)
+	ble.w	.4						;branch if <= 0
+	movea.l	#HotList2,a1			;move HotList address into a1
+	move.w	6(a0),d0				;move frame into d0
+	move.w	(a1)+,d1
+	subq.w	#1,d1
+	sub.w	d1,d0
+	bmi.w	.loop
+	asl.w	#2,d0
+	add.w	6(a0),d0
+	add.w	6(a0),d0
+	move.b	5(a1,d0.w),d1			;SprStrHot Y byte
+	ext.w	d1						;extend d1
+	move.b	4(a1,d0.w),d0			;SprStrHot X byte
+	ext.w	d0						;extend d0
+	btst	#3,4(a0)				;check attribute for X flip
+	beq.w	.1						;branch if equal
+	neg.w	d0						;negate d0 (flip)
+	;x flipped sprites mirror the hot spot x
+.1
+	btst	#4,4(a0)				;check attribute for Y flip
+	bne.w	.2						;branch if no flip
+	neg.w	d1						;negate d1 (flip)
+	;y flipped sprites mirror the hot spot y; horizontal mode swaps x and y
+.2
+	btst	#sfhor,(sflags).w		;check if horizontal mode
+	beq.w	.3						;branch if not
+	exg	d0,d1						;swap d0 and d1
+	neg.w	d1						;ngate d1 (x now)
+.3
+	add.w	$14(a0),d1
+	add.w	(a0),d0
+.4
+	movem.l	(sp)+,a0-a1
+	move.l	(sp)+,(sp)
+	rts
+.loop
+	nop
+	bra.s	.loop

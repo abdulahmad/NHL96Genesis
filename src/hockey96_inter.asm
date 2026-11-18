@@ -179,40 +179,54 @@ sctab								;Weights for 0, 1, 2, 3 goals, 8 rows
 	dc.w	$13,$26,$1F,$C
 	dc.w	$F,$26,$20,$F
 	;After sctab: code that nothing in the listing reaches.
-	;Code the listing does not decode: kept as bytes
-	dc.b	$76,$FF,$0C,$78,$01,$E0,$C4,$BE,$6E,$00,$21,$EE,$36,$38,$D0,$26
-	dc.b	$6B,$00,$21,$E6,$53,$78,$D0,$26,$B6,$78,$CF,$C4,$67,$EE,$70,$10
-	dc.b	$C0,$C3,$30,$7C,$CF,$44,$D0,$C0,$08,$28,$00,$01,$00,$0E,$66,$DC
-	dc.b	$08,$28,$00,$02,$00,$0E,$66,$D4,$4E,$75,$4A,$43,$6B,$00,$21,$BA
-	dc.b	$61,$00,$01,$2A,$61,$00,$E3,$18,$52,$78,$B0,$40,$59,$78,$B0,$42
-	dc.b	$3F,$38,$B0,$40,$61,$00,$4E,$3A,$31,$FC,$A0,$00,$B0,$44,$61,$00
-	dc.b	$E4,$DC,$00,$1A,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20
-	dc.b	$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$20,$31,$D7,$B0,$40
-	dc.b	$70,$01,$D0,$78,$CF,$CA,$4A,$78,$D2,$54,$66,$00,$00,$04,$42,$40
-	dc.b	$43,$FA,$00,$7E,$61,$00,$01,$02,$30,$28,$00,$08,$53,$40,$22,$7C
-	dc.b	$00,$02,$33,$84,$61,$00,$00,$FA,$30,$11,$E2,$48,$44,$40,$D0,$57
-	dc.b	$06,$40,$00,$17,$31,$C0,$B0,$40,$61,$00,$E4,$94,$31,$FC,$80,$00
-	dc.b	$B0,$44,$30,$28,$00,$02,$32,$28,$00,$0C,$61,$00,$00,$10,$30,$10
-	dc.b	$32,$28,$00,$0A,$61,$00,$00,$06,$54,$4F,$4E,$75,$31,$EF,$00,$04
-	dc.b	$B0,$40,$52,$78,$B0,$42,$32,$7C,$07,$7E,$E5,$40,$22,$71,$00,$00
-	dc.b	$D2,$E9,$00,$04,$61,$00,$E4,$58,$31,$EF,$00,$04,$B0,$40,$06,$78
-	dc.b	$00,$15,$B0,$40,$30,$01,$72,$02,$61,$00,$E6,$C0,$60,$00,$E4,$40
-	dc.b	$00,$12,$45,$41,$20,$48,$6F,$63,$6B,$65,$79,$20,$4E,$69,$67,$68
-	dc.b	$74,$00,$00,$18,$53,$74,$61,$6E,$6C,$65,$79,$20,$43,$75,$70,$20
-	dc.b	$51,$75,$61,$6C,$69,$66,$69,$65,$72,$00,$00,$0E,$51,$75,$61,$72
-	dc.b	$74,$65,$72,$66,$69,$6E,$61,$6C,$00,$18,$53,$74,$61,$6E,$6C,$65
-	dc.b	$79,$20,$43,$75,$70,$20,$53,$65,$6D,$69,$66,$69,$6E,$61,$6C,$00
-	dc.b	$61,$00,$00,$0A,$34,$3C,$07,$FF,$60,$00,$E1,$BA,$61,$00,$E3,$CE
-	dc.b	$00,$06,$BD,$03,$17,$00,$08,$38,$00,$00,$C3,$3A,$66,$00,$00,$0C
-	dc.b	$61,$00,$E3,$BA,$00,$06,$BF,$03,$17,$00,$70,$1A,$72,$05,$4E,$75
+	moveq	#-$1,d3
+	cmpi.w	#$1E0,(gameclock).w
+	bgt.w	rtss2
+.loop
+	move.w	(TickerNum).w,d3
+	bmi.w	rtss2
+	subq.w	#1,(TickerNum).w
+	cmp.w	(gamenum).w,d3
+	beq.s	.loop
+	moveq	#$10,d0					;gssize
+	mulu.w	d3,d0
+	movea.w	#(gsstruct-M68K_RAM),a0
+	adda.w	d0,a0
+	btst	#1,$E(a0)				;gsfhl
+	bne.s	.loop					;don't show if hilite coming up
+	btst	#2,$E(a0)				;gsfso
+	bne.s	.loop					;don't show if the series is over for this game
+	rts
+	dc.w	$4A43,$6B00,$21BA,$6100,$012A,$6100,$E318,$5278
+	dc.w	$B040,$5978,$B042,$3F38,$B040,$6100,$4E3A,$31FC
+	dc.w	$A000,$B044,$6100,$E4DC,$001A,SPAturnl,SPAturnl,SPAturnl
+	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl
+	dc.w	SPAturnl,$31D7,$B040,$7001,$D078,$CFCA,$4A78,$D254
+	dc.w	$6600,$0004,$4240,$43FA,$007E,$6100,$0102,$3028
+	dc.w	$0008,$5340,$227C,$0002,$3384,$6100,$00FA,$3011
+	dc.w	$E248,$4440,$D057,SPAgskate,$0017,$31C0,$B040,$6100
+	dc.w	$E494,$31FC,$8000,$B044,$3028,$0002,$3228,$000C
+	dc.w	$6100,$0010,$3010,$3228,$000A,$6100,$0006,$544F
+	dc.w	$4E75,$31EF,$0004,$B040,$5278,$B042,$327C,$077E
+	dc.w	$E540,$2271,$0000,$D2E9,$0004,$6100,$E458,$31EF
+	dc.w	$0004,$B040,$0678,$0015,$B040,$3001,$7202,$6100
+	dc.w	$E6C0,$6000,$E440,$0012,$4541,$2048,$6F63,$6B65
+	dc.w	$7920,$4E69,$6768,$7400,$0018,$5374,$616E,$6C65
+	dc.w	$7920,$4375,$7020,$5175,$616C,$6966,$6965,$7200
+	dc.w	$000E,$5175,$6172,$7465,$7266,$696E,$616C,$0018
+	dc.w	$5374,$616E,$6C65,$7920,$4375,$7020,$5365,$6D69
+	dc.w	$6669,$6E61,$6C00,$6100,$000A,$343C,$07FF,$6000
+	dc.w	$E1BA,$6100,$E3CE,$0006,$BD03,$1700,$0838,$0000
+	dc.w	$C33A,$6600,$000C,$6100,$E3BA,$0006,$BF03,$1700
+	dc.w	$701A,$7205,$4E75
 
 PrintBigListItem					;printbig String d0 of the String list a1 (SkipStrings).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$00,$0E,$60,$00,$E7,$04
+	bsr.w	SkipStrings
+	bra.w	printbig
 
 PrintSmallListItem					;printsmall String d0 of the String list a1 (SkipStrings).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$00,$06,$60,$00,$E2,$50
+	bsr.w	SkipStrings
+	bra.w	printsmall
 
 SkipStrings							;a1 = String d0 of the String list a1
 	bra.w	.1

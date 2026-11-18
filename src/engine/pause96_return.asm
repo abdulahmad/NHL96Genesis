@@ -273,6 +273,6 @@ DigitText							;The digits 0-9
 	String	$39
 
 PrintDigit							;Print digit d0 (DigitText)
-									;Code the listing does not decode: kept as bytes
-	dc.b	$22,$7C,$00,$1E,$2E,$3C,$4E,$B9,$00,$01,$D7,$F2,$4E,$F9,$00,$01
-	dc.b	$BE,$E8
+	movea.l	#DigitText,a1
+	jsr	(SkipStrings).l
+	jmp	(printbigcur).l

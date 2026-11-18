@@ -239,7 +239,7 @@ def decode_block(ctx, start, end, entry_label):
     pc_refs = set()
     while work:
         a = work.pop()
-        while start <= a < end and a not in insns:
+        while start <= a < end and a not in insns and not any(fa <= a < fb for fa, fb in forced):
             try:
                 ins = ctx.dis.one(a, end)
             except Bad as e:
@@ -282,8 +282,13 @@ def decode_block(ctx, start, end, entry_label):
         else:
             b = a
             while b < end and b not in insns: b += 1
+            for fa, fb in forced:
+                if a < fa < b: b = fa
+                if fa <= a < fb: b = min(b, fb)
             # try the gap as an orphan code run
             seg = ('data', a, b, 'pocket')
+            if any(fa <= a < fb for fa, fb in forced):
+                segs.append(seg); a = b; continue
             try:
                 x, run = a, []
                 while x < b:
@@ -368,7 +373,7 @@ def load_names():
     return d
 
 
-def make_records(ctx, segs, start, end, entry_label, names):
+def make_records(ctx, segs, start, end, entry_label, names, reserved=frozenset()):
     blk = Out()
     ins_list = [i for s in segs if s[0] == 'code' for i in s[1]]
     addrs = {i.addr for i in ins_list}
@@ -415,13 +420,19 @@ def make_records(ctx, segs, start, end, entry_label, names):
             continue
         sc = scope(t)
         back = any(x >= t for x in srcs)
-        c = counters.setdefault(sc, {'n': 0, 'loop': 0})
+        c = counters.setdefault(sc, {'n': 0, 'loop': 0, 'tab': 0})
         if dataT:
-            c['n'] += 1; local[t] = '.table' if c['n'] == 1 else '.table%d' % c['n']
+            c['tab'] += 1
+            while ('.table' if c['tab'] == 1 else '.table%d' % c['tab']) in reserved: c['tab'] += 1
+            local[t] = '.table' if c['tab'] == 1 else '.table%d' % c['tab']
         elif back:
-            c['loop'] += 1; local[t] = '.loop' if c['loop'] == 1 else '.loop%d' % c['loop']
+            c['loop'] += 1
+            while ('.loop' if c['loop'] == 1 else '.loop%d' % c['loop']) in reserved: c['loop'] += 1
+            local[t] = '.loop' if c['loop'] == 1 else '.loop%d' % c['loop']
         else:
-            c['n'] += 1; local[t] = '.%d' % c['n']
+            c['n'] += 1
+            while '.%d' % c['n'] in reserved: c['n'] += 1
+            local[t] = '.%d' % c['n']
     recs = []
     def lookup(v):
         return glob_at.get(v) or local.get(v)
@@ -434,7 +445,9 @@ def make_records(ctx, segs, start, end, entry_label, names):
                     ops = []
                     for o in i.ops:
                         ops.append(symbolize2(ctx, i, o, blk, glob_at, local, start, end))
-                    r = Rec(i.addr, '\t' + i.mnem + ('\t' + ','.join(ops) if ops else ''), i)
+                    mn = i.mnem
+                    if mn == 'cmpi.w' and i.ops[1][0] == 'dn': mn = 'cmpi'   # fixopcodes.js rewrites cmpi.w #x,dn to EA's cmp
+                    r = Rec(i.addr, '\t' + mn + ('\t' + ','.join(ops) if ops else ''), i)
                     from lineage import norm_ins
                     r.norm = norm_ins(i)
                 if i.addr in glob_at and not (i.addr == start and entry_label):
@@ -583,15 +596,28 @@ def vis(s):
     return c
 
 
-def render(recs):
+def needs_opt(ins):
+    """SNASM options that must be off so this instruction keeps its retail encoding."""
+    if ins is None: return set()
+    out = set()
+    m = ins.mnem
+    if m.startswith('addi.') and ins.ops[0][0] == 'imm' and 1 <= ins.ops[0][1] <= 8: out.add('oaq')
+    if m.startswith('subi.') and ins.ops[0][0] == 'imm' and 1 <= ins.ops[0][1] <= 8: out.add('osq')
+    for o in ins.ops:
+        if o[0] == 'disp' and o[1] == 0: out.add('oz')
+        if o[0] == 'idx' and o[1] == 0 and False: out.add('oz')
+    return out
+
+
+def render(recs, reserved=frozenset()):
     """Lines of text; locals renamed from the parent where possible and unique within the scope."""
     # scope = since last global label
     lines, used, ren = [], set(), {}
     scope_recs = []
     # first pass: rename locals
-    cur_used = set()
+    cur_used = set(reserved)
     for r in recs:
-        if r.glabel: cur_used = set()
+        if r.glabel: cur_used = set(reserved)
         if r.llabel:
             want = getattr(r, 'want_label', None)
             if want and want not in cur_used and not re.match(r'^\.\d+$', want):
@@ -638,8 +664,20 @@ def render(recs):
         if r.comment:
             pad = '\t' * max(1, -(-(36 - vis(code)) // 4)) if vis(code) < 36 else '\t'
             code = code + pad + ';' + r.comment
-        lines.append(code)
-    return lines
+        lines.append((code, needs_opt(r.ins) if not r.llabel and not r.glabel or True else set()))
+    # wrap runs that need options off
+    out, cur = [], set()
+    for item in lines:
+        if isinstance(item, str):
+            out.append(item); continue
+        code, need = item
+        if need != cur:
+            if cur: out.append('\topt\t' + ','.join(o + '+' for o in sorted(cur)))
+            if need: out.append('\topt\t' + ','.join(o + '-' for o in sorted(need)))
+            cur = need
+        out.append(code)
+    if cur: out.append('\topt\t' + ','.join(o + '+' for o in sorted(cur)))
+    return out
 
 
 def update_stub(ctx, relfile, names_needed, pending_defs):
@@ -667,6 +705,24 @@ def update_stub(ctx, relfile, names_needed, pending_defs):
         txt = txt[:i].rstrip('\n') + '\n' + '\n'.join(add) + '\n' + txt[i:]
         open(p, 'w', newline='').write(txt)
     return add
+
+
+SCOPE_USED = {}
+
+
+def reserved_locals(src, i, k):
+    """Local labels already used in the global scope(s) the block at src[i:k] sits in."""
+    a = i
+    while a > 0 and not re.match(r'^[A-Za-z_][\w$]*', src[a]): a -= 1
+    b = k
+    while b < len(src) and not re.match(r'^[A-Za-z_][\w$]*', src[b]): b += 1
+    return frozenset(m.group(0) for l in src[a:b] for m in [re.match(r'^\.[\w]+', l)] if m) | SCOPE_USED.get((id(src), a), frozenset())
+
+
+def scope_key(src, i):
+    a = i
+    while a > 0 and not re.match(r'^[A-Za-z_][\w$]*', src[a]): a -= 1
+    return (id(src), a)
 
 
 def main():
@@ -719,15 +775,17 @@ def main():
                 end = start + sum(r.count('$') for r in run)
                 lab = ctx.a2l.get(start, [None])[0]
                 segs, notes = decode_block(ctx, start, end, lab)
-                recs, blk = make_records(ctx, segs, start, end, lab, names)
+                recs, blk = make_records(ctx, segs, start, end, lab, names, reserved_locals(src, i, k))
                 blk.errors.extend(notes)
                 matches = transplant(ctx, recs, parents) if parents else []
                 name_bits(ctx, recs)
-                text = render(recs)
+                text = render(recs, reserved_locals(src, i, k))
+                SCOPE_USED[scope_key(src, i)] = SCOPE_USED.get(scope_key(src, i), frozenset()) | frozenset(m.group(0) for l in text for m in [re.match(r'^\.\w+', l)] if m)
                 msgs = []
                 if blk.unres_ram: msgs.append('ram ' + ','.join(sorted({'%08X%s' % (v, ' ' + n if n else '') for v, n in blk.unres_ram})))
                 ur = sorted({v for v in blk.unres_rom if not (start <= v < end)})
                 if ur: msgs.append('rom ' + ','.join('%06X' % v for v in ur))
+                if ur: blk.errors.append('unnamed targets outside the block')
                 if blk.errors: msgs.append('; '.join(blk.errors))
                 for nn in blk.needname:
                     sg = [getattr(r, 'suggest', None) for r in recs if r.addr == nn]

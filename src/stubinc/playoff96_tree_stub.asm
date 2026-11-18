@@ -30,6 +30,8 @@ PlayoffTreeMap = $1BDCD4			;graphics96
 PlayoffTreeBgMap = $1C0302			;graphics96
 PlayoffTeamFrameMap = $1C4810		;graphics96
 ZeroLong = $000772					;main96
+cramfade = $01AFD6					;display96_stub
+p_music_vblank = $024486			;display96_stub
 
 
 ; Main segment code

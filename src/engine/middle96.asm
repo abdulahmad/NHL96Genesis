@@ -48,12 +48,31 @@ GetPlayerNumInitial					;GetPlayerName with FormatPlayerNumInitial ("NN F. Last"
 
 FormatPlayerNumInitialShort			;a1 = mesarea string "NN F.Last" for player d0 of team a2, built in
 									;TextBuffer.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$F1,$A0,$3E,$2A,$00,$28,$4E,$B9,$00,$01,$02,$B8,$4E,$B9
-	dc.b	$00,$01,$01,$C6,$2F,$08,$32,$7C,$BF,$F4,$D0,$D0,$30,$38,$DD,$AA
-	dc.b	$61,$00,$01,$AA,$12,$FC,$00,$20,$20,$5F,$30,$18,$45,$F0,$00,$FE
-	dc.b	$12,$D8,$12,$FC,$00,$2E,$0C,$18,$00,$20,$66,$FA,$12,$D8,$B5,$C8
-	dc.b	$66,$FA,$61,$00,$01,$6E,$4C,$DF,$05,$8F,$4E,$75
+	movem.l	d0-d3/d7/a0/a2,-(sp)
+	move.w	Xvel(a2),d7
+	jsr	(GetJerseyNumber).l
+	jsr	(GetPlayerNamePointer).l
+	move.l	a0,-(sp)
+	movea.w	#(TextBuffer-M68K_RAM),a1
+	adda.w	(a0),a0
+	move.w	(jerseynum).w,d0
+	bsr.w	ConvertByteToDigits
+	move.b	#$20,(a1)+
+	movea.l	(sp)+,a0
+	move.w	(a0)+,d0
+	lea	-$2(a0,d0.w),a2
+	move.b	(a0)+,(a1)+
+	move.b	#$2E,(a1)+
+.loop
+	cmpi.b	#$20,(a0)+
+	bne.s	.loop
+.loop2
+	move.b	(a0)+,(a1)+
+	cmpa.l	a0,a2
+	bne.s	.loop2
+	bsr.w	FinalizeTextBuffer
+	movem.l	(sp)+,d0-d3/d7/a0/a2
+	rts
 
 FormatPlayerNumInitial				;a1 = mesarea string "NN F. Last" for player d0 of team a2, built in
 									;TextBuffer. Called from PenaltyShotBox
@@ -119,9 +138,10 @@ FormatPlayerName					;a1 = mesarea string "NN Last" for player d0 of team a2, bu
 
 FormatPlayerNameLast				;FormatPlayerNameShort without the leading space ("Last", space padded).
 									;Branches into FormatLastName.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$F0,$A0,$4E,$B9,$00,$01,$01,$C6,$32,$7C,$BF,$F4,$60,$00
-	dc.b	$00,$14
+	movem.l	d0-d3/a0/a2,-(sp)
+	jsr	(GetPlayerNamePointer).l
+	movea.w	#(TextBuffer-M68K_RAM),a1
+	bra.w	FormatLastName
 
 FormatPlayerNameShort				;a1 = mesarea string " Last" for player d0 of team a2, space padded to 12
 									;characters.
@@ -131,10 +151,26 @@ FormatPlayerNameShort				;a1 = mesarea string " Last" for player d0 of team a2, 
 
 FormatLastName						;Skip the first name, copy the last name, pad; branched to from
 									;FormatPlayerNameLast.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$30,$18,$45,$F0,$00,$FE,$0C,$18,$00,$20,$66,$FA,$12,$D8,$B5,$C8
-	dc.b	$67,$00,$00,$0E,$4A,$10,$66,$F4,$60,$00,$00,$06,$12,$FC,$00,$20
-	dc.b	$B2,$FC,$C0,$00,$6D,$F6,$61,$00,$00,$66,$4C,$DF,$05,$0F,$4E,$75
+	move.w	(a0)+,d0
+	lea	-$2(a0,d0.w),a2
+.loop
+	cmpi.b	#$20,(a0)+
+	bne.s	.loop
+.loop2
+	move.b	(a0)+,(a1)+
+	cmpa.l	a0,a2
+	beq.w	.1
+	tst.b	(a0)
+	bne.s	.loop2
+	bra.w	.1
+.loop3
+	move.b	#$20,(a1)+
+.1
+	cmpa.w	#(TextBuffer+12-M68K_RAM),a1
+	blt.s	.loop3
+	bsr.w	FinalizeTextBuffer
+	movem.l	(sp)+,d0-d3/a0/a2
+	rts
 
 GetPlayerInitial					;GetPlayerName with FormatPlayerInitial ("F. Last").
 									;Code the listing does not decode: kept as bytes
@@ -143,11 +179,28 @@ GetPlayerInitial					;GetPlayerName with FormatPlayerInitial ("F. Last").
 	dc.b	$4E,$75
 
 FormatPlayerInitial					;a1 = mesarea "F. Last" for player d0 of team a2.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$F0,$A0,$4E,$B9,$00,$01,$01,$C6,$2F,$08,$32,$7C,$BF,$F4
-	dc.b	$D0,$D0,$10,$10,$20,$5F,$30,$18,$45,$F0,$00,$FE,$12,$D8,$12,$FC
-	dc.b	$00,$2E,$12,$FC,$00,$20,$0C,$18,$00,$20,$66,$FA,$12,$D8,$B5,$C8
-	dc.b	$66,$FA,$61,$00,$00,$08,$4C,$DF,$05,$0F,$4E,$75
+	movem.l	d0-d3/a0/a2,-(sp)
+	jsr	(GetPlayerNamePointer).l
+	move.l	a0,-(sp)
+	movea.w	#(TextBuffer-M68K_RAM),a1
+	adda.w	(a0),a0
+	move.b	(a0),d0
+	movea.l	(sp)+,a0
+	move.w	(a0)+,d0
+	lea	-$2(a0,d0.w),a2
+	move.b	(a0)+,(a1)+
+	move.b	#$2E,(a1)+
+	move.b	#$20,(a1)+
+.loop
+	cmpi.b	#$20,(a0)+
+	bne.s	.loop
+.loop2
+	move.b	(a0)+,(a1)+
+	cmpa.l	a0,a2
+	bne.s	.loop2
+	bsr.w	FinalizeTextBuffer
+	movem.l	(sp)+,d0-d3/a0/a2
+	rts
 
 FinalizeTextBuffer					;mesarea length word = a1 - mesarea, with a 0 pad byte when odd. Returns
 									;a1 = mesarea. Called from the
@@ -182,11 +235,41 @@ ConvertByteToDigits					;Converts decimal number in d0 to ascii: two ascii digit
 
 PushNumberWidthZero					;PushNumberWidth with leading zeros: d0 as d1 digits to PushWidthBuf (a
 									;String).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$F0,$00,$32,$7C,$C0,$58,$74,$01,$92,$42,$60,$00,$00,$06
-	dc.b	$C4,$FC,$00,$0A,$51,$C9,$FF,$FA,$76,$30,$48,$C0,$80,$C2,$66,$00
-	dc.b	$00,$10,$B4,$7C,$00,$01,$67,$00,$00,$08,$30,$03,$60,$00,$00,$06
-	dc.b	$76,$30,$D0,$43,$12,$C0,$48,$40,$84,$FC,$00,$0A,$66,$DC,$20,$09
-	dc.b	$04,$40,$C0,$56,$08,$00,$00,$00,$67,$00,$00,$06,$42,$19,$52,$40
-	dc.b	$32,$7C,$C0,$56,$32,$80,$4C,$DF,$00,$0F,$4E,$75
+	movem.l	d0-d3,-(sp)				;push to stack
+	movea.w	#(PushWidthBuf+2-M68K_RAM),a1
+	moveq	#1,d2					;move 1 into d2
+	sub.w	d2,d1					;sub d2 from d1
+	bra.w	.1
+.loop
+	mulu.w	#$A,d2					;mult d2 by 10 dec
+.1
+	dbf	d1,.loop
+	moveq	#$30,d3
+.loop2
+	ext.l	d0						;sign extend d0
+	divu.w	d2,d0					;divide d2 into d0
+	bne.w	.2
+	cmp.w	#1,d2					;compare d2 to 1
+	beq.w	.2
+	move.w	d3,d0					;move d3 into d0
+	bra.w	.3
+.2
+	moveq	#$30,d3					;'0'   ; move 48 dec into d3
+	add.w	d3,d0					;add d3 to d0
+.3
+	move.b	d0,(a1)+				;move d0 into a1 and increment a1
+	swap	d0						;swap d0 words
+	divu.w	#$A,d2					;divide d2 by 10 dec
+	bne.s	.loop2
+	move.l	a1,d0					;move a1 into d0
+	subi.w	#(PushWidthBuf-M68K_RAM),d0
+	btst	#0,d0					;test bit 0 of d0
+	beq.w	.4
+	clr.b	(a1)+					;clear byte at a1 and increment
+	addq.w	#1,d0					;add 1 to d0
+.4
+	movea.w	#(PushWidthBuf-M68K_RAM),a1
+	move.w	d0,(a1)					;move d0 into a1 address location
+	movem.l	(sp)+,d0-d3				;push from stack
+	rts
 

@@ -123,16 +123,27 @@ TradePlayers						;The trade screen (roster menu item Trade Players): the two ro
 
 DrawHomeTradeRoster					;Draw the roster of HomeTeam with the chosen marks; falls into
 									;DrawTradeRosterRows
-									;Code the listing does not decode: kept as bytes
-	dc.b	$3A,$39,$FF,$FF,$27,$10,$4A,$79,$FF,$FF,$27,$1C,$67,$00,$00,$06
-	dc.b	$3A,$3C,$FF,$FF,$2A,$7C,$FF,$FF,$27,$14,$28,$7C,$FF,$FF,$3A,$98
-	dc.b	$31,$FC,$00,$07,$B0,$42,$3E,$38,$C3,$A0,$60,$00,$00,$2C
+	move.w	(TeamSelectRedraw).l,d5
+	tst.w	(vislogochars+4).l
+	beq.w	.1
+	move.w	#$FFFF,d5
+.1
+	movea.l	#pstatscount,a5
+	movea.l	#$FFFF3A98,a4
+	move.w	#7,(printy).w
+	move.w	(HomeTeam).w,d7
+	bra.w	DrawTradeRosterRows
 
 DrawVisTradeRoster					;The same for the visiting team
-									;Code the listing does not decode: kept as bytes
-	dc.b	$3A,$39,$FF,$FF,$27,$12,$4A,$79,$FF,$FF,$27,$1C,$66,$00,$00,$06
-	dc.b	$3A,$3C,$FF,$FF,$2A,$7C,$FF,$FF,$27,$18,$28,$7C,$FF,$FF,$88,$B8
-	dc.b	$31,$FC,$00,$11,$B0,$42,$3E,$38,$C3,$A2
+	move.w	(pstatsblockchars).l,d5
+	tst.w	(vislogochars+4).l
+	bne.w	.1
+	move.w	#$FFFF,d5
+.1
+	movea.l	#vislogochars,a5
+	movea.l	#$FFFF88B8,a4
+	move.w	#$11,(printy).w
+	move.w	(VisTeam).w,d7
 
 DrawTradeRosterRows					;Draw the roster rows of team d7 (name, position, rating), * for the
 									;chosen players
@@ -193,11 +204,28 @@ TradeDone							;After a trade
 TradeValue							;d0 = trade value of the d3 players at a0: each rating (byte 3) mapped
 									;through TradeRatingSteps /
 									;TradeRatingValues
-									;Code the listing does not decode: kept as bytes
-	dc.b	$53,$43,$42,$40,$4A,$10,$67,$00,$00,$28,$12,$28,$00,$03,$22,$7C
-	dc.b	$00,$1D,$C9,$10,$24,$7C,$00,$1D,$C9,$1A,$42,$44,$B2,$31,$40,$00
-	dc.b	$6F,$00,$00,$06,$52,$44,$60,$F4,$18,$32,$40,$00,$48,$84,$D0,$44
-	dc.b	$4A,$98,$51,$CB,$FF,$D0,$4E,$75
+	subq.w	#1,d3
+	clr.w	d0
+.loop
+	tst.b	(a0)
+	beq.w	.2
+	move.b	3(a0),d1
+	movea.l	#TradeRatingSteps,a1
+	movea.l	#TradeRatingValues,a2
+	clr.w	d4
+.loop2
+	cmp.b	(a1,d4.w),d1
+	ble.w	.1
+	addq.w	#1,d4
+	bra.s	.loop2
+.1
+	move.b	(a2,d4.w),d4
+	ext.w	d4
+	add.w	d4,d0
+.2
+	tst.l	(a0)+
+	dbf	d3,.loop
+	rts
 
 TradeRatingSteps					;TradeValue: the rating steps
 	dc.b	$28,$32,$3C,$46,$4B,$50,$55,$5A,$5F,$65
@@ -206,8 +234,7 @@ TradeRatingValues					;TradeValue: the value of each step
 	dc.b	$01,$02,$03,$04,$05,$07,$0A,$0F,$14,$1E
 
 TradeExit							;Leave the trade screen
-									;Code the listing does not decode: kept as bytes
-	dc.b	$4E,$F9,$00,$02,$17,$4A
+	jmp	(Opening2).l
 
 CheckTrade							;Check the trade (players chosen on both teams, at most three a team, the
 									;roster limits); else the reason from InvalidTradeText Code the listing
@@ -257,80 +284,129 @@ InvalidTradeText					;CheckTrade: the reasons a trade is refused
 	String	CC_SetX,$08,CC_SetY,$09,'more than 3 players',CC_AddY,$01,CC_SetX,$08,'selected for trade on',CC_AddY,$01,CC_SetX,$08,'one or more teams'
 
 WaitMenuFrame						;Wait for the next frame (Vcount), then SetMenuScroll; d0 kept Code the
-									;listing does not decode: kept as bytes
-	dc.b	$3F,$00,$30,$38,$B0,$52,$B0,$78,$B0,$52,$67,$FA,$4E,$B9,$00,$01
-	dc.b	$26,$40,$30,$1F,$4E,$75
+	move.w	d0,-(sp)
+	move.w	(Vcount).w,d0			;frame counter
+	;loop
+.loop
+	cmp.w	(Vcount).w,d0
+	beq.s	.loop					;wait for a new frame
+	jsr	(SetMenuScroll).l			;read the pads
+	move.w	(sp)+,d0
+	rts
 
 BuildTradeList						;Trade list of team d7: the chosen players ($FFFF = none) Code the listing
-									;does not decode: kept as bytes
-	dc.b	$32,$C7,$32,$BC,$FF,$FF,$33,$7C,$FF,$FF,$00,$02,$33,$7C,$FF,$FF
-	dc.b	$00,$04,$53,$46,$4A,$12,$67,$00,$00,$0A,$42,$40,$10,$2A,$00,$02
-	dc.b	$32,$C0,$4A,$9A,$51,$CE,$FF,$EE,$4E,$75,$08,$F8,$00,$05,$C3,$56
-	dc.b	$21,$FC,$00,$01,$2D,$46,$D2,$44,$08,$B8,$00,$00,$BF,$B2,$08,$F8
-	dc.b	$00,$02,$BF,$B2,$08,$B8,$00,$01,$BF,$B2,$31,$FC,$00,$00,$B0,$00
-	dc.b	$31,$FC,$BC,$00,$B0,$02,$31,$FC,$BC,$00,$B0,$0C,$31,$FC,$00,$05
-	dc.b	$B0,$0E,$31,$FC,$C0,$00,$B0,$08,$31,$FC,$00,$06,$B0,$0A,$31,$FC
-	dc.b	$E0,$00,$B0,$04,$31,$FC,$00,$06,$B0,$06,$30,$3C,$00,$00,$08,$F8
-	dc.b	$00,$05,$BF,$B2,$4E,$B9,$00,$01,$B5,$7E,$08,$B8,$00,$05,$BF,$B2
-	dc.b	$4E,$B9,$00,$01,$B2,$C4,$38,$3C,$00,$01,$22,$7C,$00,$19,$26,$2C
-	dc.b	$4E,$B9,$00,$01,$21,$7A,$31,$C4,$B0,$1C,$24,$7C,$00,$17,$91,$70
-	dc.b	$4E,$B9,$00,$01,$B7,$30,$31,$C4,$B0,$1E,$24,$7C,$00,$17,$A1,$6C
-	dc.b	$4E,$B9,$00,$01,$B7,$30,$21,$FC,$00,$17,$91,$68,$BF,$8A,$31,$C4
-	dc.b	$B0,$18,$24,$7C,$00,$17,$B6,$88,$4E,$B9,$00,$01,$B7,$30,$4E,$B9
-	dc.b	$00,$01,$BA,$2E,$00,$08,$FF,$01,$FD,$00,$FC,$00,$70,$28,$72,$1C
-	dc.b	$34,$3C,$07,$FF,$4E,$B9,$00,$01,$B9,$76,$4E,$B9,$00,$01,$BB,$8E
-	dc.b	$00,$06,$BF,$00,$00,$00,$20,$7C,$00,$19,$0E,$FE,$22,$48,$24,$48
-	dc.b	$D1,$DA,$D3,$DA,$42,$40,$42,$41,$74,$28,$76,$1C,$7A,$08,$4E,$B9
-	dc.b	$00,$01,$B6,$92,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$BF,$0B,$01,$00
-	dc.b	$20,$7C,$00,$19,$06,$FE,$22,$48,$24,$48,$D1,$DA,$D3,$DA,$42,$40
-	dc.b	$42,$41,$34,$11,$36,$29,$00,$02,$7A,$08,$4E,$B9,$00,$01,$B6,$92
-	dc.b	$61,$00,$01,$A0,$4E,$B9,$00,$01,$BB,$8E,$00,$06,$FE,$00,$00,$00
-	dc.b	$20,$7C,$00,$17,$0B,$0C,$22,$48,$24,$48,$D1,$DA,$D3,$DA,$42,$40
-	dc.b	$42,$41,$74,$40,$76,$1C,$7A,$01,$4E,$B9,$00,$01,$B6,$92,$32,$3C
-	dc.b	$00,$19,$42,$42,$20,$7C,$FF,$FF,$27,$1E,$22,$7C,$00,$01,$2B,$FE
-	dc.b	$30,$C4,$30,$02,$E5,$40,$24,$71,$00,$00,$50,$4A,$4E,$B9,$00,$01
-	dc.b	$B7,$30,$52,$42,$51,$C9,$FF,$EA,$08,$F8,$00,$02,$C3,$54,$4E,$B9
-	dc.b	$00,$01,$BE,$D6,$00,$12,$F8,$07,$01,$15,$04,$70,$6F,$73,$F8,$07
-	dc.b	$01,$15,$0E,$70,$6F,$73,$08,$B8,$00,$02,$C3,$54,$4E,$75,$48,$E7
-	dc.b	$FF,$FE,$42,$40,$E5,$41,$20,$7C,$00,$01,$2B,$FE,$20,$70,$10,$00
-	dc.b	$E2,$49,$22,$7C,$FF,$FF,$27,$1E,$38,$31,$10,$00,$22,$48,$D1,$D0
-	dc.b	$D3,$E9,$00,$04,$34,$7C,$07,$72,$34,$11,$76,$02,$42,$40,$42,$41
-	dc.b	$7A,$04,$4E,$B9,$00,$01,$B6,$92,$4C,$DF,$7F,$FF,$4E,$75,$48,$E7
-	dc.b	$FF,$FE,$4E,$B9,$00,$01,$57,$74,$32,$80,$4E,$B9,$00,$01,$57,$B2
-	dc.b	$33,$40,$00,$04,$53,$40,$24,$48,$42,$41,$42,$92,$15,$41,$00,$02
-	dc.b	$48,$E7,$80,$00,$30,$01,$4E,$B9,$00,$01,$03,$AA,$15,$40,$00,$01
-	dc.b	$16,$00,$4C,$DF,$00,$01,$48,$E7,$C8,$00,$2F,$0A,$42,$40,$10,$2A
-	dc.b	$00,$02,$31,$C0,$C4,$48,$24,$7C,$FF,$FF,$C7,$26,$BE,$78,$C3,$A0
-	dc.b	$67,$00,$00,$08,$24,$7C,$FF,$FF,$CA,$C4,$28,$39,$00,$02,$34,$56
-	dc.b	$4A,$03,$66,$00,$00,$08,$28,$39,$00,$02,$35,$B8,$4E,$B9,$00,$1D
-	dc.b	$7D,$F8,$C0,$FC,$00,$64,$80,$C1,$48,$E7,$80,$00,$30,$38,$C4,$48
-	dc.b	$4E,$B9,$00,$01,$03,$78,$4C,$DF,$00,$01,$67,$00,$00,$02,$24,$5F
-	dc.b	$15,$40,$00,$03,$4C,$DF,$00,$13,$4A,$9A,$52,$41,$51,$C8,$FF,$7C
-	dc.b	$4C,$DF,$7F,$FF,$4E,$75,$48,$E7,$FF,$FE,$4E,$B9,$00,$01,$57,$B2
-	dc.b	$55,$40,$24,$48,$32,$00,$50,$C6,$14,$2A,$00,$01,$B4,$2A,$00,$05
-	dc.b	$6F,$00,$00,$10,$24,$12,$26,$2A,$00,$04,$24,$83,$25,$42,$00,$04
-	dc.b	$42,$46,$58,$4A,$51,$C9,$FF,$E2,$4A,$46,$67,$D6,$4C,$DF,$7F,$FF
-	dc.b	$4E,$75,$3F,$38,$B0,$1C,$31,$F8,$B0,$1E,$B0,$1C,$4E,$B9,$00,$01
-	dc.b	$BC,$72,$00,$3A,$8F,$07,$19,$61,$2D,$53,$77,$69,$74,$63,$68,$20
-	dc.b	$54,$65,$61,$6D,$8F,$07,$1A,$42,$2D,$43,$61,$6E,$63,$65,$6C,$8F
-	dc.b	$15,$19,$43,$2D,$50,$6C,$61,$79,$65,$72,$8F,$11,$1A,$53,$74,$61
-	dc.b	$72,$74,$2D,$45,$76,$61,$6C,$75,$61,$74,$65,$00,$31,$DF,$B0,$1C
-	dc.b	$4E,$75
+	move.w	d7,(a1)+
+	move.w	#$FFFF,(a1)
+	move.w	#$FFFF,2(a1)
+	move.w	#$FFFF,4(a1)
+	subq.w	#1,d6
+.loop
+	tst.b	(a2)
+	beq.w	.1
+	clr.w	d0
+	move.b	2(a2),d0
+	move.w	d0,(a1)+
+.1
+	tst.l	(a2)+
+	dbf	d6,.loop
+	rts
+	dc.w	$08F8,$0005,$C356,$21FC,$0001,$2D46,$D244,$08B8
+	dc.w	$0000,$BFB2,$08F8,$0002,$BFB2,$08B8,$0001,$BFB2
+	dc.w	$31FC,$0000,$B000,$31FC,$BC00,$B002,$31FC,$BC00
+	dc.w	$B00C,$31FC,$0005,$B00E,$31FC,$C000,$B008,$31FC
+	dc.w	$0006,$B00A,$31FC,$E000,$B004,$31FC,$0006,$B006
+	dc.w	$303C,$0000,$08F8,$0005,$BFB2,$4EB9,$0001,$B57E
+	dc.w	$08B8,$0005,$BFB2,$4EB9,$0001,$B2C4,$383C,$0001
+	dc.w	$227C,$0019,$262C,$4EB9,$0001,$217A,$31C4,$B01C
+	dc.w	$247C,$0017,$9170,$4EB9,$0001,$B730,$31C4,$B01E
+	dc.w	$247C,$0017,$A16C,$4EB9,$0001,$B730,$21FC,$0017
+	dc.w	$9168,$BF8A,$31C4,$B018,$247C,$0017,$B688,$4EB9
+	dc.w	$0001,$B730,$4EB9,$0001,$BA2E,$0008,$FF01,$FD00
+	dc.w	$FC00,$7028,$721C,$343C,$07FF,$4EB9,$0001,$B976
+	dc.w	$4EB9,$0001,$BB8E,$0006,$BF00,$0000,$207C,$0019
+	dc.w	$0EFE,$2248,$2448,$D1DA,$D3DA,$4240,$4241,$7428
+	dc.w	$761C,$7A08,$4EB9,$0001,$B692,$4EB9,$0001,$BB8E
+	dc.w	$0006,$BF0B,$0100,$207C,$0019,$06FE,$2248,$2448
+	dc.w	$D1DA,$D3DA,$4240,$4241,$3411,$3629,$0002,$7A08
+	dc.w	$4EB9,$0001,$B692,$6100,$01A0,$4EB9,$0001,$BB8E
+	dc.w	$0006,$FE00,$0000,$207C,$0017,$0B0C,$2248,$2448
+	dc.w	$D1DA,$D3DA,$4240,$4241,$7440,$761C,$7A01,$4EB9
+	dc.w	$0001,$B692,$323C,$0019,$4242,$207C,$FFFF,$271E
+	dc.w	$227C,$0001,$2BFE,$30C4,$3002,$E540,$2471,$0000
+	dc.w	$504A,$4EB9,$0001,$B730,$5242,$51C9,$FFEA,$08F8
+	dc.w	$0002,$C354,$4EB9,$0001,$BED6,$0012,$F807,$0115
+	dc.w	$0470,$6F73,$F807,$0115,$0E70,$6F73,$08B8,$0002
+	dc.w	$C354,$4E75,$48E7,$FFFE,$4240,$E541,$207C,$0001
+	dc.w	$2BFE,$2070,$1000,$E249,$227C,$FFFF,$271E,$3831
+	dc.w	$1000,$2248,$D1D0,$D3E9,$0004,$347C,$0772,$3411
+	dc.w	$7602,$4240,$4241,$7A04,$4EB9,$0001,$B692,$4CDF
+	dc.w	$7FFF,$4E75,$48E7,$FFFE,$4EB9,$0001,$5774,$3280
+	dc.w	$4EB9,$0001,$57B2,$3340,$0004,$5340,$2448,$4241
+	dc.w	$4292,$1541,$0002,$48E7,$8000,$3001,$4EB9,$0001
+	dc.w	$03AA,$1540,$0001,$1600,$4CDF,$0001,$48E7,$C800
+	dc.w	$2F0A,$4240,$102A,$0002,$31C0,$C448,$247C,$FFFF
+	dc.w	$C726,$BE78,$C3A0,$6700,$0008,$247C,$FFFF,$CAC4
+	dc.w	$2839,$0002,$3456,$4A03,$6600,$0008,$2839,$0002
+	dc.w	SPAfpunchBhit1,$4EB9,$001D,$7DF8,$C0FC,$0064,$80C1,$48E7
+	dc.w	$8000,$3038,$C448,$4EB9,$0001,$0378,$4CDF,$0001
+	dc.w	$6700,$0002,$245F,$1540,$0003,$4CDF,$0013,$4A9A
+	dc.w	$5241,$51C8,$FF7C,$4CDF,$7FFF,$4E75,$48E7,$FFFE
+	dc.w	$4EB9,$0001,$57B2,$5540,$2448,$3200,$50C6,$142A
+	dc.w	$0001,$B42A,$0005,$6F00,$0010,SPAboardbot,$262A,$0004
+	dc.w	$2483,$2542,$0004,$4246,$584A,$51C9,$FFE2,$4A46
+	dc.w	$67D6,$4CDF,$7FFF,$4E75,$3F38,$B01C,$31F8,$B01E
+	dc.w	$B01C,$4EB9,$0001,$BC72,$003A,$8F07,$1961,$2D53
+	dc.w	$7769,$7463,$6820,$5465,$616D,$8F07,$1A42,$2D43
+	dc.w	$616E,$6365,$6C8F,$1519,$432D,$506C,$6179,$6572
+	dc.w	$8F11,$1A53,$7461,$7274,$2D45,$7661,$6C75,$6174
+	dc.w	$6500,$31DF,$B01C,$4E75
 
 EraseBlank							;Erase a d0 x d1 rectangle at printx / printy with the blank char $7FF
 									;(eraser)
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$F8,$C0,$3F,$38,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$34,$3C
-	dc.b	$07,$FF,$4E,$B9,$00,$01,$B9,$76,$31,$DF,$BF,$B2,$4C,$DF,$03,$1F
-	dc.b	$4E,$75,$2C,$3C,$00,$00,$54,$60,$32,$38,$B0,$52,$92,$78,$B0,$54
-	dc.b	$67,$F6,$31,$F8,$B0,$52,$B0,$54,$4E,$B9,$00,$01,$26,$40,$4E,$B9
-	dc.b	$00,$01,$B3,$48,$4E,$B9,$00,$01,$B3,$20,$4A,$41,$67,$00,$00,$06
-	dc.b	$60,$00,$00,$50,$4E,$B9,$00,$01,$B3,$60,$4E,$B9,$00,$01,$B3,$20
-	dc.b	$4A,$41,$67,$00,$00,$06,$60,$00,$00,$3A,$4A,$78,$D2,$50,$67,$00
-	dc.b	$00,$2E,$4E,$B9,$00,$01,$B3,$78,$4E,$B9,$00,$01,$B3,$20,$4A,$41
-	dc.b	$67,$00,$00,$06,$60,$00,$00,$1C,$4E,$B9,$00,$01,$B3,$90,$4E,$B9
-	dc.b	$00,$01,$B3,$20,$4A,$41,$67,$00,$00,$06,$60,$00,$00,$06,$51,$CE
-	dc.b	$FF,$88,$4E,$75
+	movem.l	d0-d4/a0-a1,-(sp)
+	move.w	(disflags).w,-(sp)
+	bset	#2,(disflags).w
+	move.w	#$7FF,d2
+	jsr	(eraser).l
+	move.w	(sp)+,(disflags).w
+	movem.l	(sp)+,d0-d4/a0-a1
+	rts
+	move.l	#$5460,d6
+.loop
+	move.w	(Vcount).w,d1
+	sub.w	(OldVcount).w,d1
+	beq.s	.loop
+	move.w	(Vcount).w,(OldVcount).w
+	jsr	(SetMenuScroll).l
+	jsr	(ReadJoy1).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.1
+	bra.w	.5
+.1
+	jsr	(ReadJoy2).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.2
+	bra.w	.5
+.2
+	tst.w	(FourWayPlay).w
+	beq.w	.4
+	jsr	(ReadJoy3).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.3
+	bra.w	.5
+.3
+	jsr	(ReadJoy4).l
+	jsr	(ProcessInputWithRepeat).l
+	tst.w	d1
+	beq.w	.4
+	bra.w	.5
+.4
+	dbf	d6,.loop
+.5
+	rts
 
 ExecuteTrade						;Do the trade: clear both teams' saved blocks, tag the positions, move
 									;each chosen player (ExtractTradedPlayer
@@ -360,16 +436,38 @@ ExecuteTrade						;Do the trade: clear both teams' saved blocks, tag the positio
 
 ShiftTradeUp						;Trade list: the later player numbers at or after an inserted player
 									;(TempWord2) go up one
-									;Code the listing does not decode: kept as bytes
-	dc.b	$10,$38,$BF,$49,$4A,$70,$60,$00,$6B,$00,$00,$16,$B0,$30,$60,$01
-	dc.b	$6E,$00,$00,$06,$52,$30,$60,$01,$54,$46,$BC,$7C,$00,$08,$6D,$E4
-	dc.b	$4E,$75
+	move.b	(TempWord2+1).w,d0
+.loop
+	tst.w	(a0,d6.w)
+	bmi.w	.2
+	cmp.b	1(a0,d6.w),d0
+	bgt.w	.1
+	addq.b	#1,1(a0,d6.w)
+.1
+	addq.w	#2,d6
+	cmp.w	#8,d6
+	blt.s	.loop
+.2
+	rts
 
 ShiftTradeDown						;Trade list: the later player numbers after a removed player go down one
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$54,$46,$BC,$7C,$00,$08,$6C,$00,$00,$1E,$4A,$70
-	dc.b	$60,$00,$6B,$00,$00,$16,$B0,$30,$60,$01,$6E,$00,$00,$06,$53,$30
-	dc.b	$60,$01,$54,$46,$BC,$7C,$00,$08,$6D,$E4,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	addq.w	#2,d6
+	cmp.w	#8,d6
+	bge.w	.2
+.loop
+	tst.w	(a0,d6.w)
+	bmi.w	.2
+	cmp.b	1(a0,d6.w),d0
+	bgt.w	.1
+	subq.b	#1,1(a0,d6.w)
+.1
+	addq.w	#2,d6
+	cmp.w	#8,d6
+	blt.s	.loop
+.2
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 ExtractTradedPlayer					;Take player TempWord1 out of team TempRawSpd into buffer a2 (roster id,
 									;jersey, stats, injury)
@@ -421,13 +519,34 @@ ExtractTradedPlayer					;Take player TempWord1 out of team TempRawSpd into buffe
 DeleteStatSlot						;Packed stat block d1 (d2 bits, d3 players, d4 bits a team) of team d7:
 									;player TempWord1's value to (a2)+,
 									;later ones down
-									;Code the listing does not decode: kept as bytes
-	dc.b	$20,$7C,$FF,$FF,$D1,$30,$48,$E7,$78,$80,$4E,$B9,$00,$01,$0F,$02
-	dc.b	$26,$7C,$FF,$FF,$D1,$30,$30,$38,$BF,$46,$02,$40,$00,$FF,$B0,$38
-	dc.b	$D4,$89,$6D,$00,$00,$10,$08,$38,$00,$05,$C3,$58,$66,$00,$00,$06
-	dc.b	$90,$38,$D4,$89,$D0,$40,$2F,$03,$36,$33,$00,$00,$34,$C3,$26,$1F
-	dc.b	$53,$43,$D6,$43,$32,$33,$00,$02,$37,$81,$00,$00,$54,$40,$B0,$43
-	dc.b	$6D,$F2,$42,$73,$00,$00,$4C,$DF,$01,$1E,$4E,$F9,$00,$01,$0F,$22
+	movea.l	#CalTeam,a0
+	movem.l	d1-d4/a0,-(sp)
+	jsr	(ReadSRAMBitWords).l
+	movea.l	#CalTeam,a3
+	move.w	(TempWord1).w,d0
+	andi.w	#$FF,d0
+	cmp.b	(userblockx+1).w,d0
+	blt.w	.1
+	btst	#5,(sflags13).w
+	bne.w	.1
+	sub.b	(userblockx+1).w,d0
+.1
+	add.w	d0,d0
+	move.l	d3,-(sp)
+	move.w	(a3,d0.w),d3
+	move.w	d3,(a2)+
+	move.l	(sp)+,d3
+	subq.w	#1,d3
+	add.w	d3,d3
+.loop
+	move.w	2(a3,d0.w),d1
+	move.w	d1,(a3,d0.w)
+	addq.w	#2,d0
+	cmp.w	d3,d0
+	blt.s	.loop
+	clr.w	(a3,d0.w)
+	movem.l	(sp)+,d1-d4/a0
+	jmp	(WriteSRAMBitWords).l
 
 InsertTradedPlayer					;Put the player in the buffer a2 into team TradeToTeam at TempWord2:
 									;roster, player stats, saved lines
@@ -481,35 +600,104 @@ InsertTradedPlayer					;Put the player in the buffer a2 into team TradeToTeam at
 InsertStatSlot						;Packed stat block d1 (d2 bits, d3 players, d4 bits a team) of team d7:
 									;insert (a2)+ at player TempWord2, later
 									;ones up
-									;Code the listing does not decode: kept as bytes
-	dc.b	$20,$7C,$FF,$FF,$D1,$30,$48,$E7,$78,$80,$4E,$B9,$00,$01,$0F,$02
-	dc.b	$26,$7C,$FF,$FF,$D1,$30,$30,$38,$BF,$48,$02,$40,$00,$FF,$B0,$38
-	dc.b	$D4,$89,$6D,$00,$00,$10,$08,$38,$00,$05,$C3,$58,$66,$00,$00,$06
-	dc.b	$90,$38,$D4,$89,$D0,$40,$D6,$43,$60,$00,$00,$0A,$32,$33,$30,$FE
-	dc.b	$37,$81,$30,$00,$55,$43,$B6,$40,$6F,$00,$00,$04,$60,$EE,$32,$1A
-	dc.b	$37,$81,$30,$00,$4C,$DF,$01,$1E,$4E,$F9,$00,$01,$0F,$22
+	movea.l	#CalTeam,a0
+	movem.l	d1-d4/a0,-(sp)
+	jsr	(ReadSRAMBitWords).l
+	movea.l	#CalTeam,a3
+	move.w	(TempWord2).w,d0
+	andi.w	#$FF,d0
+	cmp.b	(userblockx+1).w,d0
+	blt.w	.1
+	btst	#5,(sflags13).w
+	bne.w	.1
+	sub.b	(userblockx+1).w,d0
+.1
+	add.w	d0,d0
+	add.w	d3,d3
+	bra.w	.2
+.loop
+	move.w	-$2(a3,d3.w),d1
+	move.w	d1,(a3,d3.w)
+.2
+	subq.w	#2,d3
+	cmp.w	d0,d3
+	ble.w	.3
+	bra.s	.loop
+.3
+	move.w	(a2)+,d1
+	move.w	d1,(a3,d3.w)
+	movem.l	(sp)+,d1-d4/a0
+	jmp	(WriteSRAMBitWords).l
 
 FixJerseyNumber						;Give player d0 of team d7 a jersey number no teammate has: step it up in
 									;BCD, 99 wraps to 1
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FF,$FE,$34,$00,$4E,$B9,$00,$01,$57,$B2,$36,$00,$20,$7C
-	dc.b	$FF,$FF,$D1,$30,$CE,$FC,$00,$1B,$48,$C7,$06,$87,$00,$00,$1B,$00
-	dc.b	$20,$07,$72,$1B,$48,$E7,$C0,$80,$4E,$B9,$00,$02,$41,$E8,$18,$30
-	dc.b	$20,$00,$3A,$03,$53,$45,$42,$40,$B4,$40,$67,$00,$00,$34,$B8,$30
-	dc.b	$00,$00,$66,$00,$00,$2C,$52,$04,$1C,$04,$02,$46,$00,$0F,$BC,$3C
-	dc.b	$00,$0A,$66,$00,$00,$16,$06,$04,$00,$10,$02,$44,$00,$F0,$B8,$3C
-	dc.b	$00,$A0,$66,$00,$00,$06,$18,$3C,$00,$01,$11,$84,$20,$00,$60,$BE
-	dc.b	$52,$40,$51,$CD,$FF,$C4,$4C,$DF,$01,$03,$4E,$B9,$00,$02,$41,$88
-	dc.b	$4E,$B9,$00,$02,$41,$AA,$4C,$DF,$7F,$FF,$4E,$75
+	movem.l	d0-d7/a0-a6,-(sp)
+	move.w	d0,d2
+	jsr	(GetPlayerCountD7).l
+	move.w	d0,d3
+	movea.l	#ThreeStars,a0
+	mulu.w	#$1B,d7
+	ext.l	d7
+	addi.l	#$1B00,d7
+	move.l	d7,d0
+	moveq	#$1B,d1
+	movem.l	d0-d1/a0,-(sp)
+	jsr	(ReadSRAM).l
+.loop
+	move.b	(a0,d2.w),d4
+	move.w	d3,d5
+	subq.w	#1,d5
+	clr.w	d0
+.loop2
+	cmp.w	d0,d2
+	beq.w	.2
+	cmp.b	(a0,d0.w),d4
+	bne.w	.2
+	addq.b	#1,d4
+	move.b	d4,d6
+	andi.w	#$F,d6
+	cmp.b	#$A,d6
+	bne.w	.1
+	addi.b	#$10,d4
+	andi.w	#$F0,d4
+	cmp.b	#$A0,d4
+	bne.w	.1
+	move.b	#1,d4
+.1
+	move.b	d4,(a0,d2.w)
+	bra.s	.loop
+.2
+	addq.w	#1,d0
+	dbf	d5,.loop2
+	movem.l	(sp)+,d0-d1/a0
+	jsr	(WriteSRAM).l
+	jsr	(MakeSRAMChecksum).l
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
 
 GetRosterId							;d0 = roster id word of player d0 of team d7 (season roster in save RAM
 									;SRRosters, or d7 << 8 | d0 outside a
 									;season)
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$43,$80,$08,$38,$00,$04,$C3,$54,$67,$00,$00,$0E,$E1,$47
-	dc.b	$02,$40,$00,$FF,$80,$47,$60,$00,$00,$22,$CE,$FC,$00,$36,$D0,$40
-	dc.b	$48,$C0,$D0,$87,$06,$80,$00,$00,$15,$50,$72,$02,$20,$7C,$FF,$FF
-	dc.b	$BF,$80,$4E,$B9,$00,$02,$41,$E8,$30,$10,$4C,$DF,$01,$C2,$4E,$75
+	movem.l	d1/d6-d7/a0,-(sp)
+	btst	#4,(sflags11).w
+	beq.w	.1
+	asl.w	#8,d7
+	andi.w	#$FF,d0
+	or.w	d7,d0
+	bra.w	.2
+.1
+	mulu.w	#$36,d7
+	add.w	d0,d0
+	ext.l	d0
+	add.l	d7,d0
+	addi.l	#$1550,d0
+	moveq	#2,d1
+	movea.l	#recwins+4,a0
+	jsr	(ReadSRAM).l
+	move.w	(a0),d0
+.2
+	movem.l	(sp)+,d1/d6-d7/a0
+	rts
 
 PositionLetters						;The position of a roster row (TradePlayers and code96_17)
 	String	'G'

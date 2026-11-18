@@ -26,6 +26,15 @@ SPAgstackl = $3E6					;SPA value (frames96)
 SPAgstackr = $440					;SPA value (frames96)
 SPAgstickl = $20C					;SPA value (frames96)
 SPAgstickr = $266					;SPA value (frames96)
+assexit = $01A3BE					;logic96_ass_stub
+assreplace = $01A3DA				;collide96_stub
+donothing = $01731E					;fight96_stub
+PuckOnAttackHalf = $1D6B66			;code96_14
+randomd0 = $01B0A6					;playoff96_stub
+SetShotMode = $00F496				;input96_stub
+sfx = $088470						;collide96_stub
+ShotMode = $00F530					;input96_stub
+skateto = $01A050					;fight96_stub
 
 
 ; Main segment code

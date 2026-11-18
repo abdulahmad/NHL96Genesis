@@ -52,9 +52,8 @@ asstab								;Assignment routines: assignment number = index
 	dc.l	asscenterd4				;$2D
 	dc.l	asscentero5				;$2E
 	dc.l	asscentero4				;$2F
-	;The assignment routines below are not decoded in the listing: kept as bytes, with a label at
 	;each asstab entry
-	dc.b	$4E,$F9,$00,$01,$A3,$DA
+	jmp	(assreplace).l
 
 asscentero4							;Center on offense, two men short (tmap 4); back to asscentero /
 									;asscentero5 when tmap changes, asscenterd4

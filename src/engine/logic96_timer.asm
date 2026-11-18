@@ -182,56 +182,221 @@ OneTimerGoalieTbl					;OneTimerTarget target offsets (x, y) by facing, goalie
 
 assonetimer							;Assignment $23 (asstab), player a3 shooting a
 									;one-timer: take control of him.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$AB,$00,$01,$00,$62,$67,$00,$00,$AE,$08,$EB,$00,$03,$00,$64
-	dc.b	$66,$00,$00,$A4,$31,$FC,$00,$2D,$DC,$F4,$08,$B8,$00,$00,$BF,$B0
-	dc.b	$08,$B8,$00,$05,$C3,$4C,$42,$78,$BF,$B0,$42,$78,$BF,$A8,$50,$F8
-	dc.b	$BF,$12,$48,$E7,$FF,$FE,$30,$2B,$00,$52,$31,$C0,$BF,$A6,$08,$2B
-	dc.b	$00,$03,$00,$62,$66,$00,$00,$4A,$4A,$78,$DC,$CC,$6B,$00,$00,$42
-	dc.b	$67,$00,$00,$20,$0C,$78,$00,$02,$DC,$CC,$67,$00,$00,$20,$0C,$78
-	dc.b	$00,$04,$DC,$CC,$67,$00,$00,$20,$4E,$B9,$00,$01,$6C,$74,$60,$00
-	dc.b	$00,$20,$4E,$B9,$00,$01,$6C,$52,$60,$00,$00,$16,$4E,$B9,$00,$01
-	dc.b	$6C,$5C,$60,$00,$00,$0C,$4E,$B9,$00,$01,$6C,$68,$60,$00,$00,$02
-	dc.b	$3F,$00,$61,$00,$02,$14,$42,$6B,$00,$5A,$4E,$B9,$00,$01,$A6,$14
-	dc.b	$08,$EB,$00,$05,$00,$62,$08,$EB,$00,$01,$00,$63,$30,$1F,$4C,$DF
-	dc.b	$7F,$FF,$60,$00,$01,$F2,$08,$38,$00,$00,$BF,$B0,$66,$00,$00,$52
-	dc.b	$48,$A7,$C0,$00,$30,$38,$B7,$5E,$90,$53,$B0,$7C,$00,$3C,$6E,$00
-	dc.b	$00,$0A,$B0,$7C,$FF,$C4,$6E,$00,$00,$14,$32,$38,$B7,$86,$B3,$40
-	dc.b	$6B,$00,$00,$0A,$4C,$9F,$00,$03,$60,$00,$00,$2E,$30,$38,$B7,$72
-	dc.b	$90,$6B,$00,$14,$B0,$7C,$00,$3C,$6E,$00,$00,$0A,$B0,$7C,$FF,$C4
-	dc.b	$6E,$00,$00,$0A,$32,$38,$B7,$88,$B3,$40,$6A,$D8,$4C,$9F,$00,$03
-	dc.b	$4A,$78,$B7,$BE,$6B,$00,$00,$0C,$08,$B8,$00,$07,$C3,$4C,$60,$00
-	dc.b	$01,$80,$08,$38,$00,$00,$C3,$38,$66,$00,$01,$76,$48,$E7,$C0,$00
-	dc.b	$08,$38,$00,$03,$C3,$50,$66,$00,$01,$2A,$0C,$6B,$00,$10,$00,$5A
-	dc.b	$6C,$00,$00,$9A,$08,$38,$00,$02,$BF,$B0,$66,$00,$00,$90,$30,$13
-	dc.b	$32,$38,$B7,$5E,$90,$41,$6A,$00,$00,$04,$44,$40,$32,$2B,$00,$14
-	dc.b	$34,$38,$B7,$72,$92,$42,$6A,$00,$00,$04,$44,$41,$34,$38,$B7,$86
-	dc.b	$67,$00,$00,$08,$B2,$40,$6F,$00,$00,$08,$34,$38,$B7,$88,$30,$01
-	dc.b	$48,$40,$02,$80,$FF,$FF,$00,$00,$4A,$42,$6A,$00,$00,$04,$44,$42
-	dc.b	$32,$38,$D2,$84,$4A,$78,$D2,$80,$67,$00,$00,$06,$32,$38,$D2,$86
-	dc.b	$4A,$42,$66,$00,$00,$06,$34,$3C,$00,$01,$80,$C2,$02,$80,$00,$00
-	dc.b	$FF,$FF,$80,$C1,$34,$2B,$00,$5A,$E4,$4A,$5D,$42,$44,$42,$E5,$42
-	dc.b	$B0,$42,$6E,$00,$00,$10,$44,$6B,$00,$5A,$06,$6B,$00,$18,$00,$5A
-	dc.b	$60,$00,$00,$7A,$DF,$78,$BF,$A8,$60,$00,$00,$28,$08,$F8,$00,$02
-	dc.b	$BF,$B0,$08,$38,$00,$01,$BF,$B0,$66,$00,$00,$18,$0C,$6B,$00,$18
-	dc.b	$00,$5A,$66,$00,$00,$0E,$06,$6B,$00,$30,$00,$5C,$08,$F8,$00,$01
-	dc.b	$BF,$B0,$08,$38,$00,$01,$BF,$B0,$67,$00,$00,$1E,$0C,$6B,$00,$18
-	dc.b	$00,$5A,$6F,$00,$00,$14,$08,$38,$00,$00,$BF,$B0,$66,$00,$00,$0A
-	dc.b	$4C,$DF,$00,$03,$60,$00,$00,$7A,$08,$38,$00,$00,$BF,$B0,$67,$00
-	dc.b	$00,$1C,$0C,$6B,$00,$18,$00,$5A,$66,$00,$00,$12,$0C,$6B,$00,$01
-	dc.b	$00,$5C,$6F,$00,$00,$08,$37,$7C,$00,$01,$00,$5C,$08,$2B,$00,$01
-	dc.b	$00,$63,$66,$00,$00,$0A,$4C,$DF,$00,$03,$60,$00,$00,$3A,$30,$2B
-	dc.b	$00,$5A,$4C,$DF,$00,$03,$08,$38,$00,$00,$BF,$B0,$67,$00,$00,$0C
-	dc.b	$08,$AB,$00,$05,$00,$62,$60,$00,$00,$1E,$4E,$71,$08,$38,$00,$03
-	dc.b	$C3,$50,$67,$00,$00,$12,$4A,$78,$DC,$F4,$6B,$00,$00,$0A,$53,$78
-	dc.b	$DC,$F4,$60,$00,$00,$12,$08,$2B,$00,$01,$00,$63,$66,$00,$00,$08
-	dc.b	$4E,$B9,$00,$1D,$93,$76,$4E,$75
+	bclr	#pfna,pflags(a3)		;pfna - clear new assignment
+	beq.w	.5						;branch if not new assignment
+	bset	#pf3onetimer,pflags3(a3)	;set one timer bit
+	bne.w	.5						;branch if already set
+	move.w	#$2D,(replaydelay+2).w
+	bclr	#0,(onetimerflags).w
+	bclr	#5,(sflags8).w
+	clr.w	(onetimerflags).w
+	clr.w	(onetimerplayer+2).w
+	st	(passplayer).w
+	movem.l	d0-d7/a0-a6,-(sp)
+	move.w	SCnum(a3),d0			;move a3 SCnum into d0
+	move.w	d0,(onetimerplayer).w	;move d0
+	btst	#pfjoycon,pflags(a3)	;check if joystick controlled
+	bne.w	.4						;branch if so
+	tst.w	(inputjoy).w			;check input controller (95: the pad number 0 / 2 / 4 / 6 of the passer)
+	bmi.w	.4						;branch if minus (no control)
+	beq.w	.1						;pad 1
+	cmpi.w	#2,(inputjoy).w
+	beq.w	.2
+	cmpi.w	#4,(inputjoy).w
+	beq.w	.3
+	jsr	(setc4player).l				;each pad takes the shooter itself (94 swapped pads 3 / 4 into 1 / 2)
+	bra.w	.4
+.1
+	jsr	(setc1player).l
+	bra.w	.4
+.2
+	jsr	(setc2player).l
+	bra.w	.4
+.3
+	jsr	(setc3player).l
+	bra.w	.4						;*+4
+.4
+	move.w	d0,-(sp)
+	bsr.w	setonetimeranim			;sets the one timer animation
+	clr.w	SPAnum(a3)				;clear SPAnum
+	jsr	(SetSPA).l
+	bset	#pfalock,pflags(a3)		;lock animation
+	bset	#pf2aip,pflags2(a3)		;set anim in progress
+	move.w	(sp)+,d0
+	movem.l	(sp)+,d0-d7/a0-a6
+	bra.w	.30
+.5
+	btst	#0,(onetimerflags).w	;check if shot initiated
+	bne.w	.10						;branch if set
+	movem.w	d0-d1,-(sp)				;push to stack
+	move.w	(puckx).w,d0			;move puckx to d0
+	sub.w	(a3),d0					;sub Xpos from d0
+	cmp.w	#$3C,d0					;'<'   ; compare diff to 3C (60 pixels)
+	bgt.w	.6						;branch if greater than
+	cmp.w	#$FFC4,d0				;compare to -60 pixels
+	bgt.w	.7						;branch if greater than
+.6
+	move.w	(puckvx).w,d1			;move puckvx into d1
+	eor.w	d1,d0					;EOR d1 with d0
+	bmi.w	.7						;branch if minus
+.loop
+	movem.w	(sp)+,d0-d1				;pop from stack d0 and d1
+	bra.w	.11
+.7
+	move.w	(pucky).w,d0			;move pucky into d0
+	sub.w	Ypos(a3),d0				;sub Ypos from d0
+	cmp.w	#$3C,d0					;'<'   ; compare diff to 60 pix
+	bgt.w	.8						;branch if greater than
+	cmp.w	#$FFC4,d0				;check with -60 pix
+	bgt.w	.9						;branch if greater than
+.8
+	move.w	(puckvy).w,d1			;move puckvy into d0
+	eor.w	d1,d0					;EOR d1 with d0
+	bpl.s	.loop					;branch if positive
+.9
+	movem.w	(sp)+,d0-d1				;pop d0 and d1 from stack
+.10
+	tst.w	(puckc).w				;check if puck carrier
+	bmi.w	.12						;branch if no puck carrier
+.11
+	bclr	#7,(sflags8).w			;clear bit 7
+	bra.w	.29
+.12
+	btst	#gmclock,(gmode).w		;check if game clock
+	bne.w	.29						;branch if clock stopped
+	movem.l	d0-d1,-(sp)				;push to stack
+	btst	#3,(GameFlags).w
+	bne.w	.26
+	cmpi.w	#$10,SPAnum(a3)			;compare 10 to SPAnum
+	bge.w	.21						;branch if greater than or equal
+	btst	#2,(onetimerflags).w	;check bit 2
+	bne.w	.21						;branch if set
+	move.w	(a3),d0					;move Xpos into d0
+	move.w	(puckx).w,d1			;move puckx into d1
+	sub.w	d1,d0					;sub d1 from d0
+	bpl.w	.13						;branch if positive
+	neg.w	d0						;negate d0
+.13
+	move.w	Ypos(a3),d1				;move Ypos into d1
+	move.w	(pucky).w,d2			;move pucky into d2
+	sub.w	d2,d1					;sub d2 from d1
+	bpl.w	.14						;branch if positive
+	neg.w	d1						;negate d1
+.14
+	move.w	(puckvx).w,d2			;move puckvx into d2
+	beq.w	.15						;branch if d2 is 0
+	cmp.w	d0,d1					;compare d0 to d1
+	ble.w	.16						;branch if less than or equal
+.15
+	move.w	(puckvy).w,d2
+	move.w	d1,d0
+.16
+	swap	d0
+	andi.l	#$FFFF0000,d0
+	tst.w	d2
+	bpl.w	.17
+	neg.w	d2
+.17
+	move.w	(skillspeed).w,d1
+	tst.w	(PalMode).w
+	beq.w	.18
+	move.w	(skillspeedpal).w,d1
+.18
+	tst.w	d2
+	bne.w	.19
+	move.w	#1,d2
+.19
+	divu.w	d2,d0
+	andi.l	#$FFFF,d0
+	divu.w	d1,d0
+	move.w	SPAnum(a3),d2
+	lsr.w	#2,d2
+	subq.w	#6,d2
+	neg.w	d2
+	asl.w	#2,d2
+	cmp.w	d2,d0
+	bgt.w	.20
+	neg.w	SPAnum(a3)
+	addi.w	#$18,SPAnum(a3)
+	bra.w	.24
+.20
+	add.w	d7,(onetimerplayer+2).w
+	bra.w	.22
+.21
+	bset	#2,(onetimerflags).w
+	btst	#1,(onetimerflags).w
+	bne.w	.22
+	cmpi.w	#$18,SPAnum(a3)
+	bne.w	.22
+	addi.w	#$30,SPAcnt(a3)
+	bset	#1,(onetimerflags).w
+.22
+	btst	#1,(onetimerflags).w
+	beq.w	.23
+	cmpi.w	#$18,SPAnum(a3)
+	ble.w	.23
+	btst	#0,(onetimerflags).w
+	bne.w	.23
+	movem.l	(sp)+,d0-d1
+	bra.w	.29
+.23
+	btst	#0,(onetimerflags).w
+	beq.w	.24
+	cmpi.w	#$18,SPAnum(a3)
+	bne.w	.24
+	cmpi.w	#1,SPAcnt(a3)
+	ble.w	.24
+	move.w	#1,SPAcnt(a3)
+.24
+	btst	#pf2aip,pflags2(a3)
+	bne.w	.25
+	movem.l	(sp)+,d0-d1
+	bra.w	.28
+.25
+	move.w	SPAnum(a3),d0
+.26
+	movem.l	(sp)+,d0-d1
+	btst	#0,(onetimerflags).w
+	beq.w	.27
+	bclr	#pfalock,pflags(a3)
+	bra.w	.28
+.27
+	nop
+	btst	#3,(GameFlags).w
+	beq.w	.28
+	tst.w	(replaydelay+2).w
+	bmi.w	.28
+	subq.w	#1,(replaydelay+2).w
+	bra.w	.30
+.28
+	btst	#pf2aip,pflags2(a3)
+	bne.w	.30
+.29
+	jsr	(EndOneTimer).l
+.30
+	rts
 
 setonetimeranim						;The one-timer animation: d1 = $856 or $11BA from the angle to the goal
 									;(vtoa, CheckOneTimerFacing).
-									;Code the listing does not decode: kept as bytes
-	dc.b	$08,$38,$00,$03,$C3,$50,$67,$00,$00,$0A,$32,$3C,$08,$56,$60,$00
-	dc.b	$00,$3A,$32,$3C,$11,$BA,$48,$A7,$C0,$00,$30,$13,$44,$40,$32,$3C
-	dc.b	$01,$1E,$08,$2B,$00,$07,$00,$62,$66,$00,$00,$04,$44,$41,$92,$6B
-	dc.b	$00,$14,$4E,$B9,$00,$01,$A3,$EE,$4E,$B9,$00,$1D,$6D,$10,$4C,$9F
-	dc.b	$00,$03,$67,$00,$00,$06,$32,$3C,$0F,$B6,$4E,$75
+	btst	#3,(GameFlags).w
+	beq.w	.1
+	move.w	#$856,d1
+	bra.w	.3
+.1
+	move.w	#SPAshotf,d1			;94 $7FC
+	movem.w	d0-d1,-(sp)				;push to stack d0 and d1
+	move.w	(a3),d0					;move XPos of a3 into d0
+	neg.w	d0						;negate d0
+	move.w	#$11E,d1
+	btst	#pfgoal,pflags(a3)		;check which goal shooting at
+	bne.w	.2						;branch if top
+	neg.w	d1						;negate d1
+.2
+	sub.w	Ypos(a3),d1				;sub Ypos from d1
+	jsr	(vtoa).l
+	jsr	(CheckOneTimerFacing).l		;Z from Findhittype
+	movem.w	(sp)+,d0-d1				;pop from stack d0 and d1
+	beq.w	.3
+	move.w	#SPAshotb,d1			;94 $92E
+.3
+	rts

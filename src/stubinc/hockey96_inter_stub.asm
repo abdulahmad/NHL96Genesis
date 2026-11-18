@@ -35,6 +35,10 @@ GameOverMenu = $023CBC				;pause96_items
 PlayoffGameOverMenu = $023D88		;pause96_items
 UpdateRecords = $1D7BC6				;code96_14
 SetupTeamForIntermission = $01D33E	;lines96_bar
+printbig = $01BEEC					;stats96_stub
+printsmall = $01BA40				;create96_stub
+SPAgskate = $640					;frames96
+SPAturnl = $2020					;frames96
 
 
 ; Main segment code

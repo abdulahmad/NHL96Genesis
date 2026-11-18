@@ -42,6 +42,10 @@ showclock = $1E7664					;middle96_clock
 setplayercolors = $0215B2			;control96_team
 SPAboardmidl = $2084				;SPA value (frames96)
 SPAboxwallleft = $AF4				;SPA value (frames96)
+cramfade = $01AFD6					;summary96_stub
+p_music_vblank = $024486			;summary96_stub
+print = $01BBA0						;goal96_box_stub
+sfx = $088470						;collide96_stub
 
 
 ; Main segment code

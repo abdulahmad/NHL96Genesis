@@ -25,17 +25,38 @@ PlayoffStatsMenu					;Pause menu Playoff Stats: with GameFlags bit 7 set jump to
 
 ExitStatsScreen						;Leave a stats screen: forceblack, then reload the rink graphics (the
 									;entry after the forceblack)
-									;Code the listing does not decode: kept as bytes
-	dc.b	$61,$00,$5A,$7C,$3F,$38,$BF,$B2,$08,$F8,$00,$02,$BF,$B2,$30,$38
-	dc.b	$B0,$00,$61,$00,$61,$90,$20,$BC,$00,$00,$00,$00,$30,$3C,$8D,$00
-	dc.b	$10,$38,$B0,$00,$E4,$08,$31,$40,$00,$04,$31,$7C,$8C,$00,$00,$04
-	dc.b	$31,$FC,$00,$05,$B0,$0E,$31,$DF,$BF,$B2,$08,$F8,$00,$01,$BF,$B2
-	dc.b	$38,$38,$B0,$22,$24,$7C,$00,$09,$23,$EC,$08,$38,$00,$04,$C3,$42
-	dc.b	$67,$00,$00,$02,$61,$00,$62,$06,$4E,$B9,$00,$1D,$8E,$6C,$4E,$B9
-	dc.b	$00,$1D,$8E,$5C,$38,$38,$B0,$1C,$4E,$B9,$00,$02,$43,$A0,$38,$38
-	dc.b	$B0,$28,$4E,$B9,$00,$01,$C1,$84,$4E,$B9,$00,$02,$10,$B0,$4E,$B9
-	dc.b	$00,$02,$10,$C2,$4E,$B9,$00,$02,$10,$D0,$4E,$B9,$00,$02,$10,$9A
-	dc.b	$08,$F8,$00,$07,$C3,$54,$4E,$F9,$00,$02,$15,$B2
+	bsr.w	forceblack
+	move.w	(disflags).w,-(sp)
+	bset	#dfng,(disflags).w
+	move.w	(VSCRLPM).w,d0
+	bsr.w	Vmaddr
+	move.l	#$0,(a0)
+	move.w	#$8D00,d0				;register $D: hscroll table
+	move.b	(VSCRLPM).w,d0
+	lsr.b	#2,d0
+	move.w	d0,4(a0)
+	move.w	#VDPR_MODE4,4(a0)
+	move.w	#5,(Map3col1).w
+	move.w	(sp)+,(disflags).w
+	bset	#df32c,(disflags).w
+	move.w	(rinkvrcset).w,d4
+	movea.l	#$923EC,a2
+	btst	#4,(sflags4).w			;check if reverse angle replay
+	beq.w	.1
+.1
+	bsr.w	DecompressGraphicsPlain
+	jsr	(LoadHomeTeamGfx).l
+	jsr	(LoadReplayIcon).l
+	move.w	(smallfontchars).w,d4
+	jsr	(LoadSmallFont).l
+	move.w	(framercset).w,d4		;frame chars
+	jsr	(AddFramer).l				;send the frame tiles
+	jsr	(setupEASNmap).l
+	jsr	(LoadEnergyBarTiles).l
+	jsr	(LoadCrowdFrames).l
+	jsr	(setupIceRinkPal).l
+	bset	#7,(sflags11).w
+	jmp	(setplayercolors).l
 
 TimeoutMenu							;Pause menu Timeout.
 									;Code the listing does not decode: kept as bytes

@@ -157,26 +157,79 @@ TryAddPlayerToList					;d0 = player number (1 based), d4 = PlList slot. Put d0 i
 
 SetupPenaltyShot					;Penalty shot for team a2: the shooter plays center, the goalie stays, the
 									;other players unavailable.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$FC,$F0,$36,$6A,$00,$22,$78,$05,$30,$2B,$00,$52,$B0,$78
-	dc.b	$D2,$D4,$67,$00,$00,$1C,$B0,$78,$D2,$D6,$67,$00,$00,$2E,$08,$EB
-	dc.b	$00,$02,$00,$63,$30,$3C,$00,$20,$61,$00,$A6,$AA,$60,$00,$00,$38
-	dc.b	$61,$00,$01,$20,$11,$EB,$00,$61,$C3,$82,$17,$78,$D2,$D9,$00,$61
-	dc.b	$37,$7C,$00,$04,$00,$34,$60,$00,$00,$0A,$61,$00,$01,$06,$42,$6B
-	dc.b	$00,$34,$42,$43,$16,$2B,$00,$61,$D6,$43,$35,$BC,$FF,$FF,$30,$6C
-	dc.b	$E2,$4B,$61,$00,$01,$36,$50,$EB,$00,$61,$50,$EB,$00,$60,$D6,$FC
-	dc.b	$00,$80,$51,$CC,$FF,$96,$4C,$DF,$0F,$3F,$4E,$75
+	movem.l	d0-d5/a0-a3,-(sp)
+	movea.w	$22(a2),a3
+	moveq	#5,d4
+.loop
+	move.w	SCnum(a3),d0
+	cmp.w	(BA_Sktr_SCnum).w,d0
+	beq.w	.1
+	cmp.w	(BA_Goalie_SCnum).w,d0
+	beq.w	.2
+	bset	#pf2unav,pflags2(a3)
+	move.w	#$20,d0
+	bsr.w	assreplace
+	bra.w	.4
+.1
+	bsr.w	AssignByPosition
+	move.b	newpnum(a3),(savednewpnum).w
+	move.b	(BA_Skater_Offset+1).w,newpnum(a3)
+	move.w	#4,position(a3)
+	bra.w	.3
+.2
+	bsr.w	AssignByPosition
+	clr.w	position(a3)
+.3
+	clr.w	d3
+	move.b	newpnum(a3),d3
+	add.w	d3,d3
+	move.w	#$FFFF,$6C(a2,d3.w)
+	lsr.w	#1,d3
+	bsr.w	setplayer
+.4
+	st	newpnum(a3)
+	st	newpos(a3)
+	adda.w	#SCstruct,a3
+	dbf	d4,.loop
+	movem.l	(sp)+,d0-d5/a0-a3
+	rts
 
 forcepldata							;Force the player data.
-									;Code the listing does not decode: kept as bytes
-	dc.b	$48,$E7,$F8,$F0,$36,$6A,$00,$22,$78,$05,$10,$2B,$00,$60,$48,$80
-	dc.b	$4A,$6B,$00,$34,$66,$00,$00,$16,$4A,$40,$67,$00,$00,$10,$3F,$2B
-	dc.b	$00,$52,$37,$7C,$00,$0F,$00,$52,$37,$5F,$00,$52,$37,$40,$00,$34
-	dc.b	$6B,$00,$00,$2A,$61,$00,$00,$A0,$0C,$6B,$00,$04,$00,$34,$66,$00
-	dc.b	$00,$08,$70,$11,$61,$00,$A6,$08,$42,$43,$16,$2B,$00,$61,$D6,$43
-	dc.b	$35,$BC,$FF,$FF,$30,$6C,$E2,$4B,$61,$00,$00,$C4,$50,$EB,$00,$61
-	dc.b	$50,$EB,$00,$60,$D6,$FC,$00,$80,$51,$CC,$FF,$A0,$4C,$DF,$0F,$1F
-	dc.b	$4E,$75
+	movem.l	d0-d4/a0-a3,-(sp)
+	movea.w	$22(a2),a3				;22 offset of team struct is tmsort (address of first sort obj)
+	moveq	#5,d4					;will run the loop 6 times
+.loop
+	move.b	newpos(a3),d0			;newpos = requested next pos of player
+	ext.w	d0
+	tst.w	position(a3)			;check for goalie
+	bne.w	.1
+	tst.w	d0						;is he staying as a goalie?
+	beq.w	.1
+	move.w	SCnum(a3),-(sp)			;push SCNum to stack
+	move.w	#$F,SCnum(a3)			;put F into SCNum
+	move.w	(sp)+,SCnum(a3)			;pop original SCNum back into SCNum
+.1
+	move.w	d0,position(a3)			;move newpos(d0) into position
+	bmi.w	.3
+	bsr.w	AssignByPosition
+	cmpi.w	#4,position(a3)			;check if C
+	bne.w	.2						;branch if not
+	moveq	#$11,d0
+	bsr.w	assinsert
+.2
+	clr.w	d3
+	move.b	newpnum(a3),d3			;move newpnum into d3
+	add.w	d3,d3					;add d3 to itself
+	move.w	#$FFFF,$6C(a2,d3.w)		;move -1 into tmpdst
+	lsr.w	#1,d3					;divide d3 by 2
+	bsr.w	setplayer				;put player on the ice
+.3
+	st	newpnum(a3)					;set newpnum to FF
+	st	newpos(a3)					;set newpos to FF
+	adda.w	#SCstruct,a3			;move to next sortobj (player struct)
+	dbf	d4,.loop
+	movem.l	(sp)+,d0-d4/a0-a3
+	rts
 
 ResetBench							;Remove all players from penalty box / put all players on their own bench
 									;(not the injured, -3 / -4). Counts
