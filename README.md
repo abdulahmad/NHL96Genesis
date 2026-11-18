@@ -21,7 +21,8 @@ Start with `START_HERE.md` (setup, build, contributor workflow), then `SEGMENT_A
 | --- | --- |
 | `nhl96retail.bin` (any file name), `lst/nhl96.bin.lst` | The reference ROM (2 MB, in the repo folder, found by its SHA-1 and size) and its IDA listing (ASM68K / MRI mode, no address column). Local files: neither is in the repo (gitignored). |
 | `src/nhl96.asm` | Top level: the equates, `org 0`, every segment in ROM order with its start address, the `$FF` fill. |
-| `src/<segment>.asm`, `src/engine/`, `src/front/` | One file per segment, no `org`. A second piece of a 95 file has a suffix. |
+| `src/engine/`, `src/front/` | Gameplay and in-game code in `engine/`, everything outside a game in `front/`. A file with several pieces has its own folder (`engine/logic/logic96.asm`, `engine/logic/puck.asm`). One file per segment, no `org`. |
+| `src/*.asm` | Glue at the root: `nhl96.asm` (the ROM map), `main96`, `ram96`, `sram96`, `frames96`, `teamdata96`, `checksum96`, `graphics96`. |
 | `src/inc/` | `ports.inc` and `equals.inc` (from 95G). |
 | `src/ram96.asm`, `src/externs96.asm` | RAM map. `externs96.asm` is included by the build and holds no equates. |
 | `tools/` | `build.js`, `roms.js`, `prebuild.js`, `extractAssets96.js`, `segmap96.json`, `make_segmap96.py`, `find95.py`, `fixopcodes.js`, `verifyRom.js`, `verifySegment.js`, `build_rom.sh`, `verify_segment.sh`, `verify_all.sh`. |

@@ -121,11 +121,11 @@ The skill tables do **not** rename AI scripts or roster ratings. They only feed 
 
 ### Puck vertical speed (`puckvzadj`)
 
-`src/engine/logic96_timer.asm` — `puckvzadj` runs from the shot path (`doshot`) for top-shelf shots. It loads `word_FFD284`, or `word_FFD286` when `PalMode` is set, and uses that value when deriving `puckvz` from horizontal distance to the goal line (`$11E`) and `puckvy`.
+`src/engine/logic/timer.asm` — `puckvzadj` runs from the shot path (`doshot`) for top-shelf shots. It loads `word_FFD284`, or `word_FFD286` when `PalMode` is set, and uses that value when deriving `puckvz` from horizontal distance to the goal line (`$11E`) and `puckvy`.
 
 ### Skater movement (`updateplayers`)
 
-`src/control96.asm` — inside the per-player loop in `updateplayers`, after animation/state checks:
+`src/engine/control/control96.asm` — inside the per-player loop in `updateplayers`, after animation/state checks:
 
 1. Load the same gravity word into `d4` (PAL swap as above).
 2. Skip this block for some `SPA` ranges (`SPA17E4`–`SPA1F76`, and `SPA2B88`).
