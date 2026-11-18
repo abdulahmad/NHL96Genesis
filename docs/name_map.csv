@@ -255,10 +255,14 @@ $00B6A0,checkfight,sub_B6A0,,fight96
 $00B85E,startfight,sub_B85E,,fight96
 $00B8D0,SetInst,sub_B8D0,,fight96
 $00B8FC,.tm (SetInst),loc_B8FC,,fight96
+$00B920,FightPenaltyTeammate,,,fight96
 $00B986,rtsfight,locret_B986,,fight96
 $00B988,assfight,,,fight96
+$00BC0E,chkhit,,,fight96
 $00C068,EngageFight,loc_C068,,fight96
 $00C0A2,ClearMessageLine,sub_C0A2,,fight96
+$00C0C6,banner,,,fight96
+$00C166,addinfo,,,fight96
 $00C1C8,assfwatch,,,fight96
 $00C26C,fightinput,loc_C26C,,fight96
 $00C51C,SetFightingMajors,sub_C51C,,fight96

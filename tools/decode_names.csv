@@ -1,0 +1,8 @@
+# addr,name,header comment (new global labels created while decoding code that was kept as bytes)
+00C0C6,banner,Fight banner: close both line change boxes and frame a box with the name and team of both fighters and "vs"
+00C166,addinfo,d0 = penalty byte (player SCnum in the low nibble): build "<name> <team>" in a1; add fighting to d3; keep the widest line in d2 and centre printx
+00BBBC,.hold,Hold the two fighters together: stop a3 and when the fighters are more than $18 pixels apart push them toward each other
+00BC0E,chkhit,Part of the fight that checks whether the punch of a3 hit the opponent a0 (frame change only)
+00BE72,.cwdgrab,Crowd reacts to a grab hit and the held player a3 is shoved 3 pixels
+00BFC6,.cwd,Crowd reacts to a punch; push the hit player a3 back (the knock back is scaled by 0 in this game)
+00BFEE,.fall,a3 lost the fight: the winner a0 gets the fighting penalty and the crowd cheers
