@@ -30,14 +30,26 @@ This disassembly started from an IDA Pro listing (`lst/nhl96.bin.lst`). Many sym
 
 ## Does the switch actually do anything?
 
-**Yes, but only through physics tuning** — not through separate goalie, save, or AI difficulty logic.
+**Yes: through physics tuning, and through three AI and goalie branches** (corrected 2026-11-24; the first version of this page missed the last three).
 
 A full-tree search of converted source shows:
 
-- **`OptSkill`** is read in: options UI, SRAM defaults, `SetSkillLevel`, and one branch in **`updateplayers`** (rookie + human skater).
+- **`OptSkill`** is read in: options UI, SRAM defaults, `SetSkillLevel`, one branch in **`updateplayers`** (rookie + human skater), **`GetRoleAss`** (`src/engine/input/shot.asm`), **`check4check`** (`src/engine/logic/puck.asm`) and the goalie reach block of **`wallcollskater`** (`src/engine/collide/collide96.asm`). Season code also copies a byte into it (`season96.asm`).
 - **`word_FFD284` / `word_FFD286`** are read in exactly **`puckvzadj`** and **`updateplayers`** (plus written in `OptionsScreen` / `SetSkillLevel`).
 
-There is **no** reference that ties skill level to goalie save probability, reaction time, AI aggression, line logic, pass/shot accuracy tables, or player ratings. Those systems use other RAM and tables.
+Skill level does reach the AI and the goalies, in three places:
+
+| Routine | Pro (0) | All-Star (1) | Rookie (2) |
+| --- | --- | --- | --- |
+| `check4check` threshold | 3 | 6 | 1 |
+| `GetRoleAss` | on | on | returns 0 |
+| Goalie reach table | `$1F1EA` | `$1F196` | `$1F1C0` / `$1F196` |
+
+- **`check4check`**: a skater checks only when `randomd0` (range from his checking rating, doubled with penalties on) is at most the threshold. 95G uses 6 at all times, so All-Star plays like 95G, Pro checks about half as often, and Rookie rarely.
+- **`GetRoleAss`**: on Rookie it returns 0, so the role-based defensive assignments (`SetRoles` / `RoleTable`) are not handed out.
+- **Goalie reach** (`wallcollskater` `.10`, "goalie: body reach from agility"): the table that turns the goalie's ratings into a reach value is picked by skill level. On Rookie the choice also depends on which teams are human-controlled (`cont1team`..`cont4team`). Which table is the stronger one is not settled yet.
+
+Not found: anything tying skill level to pass or shot accuracy tables or to player ratings.
 
 What **does** change:
 
@@ -47,9 +59,11 @@ What **does** change:
 | **Skater** friction and velocity integration | `updateplayers` in `control96.asm` | Ice damping, multiply `Xvel`/`Yvel` by the gravity word, Z fall while airborne / on ice |
 | **Rookie only**, **your** skaters | Same block | If `OptSkill` = 2 and `pfjoycon`, add **+2** to the multiplier before those integrators |
 
-**Pro vs all-star:** `SkillLevelTbl` and `SkillLevelPalTbl` store **identical** values for indices 0 and 1. In this ROM, those two menu labels are **the same difficulty**; only **rookie** (index 2) changes the table, plus the extra human-only +2 on rookie.
+**Pro vs all-star:** `SkillLevelTbl` and `SkillLevelPalTbl` store **identical** values for indices 0 and 1, so the physics is the same. The two levels still differ in `check4check` (3 against 6) and in the goalie reach table. That fits the manual (PDF p.5): Pro opponents "never really rise to a championship level of play", while on All-Star "the body checks are lethal".
 
-**Goals and saves:** There is no “rookie goalie” flag. Any difference in scoring or saves would be **indirect** (puck arcs, skater speed/turning on ice), not a dedicated goal/save difficulty mode.
+**Manual** (archive.org scan, PDF p.5, Skill Level): Rookie gives "slower performance by CPU-controlled teams, from skating and shooting to the goalie's reaction time"; Pro opponents "play to their ability but never really rise to a championship level of play"; All-Star: "The skating is quick, the body checks are lethal, and the passes are right on the tape." The new-features page (PDF p.4) lists "Multiple Skill Levels—Work your way through the ranks from Rookie, to Pro, to All-star". The manual's order is Rookie, Pro, All-Star; the code's index order is pro, all-star, rookie.
+
+**Goals and saves:** There is no “rookie goalie” flag, but the goalie reach table above changes with the skill level. Other differences in scoring or saves are **indirect** (puck arcs, skater speed/turning on ice).
 
 **Shootout:** `SetSkillLevel` is **not** called when starting shootout from options, so `OptSkill` does not refresh the gravity words on that path (they stay at whatever `OptionsScreen` set on entry — default pro/all-star constants).
 
@@ -115,9 +129,9 @@ Pro and all-star share the same gravity constants; only **rookie** uses the slig
 
 `SetSkillLevel` is the **only** call site in the tree (`grep`); there is no separate path that reapplies skill mid-period except returning to options and starting again.
 
-## Gameplay effect (physics, not AI difficulty)
+## Gameplay effect of the gravity tables (physics)
 
-The skill tables do **not** rename AI scripts or roster ratings. They only feed two routines that already treat `word_FFD284` / `word_FFD286` as a **gravity scale** (comments in source use “Gravity”).
+The AI and goalie branches are listed under "Does the switch actually do anything?" above. The skill tables themselves do **not** change AI scripts or roster ratings. They only feed two routines that already treat `word_FFD284` / `word_FFD286` as a **gravity scale** (comments in source use “Gravity”).
 
 ### Puck vertical speed (`puckvzadj`)
 
@@ -142,7 +156,7 @@ addq.w  #2,d4              ; stronger effective gravity for that player only
 
 So on **rookie**, user-controlled skaters get **+2** added to the gravity multiplier before the multiply/integrate step. AI skaters on rookie still use the base rookie table value (`$14` / `$1C`). Bit 3 of `pflags` is **`pfjoycon`** (`src/inc/equals.inc`), not `pfteam` (bit 6).
 
-No other source references to `OptSkill` were found besides options UI, SRAM defaults, and this rookie branch.
+The other `OptSkill` readers are `GetRoleAss`, `check4check` and the goalie reach block, listed above.
 
 ## Related symbols (rename status)
 
