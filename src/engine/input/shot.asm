@@ -794,10 +794,10 @@ SetTeamRoles						;Team a5, last carrier d6, puck zone d7. Remap each player's r
 	adda.w	d6,a3
 	move.w	position(a3),d6
 	bmi.w	.15
-	tst.b	$65(a3)
+	tst.b	role(a3)
 	bmi.w	.0
 	clr.w	d6
-	move.b	$65(a3),d6
+	move.b	role(a3),d6
 .0
 	move.w	d6,d4
 	lsl.b	#2,d6
@@ -817,9 +817,9 @@ SetTeamRoles						;Team a5, last carrier d6, puck zone d7. Remap each player's r
 	adda.w	d6,a5
 	move.w	#5,d6
 .1
-	cmpi.b	#3,$65(a3)
+	cmpi.b	#3,role(a3)
 	beq.w	.2
-	tst.b	$65(a3)
+	tst.b	role(a3)
 	bpl.w	.3
 	cmpi.w	#3,position(a3)
 	bne.w	.3
@@ -849,11 +849,11 @@ SetTeamRoles						;Team a5, last carrier d6, puck zone d7. Remap each player's r
 	adda.w	d6,a5
 	move.w	#5,d6
 .7
-	cmpi.b	#5,$65(a3)
+	cmpi.b	#5,role(a3)
 	beq.w	.8
-	tst.b	$65(a3)
+	tst.b	role(a3)
 	bpl.w	.9
-	cmpi.w	#5,$34(a3)
+	cmpi.w	#5,position(a3)
 	bne.w	.9
 .8
 	move.w	$14(a3),d7
@@ -870,14 +870,14 @@ SetTeamRoles						;Team a5, last carrier d6, puck zone d7. Remap each player's r
 	move.w	#5,d5
 .12
 	clr.w	d1
-	move.b	$65(a5),d1
+	move.b	role(a5),d1
 	bpl.w	.13
-	move.w	$34(a5),d1
+	move.w	position(a5),d1
 	bmi.w	.14
 .13
 	move.b	(a0,d1.w),d2
 	bmi.w	.14
-	move.b	d2,$65(a5)
+	move.b	d2,role(a5)
 .14
 	adda.w	#$80,a5
 	dbf	d5,.12
@@ -909,7 +909,7 @@ GetRoleAss							;d0 = the defensive assignment for a3's role, or 0 when OptSkil
 	tst.w	position(a3)
 	bmi.w	.2
 	clr.w	d0
-	move.b	$65(a3),d0
+	move.b	role(a3),d0
 	bpl.w	.1
 	move.w	position(a3),d0
 .1
@@ -969,7 +969,7 @@ ClearRolesIfGoalie					;If the puck carrier is the goalie and the puck is in tha
 .3
 	move.w	#5,d1
 .4
-	st	$65(a0)
+	st	role(a0)
 	adda.w	#$80,a0
 	dbf	d1,.4
 .5
@@ -981,7 +981,7 @@ ClearTeamRoles						;Role byte $65 = -1 (play the own position) for the 6 player
 	movem.l	d1/a0,-(sp)
 	move.w	#5,d1
 .0
-	st	$65(a0)
+	st	role(a0)
 	adda.w	#$80,a0
 	dbf	d1,.0
 	movem.l	(sp)+,d1/a0
@@ -1003,9 +1003,9 @@ CheckTeamRoles						;Team a0: when two players have the same role ($65, else the
 	move.w	#5,d0
 .0
 	clr.w	d1
-	move.b	$65(a0),d1
+	move.b	role(a0),d1
 	bpl.w	.1
-	move.w	$34(a0),d1
+	move.w	position(a0),d1
 	bmi.w	.2
 .1
 	bset	d1,d2

@@ -112,7 +112,7 @@ asscentero4							;Center on offense, two men short (tmap 4); back to asscentero
 	subq.b	#1,temp1(a3)
 .7
 	clr.w	d1
-	move.b	$65(a3),d1
+	move.b	role(a3),d1
 	bpl.w	.8
 	move.w	position(a3),d1
 	bmi.w	.22
@@ -153,7 +153,7 @@ asscentero4							;Center on offense, two men short (tmap 4); back to asscentero
 .loop
 	btst	#pf2unav,pflags2(a0)
 	bne.w	.16
-	tst.b	$65(a0)
+	tst.b	role(a0)
 	bpl.w	.15
 	tst.w	$34(a0)
 	bmi.w	.16
@@ -178,7 +178,7 @@ asscentero4							;Center on offense, two men short (tmap 4); back to asscentero
 .loop2
 	btst	#pf2unav,pflags2(a0)
 	bne.w	.20
-	tst.b	$65(a0)
+	tst.b	role(a0)
 	bpl.w	.19
 	tst.w	$34(a0)
 	bmi.w	.20
@@ -907,7 +907,7 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 	subq.b	#1,temp1(a3)
 .6
 	clr.w	d1
-	move.b	$65(a3),d1
+	move.b	role(a3),d1
 	bpl.w	.7
 	move.w	position(a3),d1
 	bmi.w	.34
@@ -1018,7 +1018,7 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 .loop
 	btst	#pf2unav,pflags2(a0)
 	bne.w	.28
-	tst.b	$65(a0)
+	tst.b	role(a0)
 	bpl.w	.27
 	tst.w	$34(a0)
 	bmi.w	.28
@@ -1043,7 +1043,7 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 .loop2
 	btst	#pf2unav,pflags2(a0)
 	bne.w	.32
-	tst.b	$65(a0)
+	tst.b	role(a0)
 	bpl.w	.31
 	tst.w	$34(a0)
 	bmi.w	.32
@@ -1118,7 +1118,7 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 	subq.b	#1,temp1(a3)
 .6
 	clr.w	d1
-	move.b	$65(a3),d1
+	move.b	role(a3),d1
 	bpl.w	.7
 	move.w	position(a3),d1
 	bmi.w	.34
@@ -1229,7 +1229,7 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 .loop
 	btst	#pf2unav,pflags2(a0)
 	bne.w	.28
-	tst.b	$65(a0)
+	tst.b	role(a0)
 	bpl.w	.27
 	tst.w	$34(a0)
 	bmi.w	.28
@@ -1254,7 +1254,7 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 .loop2
 	btst	#pf2unav,pflags2(a0)
 	bne.w	.32
-	tst.b	$65(a0)
+	tst.b	role(a0)
 	bpl.w	.31
 	tst.w	$34(a0)
 	bmi.w	.32
@@ -1331,7 +1331,7 @@ assdefd4							;Defenseman on defense, two men short (tmap 4); assdefo4 when his
 	blt.w	GoAssReplace
 .6
 	clr.w	d0
-	move.b	$65(a3),d0
+	move.b	role(a3),d0
 	bpl.w	.7
 	move.w	position(a3),d0
 	bmi.w	.17
@@ -1464,7 +1464,7 @@ assdefd5							;Defenseman on defense, one man short (tmap 5); assdefo5 when his
 	blt.w	GoAssReplace
 .6
 	clr.w	d0
-	move.b	$65(a3),d0
+	move.b	role(a3),d0
 	bpl.w	.7
 	move.w	position(a3),d0
 	bmi.w	.17
@@ -1601,7 +1601,7 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 .6
 	st	(LastCarrierAway+2).w
 	clr.w	d0
-	move.b	$65(a3),d0
+	move.b	role(a3),d0
 	bpl.w	.7
 	move.w	position(a3),d0
 	bmi.w	.35
@@ -1846,7 +1846,7 @@ asswingd							;Winger on defense (tmap 5 / 4: asswingd5 / asswingd4); asswingo 
 	subq.b	#1,temp1(a3)
 .5
 	clr.w	d1
-	move.b	$65(a3),d1
+	move.b	role(a3),d1
 	bpl.w	.6
 	move.w	position(a3),d1
 	bmi.w	.34
@@ -2266,7 +2266,7 @@ assdefo								;Defenseman on offense (tmap 5 / 4: assdefo5 / assdefo4); assdefd
 .6
 	movea.l	#EvadePC,a0
 	clr.w	d1
-	move.b	$65(a3),d1
+	move.b	role(a3),d1
 	bpl.w	.7
 	move.w	position(a3),d1
 	bmi.w	.25
@@ -2623,7 +2623,7 @@ asswingo							;Winger on offense (tmap 5 / 4: asswingo5 / asswingo4): a random 
 .9
 	move.w	temp3(a3),d0
 	clr.w	d1
-	move.b	$65(a3),d1
+	move.b	role(a3),d1
 	bpl.w	.10
 	move.w	position(a3),d1
 	bmi.w	.13
@@ -2648,9 +2648,9 @@ asswingoCheckSlot	equ	*	;Part of asswingo: d1 = 5; test the player a0 (pflags2 b
 .loop
 	btst	#pf2unav,pflags2(a0)
 	bne.w	.15
-	tst.b	$65(a0)
+	tst.b	role(a0)
 	bmi.w	.14
-	cmp.b	$65(a0),d0
+	cmp.b	role(a0),d0
 	bne.w	.15
 	bra.w	.16
 .14

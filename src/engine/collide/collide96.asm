@@ -2018,12 +2018,12 @@ wallcollskater	equ	*	;Wall collision of one skater against the others (low confi
 .14
 	clr.w	d0
 	clr.w	d1
-	move.b	$74(a2),d0
-	move.b	$6F(a2),d1
+	move.b	GGSleft(a2),d0
+	move.b	GGSright(a2),d1
 	add.w	d1,d0
-	move.b	$71(a2),d1
+	move.b	GSSleft(a2),d1
 	add.w	d1,d0
-	move.b	$73(a2),d1
+	move.b	GSSright(a2),d1
 	add.w	d1,d0
 	asr.w	#3,d0
 	andi.w	#$F,d0
@@ -2195,7 +2195,7 @@ wallcollpuck	equ	*	;Skater and puck contact check
 	bhi.w	rtss2					;smaller range for stealing puck
 	;one timer?
 .29
-	btst	#pf3onetimer,$64(a2)
+	btst	#pf3onetimer,pflags3(a2)
 	beq.w	.31
 	cmp.l	#$64,d0					;not a one-timer, or past its frame: catch or deflect by puck speed
 	bhi.w	.35
@@ -2216,9 +2216,9 @@ wallcollpuck	equ	*	;Skater and puck contact check
 	clr.w	d1
 	btst	#sf2shot,(sflags2).w	;check if shot was taken
 	bne.w	.32
-	btst	#pf3onetimer,$64(a2)	;check if one timer
+	btst	#pf3onetimer,pflags3(a2)	;check if one timer
 	bne.w	.34
-	move.b	$72(a2),d1
+	move.b	stickhand(a2),d1
 	mulu.w	#$15E,d1
 .32
 	addi.l	#$32C8,d1
