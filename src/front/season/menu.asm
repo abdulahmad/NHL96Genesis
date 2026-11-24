@@ -511,7 +511,7 @@ SetupLeadersScreenVideo	equ	*	;Set the VBint handler, scroll and map addresses f
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
@@ -844,7 +844,7 @@ PStatsSetup							;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the h
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
@@ -1466,7 +1466,7 @@ PlayoffMenuSetup					;PlayoffMenuScreen: vram and the screen bitmaps
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B400,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
