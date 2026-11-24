@@ -659,7 +659,7 @@ setVram_0							;Second half of setVram without the fade: clear vram and set the
 	move.w	#$8004,4(a0)			;512 color palette enable
 	move.w	#$8164,4(a0)
 	move.w	#$9001,d0				;playfield is 64x32
-	cmpi.w	#6,(Map1col1).w
+	cmpi.w	#6,(Map1col).w
 	beq.w	.i64
 	move.w	#$9003,d0
 .i64
