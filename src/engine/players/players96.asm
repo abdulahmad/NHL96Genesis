@@ -268,7 +268,7 @@ ResetBench							;Remove all players from penalty box / put all players on their
 AssignByPosition					;assreplace player a3 with the assignment of his position
 	move.w	position(a3),d0
 	bmi.w	rtss2
-	st	$65(a3)
+	st	role(a3)
 	lea	PosAssignTable(pc),a0
 	move.b	(a0,d0.w),d0
 	bra.w	assreplace
@@ -276,12 +276,12 @@ AssignByPosition					;assreplace player a3 with the assignment of his position
 PosAssignTable						;Assignment byte for each position
 	dc.b	$0E,$02,$02,$03,$05,$03,$05,$FF
 
-AssignBySavedPos					;assreplace from the saved index at $65(a3), or from the position
+AssignBySavedPos					;assreplace from the role byte (role(a3)), or from the position
 	move.w	position(a3),d0
 	bmi.w	rtss2
-	tst.b	$65(a3)
+	tst.b	role(a3)
 	bmi.w	.0
-	move.b	$65(a3),d0
+	move.b	role(a3),d0
 .0
 	lea	PosAssignTable2(pc),a0
 	move.b	(a0,d0.w),d0
@@ -295,7 +295,7 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 									;Reads the roster bytes through AttributeCalc (attribute number in
 									;TempWord2), adds the PP / PK, home / away and third period bonuses and
 									;clamps them (ClampNibble).
-	st	$65(a3)
+	st	role(a3)
 	bclr	#6,pflags2(a3)
 	movea.w	#(tmstruct-M68K_RAM),a0	;Start of Team Struct
 	btst	#6,pflags(a3)

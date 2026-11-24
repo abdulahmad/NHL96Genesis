@@ -100,7 +100,7 @@ pfalock equ 5						;lock out until anim is done
 pflags2 equ $63
 pf2aip equ 1						;animation in progress wait
 pf2fight equ 0						;player is fighting (93; 94 has no fights)
-;$65: 96 position override (-1 = by position; AssignBySavedPos), no 95G/94G name; 95G glitch is at $65
+role equ $65						;96: the position the player plays now, -1 = his own (SetTeamRoles)
 passacc equ $6F						;passing (roster byte 7 high nibble; 95G: $6E)
 glitch equ $66						;counter to eliminate quick frame changes (de-glitch graphics; 95G: $65)
 legspd equ $6A						;speed (roster byte 2 high nibble; 95G: $69)
@@ -126,6 +126,10 @@ pf3fall equ 5						;falling down
 endurance equ $73					;endurance (End; 95G: $72)
 aggress equ $74						;aggression (Agr, roster byte 7 low nibble; 95G: $73)
 fighting equ $75					;fight rating: Agr - 6 when Agr > 6, else 0 (0 for goalies; 95G: $74)
+GGSleft equ aggress					;goalie glove save left (92/94G name; 95G collide .list)
+GGSright equ passacc				;goalie glove save right (92G name; 95G collide .list)
+GSSleft equ spodds					;goalie stick save left (92G name; 95G collide .list)
+GSSright equ endurance				;goalie stick save right (92G name; 95G collide .list)
 checking equ $76					;checking (Chk; 96 setplayer stores the Chk nibble here; 95G: $75)
 
 ;bit numbers in gmode

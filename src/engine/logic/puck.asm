@@ -163,7 +163,7 @@ goaliesave							;The goalie a3 makes a save of the puck crossing at a0: the sav
 	bne.w	.8
 	andi.w	#3,d3
 	beq.w	.8
-	cmpi.b	#$B,aggress(a3)
+	cmpi.b	#$B,GGSleft(a3)
 	blt.w	.8
 	move.w	#SPAgglovel2,d1
 .8
