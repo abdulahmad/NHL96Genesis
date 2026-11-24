@@ -349,10 +349,10 @@ PrintCurLetter						;Name entry: print grid letter d5 when the cursor is on
 	beq.s	rtsNameCursor
 	movea.l	#ThreeStars,a1
 	move.w	#4,(a1)
-	move.b	#0,3(a1)
+	move.b	#0,strtext+1(a1)
 	movea.l	#CreateLetterGrid,a0
 	move.b	(a0,d5.w),d0
-	move.b	d0,2(a1)
+	move.b	d0,strtext(a1)
 	jmp	printcur
 
 LetterGridPos						;Name entry: printx / printy of grid letter d5 (10 a row)

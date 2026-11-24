@@ -1694,6 +1694,7 @@ Winnipeg							;WPG
 .pos
 	dc.b	$00,$44,$44,$44,$55,$55,$33,$33,$22,$22,$11,$11,$FF,$FF
 
+PlayoffRowTeams equ 16				;teams per playoffseats row
 playoffseats						;Playoff seeding: rows of 16 team numbers
 	dc.b	TOR,DET,STL,CHI, LA,CGY,WPG,VAN, BUF,BOS,MTL,QUE, NYI,WSH,NJ,PIT
 	dc.b	CGY,TOR,LA,VAN, STL,DET,DAL,CHI, NYI,BUF,TB,MTL, QUE,PIT,NYR,BOS

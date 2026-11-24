@@ -72,7 +72,7 @@ goaliesave							;The goalie a3 makes a save of the puck crossing at a0: the sav
 	bra.w	.done
 .low
 	addq.w	#4,d0
-	cmpi.w	#8,2(a0)				;puckcross frames
+	cmpi.w	#8,pcframes(a0)			;puckcross frames
 	bls.w	.15
 	cmpi.w	#2,facedir(a3)
 	beq.w	.done

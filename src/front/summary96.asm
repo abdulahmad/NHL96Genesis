@@ -2111,10 +2111,10 @@ PrintRecordName						;Record Holders: print the row number and the user name Cod
 	addi.w	#$30,d7
 	movea.l	#mesarea,a1
 	move.w	#6,(a1)
-	move.b	d7,2(a1)
-	move.b	#$2E,3(a1)
-	move.b	#$20,4(a1)
-	move.b	#0,5(a1)
+	move.b	d7,strtext(a1)
+	move.b	#$2E,strtext+1(a1)
+	move.b	#$20,strtext+2(a1)
+	move.b	#0,strtext+3(a1)
 	jsr	(printbig).l
 	move.w	(sp)+,d7
 	move.b	-$1(a0),d2

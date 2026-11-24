@@ -313,3 +313,11 @@ lipy equ 2							;LineIconPosTable entry (x, y, slot count - 1): y
 lipslots equ 4						;LineIconPosTable entry: slot count - 1
 tsoff2 equ 2						;TeamStatTextTbl entry, after its label: second offset ($FFFF none)
 tssize equ 4						;TeamStatTextTbl entry: size of its two offset words
+strtext equ 2						;String: start of the text after its length word
+satX equ 6							;VDP sprite attribute table entry: x + 128
+satLen equ 8						;VDP sprite attribute table entry: size in bytes
+mapwords equ 4						;.map.jim map section (at jimdata): the map words
+pcframes equ 2						;puckcross entry (x, frames): frames
+plpos equ 6							;PlList: 6 wanted roster players, then their positions
+hcsum equ 1							;hot / cold pairs BuildTeamHotCold builds (slot byte, sum): sum
+hcsize equ 2						;hot / cold pairs: size of a pair in bytes

@@ -22,7 +22,7 @@ getname								;a1 = mesarea "NN First Last" for player d0 of team struct a2.
 	move.l	a0,-(sp)
 	movea.w	#(mesarea-M68K_RAM),a3
 	move.w	#4,(a3)
-	lea	2(a3),a1
+	lea	strtext(a3),a1
 	adda.w	(a0),a0
 	move.w	(jerseynum).w,d0
 	bsr.w	ConvertByteToDigits

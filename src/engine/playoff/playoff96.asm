@@ -132,7 +132,7 @@ MakeTree							;Make the playoff tree (potree) from the playoff seeds and WinBit
 	move.l	4(a1),4(a0)
 	move.l	8(a1),8(a0)
 	move.l	$C(a1),$C(a0)
-	lea	$10(a0),a1
+	lea	PlayoffRowTeams(a0),a1
 	moveq	#$E,d2
 	move.w	(WinBits).w,d0
 
@@ -455,7 +455,7 @@ rtsInitGames						;GameFlags bit 7 skips the random pairs and returns here
 ReadPassBits						;Translate the saved bits at a3 (5 words) to the playoff variables; the 5
 									;words are kept
 	moveq	#4,d0
-	lea	$A(a3),a0
+	lea	5*2(a3),a0
 .save
 	move.w	-(a0),-(sp)				;SuperDiv destroys the bits
 	dbf	d0,.save
@@ -650,7 +650,7 @@ ClrPassBits							;Clear the 5 words of bits at a3
 
 SuperAdd							;1 long (d0.L) added to the 5 words at a3
 	movem.l	d1/a0,-(sp)
-	lea	$A(a3),a0
+	lea	5*2(a3),a0
 	moveq	#3,d1
 	add.l	d0,-(a0)
 	bra.w	.1
