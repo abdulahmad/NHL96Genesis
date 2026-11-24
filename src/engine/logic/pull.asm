@@ -475,7 +475,7 @@ a2touchpuck							;Player a2 touched the puck: last touch, scorer / assist slots
 	lea	$39E(a0),a0
 .1
 	clr.w	d0
-	move.b	weight(a2),d0
+	move.b	pnum(a2),d0
 	btst	#pf3onetimer,pflags3(a2)	;check if one timer
 	beq.w	.2						;branch if not
 	bset	#7,(sflags8).w			;set if one timer

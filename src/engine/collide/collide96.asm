@@ -218,7 +218,7 @@ checkcx								;d4 = obj. # * 2 for possible collision so check x range and dist
 	asr.l	#4,d0
 	move.w	d0,d5
 	clr.w	d0
-	move.b	legstr(a3),d0
+	move.b	weight(a3),d0
 	tst.w	position(a3)
 	bne.w	.6
 	move.b	#$78,d0
@@ -229,7 +229,7 @@ checkcx								;d4 = obj. # * 2 for possible collision so check x range and dist
 .5
 	addi.w	#$8C,d0
 	clr.w	d1
-	move.b	legstr(a2),d1
+	move.b	weight(a2),d1
 	tst.w	position(a2)
 	bne.w	.7
 	move.b	#$78,d1
@@ -390,7 +390,7 @@ checkint							;Check for interference penalty. player a2 interferes with a3 or
 	cmp.w	#$FFEC,d0
 	blt.w	rtss2
 	move.w	#$28,d0
-	sub.b	fighting(a3),d0
+	sub.b	aggress(a3),d0
 	bsr.w	randomd0
 	cmp.w	#4,d0
 	bhi.w	rtss2
@@ -465,8 +465,8 @@ CCStart								;Player a3 is checking player a2
 	btst	#pfjoycon,pflags(a3)
 	beq.w	*+4
 .0
-	sub.b	legstr(a3),d0
-	add.b	legstr(a2),d0
+	sub.b	weight(a3),d0
+	add.b	weight(a2),d0
 	lsr.w	#1,d0
 	exg	a2,a3
 	jsr	(wallcollduringcheck).l
@@ -522,7 +522,7 @@ CheckPenalties						;Penalties a check can draw: Roughing, Cross Check, Elbowing
 
 checkagr							;Aggression check
 	move.w	#$28,d0
-	sub.b	fighting(a3),d0
+	sub.b	aggress(a3),d0
 	lsr.b	#1,d0
 	mulu.w	#$D,d0
 	btst	#pfjoycon,pflags(a3)
@@ -672,7 +672,7 @@ Bcheck								;a2 B-checks a3 (CCStart, sweep checks). With OptPen off and a pad
 	beq.w	.checkdir
 	move.w	#$20,d0
 	add.b	checking(a2),d0
-	sub.b	legspd(a3),d0
+	sub.b	legstr(a3),d0
 	btst	#1,(sflags8).w
 	bne.w	.0
 	btst	#6,(sflags7).w
@@ -741,7 +741,7 @@ FallDown							;Player a2 falls down (hit by a3, or the puck): the fall animatio
 	move.w	#SPAstumble,d1
 	btst	#pf3wall,pflags3(a3)	;wall collision bit
 	bne.w	.cont2
-	cmpi.b	#$18,endurance(a2)
+	cmpi.b	#$18,stickhand(a2)
 	blt.w	.cont2
 	tst.b	nopuck+1(a2)			;check if puck collision possible
 	bne.w	.cont2
@@ -762,11 +762,11 @@ FallDown							;Player a2 falls down (hit by a3, or the puck): the fall animatio
 .AddChktoPlayerStats
 	addq.w	#1,$10(a0)				;Add 1 Chk to Team Total
 	clr.w	d0
-	move.b	weight(a3),d0
+	move.b	pnum(a3),d0
 	adda.w	d0,a0
 	addq.b	#1,$130(a0)
 	addq.w	#1,(ChkCnt).w			;Add 1 to ChkCnt
-	tst.b	$75(a3)
+	tst.b	fighting(a3)
 	bne.w	.chkpos
 	addq.w	#2,(ChkCnt).w			;add 2 to ChkCnt
 .chkpos
@@ -842,7 +842,7 @@ FallDown							;Player a2 falls down (hit by a3, or the puck): the fall animatio
 	addi.w	#$96,(Crowdlevel).w
 	move.w	d1,-(sp)				;push to stack
 	move.b	#0,temp1(a3)
-	move.b	#0,pnum(a3)
+	move.b	#0,glitch(a3)
 	move.w	#SPAcrosscheck,d1
 	jsr	(SetSPA).l					;set animation
 	clr.w	Xvel(a3)
@@ -1035,7 +1035,7 @@ setInjuryType						;a2 injured: out for the period ($FFFD) or the game ($FFFC); 
 	move.w	#$8000,d1
 	adda.w	#$39E,a0				;add $364 to a0 (Away Team Struct start)
 .0
-	move.b	weight(a2),d1
+	move.b	pnum(a2),d1
 	move.w	d1,(TempPlOffset).w
 	ext.w	d1						;sign extend - in this case just makes upper bye of word 00
 	add.w	d1,d1					;add d1 to itself
@@ -2143,12 +2143,12 @@ wallcollpuck	equ	*	;Skater and puck contact check
 	beq.w	.27
 	tst.w	position(a0)
 	beq.w	rtss2					;no stealing from goalie
-	move.b	endurance(a0),d0
+	move.b	stickhand(a0),d0
 	lsr.b	#1,d0
 	bsr.w	makepde					;adjust for energy level
 	move.w	d0,-(sp)
 	exg	a0,a2						;swap a2 and a0 (a0 now collider)
-	move.b	$72(a0),d0
+	move.b	stickhand(a0),d0
 	lsr.b	#1,d0					;divie by 2
 	bsr.w	makepde					;adjust for energy
 	exg	a0,a2						;swap back (a0 now puckc)
@@ -2166,13 +2166,13 @@ wallcollpuck	equ	*	;Skater and puck contact check
 	cmp.w	#2,d0					;compare 2 to d0
 	bhi.w	rtss2					;exit if higher (not losing puck)
 .27
-	move.b	endurance(a0),d0
+	move.b	stickhand(a0),d0
 	lsr.b	#1,d0
 	bsr.w	makepde					;adj for energy
 	addi.w	#$14,d0					;add 14 hex (20 dec)
 	move.b	d0,nopuck(a0)			;move result into nopuck (cant get puck timer)
 	exg	a0,a2						;swap a0 and a2 (a0 now collider)
-	move.b	$72(a0),d0
+	move.b	stickhand(a0),d0
 	lsr.b	#1,d0
 	bsr.w	makepde					;adj for energy
 	addi.w	#$14,d0					;add 14 hex (20 dec)
@@ -2525,7 +2525,7 @@ puckgoalie							;Puck hits goalie a2 (a3 = puck, d0 / d1 = goalie - puck x / y)
 	cmpi.w	#SPAgdive,SPA(a2)		;goalie dive animation
 	beq.s	.loop					;branch if equal
 	moveq	#2,d0					;move 2 into d0
-	add.b	shotacc(a2),d0
+	add.b	shotspd(a2),d0
 	asl.w	#8,d0					;mult by 256
 	asl.w	#1,d0					;mult by 2
 	bsr.w	randomd0				;random
@@ -2611,13 +2611,13 @@ getpde								;Get player a3's energy level into d0. Return a2 = his team struct
 	beq.w	.0
 	adda.w	#$39E,a2				;team is away
 .0
-	move.b	weight(a3),d1
+	move.b	pnum(a3),d1
 	ext.w	d1
 	add.w	d1,d1
 	move.w	$34(a2,d1.w),d0
 	rts
 
-setpde								;d1 = rostnum of player * 2, a2 = team struct, d0 = new energy level (0 if
+setpde								;d1 = pnum of player * 2, a2 = team struct, d0 = new energy level (0 if
 									;negative)
 	tst.w	d0
 	bpl.w	.0

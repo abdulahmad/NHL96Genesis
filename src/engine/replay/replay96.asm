@@ -611,7 +611,7 @@ RevReplayAdjFrames	equ	*			;Reverse replay: adjust the frame offsets of the six 
 	moveq	#5,d2					;6 pairs of players
 	movea.w	#(SortCords-M68K_RAM),a3
 .loop2
-	move.b	(a0)+,spodds(a3)
+	move.b	(a0)+,rostnum(a3)
 	move.b	(a0),d0					;position byte
 	andi.w	#$F,d0					;low nibble
 	cmp.w	#$F,d0					;$F?
@@ -623,10 +623,10 @@ RevReplayAdjFrames	equ	*			;Reverse replay: adjust the frame offsets of the six 
 	adda.w	#SCstruct,a3
 	move.b	(a0)+,d0
 	lsr.b	#4,d0					;high nibble
-	move.b	d0,spodds(a3)
+	move.b	d0,rostnum(a3)
 	move.b	(a0),d0
 	asl.b	#4,d0					;low nibble up
-	or.b	d0,spodds(a3)
+	or.b	d0,rostnum(a3)
 	move.b	(a0)+,d0				;position byte
 	lsr.b	#4,d0					;high nibble
 	andi.w	#$F,d0
@@ -755,7 +755,7 @@ updatereplay						;Called every frame to save replay events, d7 = elapsed frames
 	moveq	#5,d2
 	movea.w	#(SortCords-M68K_RAM),a3
 .loop
-	move.b	spodds(a3),(a0)+
+	move.b	rostnum(a3),(a0)+
 	move.w	position(a3),d0
 	bpl.w	.n0
 	moveq	#$F,d0
@@ -763,10 +763,10 @@ updatereplay						;Called every frame to save replay events, d7 = elapsed frames
 	andi.w	#$F,d0
 	move.b	d0,(a0)
 	adda.w	#$80,a3
-	move.b	spodds(a3),d0
+	move.b	rostnum(a3),d0
 	asl.w	#4,d0
 	or.b	d0,(a0)+
-	move.b	spodds(a3),d0
+	move.b	rostnum(a3),d0
 	lsr.b	#4,d0
 	move.b	d0,(a0)
 	move.w	position(a3),d0

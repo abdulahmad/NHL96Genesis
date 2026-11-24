@@ -439,7 +439,7 @@ puckfaceoff2						;Puck assignment: the faceoff
 	;clear the touches
 .4
 	clr.w	Zpos(a2)
-	move.b	weight(a3),$19(a2)
+	move.b	pnum(a3),$19(a2)
 	bclr	#7,(sflags8).w
 	st	$1A(a2)						;clear last player to touch puck (assist 1)
 	st	OldXpos(a2)					;clear second last player to touch puck (assist 2)

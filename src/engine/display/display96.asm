@@ -774,7 +774,7 @@ uppads								;Update the 6 pad objects and queue new pad labels (QueuePadLabel)
 	clr.w	$18(a0)
 	move.b	$35(a2,d0.w),d1			;position+1
 	asl.w	#8,d1
-	move.b	$70(a2,d0.w),d1			;rostnum
+	move.b	rostnum(a2,d0.w),d1		;jersey number
 .chg
 	cmp.w	(a1),d1
 	beq.w	.next
@@ -1291,7 +1291,7 @@ defaultsprites2						;Objects which are tied to screen scrolling and have veloci
 	dbf	d0,.1
 	move.w	d6,SCnum(a3)
 	st	oldframe(a3)
-	st	weight(a3)
+	st	pnum(a3)
 	move.w	(a2)+,(a3)
 	move.w	(a2)+,Ypos(a3)
 	move.w	(a2)+,Zpos(a3)

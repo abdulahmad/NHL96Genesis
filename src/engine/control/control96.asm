@@ -133,7 +133,7 @@ updateplayersanim	equ	*			;Animate the player after the position check of update
 	btst	#sf3icetime,(sflags3).w	;check if penalty timer is up
 	beq.w	.21
 	clr.w	d0
-	move.b	weight(a3),d0			;player offset on roster
+	move.b	pnum(a3),d0				;player offset on roster
 	bmi.w	.21
 	add.w	d0,d0
 	addi.w	#$14C,d0
@@ -324,14 +324,14 @@ updateanim							;Frame switch control on struct a3. Called from updateplayers
 .0
 	move.w	d0,SPAcnt(a3)			;move d0 into SPAcnt
 .cframe
-	sub.b	d7,pnum(a3)				;sub frames elapsed from glitch - limit minimum
+	sub.b	d7,glitch(a3)			;sub frames elapsed from glitch - limit minimum
 	;time between frame switches
 	bpl.w	.rtss					;branch if glitch is positive still
-	clr.b	pnum(a3)				;clear glitch
+	clr.b	glitch(a3)				;clear glitch
 	cmp.w	frame(a3),d2			;compare frame to d2
 	beq.w	.rtss					;branch if equal
 	move.w	d2,frame(a3)			;move d2 into frame
-	move.b	#4,pnum(a3)				;move 4 into glitch - /60 sec min frame switch time
+	move.b	#4,glitch(a3)			;move 4 into glitch - /60 sec min frame switch time
 .rtss
 	rts
 

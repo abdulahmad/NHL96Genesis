@@ -245,7 +245,7 @@ PenaltyShotBox						;In a shootout ShootoutModeBox; else the "PENALTY SHOT!" box
 	movea.l	#SortCords,a2
 	adda.w	d0,a2
 	clr.w	d0
-	move.b	weight(a2),d0
+	move.b	pnum(a2),d0
 	movea.l	#tmstruct,a2
 	tst.w	(BA_Team).w
 	beq.w	.5

@@ -142,15 +142,15 @@ startfight							;Start the fight for player a3 against a2: AddPenalty2 $2E, set
 	move.w	#SPAfight,d1
 	jmp	SetSPA
 
-SetInst								;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 bit 0
+SetInst								;Both a3 and a2 need fight rating (fighting) 1 or more: then pflags2 bit 0
 									;(fighting) on both;
 									;Z clear when a3 was already fighting
-	cmpi.b	#1,$75(a3)
+	cmpi.b	#1,fighting(a3)
 	blt.w	rtsfight
-	cmpi.b	#1,$75(a2)
+	cmpi.b	#1,fighting(a2)
 	blt.w	rtsfight
 	clr.w	d1
-	move.b	weight(a2),d1
+	move.b	pnum(a2),d1
 	movea.w	#(tmstruct-M68K_RAM),a0
 	btst	#pfteam,pflags(a2)
 	beq.w	.tm
@@ -161,7 +161,7 @@ SetInst								;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 b
 	asl.b	#1,d1
 	neg.b	d1
 	addi.b	#$10,d1
-	cmp.b	$75(a2),d1
+	cmp.b	fighting(a2),d1
 	bset	#pf2fight,pflags2(a2)
 	bset	#pf2fight,pflags2(a3)
 	bne.w	rtsfight
@@ -213,7 +213,7 @@ assfight							;Assignment $14: the fighter (a3 = player)
 	beq.w	.nna
 	bclr	#7,(sflags12).w
 	clr.w	d0
-	move.b	$75(a3),d0
+	move.b	fighting(a3),d0
 	add.w	d0,d0
 	addq.w	#3,d0
 	move.w	d0,temp3(a3)			;temp3 = strength
@@ -763,13 +763,13 @@ addinfo								;d0 = penalty byte (player SCnum in the low nibble): build "<name
 	movea.w	#(SortCords-M68K_RAM),a1
 	andi.w	#$F,d0
 	asl.w	#7,d0
-	add.b	$75(a1,d0.w),d3			;fighting
+	add.b	fighting(a1,d0.w),d3	;fighting
 	movea.w	#(tmstruct-M68K_RAM),a2
 	btst	#pfteam,$62(a1,d0.w)
 	beq.w	.1
 	adda.w	#$39E,a2
 .1
-	move.b	$67(a1,d0.w),d0			;player number
+	move.b	pnum(a1,d0.w),d0		;player number
 	ext.w	d0
 	jsr	(getname).l
 	movea.w	a1,a3

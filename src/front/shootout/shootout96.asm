@@ -311,7 +311,7 @@ puckpenshot							;asstab entry: the penalty shot / shootout face-off.
 	beq.w	.4
 	movem.l	d0-d7/a0-a6,-(sp)
 	clr.w	d3
-	move.b	weight(a3),d3
+	move.b	pnum(a3),d3
 	jsr	(setplayer).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	tst.w	position(a3)
@@ -343,10 +343,10 @@ puckpenshot							;asstab entry: the penalty shot / shootout face-off.
 .7
 	btst	#0,(gmode2).w
 	beq.w	.8
-	move.b	($FFFFD453).w,weight(a3)
+	move.b	($FFFFD453).w,pnum(a3)
 	tst.w	(shootoutteam).w
 	beq.w	.9
-	move.b	($FFFFD445).w,weight(a3)
+	move.b	($FFFFD445).w,pnum(a3)
 	bra.w	.9
 .8
 	tst.w	position(a3)
@@ -356,7 +356,7 @@ puckpenshot							;asstab entry: the penalty shot / shootout face-off.
 .9
 	movem.l	d0-d7/a0-a6,-(sp)
 	clr.w	d3
-	move.b	weight(a3),d3
+	move.b	pnum(a3),d3
 	jsr	(setplayer).l
 	movem.l	(sp)+,d0-d7/a0-a6
 	tst.w	position(a3)
