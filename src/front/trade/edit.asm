@@ -501,61 +501,61 @@ TradeExit							;Leave the trade screen
 CheckTrade							;Check the trade (players chosen on both teams, at most three a team, the
 									;roster limits); else the reason from InvalidTradeText Code the listing
 	movem.l	d0-d7/a0-a6,-(sp)
-	movea.l	#TempLegSpd+2,a0
+	movea.l	#ChosenGoalies1,a0
 	movea.l	#$FFFF3A98,a1
 	move.w	($FFFF2AFC).l,d0
 	bsr.w	CountChosen
-	movea.l	#pstatslast,a0
+	movea.l	#ChosenGoalies2,a0
 	movea.l	#$FFFF88B8,a1
 	move.w	($FFFF2B02).l,d0
 	bsr.w	CountChosen
 	clr.w	d0
 	move.w	#5,d1
-	movea.l	#TempLegSpd+2,a0
+	movea.l	#ChosenGoalies1,a0
 .loop
 	add.w	(a0)+,d0
 	dbf	d1,.loop
 	tst.w	d0
 	bne.w	.1
-	move.w	#0,($FFFFBF68).w
+	move.w	#0,(InvalidTradeReason).w
 	bra.w	.6
 .loop2
-	move.w	#2,($FFFFBF68).w
+	move.w	#2,(InvalidTradeReason).w
 	bra.w	.6
 .loop3
-	move.w	#3,($FFFFBF68).w
+	move.w	#3,(InvalidTradeReason).w
 	bra.w	.6
 .1
-	move.w	(TempLegSpd+2).w,d0
-	add.w	(pstatscat).w,d0
-	add.w	(pstatstop).w,d0
+	move.w	(ChosenGoalies1).w,d0
+	add.w	(ChosenSkaters1).w,d0
+	add.w	(ChosenDefense1).w,d0
 	cmp.w	#3,d0
 	bgt.s	.loop3
-	move.w	(pstatslast).w,d0
-	add.w	(pstatslast+2).w,d0
-	add.w	(pstatslast+4).w,d0
+	move.w	(ChosenGoalies2).w,d0
+	add.w	(ChosenSkaters2).w,d0
+	add.w	(ChosenDefense2).w,d0
 	cmp.w	#3,d0
 	bgt.s	.loop3
-	move.w	(TempLegSpd+2).w,d0
-	add.w	(pstatscat).w,d0
-	add.w	(pstatstop).w,d0
+	move.w	(ChosenGoalies1).w,d0
+	add.w	(ChosenSkaters1).w,d0
+	add.w	(ChosenDefense1).w,d0
 	beq.s	.loop2
-	move.w	(pstatslast).w,d0
-	add.w	(pstatslast+2).w,d0
-	add.w	(pstatslast+4).w,d0
+	move.w	(ChosenGoalies2).w,d0
+	add.w	(ChosenSkaters2).w,d0
+	add.w	(ChosenDefense2).w,d0
 	beq.s	.loop2
 	move.w	($FFFF2AFC).l,d0
-	sub.w	(TempLegSpd+2).w,d0
-	sub.w	(pstatscat).w,d0
-	sub.w	(pstatstop).w,d0
-	add.w	(pstatslast).w,d0
-	add.w	(pstatslast+2).w,d0
-	add.w	(pstatslast+4).w,d0
+	sub.w	(ChosenGoalies1).w,d0
+	sub.w	(ChosenSkaters1).w,d0
+	sub.w	(ChosenDefense1).w,d0
+	add.w	(ChosenGoalies2).w,d0
+	add.w	(ChosenSkaters2).w,d0
+	add.w	(ChosenDefense2).w,d0
 	move.w	d0,(SRAMChecksum).w
 	cmp.w	#$1B,d0
 	ble.w	.2
 .loop4
-	move.w	#1,($FFFFBF68).w
+	move.w	#1,(InvalidTradeReason).w
 	bra.w	.6
 .2
 	cmp.w	#$11,d0
@@ -565,19 +565,19 @@ CheckTrade							;Check the trade (players chosen on both teams, at most three a
 	movem.l	d0/d7,-(sp)
 	move.w	(HomeTeam).w,d7
 	jsr	(GetGoalieCountD7).l
-	sub.w	(TempLegSpd+2).w,d0
-	add.w	(pstatslast).w,d0
+	sub.w	(ChosenGoalies1).w,d0
+	add.w	(ChosenGoalies2).w,d0
 	sub.w	d0,(SRAMChecksum).w
 	cmpi.w	#$18,(SRAMChecksum).w
 	movem.l	(sp)+,d0/d7
 	bgt.s	.loop4
 	move.w	($FFFF2B02).l,d0
-	sub.w	(pstatslast).w,d0
-	sub.w	(pstatslast+2).w,d0
-	sub.w	(pstatslast+4).w,d0
-	add.w	(TempLegSpd+2).w,d0
-	add.w	(pstatscat).w,d0
-	add.w	(pstatstop).w,d0
+	sub.w	(ChosenGoalies2).w,d0
+	sub.w	(ChosenSkaters2).w,d0
+	sub.w	(ChosenDefense2).w,d0
+	add.w	(ChosenGoalies1).w,d0
+	add.w	(ChosenSkaters1).w,d0
+	add.w	(ChosenDefense1).w,d0
 	move.w	d0,(SRAMChecksum).w
 	cmp.w	#$1B,d0
 	ble.w	.4
@@ -590,22 +590,22 @@ CheckTrade							;Check the trade (players chosen on both teams, at most three a
 	movem.l	d0/d7,-(sp)
 	move.w	(VisTeam).w,d7
 	jsr	(GetGoalieCountD7).l
-	sub.w	(pstatslast).w,d0
-	add.w	(TempLegSpd+2).w,d0
+	sub.w	(ChosenGoalies2).w,d0
+	add.w	(ChosenGoalies1).w,d0
 	sub.w	d0,(SRAMChecksum).w
 	cmpi.w	#$18,(SRAMChecksum).w
 	movem.l	(sp)+,d0/d7
 	bgt.w	.loop4
 	move.w	($FFFF2AF8).l,d0
-	sub.w	(TempLegSpd+2).w,d0
-	add.w	(pstatslast).w,d0
+	sub.w	(ChosenGoalies1).w,d0
+	add.w	(ChosenGoalies2).w,d0
 	cmp.w	#2,d0
 	blt.w	.loop4
 	cmp.w	#3,d0
 	bgt.w	.loop4
 	move.w	($FFFF2AFE).l,d0
-	sub.w	(pstatslast).w,d0
-	add.w	(TempLegSpd+2).w,d0
+	sub.w	(ChosenGoalies2).w,d0
+	add.w	(ChosenGoalies1).w,d0
 	cmp.w	#2,d0
 	blt.w	.loop4
 	cmp.w	#3,d0
@@ -619,7 +619,7 @@ CheckTrade							;Check the trade (players chosen on both teams, at most three a
 	jsr	(EraseBlank).l
 	jsr	(printsmallz).l
 	String	$FE,7,$FD,$D,$FC,8,'INVALID  TRADE'
-	move.w	($FFFFBF68).w,d0
+	move.w	(InvalidTradeReason).w,d0
 	movea.l	#InvalidTradeText,a1
 	jsr	(PrintSmallListItem).l
 	bsr.w	TradeReadPad

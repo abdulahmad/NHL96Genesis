@@ -137,11 +137,21 @@ TempRawSpd			equ	$FFFFBF4A	; temporary: raw speed
 TempMaxSpd			equ	$FFFFBF4C	; temporary: maximum speed
 rosterscroll		equ	$FFFFBF50	; First player row shown by DisplayPlayerList
 TempLegSpd			equ	$FFFFBF52	; temporary: leg speed
+ChosenGoalies1		equ	$FFFFBF54	;CheckTrade: goalies chosen on team 1 (CountChosen fills three words from
+									;here)
+ChosenSkaters1		equ	$FFFFBF56	;CheckTrade: skaters chosen on team 1. Shares pstatscat
 pstatscat			equ	$FFFFBF56	;SeasonPlayoffStats: the stat category (BuildPlayerLeaders)
 pstatstop			equ	$FFFFBF58	;SeasonPlayoffStats: first row shown
+ChosenDefense1		equ	$FFFFBF58	;CheckTrade: the third CountChosen word of team 1, cleared and never
+									;counted (defensemen are counted as skaters). Shares pstatstop
 pstatsrow			equ	$FFFFBF5A	;SeasonPlayoffStats: bottom row shown
 pstatsrows			equ	$FFFFBF5C	;SeasonPlayoffStats: rows on screen
 pstatslast			equ	$FFFFBF5E	;SeasonPlayoffStats: last row
+ChosenGoalies2		equ	$FFFFBF5E	;CheckTrade: goalies chosen on team 2 (three words as on team 1). Shares
+									;pstatslast
+ChosenSkaters2		equ	$FFFFBF60	;CheckTrade: skaters chosen on team 2
+ChosenDefense2		equ	$FFFFBF62	;CheckTrade: the third CountChosen word of team 2, never counted
+InvalidTradeReason	equ	$FFFFBF68	;CheckTrade: the INVALID TRADE reason, an InvalidTradeText item
 recwins				equ	$FFFFBF7C	; team record: wins
 smallfontalt		equ	$FFFFBF88	;printsmall / printcur: char base when sflags6 bit 3
 onetimerplayer		equ	$FFFFBFA6	; player taking a one timer
