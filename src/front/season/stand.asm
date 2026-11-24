@@ -276,41 +276,41 @@ DrawStandingsTeamLogo				;Draw the team logo of team d1 for the standings
 	dc.w	$3038,$D25E,$6A00,$0006,$303C,$0001,$B07C,$0001
 	dc.w	$6F00,$0004,$4240,$31C0,$D25E,$227C,$001D,$A468
 	dc.w	$4EB9,$0001,$D7F2,$4E75,$0014,$4D41,$4E55,$414C
-	dc.w	$2043,$4F4E,$5452,$4F4C,SPAturnl,SPAturnl,$0014,$4155
-	dc.w	$544F,$2043,$4F4E,$5452,$4F4C,SPAturnl,SPAturnl,SPAturnl
+	dc.w	$2043,$4F4E,$5452,$4F4C,$2020,$2020,$0014,$4155
+	dc.w	$544F,$2043,$4F4E,$5452,$4F4C,$2020,$2020,$2020
 	dc.w	$3038,$D25C,$6A00,$0006,$303C,$0002,$B07C,$0002
 	dc.w	$6F00,$0004,$4240,$31C0,$D25C,$227C,$001D,$A4B8
 	dc.w	$4EB9,$0001,$D7F2,$4E75,$0014,$3520,$4D49,$4E55
-	dc.w	$5445,$5320,SPAturnl,SPAturnl,SPAturnl,SPAturnl,$0014,$3130
-	dc.w	$204D,$494E,$5554,$4553,SPAturnl,SPAturnl,SPAturnl,SPAturnl
-	dc.w	$0014,SPAfweaveend,$204D,$494E,$5554,$4553,SPAturnl,SPAturnl
-	dc.w	SPAturnl,SPAturnl,$3038,$D260,$6A00,$0006,$303C,$0001
+	dc.w	$5445,$5320,$2020,$2020,$2020,$2020,$0014,$3130
+	dc.w	$204D,$494E,$5554,$4553,$2020,$2020,$2020,$2020
+	dc.w	$0014,$3230,$204D,$494E,$5554,$4553,$2020,$2020
+	dc.w	$2020,$2020,$3038,$D260,$6A00,$0006,$303C,$0001
 	dc.w	$B07C,$0001,$6F00,$0004,$4240,$31C0,$D260,$227C
 	dc.w	$001D,$A51C,$4EB9,$0001,$D7F2,$4E75,$0014,$4F46
-	dc.w	$4620,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl
-	dc.w	$0014,$4F4E,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl
-	dc.w	SPAturnl,SPAturnl,$3038,$D262,$6A00,$0006,$303C,$0002
+	dc.w	$4620,$2020,$2020,$2020,$2020,$2020,$2020,$2020
+	dc.w	$0014,$4F4E,$2020,$2020,$2020,$2020,$2020,$2020
+	dc.w	$2020,$2020,$3038,$D262,$6A00,$0006,$303C,$0002
 	dc.w	$B07C,$0002,$6F00,$0004,$4240,$31C0,$D262,$227C
 	dc.w	$001D,$A56C,$4EB9,$0001,$D7F2,$4E75,$0014,$4F46
-	dc.w	$4620,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl
+	dc.w	$4620,$2020,$2020,$2020,$2020,$2020,$2020,$2020
 	dc.w	$0014,$4F4E,$2C20,$4E4F,$204F,$4646,$5349,$4445
-	dc.w	$5320,SPAturnl,$0014,$4F4E,SPAturnl,SPAturnl,SPAturnl,SPAturnl
-	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,$3038,$D264,$6A00,$0006
+	dc.w	$5320,$2020,$0014,$4F4E,$2020,$2020,$2020,$2020
+	dc.w	$2020,$2020,$2020,$2020,$3038,$D264,$6A00,$0006
 	dc.w	$303C,$0002,$B07C,$0002,$6F00,$0004,$4240,$31C0
 	dc.w	$D264,$227C,$001D,$A5D0,$4EB9,$0001,$D7F2,$4E75
-	dc.w	$0014,$4F46,$4620,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl
-	dc.w	SPAturnl,SPAturnl,$0014,$4155,$544F,SPAturnl,SPAturnl,SPAturnl
-	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,$0014,$4F4E,SPAturnl,SPAturnl
-	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,$3038,$D266
+	dc.w	$0014,$4F46,$4620,$2020,$2020,$2020,$2020,$2020
+	dc.w	$2020,$2020,$0014,$4155,$544F,$2020,$2020,$2020
+	dc.w	$2020,$2020,$2020,$2020,$0014,$4F4E,$2020,$2020
+	dc.w	$2020,$2020,$2020,$2020,$2020,$2020,$3038,$D266
 	dc.w	$6A00,$0006,$303C,$0001,$B07C,$0001,$6F00,$0004
 	dc.w	$4240,$31C0,$D266,$227C,$001D,$A634,$4EB9,$0001
-	dc.w	$D7F2,$4E75,$0014,$4F4E,SPAturnl,SPAturnl,SPAturnl,SPAturnl
-	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,$0014,$4F46,$4620,SPAturnl
-	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,$3038,$D268
+	dc.w	$D7F2,$4E75,$0014,$4F4E,$2020,$2020,$2020,$2020
+	dc.w	$2020,$2020,$2020,$2020,$0014,$4F46,$4620,$2020
+	dc.w	$2020,$2020,$2020,$2020,$2020,$2020,$3038,$D268
 	dc.w	$6A00,$0006,$303C,$0002,$B07C,$0002,$6F00,$0004
 	dc.w	$4240,$31C0,$D268,$227C,$001D,$A684,$4EB9,$0001
-	dc.w	$D7F2,$4E75,$0014,$5052,$4F20,SPAturnl,SPAturnl,SPAturnl
-	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,$0014,$414C,$4C2D,$5354
-	dc.w	$4152,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,$0014,$524F
-	dc.w	$4F4B,$4945,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl
+	dc.w	$D7F2,$4E75,$0014,$5052,$4F20,$2020,$2020,$2020
+	dc.w	$2020,$2020,$2020,$2020,$0014,$414C,$4C2D,$5354
+	dc.w	$4152,$2020,$2020,$2020,$2020,$2020,$0014,$524F
+	dc.w	$4F4B,$4945,$2020,$2020,$2020,$2020,$2020,$2020
 

@@ -514,7 +514,7 @@ CCStart								;Player a3 is checking player a2
 	bra.w	FallDown
 
 checkinglist						;Check animation by the direction from a3 to a2 (CCStart)
-	dc.b	$15,$26,$14,$94,$14,$94,$14,$94,$14,$94,$15,$26,$15,$26,$15,$26
+	dc.w	SPAshoulderchkl,SPAshoulderchkr,SPAshoulderchkr,SPAshoulderchkr,SPAshoulderchkr,SPAshoulderchkl,SPAshoulderchkl,SPAshoulderchkl
 
 CheckPenalties						;Penalties a check can draw: Roughing, Cross Check, Elbowing, High
 									;Sticking (one picked by seed)
@@ -872,7 +872,7 @@ FallDown							;Player a2 falls down (hit by a3, or the puck): the fall animatio
 	move.w	(a0,d0.w),d1
 	move.w	Ypos(a2),(FallYPos).w
 	move.w	(a2),(FallXPos).w
-	cmp.w	#$24C4,d1
+	cmp.w	#SPAboardleft,d1
 	bne.w	.2
 	cmpi.w	#$59,Ypos(a2)
 	bgt.w	.2
@@ -883,7 +883,7 @@ FallDown							;Player a2 falls down (hit by a3, or the puck): the fall animatio
 	jsr	(StartArenaAnim).l
 	move.w	(sp)+,d0
 	addq.w	#3,(ChkCnt).w
-	move.w	#SPAboardmidl,d1
+	move.w	#SPAbenchcheckl,d1
 	btst	#3,attribute(a2)
 	beq.w	.20
 	bra.w	.20
@@ -891,14 +891,14 @@ FallDown							;Player a2 falls down (hit by a3, or the puck): the fall animatio
 	addq.w	#2,(ChkCnt).w
 	btst	#3,attribute(a2)
 	beq.w	.20
-	cmp.w	#$2360,d1
+	cmp.w	#SPAboardright,d1
 	beq.w	.19
-	cmp.w	#$24C4,d1
+	cmp.w	#SPAboardleft,d1
 	bne.w	.20
-	move.w	#SPAboardleft,d1
+	move.w	#SPAboardright,d1
 	bra.w	.20
 .19
-	move.w	#SPAboardmidr,d1
+	move.w	#SPAboardleft,d1
 .20
 	clr.w	Xvel(a2)
 	clr.w	Yvel(a2)
@@ -917,7 +917,7 @@ FallDown							;Player a2 falls down (hit by a3, or the puck): the fall animatio
 	bra.w	.25
 
 .23									;Board check animation by side of the rink (two words a side)
-	dc.b	$22,$AE,$22,$AE,$23,$60,$23,$60,$24,$12,$24,$12,$24,$C4,$24,$C4
+	dc.w	SPAboardfront,SPAboardfront,SPAboardright,SPAboardright,SPAboardback,SPAboardback,SPAboardleft,SPAboardleft
 
 .24
 	move.w	#SPAfallback,d1

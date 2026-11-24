@@ -150,11 +150,11 @@ doplayeracc							;Player acceleration toward direction d0 by his speed rating (
 	clr.w	d1
 	tst.w	(a0,d0.w)
 	bpl.w	.19
-	eori.w	#$FFCE,d1
+	eori.w	#SPAturnl-SPAturnr,d1
 .19
 	btst	#3,attribute(a3)
 	beq.w	.20
-	eori.w	#$FFCE,d1
+	eori.w	#SPAturnl-SPAturnr,d1
 .20
 	addi.w	#SPAturnr,d1
 	bset	#pf2aip,pflags2(a3)

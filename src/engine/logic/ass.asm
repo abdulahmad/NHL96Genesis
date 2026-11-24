@@ -89,7 +89,7 @@ assbench							;asstab entry: player a3 should go to the bench.
 	move.w	#SPAglide,d1
 	tst.w	position(a3)
 	bne.w	.gli
-	move.w	#$640,d1
+	move.w	#SPAgskate,d1
 .gli
 	bsr.w	SetSPA					;glide (goalie: ready) animation
 	;no collisions; turn step by step toward facedir 4
@@ -114,7 +114,7 @@ assbench							;asstab entry: player a3 should go to the bench.
 	clr.w	Xvel(a3)
 	tst.w	position(a3)
 	bne.w	.5
-	move.w	#$E40,d1
+	move.w	#SPAgwallleft,d1
 	move.w	#$FF62,(a3)
 	clr.w	Xvel(a3)
 .5
@@ -174,12 +174,12 @@ asseben								;asstab entry: player a3 should exit the bench area.
 	neg.w	(a3)
 	move.w	#2,facedir(a3)
 	bset	#pfalock,pflags(a3)
-	move.w	#$D7A,d1
+	move.w	#SPAwallright,d1
 	move.w	#$FF62,(a3)
 	clr.w	Xvel(a3)
 	tst.w	position(a3)
 	bne.w	.2
-	move.w	#$DFE,d1
+	move.w	#SPAgwallright,d1
 	move.w	#$FF62,(a3)
 	clr.w	Xvel(a3)
 .2
@@ -273,7 +273,7 @@ asspenalty							;asstab entry: player a3 goes to the penalty box.
 	move.w	#$FFBE,Ypos(a3)
 .7
 	bclr	#3,attribute(a3)
-	move.w	#$AA2,d1
+	move.w	#SPAboxwallright,d1
 	bsr.w	SetSPA
 	bclr	#pf2pen,pflags2(a3)
 	moveq	#$D,d0
@@ -343,11 +343,11 @@ assepen								;asstab entry: player a3 leaves the penalty box.
 .2
 	move.w	#4,facedir(a3)
 	bset	#pfalock,pflags(a3)
-	move.w	#$AF4,d1
+	move.w	#SPAboxwallleft,d1
 	bsr.w	SetSPA
 	jmp	(SprSort).l
 .3
-	move.w	#$856,d1
+	move.w	#SPAglide,d1
 	bsr.w	SetSPA
 	move.w	#4,facedir(a3)
 	st	newpnum(a3)
@@ -462,15 +462,15 @@ assscore							;asstab entry: player a3 celebrates a goal.
 	move.w	#SPAcelebrate,d1		;94 $E8A
 	btst	#0,(seed+1).w
 	beq.w	.6
-	move.w	#$D0E,d1
+	move.w	#SPAcelebrate2,d1
 .6
 	move.w	(shotplayer).w,d0
 	cmp.w	SCnum(a3),d0
 	bne.w	.7
-	move.w	#$C30,d1
+	move.w	#SPApump,d1
 	btst	#3,(seed+1).w
 	bne.w	.7
-	move.w	#$D28,d1
+	move.w	#SPApump2,d1
 .7
 	bsr.w	SetSPA
 assscoreRandomTemp1					;temp1 = random 0..$77 (wait time before the player moves)
@@ -605,7 +605,7 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	jsr	(sfx).l
 	bra.w	.2						;set bit 3
 .1
-	move.w	#$37A,d1
+	move.w	#SPAgslam,d1
 	btst	#1,(sflags12).w
 	bne.w	.2
 	;slam animation set
@@ -680,10 +680,10 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	bgt.w	.10
 	bra.w	.12
 .10
-	move.w	#$57E,d1
+	move.w	#SPAgposemid,d1
 	bra.w	.12
 .11
-	move.w	#$CE,d1
+	move.w	#SPAgposefar,d1
 .12
 	movem.w	(sp)+,d0
 	bsr.w	SetSPA
