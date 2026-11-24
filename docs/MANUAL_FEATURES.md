@@ -11,8 +11,8 @@ The manual is a lead; the code is what shows the feature is there. Pages are the
 | Fighting option | `EngageFight`, `SetFightingMajors` (src/engine/fight96.asm) |
 | One-Timer Pass | not confirmed in code (`OneTimerPass`, src/engine/logic/timer.asm, is 94G's) |
 | Give-and-Go | not confirmed in code |
-| Spin-o-Rama | not confirmed in code |
-| New graphics and animations | new `SPA` entries in src/frames96.asm |
+| Spin-o-Rama | `dospinorama`, `SPAspinorama` (src/engine/input/input96.asm, src/frames96.asm): Start with a d-pad direction on a skater |
+| New graphics and animations | new `SPA` entries in src/frames96.asm; eight (`SPA0344` .. `SPA36F8`) are not used by any code |
 | Advanced goalie and defence AI | see below |
 | Multiple injuries | `SetInjuryGames`, `RandomInjuryGames` (src/front/injury/injury96.asm); "multiple": not confirmed in code |
 
@@ -24,6 +24,14 @@ The manual is a lead; the code is what shows the feature is there. Pages are the
 - the `goaliesave` changes in src/engine/logic/puck.asm (new `SPAgblock`, `SPAgcatchlow` and reach saves).
 
 None of these is power-play only. 95G has none of them.
+
+## Spin-o-Rama (PDF p.4 and the controls pages)
+
+- The manual: hold the D-Pad in the direction you're skating, then tap START.
+- The code: `doinput` (src/engine/input/input96.asm) tests the Start bit; for a skater (position not 0) with a
+  d-pad direction held it calls `dospinorama`, which plays `SPAspinorama` (src/frames96.asm: one 6-frame turn for
+  facing 0 and one for every other facing), sets pf2aip and adds $64 to Xvel. Not while pf2unav or gmclock is set.
+- 95G has no spin: its Start always pauses. 96 PC has none either: its `doinput` never reads Start.
 
 ## Modes (PDF p.4-5)
 
@@ -62,7 +70,7 @@ playoff modes and season playoff games. Other season games get the period length
 ## Shootout, trades and created players
 
 - Shootout (PDF p.12): `puckshootout`, `SelectPenaltyShotSkater` (src/front/shootout/shootout96.asm). No spin-o-rama
-  in the shootout: not confirmed in code.
+  in the shootout: not confirmed in code (`dospinorama` tests only pf2unav and gmclock).
 - Trades (PDF p.13): at most three players a team (`CheckTrade`) and a lopsided trade is rejected (`TradeValue`,
   " rejects trade.", "to overrule trade: press c", src/front/trade/edit.asm).
 - Created players (PDF p.13): `ReadCreatedPlayers` (src/front/create96.asm); up to 19: not confirmed in code.
