@@ -513,9 +513,9 @@ SetupLeadersScreenVideo	equ	*	;Set the VBint handler, scroll and map addresses f
 	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0					;fade to color
 	bset	#5,(disflags).w
 	jsr	(setVram).l
@@ -846,9 +846,9 @@ PStatsSetup							;SeasonPlayoffStats: vram, fonts and the screen bitmaps, the h
 	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0
 	bset	#5,(disflags).w
 	jsr	(setVram).l
@@ -1468,9 +1468,9 @@ PlayoffMenuSetup					;PlayoffMenuScreen: vram and the screen bitmaps
 	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0
 	bset	#5,(disflags).w
 	jsr	(setVram).l

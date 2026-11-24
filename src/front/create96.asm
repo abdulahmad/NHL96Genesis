@@ -669,9 +669,9 @@ SetupCreateScreenVideo	equ	*	;Set the VBint handler, scroll and map addresses fo
 	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0					;fade to color
 	bset	#5,(disflags).w
 	jsr	(setVram).l
@@ -2000,9 +2000,9 @@ CreateRatingsGfx					;Set up the create player ratings screen: vram, fonts, the 
 	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0					;fade to color
 	bset	#5,(disflags).w
 	jsr	(setVram).l
@@ -2764,9 +2764,9 @@ SetupFreeAgentsVideo	equ	*	;Set the VBint handler, scroll and map addresses for 
 	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0					;fade to color
 	bset	#5,(disflags).w
 	jsr	(setVram).l
@@ -3268,9 +3268,9 @@ ReleaseGfx							;Release Player screen video set up: fonts, bitmaps and the pos
 	move.w	#$B800,(VmMAP3).w
 	move.w	#5,(Map3col1).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0					;fade to color
 	bset	#5,(disflags).w
 	jsr	(setVram).l
