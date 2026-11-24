@@ -163,7 +163,7 @@ goaliesave							;The goalie a3 makes a save of the puck crossing at a0: the sav
 	bne.w	.8
 	andi.w	#3,d3
 	beq.w	.8
-	cmpi.b	#$B,fighting(a3)
+	cmpi.b	#$B,aggress(a3)
 	blt.w	.8
 	move.w	#SPAgglovel2,d1
 .8
@@ -211,7 +211,7 @@ assgoalietopuck						;asstab entry: the goalie skates to the loose puck.
 .1
 	sub.b	d7,temp1(a3)
 	bpl.w	.5
-	move.b	shotspd(a3),d0
+	move.b	aidef(a3),d0
 	beq.w	.2
 	btst	#6,(sflags7).w
 	beq.w	.2
@@ -435,7 +435,7 @@ asspuckc							;asstab entry: the puck carrier.
 .9
 	sub.b	d7,temp1(a3)
 	bpl.w	.16
-	move.b	aidef(a3),temp1(a3)
+	move.b	aioff(a3),temp1(a3)
 	jsr	(ReadGoaliePulled).l
 	bmi.w	.10
 	btst	#6,(sflags7).w
@@ -635,7 +635,7 @@ chk4shot	equ	*	;Choose to shoot: puck carrier with a clear lane and a random rol
 .5
 	moveq	#$20,d4
 	clr.w	d1
-	move.b	stickhand(a3),d1
+	move.b	spodds(a3),d1
 	lsr.w	#1,d1
 	sub.b	d1,d4
 	asl.w	#4,d4
@@ -692,7 +692,7 @@ chk4shot	equ	*	;Choose to shoot: puck carrier with a clear lane and a random rol
 .10
 	move.w	d4,d0
 	bsr.w	randomd0
-	btst	#0,stickhand(a3)
+	btst	#0,spodds(a3)
 	beq.w	.11
 	cmp.w	#7,d0
 	bgt.w	rtss2
@@ -724,7 +724,7 @@ chk4pass	equ	*	;Choose to pass: random roll weighted by the stick hand and the l
 	tst.w	(glovecords+4).w
 	bne.w	.15
 	moveq	#$10,d0
-	add.b	stickhand(a3),d0
+	add.b	spodds(a3),d0
 	bsr.w	randomd0
 	cmp.w	#$C,d0
 	bgt.w	rtss2
@@ -1015,7 +1015,7 @@ assnearest							;asstab entry: the player nearest the puck without it.
 .10
 	sub.b	d7,temp1(a3)			;subtract d7 (elapsed frames) from temp1
 	bpl.w	.21						;jump if positive
-	move.b	aidef(a3),temp1(a3)
+	move.b	aioff(a3),temp1(a3)
 	jsr	(ReadGoaliePulled).l		;check if goalie is pulled
 	bmi.w	.11
 	btst	#6,(sflags7).w			;check if crowd meter currently broken
@@ -1245,17 +1245,17 @@ assnearest							;asstab entry: the player nearest the puck without it.
 .32
 	btst	#5,(sflags6).w			;check if puckc is in the slot
 	beq.w	.34						;branch if not
-	move.b	aioff(a3),(TempLegSpd).w
-	addq.b	#6,aioff(a3)
-	addq.b	#2,aioff(a3)
-	cmpi.b	#$1E,aioff(a3)
+	move.b	legspd(a3),(TempLegSpd).w
+	addq.b	#6,legspd(a3)
+	addq.b	#2,legspd(a3)
+	cmpi.b	#$1E,legspd(a3)
 	ble.w	.33
-	move.b	#$1E,aioff(a3)
+	move.b	#$1E,legspd(a3)
 	;skate, then put the leg speed back
 .33
 	lea	rtss2(pc),a0
 	bsr.w	skateto
-	move.b	(TempLegSpd).w,aioff(a3)
+	move.b	(TempLegSpd).w,legspd(a3)
 	bra.w	.35
 	;bit 5 of sflags6 clear
 .34

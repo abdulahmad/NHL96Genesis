@@ -15,7 +15,7 @@ check4bench							;Check if player a3 should go to the bench (called from the as
 	bmi.s	setpadsExit
 .1
 	move.b	newpnum(a3),d0
-	cmp.b	weight(a3),d0
+	cmp.b	pnum(a3),d0
 	beq.w	.2
 	move.w	assnum(a3),d0
 	cmpi.b	#$B,$38(a3,d0.w)
@@ -69,7 +69,7 @@ assbench							;asstab entry: player a3 should go to the bench.
 	clr.w	temp1(a3)
 .nna
 	move.b	newpnum(a3),d0			;same player? just change position
-	cmp.b	weight(a3),d0
+	cmp.b	pnum(a3),d0
 	beq.w	.nobench				;same player, just change position
 	;temp1 counts frames; re-check arrival every 8
 	sub.w	d7,temp1(a3)
@@ -126,7 +126,7 @@ assbench							;asstab entry: player a3 should go to the bench.
 .done
 	clr.w	frame(a3)				;at the bench door: mark this roster slot on the bench (tmpdst -2),
 	clr.w	d0
-	move.b	weight(a3),d0
+	move.b	pnum(a3),d0
 	add.w	d0,d0
 	movea.l	#tmstruct,a0
 	btst	#pfteam,pflags(a3)
@@ -569,7 +569,7 @@ assgoaliectrl						;asstab entry: the goalie of a pad.
 .12
 	sub.b	d7,temp1(a3)			;sub d7(frames elapsed) from temp1
 	bpl.w	.14						;branch if positive
-	move.b	shotspd(a3),d0
+	move.b	aidef(a3),d0
 	beq.w	.13						;branch if value was 0
 	btst	#6,(sflags7).w			;check if crowd meter broken
 	beq.w	.13						;jump if not
@@ -716,7 +716,7 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 .16
 	sub.b	d7,temp1(a3)			;sub d7 from temp1
 	bpl.w	.42						;branch if still positive
-	move.b	shotspd(a3),d0
+	move.b	aidef(a3),d0
 	beq.w	.17						;branch if 0
 	btst	#6,(sflags7).w			;check if crowd meter broken
 	beq.w	.17						;branch if not

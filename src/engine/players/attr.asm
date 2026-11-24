@@ -26,7 +26,7 @@ AttributeCalc						;Attribute d3 of player a3 * 5 plus his hot / cold value / 3 
 	adda.l	#$39E,a1
 .attribmath
 	clr.w	d1
-	move.b	weight(a3),d1
+	move.b	pnum(a3),d1
 	asl.w	#4,d1					;shifts d1 4 bits left, moving the values over 1 nibble
 	adda.l	#$1BC,a1
 	move.b	(a1,d1.w),d1

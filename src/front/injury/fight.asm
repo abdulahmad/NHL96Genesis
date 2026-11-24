@@ -1,8 +1,8 @@
 ;	Fight byte and bit helpers.
 
-getFgtbyte							;d0 = $75(a2) / 4
+getFgtbyte							;d0 = fighting(a2) / 4
 	clr.w	d0						;clear d0
-	move.b	$75(a2),d0				;move H/F bit into d0 (this is always even)
+	move.b	fighting(a2),d0			;fight rating (0-9) into d0
 	lsr.w	#2,d0					;shift 2 right (divide by 4)
 	rts
 

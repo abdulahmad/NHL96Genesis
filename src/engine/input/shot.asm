@@ -240,7 +240,7 @@ doshot								;Shoot the puck
 	movem.l	(sp)+,d0-d1				;Pop off stack d0-d1
 .cont2
 	clr.w	d0
-	move.b	shotacc(a3),d0
+	move.b	shotspd(a3),d0
 	lsr.b	#1,d0					;divide by 2
 	movea.l	a3,a0					;move a3 address into a0
 	jsr	(makepde).l					;scale d0 based on energy level
@@ -249,7 +249,7 @@ doshot								;Shoot the puck
 	mulu.w	#$5249,d0
 	swap	d0						;swaps the upper and lower words of d0
 	move.w	d0,(passspeed).w		;move d0 into passspeed
-	btst	#0,shotacc(a3)
+	btst	#0,shotspd(a3)
 	beq.w	.even
 	asr.w	#4,d0					;divide by 16
 	add.w	(passspeed).w,d0		;add passspeed to d0
@@ -295,13 +295,13 @@ doshot								;Shoot the puck
 	btst	#0,(gmode2).w			;check if shootout
 	bne.w	.perf
 	moveq	#$10,d0					;start value for ShA calc
-	add.b	passacc(a3),d0			;shotacc(a3)
+	add.b	shotacc(a3),d0			;shotacc(a3)
 	jsr	(randomd0).l
 	cmp.w	#$E,d0					;chance of perfect shot
 	bgt.w	.perf
 .notperf
 	clr.w	d0
-	move.b	passacc(a3),d0
+	move.b	shotacc(a3),d0
 	lsr.w	#1,d0					;divide by 2
 	move.b	d0,-(sp)				;push on stack
 	move.w	(passspeed).w,d0		;move passspeed into d0
@@ -443,13 +443,13 @@ dopass								;Pass the puck
 	moveq	#8,d0					;moves 8 into d0
 	tst.w	position(a3)			;checks if goalie
 	beq.w	.calc
-	move.b	rostnum(a3),d0
+	move.b	passacc(a3),d0
 .calc
 	asl.w	#2,d0					;d0 = passacc for player, 8 for goalie
 	asr.w	#1,d0
 	addi.w	#$A0,d0
 	move.w	d0,(passspeed).w		;Passspeed = PassAcc (0 to 30 decimal) * 2 + A0 (160 decimal)
-	btst	#0,rostnum(a3)
+	btst	#0,passacc(a3)
 	beq.w	.4
 	asr.w	#4,d0					;divide d0 by 16
 	add.w	d0,(passspeed).w		;add d0 to passspeed
@@ -794,10 +794,10 @@ SetTeamRoles						;Team a5, last carrier d6, puck zone d7. Remap each player's r
 	adda.w	d6,a3
 	move.w	position(a3),d6
 	bmi.w	.15
-	tst.b	glitch(a3)
+	tst.b	$65(a3)
 	bmi.w	.0
 	clr.w	d6
-	move.b	glitch(a3),d6
+	move.b	$65(a3),d6
 .0
 	move.w	d6,d4
 	lsl.b	#2,d6
@@ -817,9 +817,9 @@ SetTeamRoles						;Team a5, last carrier d6, puck zone d7. Remap each player's r
 	adda.w	d6,a5
 	move.w	#5,d6
 .1
-	cmpi.b	#3,glitch(a3)
+	cmpi.b	#3,$65(a3)
 	beq.w	.2
-	tst.b	glitch(a3)
+	tst.b	$65(a3)
 	bpl.w	.3
 	cmpi.w	#3,position(a3)
 	bne.w	.3
@@ -909,7 +909,7 @@ GetRoleAss							;d0 = the defensive assignment for a3's role, or 0 when OptSkil
 	tst.w	position(a3)
 	bmi.w	.2
 	clr.w	d0
-	move.b	glitch(a3),d0
+	move.b	$65(a3),d0
 	bpl.w	.1
 	move.w	position(a3),d0
 .1
@@ -981,7 +981,7 @@ ClearTeamRoles						;Role byte $65 = -1 (play the own position) for the 6 player
 	movem.l	d1/a0,-(sp)
 	move.w	#5,d1
 .0
-	st	glitch(a0)
+	st	$65(a0)
 	adda.w	#$80,a0
 	dbf	d1,.0
 	movem.l	(sp)+,d1/a0

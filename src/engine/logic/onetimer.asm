@@ -96,7 +96,7 @@ onetimershot						;Do the one-timer: a pass with GameFlags bit 3, else a shot; o
 	exg	a2,a3
 	;team struct chosen
 	clr.w	d0
-	move.b	weight(a3),d0
+	move.b	pnum(a3),d0
 	move.w	$1A(a0),$1C(a0)			;move assist 1 player to assist 2
 	move.w	$18(a0),$1A(a0)			;move last player to touch puck to assist 1
 	move.w	d0,$18(a0)				;move d0 into player touching puck

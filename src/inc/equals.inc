@@ -100,20 +100,20 @@ pfalock equ 5						;lock out until anim is done
 pflags2 equ $63
 pf2aip equ 1						;animation in progress wait
 pf2fight equ 0						;player is fighting (93; 94 has no fights)
-glitch equ $65						;counter to eliminate quick frame changes (de-glitch graphics)
-rostnum equ $6F
-pnum equ $66						;player's team location number
-aioff equ $6A						;offense rating
-aidef equ $6B						;defense rating
-spodds equ $70
-weight equ $67
-legstr equ $68
-legspd equ $69
-shotspd equ $6C
-shotacc equ $6D
-passacc equ $6E
-stickhand equ $71
-endurance equ $72
+;$65: 96 position override (-1 = by position; AssignBySavedPos), no 95G/94G name; 95G glitch is at $65
+passacc equ $6F						;passing (roster byte 7 high nibble; 95G: $6E)
+glitch equ $66						;counter to eliminate quick frame changes (de-glitch graphics; 95G: $65)
+legspd equ $6A						;speed (roster byte 2 high nibble; 95G: $69)
+aioff equ $6B						;offense rating (OfA; 95G: $6A)
+rostnum equ $70						;jersey number (setplayer jerseynum; 95G: $6F)
+pnum equ $67						;player's team location number (95G: $66)
+weight equ $68						;weight (roster byte 1 high nibble; 95G: $67)
+legstr equ $69						;agility (Agl; 95G: $68)
+aidef equ $6C						;defense rating (DfA; 95G: $6B)
+shotspd equ $6D						;shot power (ShP; 95G: $6C)
+shotacc equ $6E						;shot accuracy (ShA; 95G: $6D)
+spodds equ $71						;shot / pass decision (95G: $70)
+stickhand equ $72					;stickhandling (Stk; 95G: $71)
 handed equ $77						;bit0 set is left handed (96 setplayer, goaliesave; 95G: $76)
 ;player struct fields after handed's neighbours, not named in 93 (names from the 92/93/94 comments)
 pflags3 equ $64						;player flags 3 (92: not used)
@@ -123,8 +123,9 @@ pf3gctrl equ 2						;goalie control
 pf3onetimer equ 3					;doing a one-timer
 pf3wall equ 4						;wall collision
 pf3fall equ 5						;falling down
-aggress equ $73						;aggression (Agr; goalie: glove left)
-fighting equ $74					;fighting (Fgt; from the Chk/Hnd byte, always even)
+endurance equ $73					;endurance (End; 95G: $72)
+aggress equ $74						;aggression (Agr, roster byte 7 low nibble; 95G: $73)
+fighting equ $75					;fight rating: Agr - 6 when Agr > 6, else 0 (0 for goalies; 95G: $74)
 checking equ $76					;checking (Chk; 96 setplayer stores the Chk nibble here; 95G: $75)
 
 ;bit numbers in gmode

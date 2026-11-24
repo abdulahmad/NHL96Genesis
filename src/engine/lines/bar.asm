@@ -62,7 +62,7 @@ AvgCline							;Average energy of the current line.
 	tst.w	$34(a0)
 	ble.w	.1
 	clr.w	d3
-	move.b	$67(a0),d3
+	move.b	pnum(a0),d3
 	add.w	d3,d3
 	add.w	$34(a2,d3.w),d0
 	addq.w	#1,d1
@@ -106,7 +106,7 @@ ChkShotStat							;Determine if a shot was taken and add it to the stats (crowd,
 	movea.w	$22(a2),a2
 	move.w	#5,d1
 .findplayer
-	cmp.b	$67(a2),d0
+	cmp.b	pnum(a2),d0
 	beq.w	.foundplayer
 	adda.w	#$80,a2
 	dbf	d1,.findplayer
@@ -145,7 +145,7 @@ ChkShotStat							;Determine if a shot was taken and add it to the stats (crowd,
 	addq.w	#1,$384(a2)
 	movea.l	(sp)+,a2
 	clr.w	d0
-	move.b	weight(a3),d0
+	move.b	pnum(a3),d0
 	addi.w	#$F8,d0
 	addq.b	#1,(a2,d0.w)
 	move.w	$26(a1),d0

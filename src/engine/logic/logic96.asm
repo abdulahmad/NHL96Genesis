@@ -101,7 +101,7 @@ asscentero4							;Center on offense, two men short (tmap 4); back to asscentero
 .5
 	sub.b	d7,temp1(a3)
 	bpl.w	.13
-	move.b	aidef(a3),temp1(a3)
+	move.b	aioff(a3),temp1(a3)
 	jsr	(ReadGoaliePulled).l
 	bmi.w	.6
 	btst	#6,(sflags7).w
@@ -112,7 +112,7 @@ asscentero4							;Center on offense, two men short (tmap 4); back to asscentero
 	subq.b	#1,temp1(a3)
 .7
 	clr.w	d1
-	move.b	glitch(a3),d1
+	move.b	$65(a3),d1
 	bpl.w	.8
 	move.w	position(a3),d1
 	bmi.w	.22
@@ -247,7 +247,7 @@ asscentero5							;Center on offense, one man short (tmap 5); asscenterd5 when t
 .6
 	sub.b	d7,temp1(a3)			;subtract frames elapsed from temp1
 	bpl.w	.11						;branch if positive
-	move.b	shotspd(a3),temp1(a3)
+	move.b	aidef(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check if crowd meter currently broken
 	beq.w	.7
 	tst.b	temp1(a3)				;check if temp1 is 0
@@ -341,7 +341,7 @@ asscenterd4							;Center on defense, two men short (tmap 4); asscentero4 when h
 .3
 	sub.b	d7,temp1(a3)			;subtract d7 from temp1
 	bpl.w	.13
-	move.b	shotspd(a3),temp1(a3)
+	move.b	aidef(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check for crowd record flag
 	beq.w	.4						;jump if not set
 	tst.b	temp1(a3)				;check if 0
@@ -455,7 +455,7 @@ asscenterd5							;Center on defense, one man short (tmap 5); asscentero5 when h
 .3
 	sub.b	d7,temp1(a3)			;subtract d7 from temp1
 	bpl.w	.19
-	move.b	shotspd(a3),temp1(a3)
+	move.b	aidef(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check for crowd record flag
 	beq.w	.4						;jump if not set
 	tst.b	temp1(a3)				;check if 0
@@ -624,7 +624,7 @@ asswingo5							;Winger on offense, one man short (tmap 5); asswingd5 when the o
 .4
 	sub.b	d7,temp1(a3)			;subtract frames elapsed from temp1
 	bpl.w	.10						;branch if positive
-	move.b	shotspd(a3),temp1(a3)
+	move.b	aidef(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check if crowd meter currently broken
 	beq.w	.5
 	tst.b	temp1(a3)				;check if temp1 is 0
@@ -727,7 +727,7 @@ asswingd5							;Winger on defense, one man short (tmap 5); asswingo5 when his t
 .3
 	sub.b	d7,temp1(a3)
 	bpl.w	.19
-	move.b	shotspd(a3),temp1(a3)
+	move.b	aidef(a3),temp1(a3)
 	btst	#6,(sflags7).w
 	beq.w	.4
 	tst.b	temp1(a3)
@@ -896,7 +896,7 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 .4
 	sub.b	d7,temp1(a3)
 	bpl.w	.25
-	move.b	aidef(a3),temp1(a3)
+	move.b	aioff(a3),temp1(a3)
 	jsr	(ReadGoaliePulled).l
 	bmi.w	.5
 	btst	#6,(sflags7).w
@@ -907,7 +907,7 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 	subq.b	#1,temp1(a3)
 .6
 	clr.w	d1
-	move.b	glitch(a3),d1
+	move.b	$65(a3),d1
 	bpl.w	.7
 	move.w	position(a3),d1
 	bmi.w	.34
@@ -1107,7 +1107,7 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 .4
 	sub.b	d7,temp1(a3)
 	bpl.w	.25
-	move.b	aidef(a3),temp1(a3)
+	move.b	aioff(a3),temp1(a3)
 	jsr	(ReadGoaliePulled).l
 	bmi.w	.5
 	btst	#6,(sflags7).w
@@ -1118,7 +1118,7 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 	subq.b	#1,temp1(a3)
 .6
 	clr.w	d1
-	move.b	glitch(a3),d1
+	move.b	$65(a3),d1
 	bpl.w	.7
 	move.w	position(a3),d1
 	bmi.w	.34
@@ -1304,7 +1304,7 @@ assdefd4							;Defenseman on defense, two men short (tmap 4); assdefo4 when his
 .3
 	sub.b	d7,temp1(a3)			;subtract d7 from temp1
 	bpl.w	.14
-	move.b	shotspd(a3),temp1(a3)
+	move.b	aidef(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check for crowd record flag
 	beq.w	.4						;jump if not set
 	tst.b	temp1(a3)				;check if 0
@@ -1331,7 +1331,7 @@ assdefd4							;Defenseman on defense, two men short (tmap 4); assdefo4 when his
 	blt.w	GoAssReplace
 .6
 	clr.w	d0
-	move.b	glitch(a3),d0
+	move.b	$65(a3),d0
 	bpl.w	.7
 	move.w	position(a3),d0
 	bmi.w	.17
@@ -1390,13 +1390,13 @@ assdefd4							;Defenseman on defense, two men short (tmap 4); assdefo4 when his
 	move.w	temp3(a3),d0
 	move.w	temp4(a3),d1
 	movea.l	#EvadePC,a0
-	move.b	aioff(a3),-(sp)
+	move.b	legspd(a3),-(sp)
 	cmpi.l	#$15F9,$2A(a2)
 	blt.w	.15
-	move.b	#$1E,aioff(a3)
+	move.b	#$1E,legspd(a3)
 .15
 	jsr	(skateto).l
-	move.b	(sp)+,aioff(a3)
+	move.b	(sp)+,legspd(a3)
 	move.w	Ypos(a3),d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.16
@@ -1437,7 +1437,7 @@ assdefd5							;Defenseman on defense, one man short (tmap 5); assdefo5 when his
 .3
 	sub.b	d7,temp1(a3)			;subtract d7 from temp1
 	bpl.w	.14
-	move.b	shotspd(a3),temp1(a3)
+	move.b	aidef(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check for crowd record flag
 	beq.w	.4						;jump if not set
 	tst.b	temp1(a3)				;check if 0
@@ -1464,7 +1464,7 @@ assdefd5							;Defenseman on defense, one man short (tmap 5); assdefo5 when his
 	blt.w	GoAssReplace
 .6
 	clr.w	d0
-	move.b	glitch(a3),d0
+	move.b	$65(a3),d0
 	bpl.w	.7
 	move.w	position(a3),d0
 	bmi.w	.17
@@ -1521,13 +1521,13 @@ assdefd5							;Defenseman on defense, one man short (tmap 5); assdefo5 when his
 	move.w	temp3(a3),d0
 	move.w	temp4(a3),d1
 	movea.l	#EvadePC,a0
-	move.b	aioff(a3),-(sp)
+	move.b	legspd(a3),-(sp)
 	cmpi.l	#$15F9,$2A(a2)
 	blt.w	.15
-	move.b	#$1E,aioff(a3)
+	move.b	#$1E,legspd(a3)
 .15
 	jsr	(skateto).l
-	move.b	(sp)+,aioff(a3)
+	move.b	(sp)+,legspd(a3)
 	move.w	Ypos(a3),d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.16
@@ -1592,7 +1592,7 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 .5
 	sub.b	d7,temp1(a3)
 	bpl.w	.31
-	move.b	shotspd(a3),temp1(a3)
+	move.b	aidef(a3),temp1(a3)
 	btst	#6,(sflags7).w
 	beq.w	.6
 	tst.b	temp1(a3)
@@ -1601,7 +1601,7 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 .6
 	st	(LastCarrierAway+2).w
 	clr.w	d0
-	move.b	glitch(a3),d0
+	move.b	$65(a3),d0
 	bpl.w	.7
 	move.w	position(a3),d0
 	bmi.w	.35
@@ -1776,25 +1776,25 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 	move.w	temp3(a3),d0
 	move.w	temp4(a3),d1
 	movea.l	#EvadePC,a0
-	move.b	aioff(a3),-(sp)
+	move.b	legspd(a3),-(sp)
 	cmpi.l	#$15F9,$2A(a2)
 	blt.w	.32
-	move.b	#$1E,aioff(a3)
+	move.b	#$1E,legspd(a3)
 .32
 	jsr	(skateto).l
-	move.b	(sp)+,aioff(a3)
+	move.b	(sp)+,legspd(a3)
 	rts
 .33
 	move.w	temp3(a3),d0
 	move.w	temp4(a3),d1
 	movea.l	#EvadePC,a0
-	move.b	aioff(a3),-(sp)
+	move.b	legspd(a3),-(sp)
 	cmpi.l	#$15F9,$2A(a2)
 	blt.w	.34
-	move.b	#$1E,aioff(a3)
+	move.b	#$1E,legspd(a3)
 .34
 	jsr	(skateto).l
-	move.b	(sp)+,aioff(a3)
+	move.b	(sp)+,legspd(a3)
 	jmp	(check4check).l
 .35
 	rts
@@ -1838,7 +1838,7 @@ asswingd							;Winger on defense (tmap 5 / 4: asswingd5 / asswingd4); asswingo 
 .4
 	sub.b	d7,temp1(a3)
 	bpl.w	.33
-	move.b	shotspd(a3),temp1(a3)
+	move.b	aidef(a3),temp1(a3)
 	btst	#6,(sflags7).w
 	beq.w	.5
 	tst.b	temp1(a3)
@@ -1846,7 +1846,7 @@ asswingd							;Winger on defense (tmap 5 / 4: asswingd5 / asswingd4); asswingo 
 	subq.b	#1,temp1(a3)
 .5
 	clr.w	d1
-	move.b	glitch(a3),d1
+	move.b	$65(a3),d1
 	bpl.w	.6
 	move.w	position(a3),d1
 	bmi.w	.34
@@ -2078,7 +2078,7 @@ asscenterd							;Center on defense (tmap 5 / 4: asscenterd5 / asscenterd4); ass
 .3
 	sub.b	d7,temp1(a3)			;subtract d7 from temp1
 	bpl.w	.19
-	move.b	shotspd(a3),temp1(a3)
+	move.b	aidef(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check for crowd record flag
 	beq.w	.4						;jump if not set
 	tst.b	temp1(a3)				;check if 0
@@ -2198,13 +2198,13 @@ asscenterd							;Center on defense (tmap 5 / 4: asscenterd5 / asscenterd4); ass
 	move.w	temp3(a3),d0
 	move.w	temp4(a3),d1
 	lea	.21(pc),a0
-	move.b	aioff(a3),-(sp)
+	move.b	legspd(a3),-(sp)
 	cmpi.l	#$15F9,$2A(a2)
 	blt.w	.20
-	move.b	#$1E,aioff(a3)
+	move.b	#$1E,legspd(a3)
 .20
 	jsr	(skateto).l
-	move.b	(sp)+,aioff(a3)
+	move.b	(sp)+,legspd(a3)
 .21
 	rts
 
@@ -2254,7 +2254,7 @@ assdefo								;Defenseman on offense (tmap 5 / 4: assdefo5 / assdefo4); assdefd
 .4
 	sub.b	d7,temp1(a3)
 	bpl.w	.24
-	move.b	aidef(a3),temp1(a3)
+	move.b	aioff(a3),temp1(a3)
 	jsr	(ReadGoaliePulled).l
 	bmi.w	.5
 	btst	#6,(sflags7).w
@@ -2266,7 +2266,7 @@ assdefo								;Defenseman on offense (tmap 5 / 4: assdefo5 / assdefo4); assdefd
 .6
 	movea.l	#EvadePC,a0
 	clr.w	d1
-	move.b	glitch(a3),d1
+	move.b	$65(a3),d1
 	bpl.w	.7
 	move.w	position(a3),d1
 	bmi.w	.25
@@ -2456,7 +2456,7 @@ asscentero							;Center on offense (tmap 5 / 4: asscentero5 / asscentero4): a r
 .3
 	sub.b	d7,temp1(a3)			;subtract frames elapsed from temp1
 	bpl.w	.9						;branch if positive
-	move.b	shotspd(a3),temp1(a3)
+	move.b	aidef(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check if crowd meter currently broken
 	beq.w	.4
 	tst.b	temp1(a3)				;check if temp1 is 0
@@ -2559,7 +2559,7 @@ asswingo							;Winger on offense (tmap 5 / 4: asswingo5 / asswingo4): a random 
 .3
 	sub.b	d7,temp1(a3)			;subtract frames elapsed from temp1
 	bpl.w	.9						;branch if positive
-	move.b	shotspd(a3),temp1(a3)
+	move.b	aidef(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check if crowd meter currently broken
 	beq.w	.4
 	tst.b	temp1(a3)				;check if temp1 is 0
@@ -2623,7 +2623,7 @@ asswingo							;Winger on offense (tmap 5 / 4: asswingo5 / asswingo4): a random 
 .9
 	move.w	temp3(a3),d0
 	clr.w	d1
-	move.b	glitch(a3),d1
+	move.b	$65(a3),d1
 	bpl.w	.10
 	move.w	position(a3),d1
 	bmi.w	.13

@@ -435,15 +435,15 @@ playeracc							;Player acceleration with facing d2 (doplayeracc entry used by t
 	clr.w	d1
 .noy
 	clr.w	d2						;clear d2
-	move.b	legstr(a3),d2			;move wgt of player into d2
+	move.b	weight(a3),d2			;move wgt of player into d2
 	lsr.w	#2,d2					;divide d2 by 2
 	neg.w	d2						;make it negative
 	addi.w	#$40,d2
-	add.b	legspd(a3),d2			;add agl (legstr) of player to d2
+	add.b	legstr(a3),d2			;add agl (legstr) of player to d2
 	addq.b	#2,d2
 	tst.w	position(a3)
 	bne.w	.2
-	add.b	legspd(a3),d2
+	add.b	legstr(a3),d2
 	addi.w	#$10,d2
 .2
 	asr.w	#1,d2					;divide by 2
@@ -477,7 +477,7 @@ playeracc							;Player acceleration with facing d2 (doplayeracc entry used by t
 	move.w	#$1000,d0				;d0 = energy, move 1000 hex into d0
 .noy4
 	clr.w	d2						;clear d2
-	move.b	aioff(a3),d2
+	move.b	legspd(a3),d2
 	movem.l	a0,-(sp)
 	lea	assnum(a3),a0
 	adda.w	(a0),a0
@@ -541,12 +541,12 @@ playeracc							;Player acceleration with facing d2 (doplayeracc entry used by t
 	subi.w	#$1E,d0
 	cmp.w	#$C00,d0
 	blt.w	setpde
-	move.b	aggress(a3),d2
+	move.b	endurance(a3),d2
 	ext.w	d2
 	lsr.w	#1,d2
 	add.w	d2,d0
 	bsr.w	setpde
-	btst	#0,aggress(a3)
+	btst	#0,endurance(a3)
 	beq.w	.6
 	btst	#0,(Vcount+1).w
 	beq.w	.6

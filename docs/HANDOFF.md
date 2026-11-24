@@ -105,9 +105,10 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
 - code96_03 converted: fighting, asstab and the penalty texts. MATCH (segment and ROM).
 - 96 brings fighting back from 93: the fight routines take the 93G names (checkfight in code96_02, startfight
   for 93's checkfight .sf, SetInst, fightinput, ClearMessageLine, assfight, assfwatch). 96's player struct is not 95's
-  past $60: SetInst reads the player number at $67 and the fight rating at $75 (95 / 93: $66 / $74). Since PR #63 the
-  96 layout is in equals.inc for the top of that range: handed is $77 and checking $76 (95G: $76 / $75), with their
-  18 sites named; $75 (the fight rating) is still written as a number.
+  past $60: SetInst reads the player number at $67 and the fight rating at $75 (95 / 93: $66 / $74). equals.inc
+  has the 96 layout: from glitch ($66) to handed ($77) every field is one byte above 95G (setplayer's roster unpack
+  and the readers: skate speed, the asstab aioff / aidef reads, the stick-handling steal), with the 95G names; $65 is
+  a 96 position override with no 95G / 94G name, written as a number. fighting ($75) is Agr - 6 when Agr > 6, else 0.
 - About 11 KB of this segment is code the listing does not decode (the assignment routines behind asstab, assfight,
   assfwatch): bytes, with a label at every asstab entry (loc_<address> where nothing names the routine). Even with
   RAM addresses masked only a third of it matches 95: 96 rewrote the player AI. With the "do not disassemble" rule
@@ -116,7 +117,7 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
   penalty number and text are the same, .pXX for the rest (96 adds Boarding, Elbowing and High Sticking).
 - code96_04 converted: line changes, shot and pass, roster names, the season simulation. MATCH (segment and ROM).
   Unmatched routines keep their IDA names; small unreferenced code runs stay bytes. A comment on doshot reads
-  shotacc at $6E (95 $6D): more evidence that 96's player struct is shifted past $60.
+  shotacc at $6E (95 $6D): 96's player struct is shifted past $60 (now in equals.inc).
 - Converting a segment can change names other converted segments use (code96_02 now jumps to lineinput, defined
   here): run the full ROM build, not only the segment, before committing.
 - code96_05 converted: season / save RAM code and screens, almost all new in 96 (no 95 or 93 match), so IDA names.

@@ -397,13 +397,13 @@ getBAplayerInfo						;Keep the breakaway shooter, team, goalie and checker for t
 	move.w	#1,(BA_Team).w
 .2
 	move.w	#0,(BA_Skater_Offset).w
-	move.b	$67(a1,d3.w),(BA_Skater_Offset+1).w
+	move.b	pnum(a1,d3.w),(BA_Skater_Offset+1).w
 	move.w	d1,(BA_Goalie_SCnum).w
 	asl.w	#scsize,d1				;scsize
 	move.w	#0,(BA_Goalie_Offset).w
-	move.b	$67(a1,d1.w),(BA_Goalie_Offset+1).w
+	move.b	pnum(a1,d1.w),(BA_Goalie_Offset+1).w
 	move.w	#0,(BA_Checker_Offset).w
-	move.b	weight(a3),(BA_Checker_Offset+1).w
+	move.b	pnum(a3),(BA_Checker_Offset+1).w
 .end
 	movem.l	(sp)+,d1-d3/a1
 	rts
@@ -478,7 +478,7 @@ InProgress							;Ref in progress: update the graphics, stats and penalty inform
 .5
 	addq.w	#1,6(a2)
 	add.w	d2,8(a2)
-	move.b	weight(a3),d0
+	move.b	pnum(a3),d0
 	move.b	d0,(a4)					;log: player
 	move.w	d0,(TempPlOffset).w
 	ext.w	d0
@@ -897,7 +897,7 @@ prefmes								;Print the penalty message: the player, the penalty and its lengt
 	movea.l	#SortCords,a1
 	adda.w	d0,a1
 	clr.w	d0
-	move.b	weight(a1),d0
+	move.b	pnum(a1),d0
 	jsr	(GetPlayerNumInitial).l
 	jsr	(printz).l
 	String	CC_Font1Pri,$0C,$06
