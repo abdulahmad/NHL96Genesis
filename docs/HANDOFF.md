@@ -567,6 +567,8 @@ Unsure from the naming pass (Oct 2026). Each stays an IDA name until the evidenc
 - For Abdul: the asstab entries $1-$6 are named by role and the 94 numbering, not a byte match (see the logic96 bullet).
 - StartDpadBoost (input96): closed 2026-11-04. Start + dpad on a skater sets SPA288C, pf2aip and Xvel + $64
   unless pf2unav or gmclock. No 95G parent (95G start always pauses).
+  2026-11-24 (#65): this is the manual's Spin-o-Rama (Start + d-pad), renamed `dospinorama`, SPA288C is
+  `SPAspinorama`.
 - EngageFight (fight96): closed 2026-11-04. A/B/C during SPAfight: SPA3128, count this fighter
   (FightEngageCount). The second one: SetFightingMajors and GameFlags bit 5; the first: PenCntDwn $140.
   No 93G parent (93 punches from SPAfight directly).
