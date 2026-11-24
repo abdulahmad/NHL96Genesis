@@ -1760,7 +1760,7 @@ $FFFFB006,Map1col,word_FFB006,Map1col1,ram96
 $FFFFB008,VmMap2,word_FFB008,,ram96
 $FFFFB00A,Map2col,word_FFB00A,Map2col1,ram96
 $FFFFB00C,VmMap3,word_FFB00C,,ram96
-$FFFFB00E,Map3col1,word_FFB00E,,ram96
+$FFFFB00E,Map3col,word_FFB00E,Map3col1,ram96
 $FFFFB010,bigfontptr,dword_FFB010,,ram96
 $FFFFB014,printbigchars,word_FFB014,,ram96
 $FFFFB016,bigfont1chars,word_FFB016,,ram96

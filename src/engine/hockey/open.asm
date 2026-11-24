@@ -284,7 +284,7 @@ AbortGame							;The "ABORT GAME" menu item: back to the title (Opening2).
 EASportsScreen						;Called from Begin. Show the EA Sports screen until a button or a time out
 	move.l	#vb2,(VBint).w			;vblank handler
 	bclr	#df32c,(disflags).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$A000,(VmMAP2).w
 	move.w	#7,(Map2col).w
 	move.w	#$C000,(VmMAP1).w
