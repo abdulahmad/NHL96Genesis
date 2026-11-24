@@ -304,7 +304,7 @@ SetupRosterScreenVideo				;Set the VBint handler, scroll and map addresses for t
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
@@ -554,7 +554,7 @@ GoalTypeScreenInit					;Set up the planes and VBlank handler of the goal types s
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
@@ -691,7 +691,7 @@ SetupPenaltySummaryVideo			;Set the VBint handler, scroll and map addresses for 
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
@@ -966,7 +966,7 @@ SetupPeriodStatsVideo	equ	*	;Set the VBint handler, scroll and map addresses for
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
@@ -1252,7 +1252,7 @@ TeamStatScreenInit					;Set up the planes and VBlank handler of the team stats s
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
@@ -1755,7 +1755,7 @@ SetupShootersVideo	equ	*	;Set the VBint handler, scroll and map addresses for th
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
@@ -2272,7 +2272,7 @@ RecordsScreenInit					;Set up the planes and VBlank handler of the team records 
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
 	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w

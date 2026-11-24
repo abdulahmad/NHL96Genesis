@@ -9,7 +9,7 @@ TitleScreen							;Title screen: the picture TitleScreenImg and song 0, until st
 	move.l	#VBlank_Menus,(VBint).w
 	bclr	#dfok,(disflags).w
 	bclr	#df32c,(disflags).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$A000,(VmMAP2).w
 	move.w	#7,(Map2col).w
 	move.w	#$C000,(VmMAP1).w
@@ -96,7 +96,7 @@ CreditsScreen						;The legal and credits pages (CreditsPages) over three pictur
 	move.l	#VBlank_Menus,(VBint).w
 	bclr	#dfok,(disflags).w
 	bclr	#df32c,(disflags).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$A000,(VmMAP2).w
 	move.w	#7,(Map2col).w
 	move.w	#$C000,(VmMAP1).w
@@ -357,7 +357,7 @@ CupCelebrationSetup					;CupCelebration: vram, the team and rink palettes, the r
 	move.w	#$E000,(VmMAP1).w
 	move.w	#6,(Map1col).w
 	move.w	#$F000,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$FC00,(VSCRLPM).w
 	movea.w	#(palfadenew-M68K_RAM),a0
 	moveq	#$1F,d1
