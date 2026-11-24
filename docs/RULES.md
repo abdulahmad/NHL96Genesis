@@ -28,7 +28,7 @@ rule in the same commit as the fix that confirmed it, newest last: `- YYYY-MM-DD
 - 2026-11-04 contributing: CONTRIBUTING.md must not contradict History: lineage lives only in the name history file, never in source comments. (CONTRIBUTING rewrite vs RULES History row)
 - 2026-11-04 D6: remaining generic labels and role-only 95G matches stay on the Unsure list; 95G wins only when the body is the same. (align95_plan.md Unsure; leftovers D6 parked)
 - 2026-11-04 D6 names: same job + new body takes the 95G name; leftover sub_/loc_/unk_ are named from job, callers, SRAM or role. input96_shot: SetRoles / SetTeamRoles / ClearRolesIfGoalie (no 95G parent). (owner)
-- 2026-11-04 D6 names: input96 StartDpadBoost (start + dpad on a skater: SPA288C, pf2aip, Xvel+$64). No 95G parent. (owner)
+- 2026-11-04 D6 names: input96 dospinorama, formerly StartDpadBoost, renamed 2026-11-24 in #65 after code tracing: the manual's Spin-o-Rama (start + dpad on a skater: SPAspinorama, formerly SPA288C, pf2aip, Xvel+$64). No 95G parent. (owner)
 - 2026-11-04 D6 names: fight96 EngageFight (A/B/C during SPAfight: SPA3128, second fighter SetFightingMajors). No 93G parent. (owner)
 - 2026-11-04 D6 names: season96 ClearRosterSave (Reset Rosters: stats, $DDD, injuries, FA stats). No 95G parent. (owner)
 - 2026-11-04 D6 names: create96 CheckTeamLines is the 95G name (team d7 saved lines); 96 clears the $41-byte block instead of fixing slots. (owner)
