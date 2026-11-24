@@ -2,12 +2,12 @@
 
 getFgtbyte							;d0 = $75(a2) / 4
 	clr.w	d0						;clear d0
-	move.b	checking(a2),d0			;move H/F bit into d0 (this is always even)
+	move.b	$75(a2),d0				;move H/F bit into d0 (this is always even)
 	lsr.w	#2,d0					;shift 2 right (divide by 4)
 	rts
 
-chkFgtBit1							;Z set when $77(a2) is 2 or less (d0 kept)
-	cmpi.b	#2,$77(a2)
+chkFgtBit1							;Z set when handed(a2) is 2 or less (d0 kept)
+	cmpi.b	#2,handed(a2)
 	ble.w	.0
 	movem.w	d0,-(sp)
 	move.w	#1,d0

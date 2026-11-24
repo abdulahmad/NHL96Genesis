@@ -478,7 +478,7 @@ CCStart								;Player a3 is checking player a2
 	bne.w	.2
 	bsr.w	randomd0
 	clr.w	(TempWord1).w
-	move.b	$76(a3),(TempWord1+1).w
+	move.b	checking(a3),(TempWord1+1).w
 	lsr	(TempWord1).w
 	cmp.b	(TempWord1+1).w,d0
 	ble.w	.2
@@ -671,7 +671,7 @@ Bcheck								;a2 B-checks a3 (CCStart, sweep checks). With OptPen off and a pad
 	btst	#pfjoycon,pflags(a2)
 	beq.w	.checkdir
 	move.w	#$20,d0
-	add.b	$76(a2),d0
+	add.b	checking(a2),d0
 	sub.b	legspd(a3),d0
 	btst	#1,(sflags8).w
 	bne.w	.0
@@ -766,7 +766,7 @@ FallDown							;Player a2 falls down (hit by a3, or the puck): the fall animatio
 	adda.w	d0,a0
 	addq.b	#1,$130(a0)
 	addq.w	#1,(ChkCnt).w			;Add 1 to ChkCnt
-	tst.b	checking(a3)
+	tst.b	$75(a3)
 	bne.w	.chkpos
 	addq.w	#2,(ChkCnt).w			;add 2 to ChkCnt
 .chkpos
@@ -932,7 +932,7 @@ FallDown							;Player a2 falls down (hit by a3, or the puck): the fall animatio
 	move.w	facedir(a2),d0
 	andi.w	#3,d0
 	bne.w	.hitter
-	cmpi.b	#$14,$76(a3)
+	cmpi.b	#$14,checking(a3)
 	blt.w	.hitter
 	cmpi.w	#$B,SCnum(a3)			;check if SCNum of checker is a player
 	bgt.w	.hitter

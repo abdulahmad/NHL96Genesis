@@ -248,7 +248,7 @@ asspenalty							;asstab entry: player a3 goes to the penalty box.
 	move.w	#SPAglide,d1			;94 $50C
 	bsr.w	SetSPA
 	moveq	#6,d2
-	btst	#0,$77(a3)
+	btst	#0,handed(a3)
 	beq.w	.5
 	moveq	#2,d2
 .5

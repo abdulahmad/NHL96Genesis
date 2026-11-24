@@ -58,7 +58,7 @@ assfaceoffpl						;Assignment: the faceoff player
 	move.w	SPAnum(a3),d0
 	lsr.w	#2,d0
 	addq.w	#1,d0
-	btst	#0,$77(a3)
+	btst	#0,handed(a3)
 	bne.w	.3
 	addq.w	#3,d0
 .3
