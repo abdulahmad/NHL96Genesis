@@ -2186,3 +2186,10 @@ $FFFFDD82,SeasonPen,dword_FFDD82,,ram96
 $FFFFDD84,SeasonTeam,dword_FFDD82+2,,ram96
 $FFFFDDB6,TeamSelSide,word_FFDDB6,,ram96
 $FFFFDDBE,PlayoffMenuTeam,word_FFDDBE,,ram96
+$FFFFBF54,ChosenGoalies1,,TempLegSpd+2,ram96
+$FFFFBF56,ChosenSkaters1,,pstatscat,ram96
+$FFFFBF58,ChosenDefense1,,pstatstop,ram96
+$FFFFBF5E,ChosenGoalies2,,pstatslast,ram96
+$FFFFBF60,ChosenSkaters2,,pstatslast+2,ram96
+$FFFFBF62,ChosenDefense2,,pstatslast+4,ram96
+$FFFFBF68,InvalidTradeReason,,$FFFFBF68,ram96
