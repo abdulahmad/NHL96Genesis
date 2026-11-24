@@ -70,15 +70,15 @@ SetPlList							;Create PlList of players who we want on the ice now. a2 = team 
 	clr.l	(a4)					;clear 6 bytes (PlList)
 	clr.w	4(a4)
 	movea.l	#priolist,a0			;priority of positions
-	tst.w	$26(a2)
+	tst.w	tmgoalie(a2)
 	bpl.w	.0
 	addq.w	#1,a0					;add 1 to a0
 .0
-	lea	$184(a2),a1
-	move.w	$16(a2),d0
+	lea	tmlines(a2),a1
+	move.w	tmline(a2),d0
 	asl.w	#3,d0					;mult by 8
 	adda.w	d0,a1					;add to a1 to set a1 to currently selected line
-	move.w	$24(a2),d4
+	move.w	tmap(a2),d4
 	bra.w	.next
 .1
 	clr.w	d5
@@ -87,7 +87,7 @@ SetPlList							;Create PlList of players who we want on the ice now. a2 = team 
 	move.b	d5,6(a4,d4.w)
 	bne.w	.next
 	moveq	#1,d3
-	add.w	$26(a2),d3
+	add.w	tmgoalie(a2),d3
 	move.b	d3,(a4,d4.w)
 .next
 	dbf	d4,.1
@@ -105,7 +105,7 @@ SetPlList							;Create PlList of players who we want on the ice now. a2 = team 
 	tst.w	$6C(a2,d3.w)
 	ble.w	.next1
 .4
-	lea	$184(a2),a1
+	lea	tmlines(a2),a1
 	move.b	6(a4,d4.w),d0			;move 6+a4+d4 into d0 (previous d5)
 	ext.w	d0						;extend d0
 	asl.w	#1,d0					;mult by 2
@@ -268,7 +268,7 @@ ResetBench							;Remove all players from penalty box / put all players on their
 AssignByPosition					;assreplace player a3 with the assignment of his position
 	move.w	position(a3),d0
 	bmi.w	rtss2
-	st	$65(a3)
+	st	glitch(a3)
 	lea	PosAssignTable(pc),a0
 	move.b	(a0,d0.w),d0
 	bra.w	assreplace
@@ -279,9 +279,9 @@ PosAssignTable						;Assignment byte for each position
 AssignBySavedPos					;assreplace from the saved index at $65(a3), or from the position
 	move.w	position(a3),d0
 	bmi.w	rtss2
-	tst.b	$65(a3)
+	tst.b	glitch(a3)
 	bmi.w	.0
-	move.b	$65(a3),d0
+	move.b	glitch(a3),d0
 .0
 	lea	PosAssignTable2(pc),a0
 	move.b	(a0,d0.w),d0
@@ -295,14 +295,14 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 									;Reads the roster bytes through AttributeCalc (attribute number in
 									;TempWord2), adds the PP / PK, home / away and third period bonuses and
 									;clamps them (ClampNibble).
-	st	$65(a3)
-	bclr	#6,$63(a3)
+	st	glitch(a3)
+	bclr	#6,pflags2(a3)
 	movea.w	#(tmstruct-M68K_RAM),a0	;Start of Team Struct
-	btst	#6,$62(a3)
+	btst	#6,pflags(a3)
 	beq.w	.0
 	adda.w	#$39E,a0
 .0
-	move.b	d3,$67(a3)
+	move.b	d3,weight(a3)
 	moveq	#$A,d0
 	ext.w	d3
 	add.w	d3,d3					;= asl #1,d3. Accomplishes the same. Doubles d3
@@ -313,8 +313,8 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	bne.w	.nda
 .1
 	bsr.w	assinsert
-	bclr	#5,$62(a3)
-	clr.w	$58(a3)
+	bclr	#5,pflags(a3)
+	clr.w	SPA(a3)
 .nda
 	move.w	#$FFFF,$6C(a0,d3.w)		;clear out temp space
 	lsr.w	#1,d3					;shift d3 back to its original value
@@ -323,7 +323,7 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 									;(roster, etc)
 	adda.w	8(a0),a0
 	clr.l	(PPBonus).w				;Clears all bonuses
-	tst.w	$34(a3)					;check if goalie
+	tst.w	position(a3)			;check if goalie
 	beq.w	.2
 	btst	#sf2pwrplay,(sflags2).w	;might be checking for a PP
 	beq.w	.habonus
@@ -341,7 +341,7 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	move.b	2(a0),d0				;This is location of Home/Away adv
 	andi.b	#$F,d0					;pass the lower nibble (Away) to d0
 	neg.b	d0						;make d0 negative (away disadvantage)
-	btst	#6,$62(a3)
+	btst	#6,pflags(a3)
 	bne.w	.3rdperbonuscheck
 	move.b	2(a0),d0				;player is home, move Home/Away byte back in to d0
 	lsr.b	#4,d0					;Shift d0 4 places right, to move upper nibble into d0
@@ -358,7 +358,7 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	move.w	(HmGoals).w,d0
 	sub.w	(AwGoals).w,d0
 	beq.w	.8
-	btst	#6,$62(a3)
+	btst	#6,pflags(a3)
 	beq.w	.home
 	eori	#8,ccr					;If Aw team, checks if N flag is set from HmGoals-AwGoals.
 .home
@@ -375,21 +375,21 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	adda.w	(a1),a1
 	movea.l	a1,a0
 	movem.l	(sp)+,d0/d7/a1
-	move.b	(jerseynum+1).w,$70(a3)
+	move.b	(jerseynum+1).w,spodds(a3)
 	move.b	1(a0),d3				;move Wgt/Agl byte to d3
 	andi.w	#$F0,d3					;Mask Wgt nibble
 	lsr.w	#1,d3					;shift d3 1 bit right (This is taking Wgt and mult by 8)
-	move.b	d3,$68(a3)
+	move.b	d3,legstr(a3)
 	move.b	1(a0),d3				;move Wgt/Agl byte to d3
 	andi.b	#$F,d3					;mask Agl nibble
 	move.w	#3,(TempWord2).w		;TempWord2 = 3
 	jsr	(AttributeCalc).l			;attribute math and add hot/cold
-	move.b	d3,$69(a3)
+	move.b	d3,legspd(a3)
 	move.b	2(a0),d3				;load Spd/OfA byte to d3
 	lsr.b	#4,d3					;remove OfA nibble by shifting 4 bits right, moving Spd into lower nibble
 	move.w	#4,(TempWord2).w		;TempWord2 = 4
 	jsr	(AttributeCalc).l
-	move.b	d3,$6A(a3)
+	move.b	d3,aioff(a3)
 	move.b	2(a0),d3				;move Spd/OfA byte to d3
 	andi.b	#$F,d3
 	move.w	#5,(TempWord2).w		;TempWord2 = 5
@@ -403,7 +403,7 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	eori.b	#$F,d3					;XOR d3 with F
 	addi.b	#$F,d3					;add F to d3
 	lsr.b	#1,d3					;divide by 2
-	move.b	d3,$6B(a3)
+	move.b	d3,aidef(a3)
 	move.b	3(a0),d3				;move DfA/ShP byte to d3
 	lsr.b	#4,d3					;see above
 	move.w	#6,(TempWord2).w
@@ -414,13 +414,13 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	eori.b	#$F,d3
 	addi.b	#$F,d3
 	lsr.b	#1,d3
-	move.b	d3,$6C(a3)
-	move.b	3(a0),$6D(a3)
-	andi.b	#$F,$6D(a3)
-	move.b	$6D(a3),d3
+	move.b	d3,shotspd(a3)
+	move.b	3(a0),shotacc(a3)
+	andi.b	#$F,shotacc(a3)
+	move.b	shotacc(a3),d3
 	move.w	#7,(TempWord2).w
 	jsr	(AttributeCalc).l
-	move.b	d3,$6D(a3)
+	move.b	d3,shotacc(a3)
 	move.b	4(a0),d3				;move Chk/Hnd byte into d3
 	lsr.b	#4,d3
 	move.w	#8,(TempWord2).w
@@ -428,30 +428,30 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	add.b	(PPBonus+2).w,d3
 	bsr.w	ClampNibble
 	move.b	d3,$76(a3)
-	bclr	#3,4(a3)
+	bclr	#3,attribute(a3)
 	move.b	4(a0),$77(a3)
 	andi.b	#1,$77(a3)
 	eori.b	#1,$77(a3)
 	bne.w	.3
-	bset	#3,4(a3)
+	bset	#3,attribute(a3)
 .3
 	move.b	4(a0),d3
-	tst.w	$34(a3)
+	tst.w	position(a3)
 	bne.w	.4
 	move.b	5(a0),d3
 	lsr.b	#3,d3
 .4
 	andi.b	#$FE,d3
 	or.b	d3,$77(a3)
-	clr.b	$75(a3)
-	tst.w	$34(a3)
+	clr.b	checking(a3)
+	tst.w	position(a3)
 	beq.w	.5
 	move.b	7(a0),d3
 	andi.b	#$F,d3
 	cmp.b	#6,d3
 	ble.w	.5
 	subq.w	#6,d3
-	move.b	d3,$75(a3)
+	move.b	d3,checking(a3)
 .5
 	move.b	5(a0),d3				;move Pas/Agr byte into d3
 	lsr.b	#4,d3
@@ -461,7 +461,7 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	add.b	(PPBonus+1).w,d3
 	add.b	(PPBonus+3).w,d3
 	bsr.w	ClampNibble
-	move.b	d3,$72(a3)
+	move.b	d3,endurance(a3)
 	move.b	5(a0),d3
 	andi.b	#$F,d3
 	move.w	#$B,(TempWord2).w
@@ -470,12 +470,12 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	add.b	(PPBonus+1).w,d3
 	add.b	(PPBonus+3).w,d3
 	bsr.w	ClampNibble
-	move.b	d3,$6E(a3)
+	move.b	d3,passacc(a3)
 	move.b	6(a0),d3
 	lsr.b	#4,d3
 	move.w	#$C,(TempWord2).w
 	jsr	(AttributeCalc).l
-	move.b	d3,$73(a3)
+	move.b	d3,aggress(a3)
 	move.b	6(a0),d3
 	andi.b	#$F,d3
 	move.w	#$D,(TempWord2).w
@@ -483,7 +483,7 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	add.b	(PPBonus+2).w,d3
 	add.b	(PPBonus+2).w,d3
 	bsr.w	ClampNibble
-	move.b	d3,$71(a3)
+	move.b	d3,stickhand(a3)
 	move.b	7(a0),d3				;move Pas/Agr byte into d3
 	lsr.b	#4,d3
 	move.w	#$E,(TempWord2).w
@@ -491,7 +491,7 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	add.b	(PPBonus).w,d3
 	add.b	(PPBonus+3).w,d3
 	bsr.w	ClampNibble
-	move.b	d3,$6F(a3)
+	move.b	d3,rostnum(a3)
 	move.b	7(a0),d3
 	andi.b	#$F,d3
 	cmp.b	#6,d3
@@ -500,8 +500,8 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 .7
 	move.w	#$F,(TempWord2).w
 	jsr	(AttributeCalc).l
-	move.b	d3,$74(a3)
-	andi.b	#$F,$74(a3)
+	move.b	d3,fighting(a3)
+	andi.b	#$F,fighting(a3)
 	rts
 
 ClampNibble							;Clamp byte d3 to 0-$1E. Called by setplayer

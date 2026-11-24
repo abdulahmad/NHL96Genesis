@@ -102,8 +102,8 @@ UpdateTeamRecord					;Add the game of team a1 (against a2) to team record block 
 	move.b	d0,$B(a0)
 	lsr.w	#8,d0
 	move.b	d0,$A(a0)
-	move.w	$C(a1),d0
-	cmp.w	$C(a2),d0
+	move.w	tmscore(a1),d0
+	cmp.w	tmscore(a2),d0
 	bgt.w	.0
 	blt.w	.1
 	clr.w	d0
@@ -127,11 +127,11 @@ UpdateTeamRecord					;Add the game of team a1 (against a2) to team record block 
 .1
 	movem.w	(sp)+,d0
 	movem.w	d0,-(sp)
-	move.w	$C(a1),d0
-	cmp.w	$C(a2),d0
+	move.w	tmscore(a1),d0
+	cmp.w	tmscore(a2),d0
 	movem.w	(sp)+,d0
 	ble.w	.write
-	move.w	$C(a1),d5
+	move.w	tmscore(a1),d5
 	cmp.b	(a0),d5
 	ble.w	.2
 	st	d7
@@ -140,7 +140,7 @@ UpdateTeamRecord					;Add the game of team a1 (against a2) to team record block 
 	move.b	d4,2(a0)
 	move.b	d2,3(a0)
 .2
-	move.w	$C(a2),d5
+	move.w	tmscore(a2),d5
 	move.w	(a2),d6
 	sub.w	d5,d6
 	cmp.b	4(a0),d6

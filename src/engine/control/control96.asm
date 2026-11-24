@@ -98,7 +98,7 @@ updateplayers						;This routine calls all collision/animation/assignment code f
 	move.w	#$FF70,(a3)
 	bra.w	.20
 	move.w	#$96,(a3)
-	btst	#3,4(a3)
+	btst	#3,attribute(a3)
 	beq.w	updateplayersanim
 	move.w	#$FF6A,(a3)
 	bra.w	updateplayersanim
@@ -126,14 +126,14 @@ updateplayersanim	equ	*			;Animate the player after the position check of update
 	bpl.w	.np
 	clr.b	nopuck(a3)				;clear upper byte of nopuck
 .np
-	sub.b	d7,$5F(a3)				;subtract # of frames from nopuck+1
+	sub.b	d7,nopuck+1(a3)			;subtract # of frames from nopuck+1
 	bpl.w	.np2
-	clr.b	$5F(a3)					;clear lower byte of nopuck
+	clr.b	nopuck+1(a3)			;clear lower byte of nopuck
 .np2
 	btst	#sf3icetime,(sflags3).w	;check if penalty timer is up
 	beq.w	.21
 	clr.w	d0
-	move.b	$67(a3),d0				;player offset on roster
+	move.b	weight(a3),d0			;player offset on roster
 	bmi.w	.21
 	add.w	d0,d0
 	addi.w	#$14C,d0
@@ -324,14 +324,14 @@ updateanim							;Frame switch control on struct a3. Called from updateplayers
 .0
 	move.w	d0,SPAcnt(a3)			;move d0 into SPAcnt
 .cframe
-	sub.b	d7,$66(a3)				;sub frames elapsed from glitch - limit minimum
+	sub.b	d7,pnum(a3)				;sub frames elapsed from glitch - limit minimum
 	;time between frame switches
 	bpl.w	.rtss					;branch if glitch is positive still
-	clr.b	$66(a3)					;clear glitch
+	clr.b	pnum(a3)				;clear glitch
 	cmp.w	frame(a3),d2			;compare frame to d2
 	beq.w	.rtss					;branch if equal
 	move.w	d2,frame(a3)			;move d2 into frame
-	move.b	#4,$66(a3)				;move 4 into glitch - /60 sec min frame switch time
+	move.b	#4,pnum(a3)				;move 4 into glitch - /60 sec min frame switch time
 .rtss
 	rts
 

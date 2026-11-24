@@ -9,6 +9,6 @@ ReadGoaliePulled					;Z clear when the team of a3 pulled its goalie ($26 of the 
 	beq.w	.0
 	movea.l	#AwShots,a1
 .0
-	tst.w	$26(a1)
+	tst.w	tmgoalie(a1)
 	movem.l	(sp)+,a1
 	rts

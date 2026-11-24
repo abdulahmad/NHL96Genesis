@@ -46,31 +46,31 @@ setteams							;Use HomeTeam / VisTeam to set team structures (InitTeamStructure
 	movem.l	d0/a0-a2,-(sp)
 	movea.w	#(tmstruct-M68K_RAM),a2
 	move.w	(HomeTeam).w,d0
-	move.w	#$B05E,$22(a2)
+	move.w	#$B05E,tmsort(a2)
 	bsr.w	InitTeamStructure
 	movea.w	#(AwShots-M68K_RAM),a2
 	move.w	(VisTeam).w,d0
-	move.w	#$B35E,$22(a2)
+	move.w	#$B35E,tmsort(a2)
 	bsr.w	InitTeamStructure
 	movem.l	(sp)+,d0/a0-a2
 	rts
 
 InitTeamStructure					;Set up team struct a2 for team d0: the team number at $28 and the team
 									;data address
-	move.w	d0,$28(a2)
+	move.w	d0,tmteam(a2)
 	movea.w	#TeamList,a0
 	asl.w	#2,d0
-	move.l	(a0,d0.w),$1E(a2)
+	move.l	(a0,d0.w),tmdata(a2)
 
 SetOriginalLines					;The line sets of team struct a2 from GetTeamLines: with OptLine sets 0
 									;and 2-7, else sets 1-7. The "Set Original lines" item of the line menus
 	tst.w	(OptLine).w
 	beq.w	.0
 	move.w	d7,-(sp)
-	move.w	$28(a2),d7
+	move.w	tmteam(a2),d7
 	jsr	(GetTeamLines).l
 	move.w	(sp)+,d7
-	lea	$184(a2),a1
+	lea	tmlines(a2),a1
 	move.l	(a0)+,(a1)+
 	move.l	(a0)+,(a1)+
 	addq.w	#8,a0
@@ -83,11 +83,11 @@ SetOriginalLines					;The line sets of team struct a2 from GetTeamLines: with Op
 .0
 	moveq	#$D,d0
 	move.w	d7,-(sp)
-	move.w	$28(a2),d7
+	move.w	tmteam(a2),d7
 	jsr	(GetTeamLines).l
 	move.w	(sp)+,d7
 	addq.w	#8,a0
-	lea	$184(a2),a1
+	lea	tmlines(a2),a1
 .loop2
 	move.l	(a0)+,(a1)+
 	dbf	d0,.loop2
@@ -97,9 +97,9 @@ SetOriginalLines					;The line sets of team struct a2 from GetTeamLines: with Op
 SetGoalieFromLines					;tmgoalie of team a2 = the first byte of its line sets ($184) - 1
 	move.w	d0,-(sp)
 	clr.w	d0
-	move.b	$184(a2),d0
+	move.b	tmlines(a2),d0
 	subq.w	#1,d0
-	move.w	d0,$26(a2)
+	move.w	d0,tmgoalie(a2)
 	move.w	(sp)+,d0
 	rts
 

@@ -32,7 +32,7 @@ ShootoutModeBox						;Shootout round box: "SHOOTOUT MODE" (ShootoutModeBigTxt), 
 	movea.l	#SortCords,a2
 	adda.w	d0,a2
 	clr.w	d0
-	move.b	$67(a2),d0
+	move.b	weight(a2),d0
 	movea.l	#AwShots,a2
 	tst.w	(BA_Team).w
 	beq.w	.2
@@ -45,7 +45,7 @@ ShootoutModeBox						;Shootout round box: "SHOOTOUT MODE" (ShootoutModeBigTxt), 
 	jsr	(printbigz1).l
 	String	CC_SetMapAndPosition,$04,$01,$05,$08,'<            >',CC_SetX,$06
 	movea.l	#tmstruct,a1
-	movea.l	$1E(a1),a1
+	movea.l	tmdata(a1),a1
 	adda.w	4(a1),a1
 	jsr	(printbig1).l
 	move.w	#$15,(printx).w
@@ -56,7 +56,7 @@ ShootoutModeBox						;Shootout round box: "SHOOTOUT MODE" (ShootoutModeBigTxt), 
 	jsr	(printbigz1).l
 	String	CC_SetMapAndPosition,$04,$01,$05,$0A,'<            >',CC_SetX,$06
 	movea.l	#AwShots,a1
-	movea.l	$1E(a1),a1
+	movea.l	tmdata(a1),a1
 	adda.w	4(a1),a1
 	jsr	(printbig1).l
 	move.w	#$15,(printx).w
@@ -260,20 +260,20 @@ EndShootout							;Shootout over: LockScroll, then the 5 skaters of player slots
 .loop
 	movem.w	d2-d3,-(sp)
 	jsr	(setplayer).l
-	move.w	#2,$34(a3)
+	move.w	#2,position(a3)
 	move.w	#$F0,d0
 	tst.w	(Vpos).w
 	bmi.w	.1
 	move.w	#$FF10,d0
 .1
 	add.w	(Vpos).w,d0
-	move.w	d0,$14(a3)
+	move.w	d0,Ypos(a3)
 	move.w	#0,(a3)
 	move.w	#7,d0
 	jsr	(assinsert).l
-	bclr	#5,$62(a3)
-	bclr	#1,$63(a3)
-	bclr	#2,$62(a3)
+	bclr	#5,pflags(a3)
+	bclr	#1,pflags2(a3)
+	bclr	#2,pflags(a3)
 	movem.w	(sp)+,d2-d3
 .2
 	adda.l	#$80,a3
@@ -457,7 +457,7 @@ ShortenMsgTimer						;Cap the message timer at 2, unless a second pad is on and 
 	movem.l	d0,-(sp)
 	tst.w	(cont2team).w
 	beq.w	.0
-	move.w	$52(a3),d0
+	move.w	SCnum(a3),d0
 	cmp.w	(puckc).w,d0
 	bne.w	.x
 .0
@@ -677,7 +677,7 @@ PSandSOpassdir						;Penalty shot / shootout: passdir = sopathdir (the end of th
 									;for the bottom net
 	movem.l	d0-d7/a0-a6,-(sp)
 	move.w	(sopathdir).w,d0
-	btst	#7,$62(a3)
+	btst	#7,pflags(a3)
 	bne.w	.0
 	movea.l	#passdirlist,a0
 	add.w	d0,d0

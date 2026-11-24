@@ -99,7 +99,7 @@ getplayernameD7						;Getplayername for team d7
 GetPlayerNamePointer				;a0 = name string of player d0 (roster offset) of team struct a2
 									;(GetRosterName)
 	movem.l	d0/d7/a2,-(sp)
-	move.w	$28(a2),d7
+	move.w	tmteam(a2),d7
 
 getnamea0							;Shared tail of getplayername: GetRosterName, a0 = the name
 	jsr	(GetRosterName).l
@@ -440,7 +440,7 @@ SimTeamGoals						;d2 = goals of a team of strength d3 against team d1 (its defe
 	movea.l	#AwShots,a2
 	move.w	(TempMaxSpd).w,d4
 	move.w	d3,-(sp)
-	move.w	d4,$28(a2)
+	move.w	d4,tmteam(a2)
 	movea.l	#TeamList,a1
 	asl.w	#2,d4
 	move.l	(a1,d4.w),(AwShots+tmdata).w
@@ -514,7 +514,7 @@ SimTeamStrength						;d3 = the sim strength of team d0: SimRatingPoints of its b
 	clr.l	(a0)+
 	dbf	d1,.0
 	movea.l	#tmstruct,a2
-	move.w	d0,$28(a2)
+	move.w	d0,tmteam(a2)
 	movea.l	#TeamList,a0
 	asl.w	#2,d0
 	move.l	(a0,d0.w),(tmstruct+tmdata).w

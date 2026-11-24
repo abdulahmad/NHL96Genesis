@@ -94,7 +94,7 @@ CompLine							;The computer picks a line for team a2 (a1 = other team).
 	bge.w	.2
 	addq.w	#1,(sp)
 .2
-	move.w	(sp)+,$16(a2)
+	move.w	(sp)+,Ypos+2(a2)
 .loop
 	movem.l	(sp)+,d0-d2/a0
 	rts
@@ -105,7 +105,7 @@ CompLine							;The computer picks a line for team a2 (a1 = other team).
 	lea	.table(pc),a0
 	cmpi.w	#2,(gsp).w
 	bne.w	.4
-	move.w	$C(a2),d2
+	move.w	VRoffs+2(a2),d2
 	cmp.w	$C(a1),d2
 	beq.w	.4
 	adda.w	#$E,a0
@@ -118,7 +118,7 @@ CompLine							;The computer picks a line for team a2 (a1 = other team).
 	bsr.w	getlinee
 	cmp.w	#$C00,d0
 	bls.w	.5
-	move.w	(a0,d1.w),$16(a2)
+	move.w	(a0,d1.w),Ypos+2(a2)
 	bra.s	.loop
 .table
 	dc.w	$0000,$0001,$0002,$0000,$0001,$0000,$0001,$0002
@@ -129,7 +129,7 @@ CompLine							;The computer picks a line for team a2 (a1 = other team).
 	lea	.table2(pc),a0
 	cmpi.w	#2,(gsp).w
 	bne.w	.loop2
-	move.w	$C(a2),d2
+	move.w	VRoffs+2(a2),d2
 	cmp.w	$C(a1),d2
 	beq.w	.loop2
 	addq.w	#6,a0
@@ -140,7 +140,7 @@ CompLine							;The computer picks a line for team a2 (a1 = other team).
 	bsr.w	getlinee
 	cmp.w	#$C00,d0
 	dbhi	d1,.loop2
-	move.w	-(a0),$16(a2)
+	move.w	-(a0),Ypos+2(a2)
 	bra.w	.loop
 .table2
 	dc.w	$0000,$0001,$0002,$0000,$0002,$0001,$0000,$0001
@@ -301,17 +301,17 @@ pucknorm							;asstab entry: the puck: follow the carrier, icing / offsides che
 	beq.w	.1
 	bsr.w	UpdatePenaltyShotEnd
 .1
-	bclr	#pfna,$62(a3)			;#pfna clear
+	bclr	#pfna,pflags(a3)		;#pfna clear
 	beq.w	.2
-	clr.w	$40(a3)					;temp1
-	move.w	#$78,$42(a3)			;'x' ; temp2
+	clr.w	temp1(a3)				;temp1
+	move.w	#$78,temp2(a3)			;'x' ; temp2
 .2
 	movea.w	#(puckcross-M68K_RAM),a1	;table for puck crossing lines
 	sub.w	d7,2(a1)				;sub elapse frames from time til crossing
 	sub.w	d7,6(a1)
-	sub.w	d7,$40(a3)				;temp1
+	sub.w	d7,temp1(a3)			;temp1
 	bpl.w	.3
-	addq.w	#5,$40(a3)
+	addq.w	#5,temp1(a3)
 	bsr.w	findpc
 .3
 	move.w	(puckc).w,d0
@@ -326,12 +326,12 @@ pucknorm							;asstab entry: the puck: follow the carrier, icing / offsides che
 	sub.w	(a3),d0
 	asr.w	#2,d0
 	add.w	d0,(a3)
-	add.w	$14(a2),d1				;Ypos
-	sub.w	$14(a3),d1
+	add.w	Ypos(a2),d1				;Ypos
+	sub.w	Ypos(a3),d1
 	asr.w	#2,d1
-	add.w	d1,$14(a3)
-	move.w	$28(a2),$28(a3)			;Xvel
-	move.w	$2A(a2),$2A(a3)			;Yvel
+	add.w	d1,Ypos(a3)
+	move.w	Xvel(a2),Xvel(a3)		;Xvel
+	move.w	Yvel(a2),Yvel(a3)		;Yvel
 .4
 	jsr	(PuckIChk).l
 	jsr	(ChkOffsides).l
@@ -340,23 +340,23 @@ pucknorm							;asstab entry: the puck: follow the carrier, icing / offsides che
 	tst.w	(puckc).w
 	bpl.w	.6
 	move.w	(a3),d0					;Xpos
-	cmp.w	$1C(a3),d0				;oldXpos
+	cmp.w	OldXpos(a3),d0			;oldXpos
 	bne.w	.6
-	move.w	$14(a3),d0				;Ypos
-	cmp.w	$20(a3),d0				;oldYpos
+	move.w	Ypos(a3),d0				;Ypos
+	cmp.w	OldYpos(a3),d0			;oldYpos
 	bne.w	.6
 	moveq	#6,d0
-	subq.w	#1,$42(a3)				;temp3
+	subq.w	#1,temp2(a3)			;temp3
 	bpl.w	.5
 	jsr	(AddPenalty2).l
 .5
 	bra.w	.7
 .6
-	move.w	#$78,$42(a3)			;'x' ; move 78 hex into temp2
+	move.w	#$78,temp2(a3)			;'x' ; move 78 hex into temp2
 .7
-	tst.b	$2C(a3)					;Zvel
+	tst.b	Zvel(a3)				;Zvel
 	bne.w	wallcollcheck
-	tst.w	$18(a3)					;Zpos
+	tst.w	Zpos(a3)				;Zpos
 	bne.w	wallcollcheck
 	bsr.w	puckunflip
 	bra.w	wallcollcheck
@@ -372,9 +372,9 @@ ChkOffsides							;Offsides.
 	exg	a1,a2
 	bsr.w	CheckAttackersOffside
 	move.w	#$72,d0
-	cmp.w	$14(a3),d0
+	cmp.w	Ypos(a3),d0
 	bgt.w	.3
-	cmp.w	$20(a3),d0
+	cmp.w	OldYpos(a3),d0
 	ble.w	rtss2
 	addi.w	#$A,d0
 	btst	#gmdir,(gmode).w
@@ -396,9 +396,9 @@ ChkOffsides							;Offsides.
 	rts
 .3
 	neg.w	d0
-	cmp.w	$14(a3),d0
+	cmp.w	Ypos(a3),d0
 	blt.w	rtss2
-	cmp.w	$20(a3),d0
+	cmp.w	OldYpos(a3),d0
 	bge.w	rtss2
 	subi.w	#$A,d0
 	btst	#gmdir,(gmode).w
@@ -406,13 +406,13 @@ ChkOffsides							;Offsides.
 	exg	a2,a1
 .4
 	moveq	#5,d2
-	movea.w	$22(a2),a0
+	movea.w	tmsort(a2),a0
 .loop2
-	tst.w	$34(a0)
+	tst.w	position(a0)
 	bmi.w	.5
-	cmp.w	$14(a0),d0
+	cmp.w	Ypos(a0),d0
 	ble.w	.5
-	bset	#4,$30(a2)
+	bset	#4,tmflags(a2)
 	rts
 .5
 	adda.w	#SCstruct,a0
@@ -526,7 +526,7 @@ ArmIcing							;Icing start for a2: iflags cleared, icingPlayer, direction; bit 
 									;shot from his own half and not short
 									;handed
 	clr.b	(lty+2).w
-	move.b	$53(a2),(lty+3).w
+	move.b	SCnum+1(a2),(lty+3).w
 	move.w	(pucky).w,d0
 	btst	#pfgoal,pflags(a2)
 	beq.w	.1

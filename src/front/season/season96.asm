@@ -50,7 +50,7 @@ AddTeamGameStats					;Add the game stats of team struct a1 (player arrays, ice t
 									;season or playoff totals in save RAM
 									;(AddSavedStats)
 	movem.l	d0-d7/a0-a6,-(sp)
-	move.w	$28(a1),d7
+	move.w	tmteam(a1),d7
 	moveq	#$C,d2
 	move.w	#$18,d3
 	move.l	#$120,d4

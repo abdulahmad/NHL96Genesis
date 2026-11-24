@@ -58,9 +58,9 @@ ReplayMode							;Instant replay play-back control and display code.
 .1
 	movem.l	d0/a3,-(sp)
 	movea.l	#SortCords+(12*SCstruct),a3
-	move.w	#1,8(a3)
+	move.w	#1,oldframe(a3)
 	movea.l	#SortCords+(13*SCstruct),a3
-	move.w	#1,8(a3)
+	move.w	#1,oldframe(a3)
 	movem.l	(sp)+,d0/a3
 	moveq	#1,d7					;1 frame
 	bsr.w	ReadMenuJoy				;read the paused pad
@@ -115,11 +115,11 @@ ReplayMode							;Instant replay play-back control and display code.
 	movem.w	d0-d1,-(sp)				;save the camera position
 	;each player
 .loop3
-	cmp.w	$52(a1),d3				;loop over the 12 players, skipping the tracked one
+	cmp.w	SCnum(a1),d3			;loop over the 12 players, skipping the tracked one
 	beq.w	.8						;tracked object?
 	movem.w	(sp),d0-d1				;camera position
 	sub.w	(a1),d0
-	sub.w	$14(a1),d1
+	sub.w	Ypos(a1),d1
 	jsr	(vtoa).l					;direction to object
 	btst	#3,d0					;no direction?
 	bne.w	.8
@@ -130,7 +130,7 @@ ReplayMode							;Instant replay play-back control and display code.
 	bhi.w	.8						;not within 45 degrees of the d-pad
 	movem.w	(sp),d0-d1				;camera position
 	sub.w	(a1),d0
-	sub.w	$14(a1),d1
+	sub.w	Ypos(a1),d1
 	muls.w	d0,d0
 	muls.w	d1,d1
 	add.l	d1,d0					;distance squared
@@ -139,7 +139,7 @@ ReplayMode							;Instant replay play-back control and display code.
 	cmp.l	d4,d0					;closer?
 	bhi.w	.8
 	move.l	d0,d4					;closest so far
-	move.w	$52(a1),$16(a5)
+	move.w	SCnum(a1),$16(a5)
 	bset	#5,(sflags3).w
 	;next player
 .8
@@ -426,9 +426,9 @@ suba4ToggleReplayView	equ	*
 	dbf	d0,.loop2
 	movem.l	a0,-(sp)
 	movea.l	#SortCords+(12*SCstruct),a0
-	move.w	#1,8(a0)
+	move.w	#1,oldframe(a0)
 	adda.w	#SCstruct,a0
-	move.w	#1,8(a0)
+	move.w	#1,oldframe(a0)
 	movem.l	(sp)+,a0
 	bsr.w	RevReplayAdj
 	btst	#sfscrl,(sflags).w
@@ -755,7 +755,7 @@ updatereplay						;Called every frame to save replay events, d7 = elapsed frames
 	moveq	#5,d2
 	movea.w	#(SortCords-M68K_RAM),a3
 .loop
-	move.b	$70(a3),(a0)+
+	move.b	spodds(a3),(a0)+
 	move.w	position(a3),d0
 	bpl.w	.n0
 	moveq	#$F,d0
@@ -763,10 +763,10 @@ updatereplay						;Called every frame to save replay events, d7 = elapsed frames
 	andi.w	#$F,d0
 	move.b	d0,(a0)
 	adda.w	#$80,a3
-	move.b	$70(a3),d0
+	move.b	spodds(a3),d0
 	asl.w	#4,d0
 	or.b	d0,(a0)+
-	move.b	$70(a3),d0
+	move.b	spodds(a3),d0
 	lsr.b	#4,d0
 	move.b	d0,(a0)
 	move.w	position(a3),d0

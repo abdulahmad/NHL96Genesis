@@ -402,7 +402,7 @@ SetupRosterScreenVideo				;Set the VBint handler, scroll and map addresses for t
 	bsr.w	CopyStatsPalette
 	movea.l	(sp)+,a2
 	rts
-DrawRosterTeamLogo					;Draw the logo of the team at Xvel(a2) on the roster screen
+DrawRosterTeamLogo					;Draw the logo of the team at tmteam(a2) on the roster screen
 	move.w	(awardlogochars).w,d4
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),1,4
@@ -412,12 +412,12 @@ DrawRosterTeamLogo					;Draw the logo of the team at Xvel(a2) on the roster scre
 ReloadHomeTeamStruct				;Reload tmstruct from the home team, clear the attribute deltas and
 									;restoreteams
 	movea.l	#tmstruct,a2
-	move.w	(HomeTeam).w,$28(a2)
+	move.w	(HomeTeam).w,tmteam(a2)
 	movea.l	#$77E,a0
 	move.w	(HomeTeam).w,d0
 	asl.w	#2,d0
 	movea.l	(a0,d0.w),a0
-	move.l	a0,$1E(a2)
+	move.l	a0,tmdata(a2)
 	jsr	(ClearAttribDeltas).l
 	move.l	a2,-(sp)
 	jsr	(restoreteams).l

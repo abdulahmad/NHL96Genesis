@@ -691,16 +691,16 @@ setsortcords						;Setup sort cord graphics: addframe for the 16 objects in OOli
 	asl.w	#6,d1					;mult by 64
 	movea.w	#(SortCords-M68K_RAM),a3	;Sort Cord struct start into a3
 	adda.w	d1,a3					;add offset to next struct
-	move.b	4(a3),-(sp)
-	cmpi.w	#SPAboxwallleft,$58(a3)
+	move.b	attribute(a3),-(sp)
+	cmpi.w	#SPAboxwallleft,SPA(a3)
 	beq.w	.0
-	cmpi.w	#SPAboardmidl,$58(a3)
+	cmpi.w	#SPAboardmidl,SPA(a3)
 	bne.w	.1
 .0
-	bclr	#3,4(a3)
+	bclr	#3,attribute(a3)
 .1
 	bsr.w	addframe
-	move.b	(sp)+,4(a3)
+	move.b	(sp)+,attribute(a3)
 	dbf	d0,.top
 	rts
 
@@ -892,11 +892,11 @@ addframe2							;d0/d1 = x/y coord on screen, a3 = object, a5 = dma trans, a6 = 
 	move.w	d0,-(sp)
 	move.w	frame(a3),d0
 	andi.w	#$7FF,d0
-	cmp.w	8(a3),d0
+	cmp.w	oldframe(a3),d0
 	beq.w	.5
 	tst.w	d5
 	bne.w	.1
-	move.w	d0,8(a3)
+	move.w	d0,oldframe(a3)
 .1
 	movem.w	d0-d4,-(sp)
 	move.w	2(a2),d2
@@ -933,7 +933,7 @@ addframe2							;d0/d1 = x/y coord on screen, a3 = object, a5 = dma trans, a6 = 
 	movem.w	(sp)+,d0-d1
 	addq.w	#6,sp
 	movem.w	d0-d4,-(sp)
-	add.w	$12(a3),d3
+	add.w	VRchar(a3),d3
 	ext.l	d2
 	asl.l	#5,d2
 	movem.l	d0/a2,-(sp)
@@ -986,14 +986,14 @@ addframe2							;d0/d1 = x/y coord on screen, a3 = object, a5 = dma trans, a6 = 
 	move.w	attribute(a3),d0
 	eor.w	d0,d2
 	andi.w	#$F800,d2
-	btst	#0,5(a3)
+	btst	#0,attribute+1(a3)
 	beq.w	.8
 	btst	#$E,d2
 	beq.w	.8
 	bset	#$D,d2
 .8
 	or.b	$A(a3,d5.w),d2
-	add.w	$12(a3),d2
+	add.w	VRchar(a3),d2
 	move.w	d2,attribute(a6)
 	movem.w	(sp)+,d0-d2
 	addq.w	#1,d6
@@ -1099,7 +1099,7 @@ setupice							;Set all variables, send non purgeable graphics, build sprite fra
 	movea.w	#(SortCords-M68K_RAM),a3
 	moveq	#$B,d0
 .0
-	bchg	#7,$62(a3)
+	bchg	#7,pflags(a3)
 	adda.w	#$80,a3
 	dbf	d0,.0
 .2
@@ -1137,7 +1137,7 @@ setupice							;Set all variables, send non purgeable graphics, build sprite fra
 	movea.w	#(SortCords-M68K_RAM),a3
 	moveq	#$B,d0					;12 players
 .l01
-	bchg	#pfgoal,$62(a3)			;gmdir set: swap pfgoal on all 12 players
+	bchg	#pfgoal,pflags(a3)		;gmdir set: swap pfgoal on all 12 players
 	adda.w	#SCstruct,a3
 	dbf	d0,.l01
 .gok
@@ -1289,22 +1289,22 @@ defaultsprites2						;Objects which are tied to screen scrolling and have veloci
 .1
 	clr.l	(a0)+
 	dbf	d0,.1
-	move.w	d6,$52(a3)
-	st	8(a3)
-	st	$67(a3)
+	move.w	d6,SCnum(a3)
+	st	oldframe(a3)
+	st	weight(a3)
 	move.w	(a2)+,(a3)
-	move.w	(a2)+,$14(a3)
-	move.w	(a2)+,$18(a3)
-	move.w	(a2)+,6(a3)
-	move.w	(a2)+,4(a3)
-	move.w	d4,$12(a3)
+	move.w	(a2)+,Ypos(a3)
+	move.w	(a2)+,Zpos(a3)
+	move.w	(a2)+,frame(a3)
+	move.w	(a2)+,attribute(a3)
+	move.w	d4,VRchar(a3)
 	add.w	(a2)+,d4
-	move.w	(a2)+,$4A(a3)
-	move.w	(a2)+,$4C(a3)
+	move.w	(a2)+,radiusx(a3)
+	move.w	(a2)+,radiusy(a3)
 	addq.w	#1,a2
-	move.b	(a2)+,$38(a3)
+	move.b	(a2)+,asslist(a3)
 	addq.w	#1,a2
-	move.b	(a2)+,$62(a3)
+	move.b	(a2)+,pflags(a3)
 	adda.w	#$80,a3
 	asl.w	#1,d6
 	move.b	d6,(a1)+
@@ -1346,7 +1346,7 @@ SprSort								;Sort objects in struct SortObj and set corresponding tables for 
 	movea.l	#SortCords,a0
 	move.w	#$F,d3					;Sortobjs -1
 .loop0
-	move.w	$14(a0),d4
+	move.w	Ypos(a0),d4
 	btst	#sfhor,(sflags).w
 	beq.w	.2
 	move.w	(a0),d4
@@ -1392,18 +1392,18 @@ resetplstuff						;Reset the player variables of the sort objects.
 	rts
 ResetTeamPlayers					;Clear the team offside bit and reset the six skaters of team a2 (SetSPA,
 									;impact, pflags)
-	bclr	#4,$30(a2)				;clear team offside bit
+	bclr	#4,tmflags(a2)			;clear team offside bit
 	moveq	#5,d2
-	movea.w	$22(a2),a3				;tmsort
+	movea.w	tmsort(a2),a3			;tmsort
 .loop
-	clr.b	$63(a3)					;pflags2
-	tst.w	$34(a3)					;check for goalie
+	clr.b	pflags2(a3)				;pflags2
+	tst.w	position(a3)			;check for goalie
 	bmi.w	.1
 	move.w	#SPAglide,d1
 	bsr.w	SetSPA
-	clr.w	$32(a3)					;impact
-	clr.b	$5E(a3)					;nopuck
-	andi.b	#$C2,$62(a3)			;2^pfteam + 2^pfgoal +2^pfna, pflags
+	clr.w	impact(a3)				;impact
+	clr.b	nopuck(a3)				;nopuck
+	andi.b	#$C2,pflags(a3)			;2^pfteam + 2^pfgoal +2^pfna, pflags
 .1
 	adda.w	#SCstruct,a3			;SCstruct size
 	dbf	d2,.loop

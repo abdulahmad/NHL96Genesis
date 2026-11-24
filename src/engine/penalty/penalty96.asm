@@ -206,7 +206,7 @@ AddPenalty2							;Forced penalties like faceoff and game over. d0 = penalty num
 	tst.w	(a1)+
 	dbeq	d1,.2
 	bne.w	.noplayer
-	move.b	$53(a3),-(a1)
+	move.b	SCnum+1(a3),-(a1)
 	move.b	d0,-(a1)
 	movea.l	#Penaltylist,a0
 	adda.w	(a0,d0.w),a0
@@ -403,7 +403,7 @@ getBAplayerInfo						;Keep the breakaway shooter, team, goalie and checker for t
 	move.w	#0,(BA_Goalie_Offset).w
 	move.b	$67(a1,d1.w),(BA_Goalie_Offset+1).w
 	move.w	#0,(BA_Checker_Offset).w
-	move.b	$67(a3),(BA_Checker_Offset+1).w
+	move.b	weight(a3),(BA_Checker_Offset+1).w
 .end
 	movem.l	(sp)+,d1-d3/a1
 	rts
@@ -433,7 +433,7 @@ InProgress							;Ref in progress: update the graphics, stats and penalty inform
 	asl.w	#scsize,d1				;scsize
 	movea.w	#(SortCords-M68K_RAM),a3
 	adda.w	d1,a3
-	tst.w	$34(a3)
+	tst.w	position(a3)
 	movem.l	(sp)+,a3
 	bpl.w	.ex
 	clr.w	(a0)
@@ -470,7 +470,7 @@ InProgress							;Ref in progress: update the graphics, stats and penalty inform
 	clr.w	d0
 	movea.w	#(tmstruct-M68K_RAM),a2
 	lea	$39E(a2),a1					;tmsize: visitors
-	btst	#6,$62(a3)
+	btst	#6,pflags(a3)
 	beq.w	.5
 	bset	#7,-1(a4)				;log: visitors
 	move.w	#$8000,d0
@@ -478,7 +478,7 @@ InProgress							;Ref in progress: update the graphics, stats and penalty inform
 .5
 	addq.w	#1,6(a2)
 	add.w	d2,8(a2)
-	move.b	$67(a3),d0
+	move.b	weight(a3),d0
 	move.b	d0,(a4)					;log: player
 	move.w	d0,(TempPlOffset).w
 	ext.w	d0
@@ -642,7 +642,7 @@ Stop4Pen							;a0 = Penaltylist penalty + 2. Stop the clock, set the faceoff sp
 	asl.w	#scsize,d1				;scsize
 	adda.w	d1,a3
 	move.w	#$258,d1				;600
-	btst	#7,$62(a3)
+	btst	#7,pflags(a3)
 	movea.l	(sp)+,a3
 	beq.w	.0
 	neg.w	d1
@@ -897,11 +897,11 @@ prefmes								;Print the penalty message: the player, the penalty and its lengt
 	movea.l	#SortCords,a1
 	adda.w	d0,a1
 	clr.w	d0
-	move.b	$67(a1),d0
+	move.b	weight(a1),d0
 	jsr	(GetPlayerNumInitial).l
 	jsr	(printz).l
 	String	CC_Font1Pri,$0C,$06
-	cmpi.b	#$20,2(a1)
+	cmpi.b	#$20,Xpos+2(a1)
 	beq.w	.7
 	addq.w	#1,(printx).w
 .7
@@ -909,7 +909,7 @@ prefmes								;Print the penalty message: the player, the penalty and its lengt
 	jsr	(printz).l
 	String	CC_Font1Pri,$11,$05,'penalty'
 	move.w	#$D,(printx).w
-	movea.l	$1E(a2),a1
+	movea.l	tmdata(a2),a1
 	adda.w	4(a1),a1
 	adda.w	(a1),a1
 	jsr	(print).l
@@ -960,7 +960,7 @@ PenGoalStuff						;Do this stuff after a goal: a1 = scored on team, a2 = scoring
 .4
 	jsr	(ClearPenaltyBuffer).l
 .1
-	move.w	$24(a2),d2
+	move.w	tmap(a2),d2
 .5
 	cmp.w	$24(a1),d2
 .6
@@ -981,7 +981,7 @@ PenGoalStuff						;Do this stuff after a goal: a1 = scored on team, a2 = scoring
 .11
 	bset	#0,(sflags9).w
 	addq.w	#1,$24(a1)
-	addq.w	#1,2(a2)
+	addq.w	#1,tmPwrGoals(a2)
 .12
 	bset	#0,(tmstruct+$30).w
 .13
@@ -1016,7 +1016,7 @@ updatepentime						;Update the time remaining on all penalized players, once a s
 
 ProcessPenaltyList					;a2 = team. Walk the penalty box list: count down the penalty time of each
 									;player in it
-	lea	$A4(a2),a0
+	lea	tmboxlist(a2),a0
 	movea.w	#(mesarea-M68K_RAM),a1
 	moveq	#2,d1
 	moveq	#2,d3
@@ -1147,10 +1147,10 @@ GetLowestPen						;a2 = shorthanded team, a3 = team on the power play. d0 = powe
 	move.w	d2,d3
 	bra.s	.getstatus
 .1
-	cmpi.w	#6,$24(a3)
+	cmpi.w	#6,tmap(a3)
 	beq.w	rtss2
 	sub.w	d3,d0
-	lea	$A4(a3),a0
+	lea	tmboxlist(a3),a0
 	clr.w	d2
 .2
 	move.b	(a0)+,d2
@@ -1178,7 +1178,7 @@ updatepwrplay						;The power play box: the team and the time left
 	bne.w	rtss2
 	movea.w	#(tmstruct-M68K_RAM),a2
 	lea	$39E(a2),a3
-	move.w	$24(a2),d0
+	move.w	tmap(a2),d0
 	sub.w	$24(a3),d0
 	beq.w	.clrpwrplay
 	bpl.w	.0
@@ -1201,7 +1201,7 @@ updatepwrplay						;The power play box: the team and the time left
 .2
 	bset	#sf2pwrplay,(sflags2).w
 	bne.w	.5
-	addq.w	#1,4(a3)
+	addq.w	#1,tmPwrPlays(a3)
 .4
 	movem.l	d0-d1/a3,-(sp)
 	bsr.w	DrawPowerPlayBox
@@ -1230,7 +1230,7 @@ updatepwrplay						;The power play box: the team and the time left
 	bsr.w	printbig1
 	jsr	(printbigz1).l
 	String	$2A
-	movea.l	$1E(a3),a0
+	movea.l	tmdata(a3),a0
 	movea.w	#(mesarea-M68K_RAM),a3
 	move.w	#2,(a3)
 	bsr.w	appendz
@@ -1323,7 +1323,7 @@ EASNLogo							;Draw the EASN logo
 	rts
 PrintPenaltyBoxPlayers				;Penalty box list of team a2: the players without a coincidental penalty
 	;penalty box list of team a2: the players without a coincidental penalty
-	lea	$A4(a2),a0
+	lea	tmboxlist(a2),a0
 	;loop
 .loop
 	clr.w	d0						;pass 1: players with bit 14 (coincidental) clear
@@ -1335,7 +1335,7 @@ PrintPenaltyBoxPlayers				;Penalty box list of team a2: the players without a co
 	bra.s	.loop
 	;d0 negative
 .1
-	lea	$A4(a2),a0
+	lea	tmboxlist(a2),a0
 	;loop
 .loop2
 	clr.w	d0
@@ -1351,7 +1351,7 @@ pplpen								;Print one penalty box line: player number and time remaining (a2 
 	bhi.w	rtss2					;no room for more rows
 	move.w	$6C(a2,d0.w),d2
 	andi.w	#$7FF,d2				;penalty time
-	move.w	$28(a2),d7
+	move.w	tmteam(a2),d7
 	lsr.w	#1,d0
 	jsr	(GetRosterName).l
 	adda.w	(a1),a1

@@ -61,7 +61,7 @@ HiScoreScreen						;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up t
 	move	#$2700,sr
 	rts
 	movea.l	#tmstruct,a2
-	cmp.w	Xvel(a2),d2
+	cmp.w	tmteam(a2),d2
 	beq.w	.1
 	movea.l	#AwShots,a2
 .1

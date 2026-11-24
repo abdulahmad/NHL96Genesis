@@ -18,8 +18,8 @@ SimGameStats
 	move.w	d0,(VisTeam).w
 	movea.l	#tmstruct,a1
 	movea.l	#AwShots,a2
-	move.w	(HomeTeam).w,$28(a1)
-	move.w	(VisTeam).w,$28(a2)
+	move.w	(HomeTeam).w,tmteam(a1)
+	move.w	(VisTeam).w,tmteam(a2)
 	movem.l	a2,-(sp)
 	movea.l	#tmstruct,a2
 	jsr	(SetSeasonInjuries).l
@@ -28,7 +28,7 @@ SimGameStats
 	movem.l	(sp)+,a2
 	clr.w	d0
 	move.b	2(a0),d0
-	move.w	d0,$C(a1)
+	move.w	d0,tmscore(a1)
 	move.w	d0,(rosterscroll).w
 	move.w	(HomeTeam).w,d1
 	move.w	(VisTeam).w,d2
@@ -42,7 +42,7 @@ SimGameStats
 	bsr.w	SimPenalties
 	clr.w	d0
 	move.b	3(a0),d0
-	move.w	d0,$C(a2)
+	move.w	d0,tmscore(a2)
 	move.w	d0,(rosterscroll).w
 	move.w	(VisTeam).w,d1
 	move.w	(HomeTeam).w,d2
@@ -77,7 +77,7 @@ SimPenalties						;Sim penalties of team d1: the count (SimPenaltyBase), 2 PIM e
 	addq.w	#6,a1
 	move.w	d0,(a1)
 	movea.l	(sp)+,a1
-	move.w	d1,$28(a1)
+	move.w	d1,tmteam(a1)
 	movem.l	d1/a0-a1,-(sp)
 	movea.l	#TeamList,a0
 	asl.w	#2,d1
@@ -175,7 +175,7 @@ SimGoalie							;simulated game: picks the goalie who played
 	move.w	d0,d3
 	addi.w	#$F8,d3
 	move.b	d4,(a1,d3.w)
-	move.w	$C(a2),d4
+	move.w	tmscore(a2),d4
 	move.w	d0,d3
 	addi.w	#$C0,d3
 	move.b	d4,(a1,d3.w)

@@ -42,20 +42,20 @@ GoAssExit	equ	*			;Jump to assexit (the assfaceoff branches end here)
 	jmp	(assexit).l
 
 assfaceoffpl						;Assignment: the faceoff player
-	btst	#pfalock,$62(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	.6
 	btst	#sf2faceoff,(sflags2).w
 	beq.w	.5
-	bclr	#pfna,$62(a3)
+	bclr	#pfna,pflags(a3)
 	beq.w	.1
-	clr.w	$40(a3)
+	clr.w	temp1(a3)
 .1
 	movea.l	#fofdata2,a0
-	btst	#pfteam,$62(a3)
+	btst	#pfteam,pflags(a3)
 	beq.w	.2
 	addq.w	#4,a0
 .2
-	move.w	$5A(a3),d0
+	move.w	SPAnum(a3),d0
 	lsr.w	#2,d0
 	addq.w	#1,d0
 	btst	#0,$77(a3)
@@ -63,9 +63,9 @@ assfaceoffpl						;Assignment: the faceoff player
 	addq.w	#3,d0
 .3
 	move.w	d0,(a0)
-	btst	#pfjoycon,$62(a3)
+	btst	#pfjoycon,pflags(a3)
 	bne.w	.6
-	bset	#pf2aip,$63(a3)
+	bset	#pf2aip,pflags2(a3)
 	bne.w	.6
 	move.w	#SPAfaceoff,d1
 	cmpi.w	#$12,($FFFFB79E).w
@@ -76,10 +76,10 @@ assfaceoffpl						;Assignment: the faceoff player
 	beq.w	.4
 	move.w	#SPAfaceoffr,d1
 .4
-	bset	#pf2aip,$63(a3)
+	bset	#pf2aip,pflags2(a3)
 	jmp	(SetSPA).l
 .5
-	move.b	#$14,$5E(a3)
+	move.b	#$14,nopuck(a3)
 	bra.w	GoAssExit
 .6
 	rts
@@ -96,7 +96,7 @@ puckfaceoff							;Puck assignment: the faceoff set up
 	move.w	#$1E,d0
 	jmp	(assreplace).l
 .1
-	bclr	#pfna,$62(a3)
+	bclr	#pfna,pflags(a3)
 	beq.w	WaitForFaceoffLineChanges
 	bclr	#0,(sflags8).w
 	beq.w	.2
@@ -155,8 +155,8 @@ puckfaceoff							;Puck assignment: the faceoff set up
 	bset	#4,(sflags8).w
 .7
 	jsr	(ReturnGoalies).l
-	st	$40(a3)
-	st	$42(a3)
+	st	temp1(a3)
+	st	temp2(a3)
 	tst.w	(OptLine).w
 	bne.w	WaitForFaceoffLineChanges
 	bclr	#tmflcm,(HomeTmFlags).w
@@ -164,7 +164,7 @@ puckfaceoff							;Puck assignment: the faceoff set up
 	movea.w	#(SortCords-M68K_RAM),a0
 	moveq	#$B,d0
 .loop
-	bclr	#pf2lcm,$63(a0)
+	bclr	#pf2lcm,pflags2(a0)
 	adda.w	#SCstruct,a0
 	dbf	d0,.loop
 	move.w	(cont1team).w,d0
@@ -281,9 +281,9 @@ WaitForFaceoffLineChanges			;Run both line change timers; when both are done set
 	jsr	(UpdateFaceoffLineChangeTimer).l
 	move.w	#$42,d0
 	jsr	(UpdateFaceoffLineChangeTimer).l
-	tst.w	$40(a3)
+	tst.w	temp1(a3)
 	bpl.s	SetFaceoffComputerLineExit
-	tst.w	$42(a3)
+	tst.w	temp2(a3)
 	bpl.s	SetFaceoffComputerLineExit
 	movea.w	#(tmstruct-M68K_RAM),a2
 	lea	$39E(a2),a1
@@ -389,19 +389,19 @@ puckfaceoff2						;Puck assignment: the faceoff
 	clr.w	(puckvz).w
 	st	(puckc).w					;nobody carries it
 	movea.w	#(SortCords+(12*SCstruct)-M68K_RAM),a0	;reposition goal nets
-	clr.w	$28(a0)					;Xvel
-	clr.w	$2A(a0)					;Yvel
+	clr.w	Xvel(a0)				;Xvel
+	clr.w	Yvel(a0)				;Yvel
 	clr.w	(a0)					;Xpos
-	move.w	#$122,$14(a0)
+	move.w	#$122,Ypos(a0)
 	adda.w	#SCstruct,a0			;add SCstruct to move to next goal net
-	clr.w	$28(a0)
-	clr.w	$2A(a0)
+	clr.w	Xvel(a0)
+	clr.w	Yvel(a0)
 	clr.w	(a0)
-	move.w	#$FEDE,$14(a0)
+	move.w	#$FEDE,Ypos(a0)
 	movea.w	#(SortCords+((puckscnum+1)*SCstruct)-M68K_RAM),a0	;move to puck shadow SCnum
-	move.w	#$299,6(a0)
-	clr.w	$58(a0)					;SPA
-	clr.w	4(a0)					;attribute
+	move.w	#$299,frame(a0)
+	clr.w	SPA(a0)					;SPA
+	clr.w	attribute(a0)			;attribute
 	clr.w	(puckx+4).w				;clear puck SCnum attribute
 	bclr	#sfslock,(sflags).w		;free up scrolling
 	moveq	#$64,d4					;run the scroll window 101 times so it settles

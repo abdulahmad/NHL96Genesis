@@ -343,62 +343,62 @@ goalieacc							;Goalie movement
 
 noturn0								;doplayeracc: no turn
 	moveq	#2,d4
-	btst	#4,$62(a3)
+	btst	#4,pflags(a3)
 	beq.w	.0
 	addq.w	#4,d4
 	eori.w	#8,d0
 .0
 	tst.w	d0
 	beq.w	.28
-	move.w	$28(a3),d0
-	move.w	$2A(a3),d1
+	move.w	Xvel(a3),d0
+	move.w	Yvel(a3),d1
 	bsr.w	vtoa
 	btst	#3,d0
 	bne.w	.1
-	sub.w	$54(a3),d0
+	sub.w	facedir(a3),d0
 	add.w	d4,d0
 	andi.w	#7,d0
 	cmp.w	#4,d0
 	blt.w	dostop
 .1
-	addq.w	#1,$54(a3)
-	btst	#3,4(a3)
+	addq.w	#1,facedir(a3)
+	btst	#3,attribute(a3)
 	beq.w	.2
-	subq.w	#2,$54(a3)
+	subq.w	#2,facedir(a3)
 .2
-	andi.w	#7,$54(a3)
+	andi.w	#7,facedir(a3)
 	move.w	(puckc).w,d1
-	cmp.w	$52(a3),d1
+	cmp.w	SCnum(a3),d1
 	bne.w	.26
 	move.w	#SPAglide,d1
 	bra.w	.27
 .26
 	move.w	#SPAglide,d1
-	btst	#4,$62(a3)
+	btst	#4,pflags(a3)
 	beq.w	SetSPA
 	move.w	#SPAglide,d1
 .27
 	bra.w	SetSPA
 .28
 	move.w	#SPAskateback,d1
-	btst	#4,$62(a3)
+	btst	#4,pflags(a3)
 	bne.w	.9
 	move.w	#SPAskate,d1
-	btst	#6,$63(a3)
+	btst	#6,pflags2(a3)
 	beq.w	.3
 	move.w	#SPAstumble,d1
 .3
 	move.w	(puckc).w,d4
-	cmp.w	$52(a3),d4
+	cmp.w	SCnum(a3),d4
 	bne.w	.9
 	move.w	#SPAskatewp,d1
 .9
-	btst	#1,$63(a3)
+	btst	#1,pflags2(a3)
 	bne.w	noturn
 	bsr.w	SetSPA
 
 noturn								;doplayeracc: no turn, d2 = facedir
-	btst	#4,$62(a3)
+	btst	#4,pflags(a3)
 	beq.w	playeracc
 	eori.w	#4,d2
 
@@ -422,28 +422,28 @@ playeracc							;Player acceleration with facing d2 (doplayeracc entry used by t
 .1
 	move.w	2(a0,d2.w),d1			;Y Inc
 	move.w	(a0,d2.w),d0
-	move.w	$50(a3),d2				;check acc dir and dont push wall
+	move.w	Wallsin(a3),d2			;check acc dir and dont push wall
 	beq.w	.nox
 	eor.w	d0,d2
 	bpl.w	.nox
 	clr.w	d0
 .nox
-	move.w	$4E(a3),d2
+	move.w	Wallcos(a3),d2
 	beq.w	.noy
 	eor.w	d1,d2
 	bmi.w	.noy
 	clr.w	d1
 .noy
 	clr.w	d2						;clear d2
-	move.b	$68(a3),d2				;move wgt of player into d2
+	move.b	legstr(a3),d2			;move wgt of player into d2
 	lsr.w	#2,d2					;divide d2 by 2
 	neg.w	d2						;make it negative
 	addi.w	#$40,d2
-	add.b	$69(a3),d2				;add agl (legstr) of player to d2
+	add.b	legspd(a3),d2			;add agl (legstr) of player to d2
 	addq.b	#2,d2
 	tst.w	position(a3)
 	bne.w	.2
-	add.b	$69(a3),d2
+	add.b	legspd(a3),d2
 	addi.w	#$10,d2
 .2
 	asr.w	#1,d2					;divide by 2
@@ -477,9 +477,9 @@ playeracc							;Player acceleration with facing d2 (doplayeracc entry used by t
 	move.w	#$1000,d0				;d0 = energy, move 1000 hex into d0
 .noy4
 	clr.w	d2						;clear d2
-	move.b	$6A(a3),d2
+	move.b	aioff(a3),d2
 	movem.l	a0,-(sp)
-	lea	$36(a3),a0
+	lea	assnum(a3),a0
 	adda.w	(a0),a0
 	addq.w	#2,a0
 	cmpi.b	#2,(a0)
@@ -541,12 +541,12 @@ playeracc							;Player acceleration with facing d2 (doplayeracc entry used by t
 	subi.w	#$1E,d0
 	cmp.w	#$C00,d0
 	blt.w	setpde
-	move.b	$73(a3),d2
+	move.b	aggress(a3),d2
 	ext.w	d2
 	lsr.w	#1,d2
 	add.w	d2,d0
 	bsr.w	setpde
-	btst	#0,$73(a3)
+	btst	#0,aggress(a3)
 	beq.w	.6
 	btst	#0,(Vcount+1).w
 	beq.w	.6
@@ -562,15 +562,15 @@ MaxSpeed							;Max speed values for each rating level 0-$F
 	dc.l	$49DA400,$4E8A5A9,$535F624,$5859571
 
 dostop								;stop skating: user players and CPU players take separate paths
-	btst	#3,$62(a3)
+	btst	#3,pflags(a3)
 	beq.w	.cpu
-	cmpi.w	#$1000,$28(a3)
+	cmpi.w	#$1000,Xvel(a3)
 	bgt.w	.glide
-	cmpi.w	#$F000,$28(a3)
+	cmpi.w	#$F000,Xvel(a3)
 	blt.w	.glide
-	cmpi.w	#$1000,$2A(a3)
+	cmpi.w	#$1000,Yvel(a3)
 	bgt.w	.glide
-	cmpi.w	#$F000,$2A(a3)
+	cmpi.w	#$F000,Yvel(a3)
 	blt.w	.glide
 	bra.w	.stop
 
@@ -585,26 +585,26 @@ dostop								;stop skating: user players and CPU players take separate paths
 	blt.w	.glide
 
 .stop
-	tst.w	$34(a3)
+	tst.w	position(a3)
 	bne.w	stopna2
 	jmp	stopfast
 
 .glide
 	move.w	(puckc).w,d1
-	cmp.w	$52(a3),d1
+	cmp.w	SCnum(a3),d1
 	bne.w	.1
 	move.w	#SPAglide,d1
 	bra.w	.2
 .1
 	move.w	#SPAglide,d1
 .2
-	btst	#4,$62(a3)
+	btst	#4,pflags(a3)
 	bne.w	.0
-	bset	#1,$63(a3)
+	bset	#1,pflags2(a3)
 	move.w	#SPAstop,d1
 .0
 	bsr.w	SetSPA
-	tst.w	$34(a3)
+	tst.w	position(a3)
 	bne.w	stopna2
 	jmp	stopfast
 

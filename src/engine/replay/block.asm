@@ -29,7 +29,7 @@ CanBlock							;Ne when joystick player a3 may block the shot (SPAblock): pfaloc
 	move.w	(puckc).w,d0
 	asl.w	#7,d0
 	adda.w	d0,a0
-	move.b	$62(a0),d0
+	move.b	pflags(a0),d0
 	move.b	pflags(a3),d1
 	eor.b	d1,d0
 	btst	#pfteam,d0

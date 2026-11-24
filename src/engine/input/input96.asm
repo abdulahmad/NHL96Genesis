@@ -528,10 +528,10 @@ doinput_cbut						;Button C (bit 5): new press: face the puck (vtoa) and go on b
 .near
 	add.w	d3,d1
 	move.w	d1,d2
-	cmpi.w	#$22,2(a0)
+	cmpi.w	#$22,Xpos+2(a0)
 	cmpi.w	#$18,(a0)
 	cmpi.w	#$FFE8,(a0)
-	cmpi.w	#$C,2(a0)
+	cmpi.w	#$C,Xpos+2(a0)
 	cmpi.w	#$11E,(pucky).w
 	cmpi.w	#$FEE2,(pucky).w
 	bset	#pf2aip,pflags2(a3)

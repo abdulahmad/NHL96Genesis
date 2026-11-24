@@ -83,7 +83,7 @@ asscentero4							;Center on offense, two men short (tmap 4); back to asscentero
 	move.w	#$2D,d0
 	move.w	(pucky).w,d1
 	subq.w	#6,d1
-	move.w	$52(a3),d2
+	move.w	SCnum(a3),d2
 	subq.w	#6,d2
 	eor.w	d2,d1
 	bmi.s	GoAssReplace
@@ -96,25 +96,25 @@ asscentero4							;Center on offense, two men short (tmap 4); back to asscentero
 	bgt.w	GoAssReplace
 	bclr	#pfna,pflags(a3)
 	beq.w	.5
-	clr.w	$40(a3)
-	move.w	#8,$42(a3)
+	clr.w	temp1(a3)
+	move.w	#8,temp2(a3)
 .5
-	sub.b	d7,$40(a3)
+	sub.b	d7,temp1(a3)
 	bpl.w	.13
-	move.b	$6B(a3),$40(a3)
+	move.b	aidef(a3),temp1(a3)
 	jsr	(ReadGoaliePulled).l
 	bmi.w	.6
 	btst	#6,(sflags7).w
 	beq.w	.7
-	tst.b	$40(a3)
+	tst.b	temp1(a3)
 	beq.w	.7
 .6
-	subq.b	#1,$40(a3)
+	subq.b	#1,temp1(a3)
 .7
 	clr.w	d1
-	move.b	$65(a3),d1
+	move.b	glitch(a3),d1
 	bpl.w	.8
-	move.w	$34(a3),d1
+	move.w	position(a3),d1
 	bmi.w	.22
 .8
 	move.w	(pucky).w,d1
@@ -129,19 +129,19 @@ asscentero4							;Center on offense, two men short (tmap 4); back to asscentero
 	bne.w	.10
 	neg.w	d0
 .10
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$96,d1
 	btst	#pfgoal,pflags(a3)
 	beq.w	.11
 	neg.w	d1
 .11
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.13
 .12
-	move.w	(puckx).w,$44(a3)
-	clr.w	$46(a3)
+	move.w	(puckx).w,temp3(a3)
+	clr.w	temp4(a3)
 .13
-	move.w	$46(a3),d1
+	move.w	temp4(a3),d1
 	btst	#pfgoal,pflags(a3)
 	bne.w	.17
 	movea.l	#SortCords,a0
@@ -193,7 +193,7 @@ asscentero4							;Center on offense, two men short (tmap 4); back to asscentero
 	adda.w	#$80,a0
 	dbf	d2,.loop2
 .21
-	move.w	$44(a3),d0
+	move.w	temp3(a3),d0
 	movea.l	#EvadePC,a0
 	jmp	(skateto).l
 .22
@@ -233,26 +233,26 @@ asscentero5							;Center on offense, one man short (tmap 5); asscenterd5 when t
 	move.w	(puckc).w,d1
 	bmi.w	.5
 	subq.w	#6,d1
-	move.w	$52(a3),d2
+	move.w	SCnum(a3),d2
 	subq.w	#6,d2
 	eor.w	d2,d1
 	bmi.w	GoAssReplace
 .5
-	bclr	#pfna,$62(a3)			;clear new assignment bit
+	bclr	#pfna,pflags(a3)		;clear new assignment bit
 	beq.w	.6						;branch if it was already cleared
-	st	$48(a3)						;set old zone # (temp5)
-	clr.w	$40(a3)					;clear temp1
-	move.w	#8,$42(a3)				;move 8 into temp2
+	st	temp5(a3)					;set old zone # (temp5)
+	clr.w	temp1(a3)				;clear temp1
+	move.w	#8,temp2(a3)			;move 8 into temp2
 	;count down the timer
 .6
-	sub.b	d7,$40(a3)				;subtract frames elapsed from temp1
+	sub.b	d7,temp1(a3)			;subtract frames elapsed from temp1
 	bpl.w	.11						;branch if positive
-	move.b	$6C(a3),$40(a3)
+	move.b	shotspd(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check if crowd meter currently broken
 	beq.w	.7
-	tst.b	$40(a3)					;check if temp1 is 0
+	tst.b	temp1(a3)				;check if temp1 is 0
 	beq.w	.7
-	subq.b	#1,$40(a3)				;subtract 1 from temp1
+	subq.b	#1,temp1(a3)			;subtract 1 from temp1
 .7
 	move.w	(puckvy).w,d0
 	asr.w	#7,d0
@@ -276,7 +276,7 @@ asscentero5							;Center on offense, one man short (tmap 5); asscenterd5 when t
 	addq.w	#8,d2					;add 8 to d2 (d2 = $18)
 	;d2 = zone index by where the puck is (offensive zone and past the goal
 .9
-	cmp.w	$48(a3),d2				;compare temp5 with d2
+	cmp.w	temp5(a3),d2			;compare temp5 with d2
 	bne.w	.10						;branch if different zone
 	move.w	(Vcount).w,d0			;move frame counter into d0
 	andi.w	#$7F,d0					;pass first 7 bits
@@ -284,26 +284,26 @@ asscentero5							;Center on offense, one man short (tmap 5); asscenterd5 when t
 	bgt.w	.11
 	;new zone (or 1 frame in 128): pick a new random spot from .dedata
 .10
-	move.w	d2,$48(a3)				;move d2 into temp5
+	move.w	d2,temp5(a3)			;move d2 into temp5
 	lea	.table(pc),a0				;move zonedata address into a0
 	move.w	2(a0,d2.w),d0			;move X Coord into d0
 	jsr	(randomd0s).l				;RNG d0
 	add.w	(a0,d2.w),d0			;add X Coord offset to d0
-	move.w	d0,$44(a3)				;move d0 into temp3
+	move.w	d0,temp3(a3)			;move d0 into temp3
 	move.w	6(a0,d2.w),d0			;move Y Coord into d0
 	jsr	(randomd0s).l				;RNG d0
 	add.w	4(a0,d2.w),d0			;add Y Coord offset into d0
-	move.w	d0,$46(a3)				;move d0 into temp4
+	move.w	d0,temp4(a3)			;move d0 into temp4
 	bra.w	.11
 .table
 	dc.w	$0000,$003C,$FFBA,$000A,$0000,$003C,$003C,$000A
 	dc.w	$0000,$0028,$00AA,$001E,$0000,$0050,$00AA,$0014
 	;skate to the spot; LW mirrors x
 .11
-	move.w	$44(a3),d0				;move temp3 into d0
+	move.w	temp3(a3),d0			;move temp3 into d0
 	;d1 = spot y; flip both for the bottom net
-	move.w	$46(a3),d1				;move temp4 into d1
-	btst	#pfgoal,$62(a3)			;check if shooting up or down
+	move.w	temp4(a3),d1			;move temp4 into d1
+	btst	#pfgoal,pflags(a3)		;check if shooting up or down
 	bne.w	.12						;branch if shooting up
 	neg.w	d1						;negate d0
 .12
@@ -326,27 +326,27 @@ asscenterd4							;Center on defense, two men short (tmap 4); asscentero4 when h
 	bne.w	.2
 	bra.w	GoAssReplace
 .2
-	btst	#pfalock,$62(a3)		;pfalock - locked animation
+	btst	#pfalock,pflags(a3)		;pfalock - locked animation
 	bne.w	.14						;exit if locked
 	btst	#gmclock,(gmode).w		;gmclock - check if clock is running
 	bne.w	GoDoNothing				;exit if stoppage
 	jsr	(check4bench).l
-	btst	#pfjoycon,$62(a3)		;pfjoycon - check if joystick controlled
+	btst	#pfjoycon,pflags(a3)	;pfjoycon - check if joystick controlled
 	bne.w	.14						;exit if joystick controlled
-	bclr	#pfna,$62(a3)			;pfna - new assignment
+	bclr	#pfna,pflags(a3)		;pfna - new assignment
 	beq.w	.3						;branch if no new assignment
-	clr.w	$40(a3)					;clear temp1
-	move.w	#8,$42(a3)				;move 8 into temp2
+	clr.w	temp1(a3)				;clear temp1
+	move.w	#8,temp2(a3)			;move 8 into temp2
 	;count down the timer
 .3
-	sub.b	d7,$40(a3)				;subtract d7 from temp1
+	sub.b	d7,temp1(a3)			;subtract d7 from temp1
 	bpl.w	.13
-	move.b	$6C(a3),$40(a3)
+	move.b	shotspd(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check for crowd record flag
 	beq.w	.4						;jump if not set
-	tst.b	$40(a3)					;check if 0
+	tst.b	temp1(a3)				;check if 0
 	beq.w	.4
-	subq.b	#1,$40(a3)				;subtract 1 from temp1
+	subq.b	#1,temp1(a3)			;subtract 1 from temp1
 	;center on defense: switch to asscentero if our team has the puck
 .4
 	move.w	(puckc).w,d1			;move puck carrier SCnum into d1
@@ -360,7 +360,7 @@ asscenterd4							;Center on defense, two men short (tmap 4); asscentero4 when h
 	bgt.w	.6
 	moveq	#$2F,d0
 	subq.w	#6,d1					;subtract 6 from d1
-	move.w	$52(a3),d2				;move player's SCnum into d2
+	move.w	SCnum(a3),d2			;move player's SCnum into d2
 	subq.w	#6,d2					;subtract 6 from d2
 	eor.w	d2,d1					;compare d2 and d1
 	bpl.w	GoAssReplace			;if team has puck, replace assignment with acentero
@@ -385,40 +385,40 @@ asscenterd4							;Center on defense, two men short (tmap 4); asscentero4 when h
 	asl.w	#7,d0
 	movea.l	#SortCords,a0
 	adda.w	d0,a0
-	move.w	$28(a0),d0
+	move.w	Xvel(a0),d0
 	asr.w	#7,d0
 	add.w	(a0),d0
 	asr.w	#2,d0
 	move.w	d0,d1
 	add.w	d0,d1
 	add.w	d0,d1
-	move.w	d1,$44(a3)
+	move.w	d1,temp3(a3)
 	move.w	#$11E,d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.10
 	neg.w	d0
 .10
-	move.w	$2A(a0),d1
+	move.w	Yvel(a0),d1
 	asr.w	#7,d1
-	add.w	$14(a0),d1
+	add.w	Ypos(a0),d1
 	sub.w	d0,d1
 	asr.w	#2,d1
 	add.w	d1,d0
 	add.w	d1,d0
 	add.w	d1,d0
-	move.w	d0,$46(a3)
+	move.w	d0,temp4(a3)
 	bra.w	.13
 .11
-	move.w	(puckx).w,$44(a3)
+	move.w	(puckx).w,temp3(a3)
 	move.w	#$76,d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.12
 	neg.w	d0
 .12
-	move.w	d0,$46(a3)
+	move.w	d0,temp4(a3)
 .13
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	lea	.14(pc),a0
 	jmp	(skateto).l
 .14
@@ -440,27 +440,27 @@ asscenterd5							;Center on defense, one man short (tmap 5); asscentero5 when h
 	bne.w	.2
 	bra.w	GoAssReplace
 .2
-	btst	#pfalock,$62(a3)		;pfalock - locked animation
+	btst	#pfalock,pflags(a3)		;pfalock - locked animation
 	bne.w	.20						;exit if locked
 	btst	#gmclock,(gmode).w		;gmclock - check if clock is running
 	bne.s	GoDoNothing				;exit if stoppage
 	jsr	(check4bench).l
-	btst	#pfjoycon,$62(a3)		;pfjoycon - check if joystick controlled
+	btst	#pfjoycon,pflags(a3)	;pfjoycon - check if joystick controlled
 	bne.w	.20						;exit if joystick controlled
-	bclr	#pfna,$62(a3)			;pfna - new assignment
+	bclr	#pfna,pflags(a3)		;pfna - new assignment
 	beq.w	.3						;branch if no new assignment
-	clr.w	$40(a3)					;clear temp1
-	move.w	#8,$42(a3)				;move 8 into temp2
+	clr.w	temp1(a3)				;clear temp1
+	move.w	#8,temp2(a3)			;move 8 into temp2
 	;count down the timer
 .3
-	sub.b	d7,$40(a3)				;subtract d7 from temp1
+	sub.b	d7,temp1(a3)			;subtract d7 from temp1
 	bpl.w	.19
-	move.b	$6C(a3),$40(a3)
+	move.b	shotspd(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check for crowd record flag
 	beq.w	.4						;jump if not set
-	tst.b	$40(a3)					;check if 0
+	tst.b	temp1(a3)				;check if 0
 	beq.w	.4
-	subq.b	#1,$40(a3)				;subtract 1 from temp1
+	subq.b	#1,temp1(a3)			;subtract 1 from temp1
 	;center on defense: switch to asscentero if our team has the puck
 .4
 	move.w	(puckc).w,d1			;move puck carrier SCnum into d1
@@ -474,7 +474,7 @@ asscenterd5							;Center on defense, one man short (tmap 5); asscentero5 when h
 	bgt.w	.6
 	moveq	#$2E,d0
 	subq.w	#6,d1					;subtract 6 from d1
-	move.w	$52(a3),d2				;move player's SCnum into d2
+	move.w	SCnum(a3),d2			;move player's SCnum into d2
 	subq.w	#6,d2					;subtract 6 from d2
 	eor.w	d2,d1					;compare d2 and d1
 	bpl.w	GoAssReplace			;if team has puck, replace assignment with acentero
@@ -490,7 +490,7 @@ asscenterd5							;Center on defense, one man short (tmap 5); asscentero5 when h
 	move.w	(puckc).w,d1
 	bmi.w	.10
 	subq.w	#6,d1
-	move.w	$52(a3),d2
+	move.w	SCnum(a3),d2
 	subq.w	#6,d2
 	eor.w	d2,d1
 	bmi.w	.10
@@ -502,13 +502,13 @@ asscenterd5							;Center on defense, one man short (tmap 5); asscentero5 when h
 	move.w	#$14,d0
 	jsr	(randomd0s).l
 	add.w	d1,d0
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$76,d1
 	btst	#pfgoal,pflags(a3)
 	beq.w	.9
 	neg.w	d1
 .9
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.19
 .10
 	movea.l	#SortCords,a0
@@ -531,8 +531,8 @@ asscenterd5							;Center on defense, one man short (tmap 5); asscentero5 when h
 	beq.w	.13
 	neg.w	d1
 .13
-	move.w	d0,$44(a3)
-	move.w	d1,$46(a3)
+	move.w	d0,temp3(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.19
 .14
 	move.w	$28(a0),d0
@@ -542,7 +542,7 @@ asscenterd5							;Center on defense, one man short (tmap 5); asscentero5 when h
 	move.w	d0,d1
 	add.w	d0,d1
 	add.w	d0,d1
-	move.w	d1,$44(a3)
+	move.w	d1,temp3(a3)
 	move.w	#$11E,d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.15
@@ -556,28 +556,28 @@ asscenterd5							;Center on defense, one man short (tmap 5); asscentero5 when h
 	add.w	d1,d0
 	add.w	d1,d0
 	add.w	d1,d0
-	move.w	d0,$46(a3)
+	move.w	d0,temp4(a3)
 	bra.w	.19
 .16
 	move.w	(puckx).w,d0
 	move.w	(a3),d1
 	eor.w	d1,d0
 	bmi.w	.18
-	move.w	(puckx).w,$44(a3)
+	move.w	(puckx).w,temp3(a3)
 .loop
 	move.w	#$76,d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.17
 	neg.w	d0
 .17
-	move.w	d0,$46(a3)
+	move.w	d0,temp4(a3)
 	bra.w	.19
 .18
-	move.w	#0,$44(a3)
+	move.w	#0,temp3(a3)
 	bra.s	.loop
 .19
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	lea	.20(pc),a0
 	jmp	(skateto).l
 .20
@@ -600,36 +600,36 @@ asswingo5							;Winger on offense, one man short (tmap 5); asswingd5 when the o
 	bne.w	.2
 	bra.w	GoAssReplace
 .2
-	btst	#pfalock,$62(a3)		;check if locked in animation
+	btst	#pfalock,pflags(a3)		;check if locked in animation
 	bne.w	.12						;exit if so
 	btst	#gmclock,(gmode).w		;check game clock
 	bne.w	GoDoNothing				;donothing if stopped
 	jsr	(check4bench).l				;check if player going to bench
-	btst	#pfjoycon,$62(a3)		;check if joystick controlled
+	btst	#pfjoycon,pflags(a3)	;check if joystick controlled
 	bne.w	.12						;exit if so
 	moveq	#$28,d0
 	move.w	(puckc).w,d1
 	bmi.w	.3
 	subq.w	#6,d1
-	move.w	$52(a3),d2
+	move.w	SCnum(a3),d2
 	subq.w	#6,d2
 	eor.w	d2,d1
 	bmi.w	GoAssReplace
 .3
-	bclr	#pfna,$62(a3)			;clear new assignment bit
+	bclr	#pfna,pflags(a3)		;clear new assignment bit
 	beq.w	.4						;branch if it was already cleared
-	st	$48(a3)						;set old zone # (temp5)
-	clr.w	$40(a3)					;clear temp1
-	move.w	#8,$42(a3)				;move 8 into temp2
+	st	temp5(a3)					;set old zone # (temp5)
+	clr.w	temp1(a3)				;clear temp1
+	move.w	#8,temp2(a3)			;move 8 into temp2
 .4
-	sub.b	d7,$40(a3)				;subtract frames elapsed from temp1
+	sub.b	d7,temp1(a3)			;subtract frames elapsed from temp1
 	bpl.w	.10						;branch if positive
-	move.b	$6C(a3),$40(a3)
+	move.b	shotspd(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check if crowd meter currently broken
 	beq.w	.5
-	tst.b	$40(a3)					;check if temp1 is 0
+	tst.b	temp1(a3)				;check if temp1 is 0
 	beq.w	.5
-	subq.b	#1,$40(a3)				;subtract 1 from temp1
+	subq.b	#1,temp1(a3)			;subtract 1 from temp1
 .5
 	move.w	(pucky).w,d1
 	btst	#pfgoal,pflags(a3)
@@ -642,7 +642,7 @@ asswingo5							;Winger on offense, one man short (tmap 5); asswingd5 when the o
 	move.w	(puckvy).w,d3			;puckvy into d3
 	asr.w	#6,d3					;divide d3 by 64
 	add.w	d0,d3					;add d0 to d3
-	btst	#pfgoal,$62(a3)			;check which goal shooting on
+	btst	#pfgoal,pflags(a3)		;check which goal shooting on
 	bne.w	.7						;branch if top goal
 	neg.w	d0						;negate d0
 	neg.w	d3						;negate d3
@@ -661,7 +661,7 @@ asswingo5							;Winger on offense, one man short (tmap 5); asswingd5 when the o
 	blt.w	.8						;branch if in offensive zone
 	addq.w	#8,d2					;add 8 to d2 (d2 = $18)
 .8
-	cmp.w	$48(a3),d2				;compare temp5 with d2
+	cmp.w	temp5(a3),d2			;compare temp5 with d2
 	bne.w	.9						;branch if different zone
 	move.w	(Vcount).w,d0
 	andi.w	#$7F,d0
@@ -669,24 +669,24 @@ asswingo5							;Winger on offense, one man short (tmap 5); asswingd5 when the o
 	bgt.w	.10
 	;movement in zone while waiting
 .9
-	move.w	d2,$48(a3)				;move d2 into temp5
+	move.w	d2,temp5(a3)			;move d2 into temp5
 	lea	.table(pc),a0				;move zonedata address into a0
 	move.w	2(a0,d2.w),d0			;move X Coord into d0
 	jsr	(randomd0s).l				;RNG d0
 	add.w	(a0,d2.w),d0			;add X Coord offset to d0
-	move.w	d0,$44(a3)				;move d0 into temp3
+	move.w	d0,temp3(a3)			;move d0 into temp3
 	move.w	6(a0,d2.w),d0			;move Y Coord into d0
 	jsr	(randomd0s).l				;RNG d0
 	add.w	4(a0,d2.w),d0			;add Y Coord offset into d0
-	move.w	d0,$46(a3)
+	move.w	d0,temp4(a3)
 	bra.w	.10
 .table
 	dc.w	$0050,$0014,$FFBA,$000A,$0064,$0014,$0058,$0005
 	dc.w	$0047,$0032,$00E6,$0014,$0050,$001E,$00FA,$0014
 .10
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1				;move temp4 into d1
-	btst	#pfgoal,$62(a3)			;check if shooting up or down
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1			;move temp4 into d1
+	btst	#pfgoal,pflags(a3)		;check if shooting up or down
 	bne.w	.11						;branch if shooting up
 	neg.w	d0						;negate d0
 	neg.w	d1						;negate d1
@@ -722,17 +722,17 @@ asswingd5							;Winger on defense, one man short (tmap 5); asswingo5 when his t
 	bne.w	.20
 	bclr	#pfna,pflags(a3)
 	beq.w	.3
-	clr.w	$40(a3)
-	move.w	#8,$42(a3)
+	clr.w	temp1(a3)
+	move.w	#8,temp2(a3)
 .3
-	sub.b	d7,$40(a3)
+	sub.b	d7,temp1(a3)
 	bpl.w	.19
-	move.b	$6C(a3),$40(a3)
+	move.b	shotspd(a3),temp1(a3)
 	btst	#6,(sflags7).w
 	beq.w	.4
-	tst.b	$40(a3)
+	tst.b	temp1(a3)
 	beq.w	.4
-	subq.b	#1,$40(a3)
+	subq.b	#1,temp1(a3)
 .4
 	moveq	#$2A,d0
 	move.w	(pucky).w,d1
@@ -745,7 +745,7 @@ asswingd5							;Winger on defense, one man short (tmap 5); asswingo5 when his t
 	move.w	(puckc).w,d1
 	bmi.w	.6
 	subq.w	#6,d1
-	move.w	$52(a3),d2
+	move.w	SCnum(a3),d2
 	subq.w	#6,d2
 	eor.w	d2,d1
 	bpl.w	GoAssReplace
@@ -760,7 +760,7 @@ asswingd5							;Winger on defense, one man short (tmap 5); asswingo5 when his t
 	move.w	(puckc).w,d1
 	bmi.w	.10
 	subq.w	#6,d1
-	move.w	$52(a3),d2
+	move.w	SCnum(a3),d2
 	subq.w	#6,d2
 	eor.w	d2,d1
 	bmi.w	.10
@@ -772,13 +772,13 @@ asswingd5							;Winger on defense, one man short (tmap 5); asswingo5 when his t
 	move.w	#$14,d0
 	jsr	(randomd0s).l
 	add.w	d1,d0
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$76,d1
 	btst	#pfgoal,pflags(a3)
 	beq.w	.9
 	neg.w	d1
 .9
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.19
 .10
 	move.w	#2,d0
@@ -801,8 +801,8 @@ asswingd5							;Winger on defense, one man short (tmap 5); asswingo5 when his t
 	beq.w	.13
 	neg.w	d1
 .13
-	move.w	d0,$44(a3)
-	move.w	d1,$46(a3)
+	move.w	d0,temp3(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.19
 .14
 	move.w	#$76,d1
@@ -818,7 +818,7 @@ asswingd5							;Winger on defense, one man short (tmap 5); asswingo5 when his t
 	add.w	d0,d1
 	add.w	d0,d1
 	add.w	d0,d1
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	move.w	$28(a0),d1
 	asr.w	#7,d1
 	add.w	(a0),d1
@@ -826,28 +826,28 @@ asswingd5							;Winger on defense, one man short (tmap 5); asswingo5 when his t
 	move.w	d1,d0
 	add.w	d1,d0
 	add.w	d1,d0
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	bra.w	.19
 .16
 	move.w	(puckx).w,d0
 	move.w	(a3),d1
 	eor.w	d1,d0
 	bmi.w	.18
-	move.w	(puckx).w,$44(a3)
+	move.w	(puckx).w,temp3(a3)
 .loop
 	move.w	#$76,d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.17
 	neg.w	d0
 .17
-	move.w	d0,$46(a3)
+	move.w	d0,temp4(a3)
 	bra.w	.19
 .18
-	move.w	#0,$44(a3)
+	move.w	#0,temp3(a3)
 	bra.s	.loop
 .19
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	lea	.20(pc),a0
 	jmp	(skateto).l
 .20
@@ -885,31 +885,31 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 	move.w	(puckc).w,d1
 	bmi.w	GoAssReplace
 	subq.w	#6,d1
-	move.w	$52(a3),d2
+	move.w	SCnum(a3),d2
 	subq.w	#6,d2
 	eor.w	d2,d1
 	bmi.w	GoAssReplace
 	bclr	#pfna,pflags(a3)
 	beq.w	.4
-	clr.w	$40(a3)
-	move.w	#8,$42(a3)
+	clr.w	temp1(a3)
+	move.w	#8,temp2(a3)
 .4
-	sub.b	d7,$40(a3)
+	sub.b	d7,temp1(a3)
 	bpl.w	.25
-	move.b	$6B(a3),$40(a3)
+	move.b	aidef(a3),temp1(a3)
 	jsr	(ReadGoaliePulled).l
 	bmi.w	.5
 	btst	#6,(sflags7).w
 	beq.w	.6
-	tst.b	$40(a3)
+	tst.b	temp1(a3)
 	beq.w	.6
 .5
-	subq.b	#1,$40(a3)
+	subq.b	#1,temp1(a3)
 .6
 	clr.w	d1
-	move.b	$65(a3),d1
+	move.b	glitch(a3),d1
 	bpl.w	.7
-	move.w	$34(a3),d1
+	move.w	position(a3),d1
 	bmi.w	.34
 .7
 	cmp.w	#2,d1
@@ -926,13 +926,13 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 	bne.w	.9
 	neg.w	d0
 .9
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$96,d1
 	btst	#pfgoal,pflags(a3)
 	beq.w	.10
 	neg.w	d1
 .10
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.25
 .11
 	move.w	(puckx).w,d0
@@ -942,8 +942,8 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 .12
 	tst.w	d0
 	bpl.w	.13
-	clr.w	$44(a3)
-	clr.w	$46(a3)
+	clr.w	temp3(a3)
+	clr.w	temp4(a3)
 	bra.w	.25
 .13
 	move.w	#$51,d0
@@ -951,13 +951,13 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 	bne.w	.14
 	neg.w	d0
 .14
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$6C,d1
 	btst	#pfgoal,pflags(a3)
 	bne.w	.15
 	neg.w	d1
 .15
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.25
 .16
 	move.w	(pucky).w,d1
@@ -972,13 +972,13 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 	bne.w	.18
 	neg.w	d0
 .18
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$96,d1
 	btst	#pfgoal,pflags(a3)
 	beq.w	.19
 	neg.w	d1
 .19
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.25
 .20
 	move.w	(puckx).w,d0
@@ -988,8 +988,8 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 .21
 	tst.w	d0
 	bmi.w	.22
-	clr.w	$44(a3)
-	clr.w	$46(a3)
+	clr.w	temp3(a3)
+	clr.w	temp4(a3)
 	bra.w	.25
 .22
 	move.w	#$FFAF,d0
@@ -997,16 +997,16 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 	bne.w	.23
 	neg.w	d0
 .23
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$6C,d1
 	btst	#pfgoal,pflags(a3)
 	bne.w	.24
 	neg.w	d1
 .24
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.25
 .25
-	move.w	$46(a3),d1
+	move.w	temp4(a3),d1
 	btst	#pfgoal,pflags(a3)
 	bne.w	.29
 	movea.l	#SortCords,a0
@@ -1058,7 +1058,7 @@ assdefo4							;Defenseman on offense, two men short (tmap 4); assdefd4 when his
 	adda.w	#$80,a0
 	dbf	d2,.loop2
 .33
-	move.w	$44(a3),d0
+	move.w	temp3(a3),d0
 	movea.l	#EvadePC,a0
 	jmp	(skateto).l
 .34
@@ -1096,31 +1096,31 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 	move.w	(puckc).w,d1
 	bmi.w	GoAssReplace
 	subq.w	#6,d1
-	move.w	$52(a3),d2
+	move.w	SCnum(a3),d2
 	subq.w	#6,d2
 	eor.w	d2,d1
 	bmi.w	GoAssReplace
 	bclr	#pfna,pflags(a3)
 	beq.w	.4
-	clr.w	$40(a3)
-	move.w	#8,$42(a3)
+	clr.w	temp1(a3)
+	move.w	#8,temp2(a3)
 .4
-	sub.b	d7,$40(a3)
+	sub.b	d7,temp1(a3)
 	bpl.w	.25
-	move.b	$6B(a3),$40(a3)
+	move.b	aidef(a3),temp1(a3)
 	jsr	(ReadGoaliePulled).l
 	bmi.w	.5
 	btst	#6,(sflags7).w
 	beq.w	.6
-	tst.b	$40(a3)
+	tst.b	temp1(a3)
 	beq.w	.6
 .5
-	subq.b	#1,$40(a3)
+	subq.b	#1,temp1(a3)
 .6
 	clr.w	d1
-	move.b	$65(a3),d1
+	move.b	glitch(a3),d1
 	bpl.w	.7
-	move.w	$34(a3),d1
+	move.w	position(a3),d1
 	bmi.w	.34
 .7
 	cmp.w	#2,d1
@@ -1137,13 +1137,13 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 	bne.w	.9
 	neg.w	d0
 .9
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$96,d1
 	btst	#pfgoal,pflags(a3)
 	beq.w	.10
 	neg.w	d1
 .10
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.25
 .11
 	move.w	(puckx).w,d0
@@ -1153,8 +1153,8 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 .12
 	tst.w	d0
 	bpl.w	.13
-	clr.w	$44(a3)
-	clr.w	$46(a3)
+	clr.w	temp3(a3)
+	clr.w	temp4(a3)
 	bra.w	.25
 .13
 	move.w	#$51,d0
@@ -1162,13 +1162,13 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 	bne.w	.14
 	neg.w	d0
 .14
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$6C,d1
 	btst	#pfgoal,pflags(a3)
 	bne.w	.15
 	neg.w	d1
 .15
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.25
 .16
 	move.w	(pucky).w,d1
@@ -1183,13 +1183,13 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 	bne.w	.18
 	neg.w	d0
 .18
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$96,d1
 	btst	#pfgoal,pflags(a3)
 	beq.w	.19
 	neg.w	d1
 .19
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.25
 .20
 	move.w	(puckx).w,d0
@@ -1199,8 +1199,8 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 .21
 	tst.w	d0
 	bmi.w	.22
-	clr.w	$44(a3)
-	clr.w	$46(a3)
+	clr.w	temp3(a3)
+	clr.w	temp4(a3)
 	bra.w	.25
 .22
 	move.w	#$FFAF,d0
@@ -1208,16 +1208,16 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 	bne.w	.23
 	neg.w	d0
 .23
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$6C,d1
 	btst	#pfgoal,pflags(a3)
 	bne.w	.24
 	neg.w	d1
 .24
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.25
 .25
-	move.w	$46(a3),d1
+	move.w	temp4(a3),d1
 	btst	#pfgoal,pflags(a3)
 	bne.w	.29
 	movea.l	#SortCords,a0
@@ -1269,7 +1269,7 @@ assdefo5							;Defenseman on offense, one man short (tmap 5); assdefd5 when his
 	adda.w	#$80,a0
 	dbf	d2,.loop2
 .33
-	move.w	$44(a3),d0
+	move.w	temp3(a3),d0
 	movea.l	#EvadePC,a0
 	jmp	(skateto).l
 .34
@@ -1294,29 +1294,29 @@ assdefd4							;Defenseman on defense, two men short (tmap 4); assdefo4 when his
 	btst	#gmclock,(gmode).w		;gmclock - check if clock is running
 	bne.w	GoDoNothing				;exit if stoppage
 	jsr	(check4bench).l
-	btst	#pfjoycon,$62(a3)		;pfjoycon - check if joystick controlled
+	btst	#pfjoycon,pflags(a3)	;pfjoycon - check if joystick controlled
 	bne.w	.17						;exit if joystick controlled
-	bclr	#pfna,$62(a3)			;pfna - new assignment
+	bclr	#pfna,pflags(a3)		;pfna - new assignment
 	beq.w	.3						;branch if no new assignment
-	clr.w	$40(a3)					;clear temp1
-	move.w	#8,$42(a3)				;move 8 into temp2
+	clr.w	temp1(a3)				;clear temp1
+	move.w	#8,temp2(a3)			;move 8 into temp2
 	;count down the timer
 .3
-	sub.b	d7,$40(a3)				;subtract d7 from temp1
+	sub.b	d7,temp1(a3)			;subtract d7 from temp1
 	bpl.w	.14
-	move.b	$6C(a3),$40(a3)
+	move.b	shotspd(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check for crowd record flag
 	beq.w	.4						;jump if not set
-	tst.b	$40(a3)					;check if 0
+	tst.b	temp1(a3)				;check if 0
 	beq.w	.4
-	subq.b	#1,$40(a3)				;subtract 1 from temp1
+	subq.b	#1,temp1(a3)			;subtract 1 from temp1
 	;center on defense: switch to asscentero if our team has the puck
 .4
 	move.w	(puckc).w,d1			;move puck carrier SCnum into d1
 	bmi.w	.6
 	moveq	#$26,d0
 	subq.w	#6,d1					;subtract 6 from d1
-	move.w	$52(a3),d2				;move player's SCnum into d2
+	move.w	SCnum(a3),d2			;move player's SCnum into d2
 	subq.w	#6,d2					;subtract 6 from d2
 	eor.w	d2,d1					;compare d2 and d1
 	bmi.w	.6
@@ -1331,9 +1331,9 @@ assdefd4							;Defenseman on defense, two men short (tmap 4); assdefo4 when his
 	blt.w	GoAssReplace
 .6
 	clr.w	d0
-	move.b	$65(a3),d0
+	move.b	glitch(a3),d0
 	bpl.w	.7
-	move.w	$34(a3),d0
+	move.w	position(a3),d0
 	bmi.w	.17
 .7
 	cmp.w	#2,d0
@@ -1341,11 +1341,11 @@ assdefd4							;Defenseman on defense, two men short (tmap 4); assdefo4 when his
 	move.w	#$FFFF,d1
 .loop
 	move.w	(puckx).w,d0			;Ypos of puck
-	btst	#pfgoal,$62(a3)			;pfgoal - check which net to shoot on
+	btst	#pfgoal,pflags(a3)		;pfgoal - check which net to shoot on
 	bne.w	.8						;branch if top net
 	neg.w	d1						;negate d2 if shooting on bottom net
 .8
-	move.w	d1,$44(a3)
+	move.w	d1,temp3(a3)
 	eor.w	d0,d1
 	bpl.w	.10
 	move.w	#$FF14,d1
@@ -1353,7 +1353,7 @@ assdefd4							;Defenseman on defense, two men short (tmap 4); assdefo4 when his
 	bne.w	.9
 	neg.w	d1
 .9
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.14
 .10
 	movea.l	#SortCords,a0
@@ -1363,41 +1363,41 @@ assdefd4							;Defenseman on defense, two men short (tmap 4); assdefo4 when his
 .11
 	asl.w	#7,d0
 	adda.w	d0,a0
-	move.w	$28(a0),d0
+	move.w	Xvel(a0),d0
 	asr.w	#7,d0
 	add.w	(a0),d0
 	ext.l	d0
 	divs.w	#3,d0
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$11E,d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.12
 	neg.w	d0
 .12
-	move.w	$2A(a0),d1
+	move.w	Yvel(a0),d1
 	asr.w	#7,d1
-	add.w	$14(a0),d1
+	add.w	Ypos(a0),d1
 	sub.w	d0,d1
 	ext.l	d1
 	divs.w	#3,d1
 	add.w	d1,d0
-	move.w	d0,$46(a3)
+	move.w	d0,temp4(a3)
 	bra.w	.14
 .13
 	move.w	#1,d1
 	bra.w	.loop
 .14
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	movea.l	#EvadePC,a0
-	move.b	$6A(a3),-(sp)
+	move.b	aioff(a3),-(sp)
 	cmpi.l	#$15F9,$2A(a2)
 	blt.w	.15
-	move.b	#$1E,$6A(a3)
+	move.b	#$1E,aioff(a3)
 .15
 	jsr	(skateto).l
-	move.b	(sp)+,$6A(a3)
-	move.w	$14(a3),d0
+	move.b	(sp)+,aioff(a3)
+	move.w	Ypos(a3),d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.16
 	neg.w	d0
@@ -1427,29 +1427,29 @@ assdefd5							;Defenseman on defense, one man short (tmap 5); assdefo5 when his
 	btst	#gmclock,(gmode).w		;gmclock - check if clock is running
 	bne.w	GoDoNothing				;exit if stoppage
 	jsr	(check4bench).l
-	btst	#pfjoycon,$62(a3)		;pfjoycon - check if joystick controlled
+	btst	#pfjoycon,pflags(a3)	;pfjoycon - check if joystick controlled
 	bne.w	.17						;exit if joystick controlled
-	bclr	#pfna,$62(a3)			;pfna - new assignment
+	bclr	#pfna,pflags(a3)		;pfna - new assignment
 	beq.w	.3						;branch if no new assignment
-	clr.w	$40(a3)					;clear temp1
-	move.w	#8,$42(a3)				;move 8 into temp2
+	clr.w	temp1(a3)				;clear temp1
+	move.w	#8,temp2(a3)			;move 8 into temp2
 	;count down the timer
 .3
-	sub.b	d7,$40(a3)				;subtract d7 from temp1
+	sub.b	d7,temp1(a3)			;subtract d7 from temp1
 	bpl.w	.14
-	move.b	$6C(a3),$40(a3)
+	move.b	shotspd(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check for crowd record flag
 	beq.w	.4						;jump if not set
-	tst.b	$40(a3)					;check if 0
+	tst.b	temp1(a3)				;check if 0
 	beq.w	.4
-	subq.b	#1,$40(a3)				;subtract 1 from temp1
+	subq.b	#1,temp1(a3)			;subtract 1 from temp1
 	;center on defense: switch to asscentero if our team has the puck
 .4
 	move.w	(puckc).w,d1			;move puck carrier SCnum into d1
 	bmi.w	.6
 	moveq	#$24,d0
 	subq.w	#6,d1					;subtract 6 from d1
-	move.w	$52(a3),d2				;move player's SCnum into d2
+	move.w	SCnum(a3),d2			;move player's SCnum into d2
 	subq.w	#6,d2					;subtract 6 from d2
 	eor.w	d2,d1					;compare d2 and d1
 	bmi.w	.6
@@ -1464,9 +1464,9 @@ assdefd5							;Defenseman on defense, one man short (tmap 5); assdefo5 when his
 	blt.w	GoAssReplace
 .6
 	clr.w	d0
-	move.b	$65(a3),d0
+	move.b	glitch(a3),d0
 	bpl.w	.7
-	move.w	$34(a3),d0
+	move.w	position(a3),d0
 	bmi.w	.17
 .7
 	cmp.w	#2,d0
@@ -1474,11 +1474,11 @@ assdefd5							;Defenseman on defense, one man short (tmap 5); assdefo5 when his
 	move.w	#$FFFF,d1
 .loop
 	move.w	(puckx).w,d0			;Ypos of puck
-	btst	#pfgoal,$62(a3)			;pfgoal - check which net to shoot on
+	btst	#pfgoal,pflags(a3)		;pfgoal - check which net to shoot on
 	bne.w	.8						;branch if top net
 	neg.w	d1						;negate d2 if shooting on bottom net
 .8
-	move.w	d1,$44(a3)
+	move.w	d1,temp3(a3)
 	eor.w	d0,d1
 	bpl.w	.10
 	move.w	#$FF14,d1
@@ -1486,7 +1486,7 @@ assdefd5							;Defenseman on defense, one man short (tmap 5); assdefo5 when his
 	bne.w	.9
 	neg.w	d1
 .9
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.14
 .10
 	movea.l	#SortCords,a0
@@ -1496,39 +1496,39 @@ assdefd5							;Defenseman on defense, one man short (tmap 5); assdefo5 when his
 .11
 	asl.w	#7,d0
 	adda.w	d0,a0
-	move.w	$28(a0),d0
+	move.w	Xvel(a0),d0
 	asr.w	#7,d0
 	add.w	(a0),d0
 	asr.w	#1,d0
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$11E,d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.12
 	neg.w	d0
 .12
-	move.w	$2A(a0),d1
+	move.w	Yvel(a0),d1
 	asr.w	#7,d1
-	add.w	$14(a0),d1
+	add.w	Ypos(a0),d1
 	sub.w	d0,d1
 	asr.w	#1,d1
 	add.w	d1,d0
-	move.w	d0,$46(a3)
+	move.w	d0,temp4(a3)
 	bra.w	.14
 .13
 	move.w	#1,d1
 	bra.w	.loop
 .14
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	movea.l	#EvadePC,a0
-	move.b	$6A(a3),-(sp)
+	move.b	aioff(a3),-(sp)
 	cmpi.l	#$15F9,$2A(a2)
 	blt.w	.15
-	move.b	#$1E,$6A(a3)
+	move.b	#$1E,aioff(a3)
 .15
 	jsr	(skateto).l
-	move.b	(sp)+,$6A(a3)
-	move.w	$14(a3),d0
+	move.b	(sp)+,aioff(a3)
+	move.w	Ypos(a3),d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.16
 	neg.w	d0
@@ -1565,18 +1565,18 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 	bne.w	GoAssReplace
 	bclr	#pfna,pflags(a3)
 	beq.w	.3
-	clr.w	$40(a3)
-	move.w	#8,$42(a3)
+	clr.w	temp1(a3)
+	move.w	#8,temp2(a3)
 .3
 	btst	#4,$30(a2)
 	bne.w	.5
 	move.w	(puckc).w,d1
 	bmi.w	.5
-	cmpi.b	#4,$40(a3)
+	cmpi.b	#4,temp1(a3)
 	bge.w	.5
 	moveq	#1,d0
 	subq.w	#6,d1
-	move.w	$52(a3),d2
+	move.w	SCnum(a3),d2
 	subq.w	#6,d2
 	eor.w	d2,d1
 	bmi.w	.5
@@ -1590,20 +1590,20 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 	cmp.w	#$76,d1
 	blt.w	GoAssReplace
 .5
-	sub.b	d7,$40(a3)
+	sub.b	d7,temp1(a3)
 	bpl.w	.31
-	move.b	$6C(a3),$40(a3)
+	move.b	shotspd(a3),temp1(a3)
 	btst	#6,(sflags7).w
 	beq.w	.6
-	tst.b	$40(a3)
+	tst.b	temp1(a3)
 	beq.w	.6
-	subq.b	#1,$40(a3)
+	subq.b	#1,temp1(a3)
 .6
 	st	(LastCarrierAway+2).w
 	clr.w	d0
-	move.b	$65(a3),d0
+	move.b	glitch(a3),d0
 	bpl.w	.7
-	move.w	$34(a3),d0
+	move.w	position(a3),d0
 	bmi.w	.35
 .7
 	cmp.w	#2,d0
@@ -1614,7 +1614,7 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 	bne.w	.8
 	neg.w	d1
 .8
-	move.w	d1,$44(a3)
+	move.w	d1,temp3(a3)
 	eor.w	d0,d1
 	bpl.w	.10
 	move.w	#$FF14,d1
@@ -1622,11 +1622,11 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 	bne.w	.9
 	neg.w	d1
 .9
-	move.w	d1,$46(a3)
-	move.w	$52(a3),(LastCarrierAway+2).w
+	move.w	d1,temp4(a3)
+	move.w	SCnum(a3),(LastCarrierAway+2).w
 	movem.w	d0,-(sp)
-	move.w	$28(a3),d0
-	or.w	$2A(a3),d0
+	move.w	Xvel(a3),d0
+	or.w	Yvel(a3),d0
 	movem.w	(sp)+,d0
 	bne.w	.27
 	jsr	(FacePuck).l
@@ -1653,13 +1653,13 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 	neg.w	d1
 	neg.w	d0
 .13
-	move.w	d0,$44(a3)
-	move.w	d1,$46(a3)
+	move.w	d0,temp3(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.31
 .14
 	move.w	(a0),d0
 	asr.w	#1,d0
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$11E,d1
 	btst	#pfgoal,pflags(a3)
 	beq.w	.15
@@ -1674,7 +1674,7 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 .16
 	neg.w	d1
 	add.w	d0,d1
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.27
 .17
 	move.w	#$FFFF,d1
@@ -1683,7 +1683,7 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 	bne.w	.18
 	neg.w	d1
 .18
-	move.w	d1,$44(a3)
+	move.w	d1,temp3(a3)
 	eor.w	d0,d1
 	bpl.w	.20
 	move.w	#$FF14,d1
@@ -1691,11 +1691,11 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 	bne.w	.19
 	neg.w	d1
 .19
-	move.w	d1,$46(a3)
-	move.w	$52(a3),(LastCarrierAway+2).w
+	move.w	d1,temp4(a3)
+	move.w	SCnum(a3),(LastCarrierAway+2).w
 	movem.w	d0,-(sp)
-	move.w	$28(a3),d0
-	or.w	$2A(a3),d0
+	move.w	Xvel(a3),d0
+	or.w	Yvel(a3),d0
 	movem.w	(sp)+,d0
 	bne.w	.27
 	jsr	(FacePuck).l
@@ -1722,13 +1722,13 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 	neg.w	d1
 	neg.w	d0
 .23
-	move.w	d0,$44(a3)
-	move.w	d1,$46(a3)
+	move.w	d0,temp3(a3)
+	move.w	d1,temp4(a3)
 	bra.w	.31
 .24
 	move.w	(a0),d0
 	asr.w	#1,d0
-	move.w	d0,$44(a3)
+	move.w	d0,temp3(a3)
 	move.w	#$11E,d1
 	btst	#pfgoal,pflags(a3)
 	beq.w	.25
@@ -1743,7 +1743,7 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 .26
 	neg.w	d1
 	add.w	d0,d1
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 .27
 	cmpi.w	#$11E,(pucky).w
 	bgt.w	.33
@@ -1754,10 +1754,10 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 	asl.w	#7,d0
 	movea.l	#SortCords,a0
 	adda.w	d0,a0
-	tst.w	$34(a0)
+	tst.w	position(a0)
 	beq.w	.33
 .28
-	move.w	$46(a3),d1
+	move.w	temp4(a3),d1
 	move.w	(pucky).w,d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.29
@@ -1771,30 +1771,30 @@ assdefd								;Defenseman on defense (tmap 5 / 4: assdefd5 / assdefd4); assdefo
 	beq.w	.30
 	neg.w	d0
 .30
-	move.w	d0,$46(a3)
+	move.w	d0,temp4(a3)
 .31
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	movea.l	#EvadePC,a0
-	move.b	$6A(a3),-(sp)
+	move.b	aioff(a3),-(sp)
 	cmpi.l	#$15F9,$2A(a2)
 	blt.w	.32
-	move.b	#$1E,$6A(a3)
+	move.b	#$1E,aioff(a3)
 .32
 	jsr	(skateto).l
-	move.b	(sp)+,$6A(a3)
+	move.b	(sp)+,aioff(a3)
 	rts
 .33
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	movea.l	#EvadePC,a0
-	move.b	$6A(a3),-(sp)
+	move.b	aioff(a3),-(sp)
 	cmpi.l	#$15F9,$2A(a2)
 	blt.w	.34
-	move.b	#$1E,$6A(a3)
+	move.b	#$1E,aioff(a3)
 .34
 	jsr	(skateto).l
-	move.b	(sp)+,$6A(a3)
+	move.b	(sp)+,aioff(a3)
 	jmp	(check4check).l
 .35
 	rts
@@ -1813,49 +1813,49 @@ asswingd							;Winger on defense (tmap 5 / 4: asswingd5 / asswingd4); asswingo 
 	bne.w	.2
 	bra.w	GoAssReplace
 .2
-	btst	#pfalock,$62(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	.34
 	btst	#gmclock,(gmode).w
 	bne.w	GoDoNothing
 	jsr	(check4bench).l
-	btst	#pfjoycon,$62(a3)
+	btst	#pfjoycon,pflags(a3)
 	bne.w	.34
 	jsr	(GetRoleAss).l
 	bne.w	GoAssReplace
-	bclr	#pfna,$62(a3)
+	bclr	#pfna,pflags(a3)
 	beq.w	.3
-	clr.w	$40(a3)
-	move.w	#8,$42(a3)
+	clr.w	temp1(a3)
+	move.w	#8,temp2(a3)
 .3
 	move.w	(puckc).w,d1
 	bmi.w	.4
 	moveq	#4,d0					;acentero
 	subq.w	#6,d1
-	move.w	$52(a3),d2
+	move.w	SCnum(a3),d2
 	subq.w	#6,d2
 	eor.w	d2,d1
 	bpl.w	GoAssReplace			;our team has puck
 .4
-	sub.b	d7,$40(a3)
+	sub.b	d7,temp1(a3)
 	bpl.w	.33
-	move.b	$6C(a3),$40(a3)
+	move.b	shotspd(a3),temp1(a3)
 	btst	#6,(sflags7).w
 	beq.w	.5
-	tst.b	$40(a3)
+	tst.b	temp1(a3)
 	beq.w	.5
-	subq.b	#1,$40(a3)
+	subq.b	#1,temp1(a3)
 .5
 	clr.w	d1
-	move.b	$65(a3),d1
+	move.b	glitch(a3),d1
 	bpl.w	.6
-	move.w	$34(a3),d1
+	move.w	position(a3),d1
 	bmi.w	.34
 .6
 	cmp.w	#5,d1
 	bne.w	.17
 	move.w	#1,d1
 	move.w	(puckx).w,d0
-	btst	#pfgoal,$62(a3)
+	btst	#pfgoal,pflags(a3)
 	bne.w	.7
 	neg.w	d1
 .7
@@ -2037,11 +2037,11 @@ asswingd							;Winger on defense (tmap 5 / 4: asswingd5 / asswingd4); asswingo 
 	asr.w	#8,d1
 	add.w	(pucky).w,d1
 .32
-	move.w	d0,$44(a3)
-	move.w	d1,$46(a3)
+	move.w	d0,temp3(a3)
+	move.w	d1,temp4(a3)
 .33
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	lea	.34(pc),a0
 	jmp	(skateto).l
 .34
@@ -2061,36 +2061,36 @@ asscenterd							;Center on defense (tmap 5 / 4: asscenterd5 / asscenterd4); ass
 	bne.w	.2
 	bra.w	GoAssReplace
 .2
-	btst	#pfalock,$62(a3)		;pfalock - locked animation
+	btst	#pfalock,pflags(a3)		;pfalock - locked animation
 	bne.w	.21						;exit if locked
 	btst	#gmclock,(gmode).w		;gmclock - check if clock is running
 	bne.w	GoDoNothing				;exit if stoppage
 	jsr	(check4bench).l
-	btst	#pfjoycon,$62(a3)		;pfjoycon - check if joystick controlled
+	btst	#pfjoycon,pflags(a3)	;pfjoycon - check if joystick controlled
 	bne.w	.21
 	jsr	(GetRoleAss).l
 	bne.w	GoAssReplace			;exit if joystick controlled
-	bclr	#pfna,$62(a3)			;pfna - new assignment
+	bclr	#pfna,pflags(a3)		;pfna - new assignment
 	beq.w	.3						;branch if no new assignment
-	clr.w	$40(a3)					;clear temp1
-	move.w	#8,$42(a3)				;move 8 into temp2
+	clr.w	temp1(a3)				;clear temp1
+	move.w	#8,temp2(a3)			;move 8 into temp2
 	;count down the timer
 .3
-	sub.b	d7,$40(a3)				;subtract d7 from temp1
+	sub.b	d7,temp1(a3)			;subtract d7 from temp1
 	bpl.w	.19
-	move.b	$6C(a3),$40(a3)
+	move.b	shotspd(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check for crowd record flag
 	beq.w	.4						;jump if not set
-	tst.b	$40(a3)					;check if 0
+	tst.b	temp1(a3)				;check if 0
 	beq.w	.4
-	subq.b	#1,$40(a3)				;subtract 1 from temp1
+	subq.b	#1,temp1(a3)			;subtract 1 from temp1
 	;center on defense: switch to asscentero if our team has the puck
 .4
 	move.w	(puckc).w,d1			;move puck carrier SCnum into d1
 	bmi.w	.5
 	moveq	#6,d0					;asscentero
 	subq.w	#6,d1					;subtract 6 from d1
-	move.w	$52(a3),d2				;move player's SCnum into d2
+	move.w	SCnum(a3),d2			;move player's SCnum into d2
 	subq.w	#6,d2					;subtract 6 from d2
 	eor.w	d2,d1					;compare d2 and d1
 	bpl.w	GoAssReplace			;if team has puck, replace assignment with acentero
@@ -2101,10 +2101,10 @@ asscenterd							;Center on defense (tmap 5 / 4: asscenterd5 / asscenterd4); ass
 	asl.w	#7,d1
 	movea.l	#SortCords,a0
 	adda.w	d1,a0
-	tst.w	$34(a0)
+	tst.w	position(a0)
 	bne.w	.6
-	move.b	$62(a0),d1
-	move.b	$62(a3),d0
+	move.b	pflags(a0),d1
+	move.b	pflags(a3),d0
 	eor.b	d1,d0
 	btst	#6,d0
 	beq.w	.6
@@ -2192,19 +2192,19 @@ asscenterd							;Center on defense (tmap 5 / 4: asscenterd5 / asscenterd4); ass
 	add.w	(sp)+,d1
 	add.w	$14(a0),d1
 .18
-	move.w	d0,$44(a3)
-	move.w	d1,$46(a3)
+	move.w	d0,temp3(a3)
+	move.w	d1,temp4(a3)
 .19
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	lea	.21(pc),a0
-	move.b	$6A(a3),-(sp)
+	move.b	aioff(a3),-(sp)
 	cmpi.l	#$15F9,$2A(a2)
 	blt.w	.20
-	move.b	#$1E,$6A(a3)
+	move.b	#$1E,aioff(a3)
 .20
 	jsr	(skateto).l
-	move.b	(sp)+,$6A(a3)
+	move.b	(sp)+,aioff(a3)
 .21
 	rts
 
@@ -2243,32 +2243,32 @@ assdefo								;Defenseman on offense (tmap 5 / 4: assdefo5 / assdefo4); assdefd
 	move.w	(puckc).w,d1
 	bmi.w	GoAssReplace
 	subq.w	#6,d1
-	move.w	$52(a3),d2
+	move.w	SCnum(a3),d2
 	subq.w	#6,d2
 	eor.w	d2,d1
 	bmi.w	GoAssReplace
 	bclr	#pfna,pflags(a3)
 	beq.w	.4
-	clr.w	$40(a3)
-	move.w	#8,$42(a3)
+	clr.w	temp1(a3)
+	move.w	#8,temp2(a3)
 .4
-	sub.b	d7,$40(a3)
+	sub.b	d7,temp1(a3)
 	bpl.w	.24
-	move.b	$6B(a3),$40(a3)
+	move.b	aidef(a3),temp1(a3)
 	jsr	(ReadGoaliePulled).l
 	bmi.w	.5
 	btst	#6,(sflags7).w
 	beq.w	.6
-	tst.b	$40(a3)
+	tst.b	temp1(a3)
 	beq.w	.6
 .5
-	subq.b	#1,$40(a3)
+	subq.b	#1,temp1(a3)
 .6
 	movea.l	#EvadePC,a0
 	clr.w	d1
-	move.b	$65(a3),d1
+	move.b	glitch(a3),d1
 	bpl.w	.7
-	move.w	$34(a3),d1
+	move.w	position(a3),d1
 	bmi.w	.25
 .7
 	cmp.w	#2,d1
@@ -2414,11 +2414,11 @@ assdefoRightSide	equ	*			;Defense wing: pick the x offset on the right side rela
 	move.w	(pucky).w,d1
 	subi.w	#$A,d1
 .23
-	move.w	d0,$44(a3)
-	move.w	d1,$46(a3)
+	move.w	d0,temp3(a3)
+	move.w	d1,temp4(a3)
 .24
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	movea.l	#EvadePC,a0
 	jmp	(skateto).l
 .25
@@ -2439,35 +2439,35 @@ asscentero							;Center on offense (tmap 5 / 4: asscentero5 / asscentero4): a r
 	bne.w	.2
 	bra.w	GoAssReplace
 .2
-	btst	#pfalock,$62(a3)		;check if locked in animation
+	btst	#pfalock,pflags(a3)		;check if locked in animation
 	bne.w	.11						;exit if so
 	btst	#gmclock,(gmode).w		;check game clock
 	bne.w	GoDoNothing				;donothing if stopped
 	jsr	(check4bench).l				;check if player going to bench
-	btst	#pfjoycon,$62(a3)		;check if joystick controlled
+	btst	#pfjoycon,pflags(a3)	;check if joystick controlled
 	bne.w	.11
 	jsr	(GetRoleAss).l
 	bne.w	GoAssReplace			;exit if so
-	bclr	#pfna,$62(a3)			;clear new assignment bit
+	bclr	#pfna,pflags(a3)		;clear new assignment bit
 	beq.w	.3						;branch if it was already cleared
-	st	$48(a3)						;set old zone # (temp5)
-	clr.w	$40(a3)					;clear temp1
-	move.w	#8,$42(a3)				;move 8 into temp2
+	st	temp5(a3)					;set old zone # (temp5)
+	clr.w	temp1(a3)				;clear temp1
+	move.w	#8,temp2(a3)			;move 8 into temp2
 .3
-	sub.b	d7,$40(a3)				;subtract frames elapsed from temp1
+	sub.b	d7,temp1(a3)			;subtract frames elapsed from temp1
 	bpl.w	.9						;branch if positive
-	move.b	$6C(a3),$40(a3)
+	move.b	shotspd(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check if crowd meter currently broken
 	beq.w	.4
-	tst.b	$40(a3)					;check if temp1 is 0
+	tst.b	temp1(a3)				;check if temp1 is 0
 	beq.w	.4
-	subq.b	#1,$40(a3)				;subtract 1 from temp1
+	subq.b	#1,temp1(a3)			;subtract 1 from temp1
 .4
 	move.w	(puckc).w,d1
 	bmi.w	.5
 	moveq	#5,d0
 	subq.w	#6,d1					;sub 6 from d1
-	move.w	$52(a3),d2				;move SCnum into d2
+	move.w	SCnum(a3),d2			;move SCnum into d2
 	subq.w	#6,d2					;sub 6 from d2
 	eor.w	d2,d1					;EOR d2 with d1. Checks if puckc on same team
 	bmi.w	GoAssReplace			;if not, branch to assreplace
@@ -2493,7 +2493,7 @@ asscentero							;Center on offense (tmap 5 / 4: asscentero5 / asscentero4): a r
 	blt.w	.7						;branch if in offensive zone
 	addq.w	#8,d2					;add 8 to d2 (d2 = $18)
 .7
-	cmp.w	$48(a3),d2				;compare temp5 with d2
+	cmp.w	temp5(a3),d2			;compare temp5 with d2
 	bne.w	.8						;branch if different zone
 	move.w	(Vcount).w,d0
 	andi.w	#$7F,d0
@@ -2501,24 +2501,24 @@ asscentero							;Center on offense (tmap 5 / 4: asscentero5 / asscentero4): a r
 	bgt.w	.9
 	;movement in zone while waiting
 .8
-	move.w	d2,$48(a3)				;move d2 into temp5
+	move.w	d2,temp5(a3)			;move d2 into temp5
 	lea	.table(pc),a0				;move zonedata address into a0
 	move.w	2(a0,d2.w),d0			;move X Coord into d0
 	jsr	(randomd0s).l				;RNG d0
 	add.w	(a0,d2.w),d0			;add X Coord offset to d0
-	move.w	d0,$44(a3)				;move d0 into temp3
+	move.w	d0,temp3(a3)			;move d0 into temp3
 	move.w	6(a0,d2.w),d0			;move Y Coord into d0
 	jsr	(randomd0s).l				;RNG d0
 	add.w	4(a0,d2.w),d0			;add Y Coord offset into d0
-	move.w	d0,$46(a3)
+	move.w	d0,temp4(a3)
 	bra.w	.9
 .table
 	dc.w	$0000,$003C,$FFBA,$000A,$0000,$003C,$003C,$000A
 	dc.w	$0000,$0028,$00CB,$001E,$0000,$0050,$00CB,$0014
 .9
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1				;move temp4 into d1
-	btst	#pfgoal,$62(a3)			;check if shooting up or down
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1			;move temp4 into d1
+	btst	#pfgoal,pflags(a3)		;check if shooting up or down
 	bne.w	.10						;branch if shooting up
 	neg.w	d1						;negate d0
 .10
@@ -2542,35 +2542,35 @@ asswingo							;Winger on offense (tmap 5 / 4: asswingo5 / asswingo4): a random 
 	bne.w	.2
 	bra.w	GoAssReplace
 .2
-	btst	#pfalock,$62(a3)		;check if locked in animation
+	btst	#pfalock,pflags(a3)		;check if locked in animation
 	bne.w	.13						;exit if so
 	btst	#gmclock,(gmode).w		;check game clock
 	bne.w	GoDoNothing				;donothing if stopped
 	jsr	(check4bench).l				;check if player going to bench
-	btst	#pfjoycon,$62(a3)		;check if joystick controlled
+	btst	#pfjoycon,pflags(a3)	;check if joystick controlled
 	bne.w	.13
 	jsr	(GetRoleAss).l
 	bne.w	GoAssReplace			;exit if so
-	bclr	#pfna,$62(a3)			;clear new assignment bit
+	bclr	#pfna,pflags(a3)		;clear new assignment bit
 	beq.w	.3						;branch if it was already cleared
-	st	$48(a3)						;set old zone # (temp5)
-	clr.w	$40(a3)					;clear temp1
-	move.w	#8,$42(a3)				;move 8 into temp2
+	st	temp5(a3)					;set old zone # (temp5)
+	clr.w	temp1(a3)				;clear temp1
+	move.w	#8,temp2(a3)			;move 8 into temp2
 .3
-	sub.b	d7,$40(a3)				;subtract frames elapsed from temp1
+	sub.b	d7,temp1(a3)			;subtract frames elapsed from temp1
 	bpl.w	.9						;branch if positive
-	move.b	$6C(a3),$40(a3)
+	move.b	shotspd(a3),temp1(a3)
 	btst	#6,(sflags7).w			;check if crowd meter currently broken
 	beq.w	.4
-	tst.b	$40(a3)					;check if temp1 is 0
+	tst.b	temp1(a3)				;check if temp1 is 0
 	beq.w	.4
-	subq.b	#1,$40(a3)				;subtract 1 from temp1
+	subq.b	#1,temp1(a3)			;subtract 1 from temp1
 .4
 	moveq	#3,d0
 	move.w	(puckc).w,d1			;move puckc SCnum into d1
 	bmi.w	.5						;branch if no puckc
 	subq.w	#6,d1					;sub 6 from d1
-	move.w	$52(a3),d2				;move SCnum into d2
+	move.w	SCnum(a3),d2			;move SCnum into d2
 	subq.w	#6,d2					;sub 6 from d2
 	eor.w	d2,d1					;EOR d2 with d1. Checks if puckc on same team
 	bmi.w	GoAssReplace			;if not, branch to assreplace
@@ -2579,7 +2579,7 @@ asswingo							;Winger on offense (tmap 5 / 4: asswingo5 / asswingo4): a random 
 	move.w	(puckvy).w,d3			;puckvy into d3
 	asr.w	#6,d3					;divide d3 by 64
 	add.w	d0,d3					;add d0 to d3
-	btst	#pfgoal,$62(a3)			;check which goal shooting on
+	btst	#pfgoal,pflags(a3)		;check which goal shooting on
 	bne.w	.6						;branch if top goal
 	neg.w	d0						;negate d0
 	neg.w	d3						;negate d3
@@ -2598,7 +2598,7 @@ asswingo							;Winger on offense (tmap 5 / 4: asswingo5 / asswingo4): a random 
 	blt.w	.7						;branch if in offensive zone
 	addq.w	#8,d2					;add 8 to d2 (d2 = $18)
 .7
-	cmp.w	$48(a3),d2				;compare temp5 with d2
+	cmp.w	temp5(a3),d2			;compare temp5 with d2
 	bne.w	.8						;branch if different zone
 	move.w	(Vcount).w,d0
 	andi.w	#$7F,d0
@@ -2606,34 +2606,34 @@ asswingo							;Winger on offense (tmap 5 / 4: asswingo5 / asswingo4): a random 
 	bgt.w	.9
 	;movement in zone while waiting
 .8
-	move.w	d2,$48(a3)				;move d2 into temp5
+	move.w	d2,temp5(a3)			;move d2 into temp5
 	lea	.table(pc),a0				;move zonedata address into a0
 	move.w	2(a0,d2.w),d0			;move X Coord into d0
 	jsr	(randomd0s).l				;RNG d0
 	add.w	(a0,d2.w),d0			;add X Coord offset to d0
-	move.w	d0,$44(a3)				;move d0 into temp3
+	move.w	d0,temp3(a3)			;move d0 into temp3
 	move.w	6(a0,d2.w),d0			;move Y Coord into d0
 	jsr	(randomd0s).l				;RNG d0
 	add.w	4(a0,d2.w),d0			;add Y Coord offset into d0
-	move.w	d0,$46(a3)
+	move.w	d0,temp4(a3)
 	bra.w	.9
 .table
 	dc.w	$0050,$0014,$FFBA,$000A,$0064,$0014,$0058,$0005
 	dc.w	$0047,$0032,$00E6,$0014,$0050,$001E,$00FA,$0014
 .9
-	move.w	$44(a3),d0
+	move.w	temp3(a3),d0
 	clr.w	d1
-	move.b	$65(a3),d1
+	move.b	glitch(a3),d1
 	bpl.w	.10
-	move.w	$34(a3),d1
+	move.w	position(a3),d1
 	bmi.w	.13
 .10
 	cmp.w	#5,d1
 	beq.w	.11						;branch if RW
 	neg.w	d0						;negate d0
 .11
-	move.w	$46(a3),d1				;move temp4 into d1
-	btst	#pfgoal,$62(a3)			;check if shooting up or down
+	move.w	temp4(a3),d1			;move temp4 into d1
+	btst	#pfgoal,pflags(a3)		;check if shooting up or down
 	bne.w	.12						;branch if shooting up
 	neg.w	d0						;negate d0
 	neg.w	d1						;negate d1

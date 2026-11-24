@@ -128,7 +128,7 @@ SelectPenaltyShotSkater				;The best rated free skater of the shooting team.
 	move.w	#0,d1
 	move.w	#$FFFF,d6
 	move.w	#$FFFF,d5
-	move.w	$28(a0),d7
+	move.w	tmteam(a0),d7
 	jsr	(GetPlayerCountD7).l
 	subq.w	#1,d0
 	move.w	d0,(puckanimchars).w
@@ -136,7 +136,7 @@ SelectPenaltyShotSkater				;The best rated free skater of the shooting team.
 	tst.w	(puckanimchars).w
 	bmi.w	.5
 	movem.l	d0-d1/a1,-(sp)
-	move.w	$28(a0),d7
+	move.w	tmteam(a0),d7
 	move.w	d1,d0
 	jsr	(GetRosterName).l
 	movea.l	a1,a2
@@ -262,19 +262,19 @@ puckpenshot							;asstab entry: the penalty shot / shootout face-off.
 	clr.w	(puckvz).w
 	st	(puckc).w
 	movea.w	#(SortCords+(12*SCstruct)-M68K_RAM),a0	;goal net SCstruct
-	clr.w	$28(a0)
-	clr.w	$2A(a0)
+	clr.w	Xvel(a0)
+	clr.w	Yvel(a0)
 	clr.w	(a0)
-	move.w	#$122,$14(a0)
+	move.w	#$122,Ypos(a0)
 	adda.w	#SCstruct,a0
-	clr.w	$28(a0)
-	clr.w	$2A(a0)
+	clr.w	Xvel(a0)
+	clr.w	Yvel(a0)
 	clr.w	(a0)
-	move.w	#$FEDE,$14(a0)
+	move.w	#$FEDE,Ypos(a0)
 	movea.w	#(SortCords+((puckscnum+1)*SCstruct)-M68K_RAM),a0	;puck shadow SCstruct
-	move.w	#$299,6(a0)
-	clr.w	$58(a0)
-	clr.w	4(a0)
+	move.w	#$299,frame(a0)
+	clr.w	SPA(a0)
+	clr.w	attribute(a0)
 	clr.w	(puckx+4).w
 	bclr	#sfslock,(sflags).w
 	moveq	#$64,d4
