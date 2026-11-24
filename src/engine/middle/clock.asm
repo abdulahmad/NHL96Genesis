@@ -114,7 +114,7 @@ showclockdma						;When dfclock is set queue the clock chars in the dma list (a5
 	moveq	#5,d0
 	moveq	#$D,d2
 .0
-	move.w	2(a1),d1
+	move.w	Map1col-VmMAP1(a1),d1
 	asl.w	d1,d0
 	add.w	d2,d0
 	asl.w	#1,d0
@@ -166,7 +166,7 @@ showclockdma						;When dfclock is set queue the clock chars in the dma list (a5
 	moveq	#5,d0
 	moveq	#$D,d2
 .4
-	move.w	2(a1),d1
+	move.w	Map1col-VmMAP1(a1),d1
 	asl.w	d1,d0
 	add.w	d2,d0
 	asl.w	#1,d0
