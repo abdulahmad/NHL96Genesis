@@ -56,7 +56,7 @@ SetLCmode2							;Open the line change box: wait for the box, then draw the line
 .pr
 	movea.w	#(mesarea-M68K_RAM),a1
 	move.l	#$44120,(a1)			;String length 4, 'A '
-	add.b	d4,2(a1)
+	add.b	d4,strtext(a1)
 	jsr	(print).l
 	move.w	d0,-(sp)
 	movea.l	#linelist,a1

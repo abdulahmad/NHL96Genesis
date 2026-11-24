@@ -517,7 +517,7 @@ showclockVertical					;Draw the clock when the display flag is set
 	movea.w	#$BFC6,a0
 	movea.l	#SmallFontMap,a1
 	adda.l	4(a1),a1
-	move.w	$78(a1),d0
+	move.w	mapwords+':'*2(a1),d0	;the map word of ':'
 	add.w	(smallfontchars).w,d0
 	ori.w	#$8000,d0
 	move.w	d0,(lty+8).w
@@ -714,8 +714,8 @@ setffo								;Called from setvideo
 	cmpa.w	a6,a0
 	beq.w	.next
 	move.w	padxoff(a3),d1
-	add.w	d1,6(a0)
-	add.w	d1,$E(a0)
+	add.w	d1,satX(a0)
+	add.w	d1,satLen+satX(a0)
 .next
 	adda.w	#$1C,a3					;move to next struct
 	dbf	d0,.top

@@ -961,13 +961,13 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	bra.w	.38
 	;crossing point near enough: try a save
 .37
-	cmpi.w	#$22,2(a0)
+	cmpi.w	#$22,pcframes(a0)
 	bhi.w	.loop3
 	cmpi.w	#$18,(a0)
 	bgt.w	.43
 	cmpi.w	#$FFE8,(a0)
 	blt.w	.43
-	cmpi.w	#$C,2(a0)
+	cmpi.w	#$C,pcframes(a0)
 	bhi.w	.39
 .38
 	cmpi.w	#$11E,(pucky).w

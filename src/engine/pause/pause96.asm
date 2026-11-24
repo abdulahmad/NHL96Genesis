@@ -346,7 +346,7 @@ Pausemode_Pmenu						;Clamp menuitem to the list, scroll menuitem+2 to show it, 
 
 PrintMenuItem						;printsmall item String a1; an item that starts with x prints MANUAL
 									;GOALIE or AUTO GOALIE (goaliemode1 / goaliemode2 by the pause pad)
-	cmpi.b	#$78,2(a1)
+	cmpi.b	#$78,strtext(a1)
 	bne.w	.0
 	move.l	a1,-(sp)
 	movea.l	#.11,a1

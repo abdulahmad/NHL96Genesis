@@ -17,7 +17,7 @@ AppendUserName						;Append user name d2 (12 bytes of the name log at namelog, s
 	bne.w	.1
 	move.b	#$20,d1
 .1
-	move.b	d1,2(a1)
+	move.b	d1,strtext(a1)
 	tst.b	(a1)+
 	addq.w	#1,d3
 	dbf	d0,.loop
