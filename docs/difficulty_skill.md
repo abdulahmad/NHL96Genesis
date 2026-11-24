@@ -63,6 +63,8 @@ What **does** change:
 
 **Manual** (archive.org scan, PDF p.5, Skill Level): Rookie gives "slower performance by CPU-controlled teams, from skating and shooting to the goalie's reaction time"; Pro opponents "play to their ability but never really rise to a championship level of play"; All-Star: "The skating is quick, the body checks are lethal, and the passes are right on the tape." The new-features page (PDF p.4) lists "Multiple Skill Levels—Work your way through the ranks from Rookie, to Pro, to All-star". The manual's order is Rookie, Pro, All-Star; the code's index order is pro, all-star, rookie.
 
+Against the code: on Rookie the gravity tables change (`SetSkillLevel`) and your own skaters get +2 (`updateplayers`); a slower CPU as such: not confirmed in code. The goalie's reaction time is the reach table in `wallcollskater`; All-Star's "lethal" checks are the higher `check4check` threshold. "Passes right on the tape" on All-Star: not confirmed in code (no skill branch in the pass code).
+
 **Goals and saves:** There is no “rookie goalie” flag, but the goalie reach table above changes with the skill level. Other differences in scoring or saves are **indirect** (puck arcs, skater speed/turning on ice).
 
 **Shootout:** `SetSkillLevel` is **not** called when starting shootout from options, so `OptSkill` does not refresh the gravity words on that path (they stay at whatever `OptionsScreen` set on entry — default pro/all-star constants).
