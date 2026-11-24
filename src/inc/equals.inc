@@ -180,6 +180,7 @@ tmnear equ $2A						;long: nearest skater's distance^2 to the puck (93G name)
 tmpde equ $34						;energy level of each roster player (94: $32)
 tmpdst equ $68						;-2=bench/-1=ice/0+=penalty box (94: $66)
 tmflags equ $30						;flags
+tmboxlist equ $A4					;penalty box list of roster players (93G name; 95: $9C, same use)
 tmlines equ $184					;line sets copied from the team data (93G name; 93/94: $16A)
 tmsize equ $366						;$364
 

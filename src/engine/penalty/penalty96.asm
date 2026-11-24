@@ -1016,7 +1016,7 @@ updatepentime						;Update the time remaining on all penalized players, once a s
 
 ProcessPenaltyList					;a2 = team. Walk the penalty box list: count down the penalty time of each
 									;player in it
-	lea	$A4(a2),a0
+	lea	tmboxlist(a2),a0
 	movea.w	#(mesarea-M68K_RAM),a1
 	moveq	#2,d1
 	moveq	#2,d3
@@ -1150,7 +1150,7 @@ GetLowestPen						;a2 = shorthanded team, a3 = team on the power play. d0 = powe
 	cmpi.w	#6,tmap(a3)
 	beq.w	rtss2
 	sub.w	d3,d0
-	lea	$A4(a3),a0
+	lea	tmboxlist(a3),a0
 	clr.w	d2
 .2
 	move.b	(a0)+,d2
@@ -1323,7 +1323,7 @@ EASNLogo							;Draw the EASN logo
 	rts
 PrintPenaltyBoxPlayers				;Penalty box list of team a2: the players without a coincidental penalty
 	;penalty box list of team a2: the players without a coincidental penalty
-	lea	$A4(a2),a0
+	lea	tmboxlist(a2),a0
 	;loop
 .loop
 	clr.w	d0						;pass 1: players with bit 14 (coincidental) clear
@@ -1335,7 +1335,7 @@ PrintPenaltyBoxPlayers				;Penalty box list of team a2: the players without a co
 	bra.s	.loop
 	;d0 negative
 .1
-	lea	$A4(a2),a0
+	lea	tmboxlist(a2),a0
 	;loop
 .loop2
 	clr.w	d0
