@@ -5,207 +5,207 @@ check4bench							;Check if player a3 should go to the bench (called from the as
 									;code).
 	btst	#2,(BA_PS_flags).w
 	bne.s	setpadsExit
-	btst	#pfjoycon,$62(a3)
+	btst	#pfjoycon,pflags(a3)
 	bne.s	setpadsExit
-	btst	#pf2pen,$63(a3)
+	btst	#pf2pen,pflags2(a3)
 	bne.s	setpadsExit
-	tst.b	$60(a3)
+	tst.b	newpos(a3)
 	bpl.w	.1
-	tst.b	$61(a3)
+	tst.b	newpnum(a3)
 	bmi.s	setpadsExit
 .1
-	move.b	$61(a3),d0
-	cmp.b	$67(a3),d0
+	move.b	newpnum(a3),d0
+	cmp.b	weight(a3),d0
 	beq.w	.2
-	move.w	$36(a3),d0
+	move.w	assnum(a3),d0
 	cmpi.b	#$B,$38(a3,d0.w)
 	beq.s	setpadsExit
-	move.w	$52(a3),d0
+	move.w	SCnum(a3),d0
 	cmp.w	(puckc).w,d0
 	beq.s	setpadsExit
 	addq.w	#4,sp
-	bset	#pf2unav,$63(a3)		;set player unavailable (pf2unav)
-	clr.w	$40(a3)
+	bset	#pf2unav,pflags2(a3)	;set player unavailable (pf2unav)
+	clr.w	temp1(a3)
 	moveq	#$B,d0
 	bra.w	assreplace
 .2
 	addq.w	#4,sp
-	bclr	#pf2unav,$63(a3)
-	bclr	#pfnc,$62(a3)
-	st	$61(a3)
-	st	$60(a3)
-	move.w	$34(a3),d0
-	tst.b	$60(a3)
+	bclr	#pf2unav,pflags2(a3)
+	bclr	#pfnc,pflags(a3)
+	st	newpnum(a3)
+	st	newpos(a3)
+	move.w	position(a3),d0
+	tst.b	newpos(a3)
 	bpl.w	.3
 	jmp	(AssignByPosition).l
 .3
-	move.b	$60(a3),d0
+	move.b	newpos(a3),d0
 	ext.w	d0
-	move.w	d0,$34(a3)
+	move.w	d0,position(a3)
 	jmp	(AssignByPosition).l
 
 assbench							;asstab entry: player a3 should go to the bench.
-	btst	#pfalock,$62(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	setpadsExit
-	cmpi.w	#$64,$40(a3)			;temp1 = 100 flag: at the bench door
+	cmpi.w	#$64,temp1(a3)			;temp1 = 100 flag: at the bench door
 	beq.w	.done
 	;may switch to a position change or reassign to abench
 	bsr.w	check4bench
-	btst	#pf2pen,$63(a3)			;pf2pen
+	btst	#pf2pen,pflags2(a3)		;pf2pen
 	bne.w	assexit
 	;first time: target = bench spot, x = -(Sideline+8), y = +-80 by team
-	bclr	#pfna,$62(a3)
+	bclr	#pfna,pflags(a3)
 	beq.w	.nna
-	move.w	#8,$42(a3)
+	move.w	#8,temp2(a3)
 	moveq	#$50,d0					;80
-	btst	#pfteam,$62(a3)
+	btst	#pfteam,pflags(a3)
 	bne.w	.1
 	neg.w	d0
 .1
-	move.w	d0,$46(a3)				;temp4 = bench y
-	move.w	#$96,$44(a3)
-	neg.w	$44(a3)
-	subq.w	#8,$44(a3)				;temp3 = bench x
-	clr.w	$40(a3)
+	move.w	d0,temp4(a3)			;temp4 = bench y
+	move.w	#$96,temp3(a3)
+	neg.w	temp3(a3)
+	subq.w	#8,temp3(a3)			;temp3 = bench x
+	clr.w	temp1(a3)
 .nna
-	move.b	$61(a3),d0				;same player? just change position
-	cmp.b	$67(a3),d0
+	move.b	newpnum(a3),d0			;same player? just change position
+	cmp.b	weight(a3),d0
 	beq.w	.nobench				;same player, just change position
 	;temp1 counts frames; re-check arrival every 8
-	sub.w	d7,$40(a3)
+	sub.w	d7,temp1(a3)
 	bpl.w	.nodec
-	addq.w	#8,$40(a3)
+	addq.w	#8,temp1(a3)
 	;within 40 px of bench y and 32 px of bench x?
-	move.w	$14(a3),d0
-	sub.w	$46(a3),d0
+	move.w	Ypos(a3),d0
+	sub.w	temp4(a3),d0
 	cmp.w	#$28,d0
 	bgt.w	.nodec
 	cmp.w	#$FFD8,d0
 	blt.w	.nodec
 	move.w	(a3),d0
-	sub.w	$44(a3),d0
+	sub.w	temp3(a3),d0
 	cmp.w	#$20,d0
 	bgt.w	.nodec
 	move.w	#SPAglide,d1
-	tst.w	$34(a3)
+	tst.w	position(a3)
 	bne.w	.gli
 	move.w	#$640,d1
 .gli
 	bsr.w	SetSPA					;glide (goalie: ready) animation
 	;no collisions; turn step by step toward facedir 4
-	bset	#pfnc,$62(a3)
-	cmpi.w	#4,$54(a3)
+	bset	#pfnc,pflags(a3)
+	cmpi.w	#4,facedir(a3)
 	beq.w	.ok
-	addq.w	#1,$54(a3)				;turn toward the bench
-	andi.w	#7,$54(a3)
+	addq.w	#1,facedir(a3)			;turn toward the bench
+	andi.w	#7,facedir(a3)
 .ok
-	clr.w	$2A(a3)					;drift left (Xvel -$800)
-	move.w	#$F800,$28(a3)			;-$800
+	clr.w	Yvel(a3)				;drift left (Xvel -$800)
+	move.w	#$F800,Xvel(a3)			;-$800
 	;within 16 px of the wall: stop and climb over (SPAwallleft)
 	cmp.w	#$10,d0
 	bgt.w	.loop
-	clr.w	$28(a3)
-	cmpi.w	#4,$54(a3)
+	clr.w	Xvel(a3)
+	cmpi.w	#4,facedir(a3)
 	bne.w	.loop
-	move.w	#$F800,$28(a3)
-	move.w	#2,$54(a3)
+	move.w	#$F800,Xvel(a3)
+	move.w	#2,facedir(a3)
 	move.w	#SPAwallleft,d1
 	move.w	#$FF62,(a3)
-	clr.w	$28(a3)
-	tst.w	$34(a3)
+	clr.w	Xvel(a3)
+	tst.w	position(a3)
 	bne.w	.5
 	move.w	#$E40,d1
 	move.w	#$FF62,(a3)
-	clr.w	$28(a3)
+	clr.w	Xvel(a3)
 .5
 	bsr.w	SetSPA
-	bset	#pfalock,$62(a3)
-	move.w	#$64,$40(a3)			;100
+	bset	#pfalock,pflags(a3)
+	move.w	#$64,temp1(a3)			;100
 .loop
 	rts
 .done
-	clr.w	6(a3)					;at the bench door: mark this roster slot on the bench (tmpdst -2),
+	clr.w	frame(a3)				;at the bench door: mark this roster slot on the bench (tmpdst -2),
 	clr.w	d0
-	move.b	$67(a3),d0
+	move.b	weight(a3),d0
 	add.w	d0,d0
 	movea.l	#tmstruct,a0
-	btst	#pfteam,$62(a3)
+	btst	#pfteam,pflags(a3)
 	beq.w	.t0
 	adda.w	#$39E,a0
 .t0
 	move.w	#$FFFE,$6C(a0,d0.w)		;tmpdst: put used player on bench
-	move.b	$61(a3),d3
+	move.b	newpnum(a3),d3
 	bsr.w	assbenchTakeNewPos
 	jmp	(setplayer).l
 .nodec
-	btst	#pfnc,$62(a3)			;skate toward bench spot (temp3,temp4), unless already over the wall
+	btst	#pfnc,pflags(a3)		;skate toward bench spot (temp3,temp4), unless already over the wall
 	bne.s	.loop
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	movea.l	#EvadePC,a0
 	bra.w	skateto
 .nobench
-	bclr	#pf2unav,$63(a3)		;pf2unav
+	bclr	#pf2unav,pflags2(a3)	;pf2unav
 assbenchTakeNewPos					;Set position from newpos, assign by position, clear newpos and newpnum
-	move.b	$60(a3),d0				;position = newpos; clear newpos and newpnum
+	move.b	newpos(a3),d0			;position = newpos; clear newpos and newpnum
 	ext.w	d0
-	move.w	d0,$34(a3)
+	move.w	d0,position(a3)
 	jsr	(AssignByPosition).l
-	st	$61(a3)
-	st	$60(a3)
+	st	newpnum(a3)
+	st	newpos(a3)
 assbenchExit	equ	*	;Shared return of assbench
 	rts
 
 asseben								;asstab entry: player a3 should exit the bench area.
-	btst	#pfalock,$62(a3)
+	btst	#pfalock,pflags(a3)
 	bne.s	assbenchExit
-	bclr	#pfna,$62(a3)
+	bclr	#pfna,pflags(a3)
 	beq.w	.3
-	clr.w	$28(a3)
-	clr.w	$2A(a3)
-	move.w	$52(a3),d0
+	clr.w	Xvel(a3)
+	clr.w	Yvel(a3)
+	move.w	SCnum(a3),d0
 	subq.w	#6,d0
 	bmi.w	.1
 	addq.w	#1,d0
 .1
 	muls.w	#$E,d0
-	move.w	d0,$14(a3)
+	move.w	d0,Ypos(a3)
 	move.w	#$96,(a3)
 	neg.w	(a3)
-	move.w	#2,$54(a3)
-	bset	#pfalock,$62(a3)
+	move.w	#2,facedir(a3)
+	bset	#pfalock,pflags(a3)
 	move.w	#$D7A,d1
 	move.w	#$FF62,(a3)
-	clr.w	$28(a3)
-	tst.w	$34(a3)
+	clr.w	Xvel(a3)
+	tst.w	position(a3)
 	bne.w	.2
 	move.w	#$DFE,d1
 	move.w	#$FF62,(a3)
-	clr.w	$28(a3)
+	clr.w	Xvel(a3)
 .2
 	bra.w	SetSPA
 .3
-	move.w	#4,$54(a3)
-	bclr	#pfnc,$62(a3)
-	bclr	#pf2npc,$63(a3)
-	bclr	#pf2unav,$63(a3)
-	clr.w	$58(a3)
-	move.w	#$1000,$28(a3)
+	move.w	#4,facedir(a3)
+	bclr	#pfnc,pflags(a3)
+	bclr	#pf2npc,pflags2(a3)
+	bclr	#pf2unav,pflags2(a3)
+	clr.w	SPA(a3)
+	move.w	#$1000,Xvel(a3)
 	bra.w	assexit
 
 asspenalty							;asstab entry: player a3 goes to the penalty box.
-	btst	#pfalock,$62(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	assbenchExit
-	bclr	#pfna,$62(a3)
+	bclr	#pfna,pflags(a3)
 	beq.w	.4
-	bset	#pf2unav,$63(a3)		;set player unavailable (pf2unav)
+	bset	#pf2unav,pflags2(a3)	;set player unavailable (pf2unav)
 	bsr.w	ReleasePadFromPlayer
 	moveq	#-$2,d4					;move -2 into d4
 	bsr.w	setpads					;moves player number into a temp value so graphics know who it is
-	move.w	#8,$42(a3)				;move 8 into temp2
+	move.w	#8,temp2(a3)			;move 8 into temp2
 	moveq	#$B,d0					;move 11 dec into d0
 	move.b	(PBnum).w,d1			;gets number of players in PB. 00HV (H=Home, V=Visitors)
-	btst	#pfteam,$62(a3)			;checks if player is home or away
+	btst	#pfteam,pflags(a3)		;checks if player is home or away
 	bne.w	.1						;branch if away
 	lsr.w	#4,d1					;shift 4 bits to get Home players in PB
 	neg.w	d0						;make d0 negative (different box)
@@ -217,34 +217,34 @@ asspenalty							;asstab entry: player a3 goes to the penalty box.
 .2
 	addq.w	#3,d1					;add 3 to d1
 	muls.w	d0,d1					;mult d0 with d1, store result in d1
-	move.w	d1,$46(a3)
+	move.w	d1,temp4(a3)
 	move.w	#$26,d1
 	btst	#pfteam,pflags(a3)
 	bne.w	.3
 	move.w	#$FFBE,d1
 .3
-	move.w	d1,$46(a3)				;move d1 into temp4 (skateto YPos)
-	move.w	#$8E,$44(a3)
-	clr.w	$40(a3)					;clear temp1
-	bset	#pf2npc,$63(a3)			;set bit for no player collision
-	clr.w	$4E(a3)					;clear wallCos (angle of last collision)
-	clr.w	$50(a3)					;clear wallSin (angle of last collision)
+	move.w	d1,temp4(a3)			;move d1 into temp4 (skateto YPos)
+	move.w	#$8E,temp3(a3)
+	clr.w	temp1(a3)				;clear temp1
+	bset	#pf2npc,pflags2(a3)		;set bit for no player collision
+	clr.w	Wallcos(a3)				;clear wallCos (angle of last collision)
+	clr.w	Wallsin(a3)				;clear wallSin (angle of last collision)
 .4
-	move.w	$14(a3),d0				;Current Ypos of player
-	sub.w	$46(a3),d0				;sub temp4 (Y pos to skate to) from Ypos
+	move.w	Ypos(a3),d0				;Current Ypos of player
+	sub.w	temp4(a3),d0			;sub temp4 (Y pos to skate to) from Ypos
 	cmp.w	#$C,d0					;compare to 13 decimal
 	bgt.w	.8						;branch if greater than (still skateto)
 	;If its within 13 decimal, it will start the animation for hopping over the board
 	cmp.w	#$FFF4,d0
 	blt.w	.8
 	move.w	(a3),d0
-	sub.w	$44(a3),d0
+	sub.w	temp3(a3),d0
 	cmp.w	#$FFE8,d0
 	blt.w	.8
-	sub.w	d7,$40(a3)
+	sub.w	d7,temp1(a3)
 	bpl.w	assbenchExit
-	addq.w	#8,$40(a3)
-	bset	#pfnc,$62(a3)
+	addq.w	#8,temp1(a3)
+	bset	#pfnc,pflags(a3)
 	move.w	#SPAglide,d1			;94 $50C
 	bsr.w	SetSPA
 	moveq	#6,d2
@@ -252,43 +252,43 @@ asspenalty							;asstab entry: player a3 goes to the penalty box.
 	beq.w	.5
 	moveq	#2,d2
 .5
-	cmp.w	$54(a3),d2
+	cmp.w	facedir(a3),d2
 	beq.w	.6
-	addq.w	#1,$54(a3)
-	andi.w	#7,$54(a3)
+	addq.w	#1,facedir(a3)
+	andi.w	#7,facedir(a3)
 .6
-	clr.w	$2A(a3)
-	move.w	#$1000,$28(a3)
+	clr.w	Yvel(a3)
+	move.w	#$1000,Xvel(a3)
 	cmp.w	#$FFF8,d0
 	blt.w	assbenchExit
-	clr.w	$28(a3)
-	cmp.w	$54(a3),d2
+	clr.w	Xvel(a3)
+	cmp.w	facedir(a3),d2
 	bne.w	assbenchExit
-	bset	#pfalock,$62(a3)
-	move.w	#2,$54(a3)
+	bset	#pfalock,pflags(a3)
+	move.w	#2,facedir(a3)
 	move.w	#$8E,(a3)
-	move.w	#$26,$14(a3)
+	move.w	#$26,Ypos(a3)
 	btst	#pfteam,pflags(a3)
 	bne.w	.7
-	move.w	#$FFBE,$14(a3)
+	move.w	#$FFBE,Ypos(a3)
 .7
-	bclr	#3,4(a3)
+	bclr	#3,attribute(a3)
 	move.w	#$AA2,d1
 	bsr.w	SetSPA
-	bclr	#pf2pen,$63(a3)
+	bclr	#pf2pen,pflags2(a3)
 	moveq	#$D,d0
 	bra.w	assreplace
 .8
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	movea.l	#rtss2,a0
 	bra.w	skateto
 ReleasePadFromPlayer				;Take the joystick off player a3 (chgplayer for the pad that controls it)
 	;Take the joystick off player a3
-	btst	#pfjoycon,$62(a3)
+	btst	#pfjoycon,pflags(a3)
 	beq.w	assbenchExit
 	clr.w	d4
-	move.w	$52(a3),d0
+	move.w	SCnum(a3),d0
 	cmp.w	(c1playernum).w,d0
 	beq.w	chgplayer
 	moveq	#2,d4
@@ -317,46 +317,46 @@ assdopen							;asstab entry: player a3 serves his penalty.
 	rts
 
 assepen								;asstab entry: player a3 leaves the penalty box.
-	btst	#pfalock,$62(a3)
+	btst	#pfalock,pflags(a3)
 	bne.w	assbenchExit
-	bclr	#pfna,$62(a3)
+	bclr	#pfna,pflags(a3)
 	beq.w	.3
-	bset	#pfnc,$62(a3)			;set player in no collision mode
-	bset	#pf2unav,$63(a3)		;set player unavailable
+	bset	#pfnc,pflags(a3)		;set player in no collision mode
+	bset	#pf2unav,pflags2(a3)	;set player unavailable
 	moveq	#$10,d0
 	moveq	#-$3C,d1
-	btst	#pfteam,$62(a3)
+	btst	#pfteam,pflags(a3)
 	beq.w	.1
 	moveq	#1,d0
 	neg.w	d1
 .1
 	sub.b	d0,(PBnum).w
-	move.w	d1,$14(a3)
-	clr.w	$28(a3)
-	clr.w	$2A(a3)
+	move.w	d1,Ypos(a3)
+	clr.w	Xvel(a3)
+	clr.w	Yvel(a3)
 	move.w	#$94,(a3)
 	move.w	#$8E,(a3)
-	move.w	#$26,$14(a3)
+	move.w	#$26,Ypos(a3)
 	btst	#pfteam,pflags(a3)
 	bne.w	.2
-	move.w	#$FFBE,$14(a3)
+	move.w	#$FFBE,Ypos(a3)
 .2
-	move.w	#4,$54(a3)
-	bset	#pfalock,$62(a3)
+	move.w	#4,facedir(a3)
+	bset	#pfalock,pflags(a3)
 	move.w	#$AF4,d1
 	bsr.w	SetSPA
 	jmp	(SprSort).l
 .3
 	move.w	#$856,d1
 	bsr.w	SetSPA
-	move.w	#4,$54(a3)
-	st	$61(a3)
-	st	$60(a3)
-	bclr	#pfjoycon,$62(a3)
-	bclr	#pfnc,$62(a3)
-	bclr	#pf2npc,$63(a3)
-	bclr	#pf2unav,$63(a3)
-	move.w	#$F000,$28(a3)
+	move.w	#4,facedir(a3)
+	st	newpnum(a3)
+	st	newpos(a3)
+	bclr	#pfjoycon,pflags(a3)
+	bclr	#pfnc,pflags(a3)
+	bclr	#pf2npc,pflags2(a3)
+	bclr	#pf2unav,pflags2(a3)
+	move.w	#$F000,Xvel(a3)
 	bra.w	assexit
 
 assgoaliebreakwait					;asstab entry: in a shootout or penalty shot park the idle goalie off the
@@ -378,7 +378,7 @@ assgoaliebreakwait					;asstab entry: in a shootout or penalty shot park the idl
 	asl.w	#7,d0					;shift d0 7 bits left
 	adda.w	d0,a0					;add d0 to address a0
 	move.w	#$191,Ypos(a3)			;move 401 decimal into Ypos
-	btst	#pfgoal,$62(a0)			;check if shooting up or down (a0 is goalie being shot on)
+	btst	#pfgoal,pflags(a0)		;check if shooting up or down (a0 is goalie being shot on)
 	bne.w	.2						;branch if shooting up
 	move.w	#$FE6F,Ypos(a3)			;move -191 decimal into Ypos (goalie not being shot on)
 .2
@@ -390,57 +390,57 @@ assgoaliebreakwaitEnd	equ	*
 
 donothing							;Unless locked or pad controlled, player a3 just skates (jumped to from
 									;the fight and assignment code).
-	btst	#pfalock,$62(a3)		;#pfalock
+	btst	#pfalock,pflags(a3)		;#pfalock
 	bne.s	assgoaliebreakwaitEnd
-	btst	#pfjoycon,$62(a3)		;#pfjoycon
+	btst	#pfjoycon,pflags(a3)	;#pfjoycon
 	bne.s	assgoaliebreakwaitEnd
 	moveq	#8,d0
 	bra.w	doplayeracc
 
 assstanley							;asstab entry: player a3 skates with the Stanley Cup overhead.
-	btst	#pfalock,$62(a3)
+	btst	#pfalock,pflags(a3)
 	bne.s	assgoaliebreakwaitEnd
-	bclr	#pfna,$62(a3)
+	bclr	#pfna,pflags(a3)
 	beq.w	.2
-	move.w	#$5A,$44(a3)			;90
+	move.w	#$5A,temp3(a3)			;90
 	tst.w	(Hpos).w
 	bpl.w	.1
-	neg.w	$44(a3)
+	neg.w	temp3(a3)
 	;target Y from Vpos
 .1
-	move.w	(Vpos).w,$46(a3)		;temp4 = y from Vpos
+	move.w	(Vpos).w,temp4(a3)		;temp4 = y from Vpos
 	move.w	#SPAstanley,d1
 	bsr.w	SetSPA
 	;skate toward the target
 .2
-	move.w	$44(a3),d0				;face and accelerate toward the target
+	move.w	temp3(a3),d0			;face and accelerate toward the target
 	sub.w	(a3),d0
-	move.w	$46(a3),d1
-	sub.w	$14(a3),d1
+	move.w	temp4(a3),d1
+	sub.w	Ypos(a3),d1
 	bsr.w	vtoa
 	cmp.w	#7,d0
 	bgt.s	assgoaliebreakwaitEnd
 	move.w	d0,d2
-	move.w	d2,$54(a3)
+	move.w	d2,facedir(a3)
 	bra.w	playeracc
 
 assscore							;asstab entry: player a3 celebrates a goal.
-	btst	#pfalock,$62(a3)
+	btst	#pfalock,pflags(a3)
 	bne.s	assgoaliebreakwaitEnd
-	bclr	#pfna,$62(a3)
+	bclr	#pfna,pflags(a3)
 	beq.w	.2
 	bsr.w	assscoreRandomTemp1
-	move.w	#8,$42(a3)
-	move.w	#$5A,$44(a3)
+	move.w	#8,temp2(a3)
+	move.w	#$5A,temp3(a3)
 	tst.w	(Hpos).w
 	bpl.w	.1
-	neg.w	$44(a3)
+	neg.w	temp3(a3)
 .1
-	move.w	(Vpos).w,$46(a3)
+	move.w	(Vpos).w,temp4(a3)
 .2
 	movea.l	#rtss2,a0
-	move.w	$44(a3),d0
-	move.w	$46(a3),d1
+	move.w	temp3(a3),d0
+	move.w	temp4(a3),d1
 	btst	#0,(gmode2).w			;shootout? count down the shootout delay and keep the players near center
 	beq.w	.5
 	tst.w	(shootoutdelay).w
@@ -456,16 +456,16 @@ assscore							;asstab entry: player a3 celebrates a goal.
 .4
 	clr.w	d1
 .5
-	sub.w	d7,$40(a3)
+	sub.w	d7,temp1(a3)
 	bpl.w	assscoreSkateOrReturn
-	bset	#pfalock,$62(a3)
+	bset	#pfalock,pflags(a3)
 	move.w	#SPAcelebrate,d1		;94 $E8A
 	btst	#0,(seed+1).w
 	beq.w	.6
 	move.w	#$D0E,d1
 .6
 	move.w	(shotplayer).w,d0
-	cmp.w	$52(a3),d0
+	cmp.w	SCnum(a3),d0
 	bne.w	.7
 	move.w	#$C30,d1
 	btst	#3,(seed+1).w
@@ -476,25 +476,25 @@ assscore							;asstab entry: player a3 celebrates a goal.
 assscoreRandomTemp1					;temp1 = random 0..$77 (wait time before the player moves)
 	moveq	#$78,d0
 	bsr.w	randomd0
-	move.w	d0,$40(a3)
+	move.w	d0,temp1(a3)
 	rts
 assscoreSkateOrReturn	equ	*	;Part of assscore: when pflags bit 3 is clear go to skateto, else return
-	btst	#pfjoycon,$62(a3)
+	btst	#pfjoycon,pflags(a3)
 	beq.w	skateto
 	rts
 	rts
 	rts
 
 assgoaliectrl						;asstab entry: the goalie of a pad.
-	btst	#pfjoycon,$62(a3)		;is player joystick controlled?
+	btst	#pfjoycon,pflags(a3)	;is player joystick controlled?
 	bne.w	.1						;branch is so
 	bra.w	assexit
 .1
-	btst	#pfna,$62(a3)			;check if new assignment
+	btst	#pfna,pflags(a3)		;check if new assignment
 	bne.w	.7						;branch if new assignment
 	movem.w	d0-d1,-(sp)				;push to stack
 	move.w	(a3),d0					;Xpos
-	move.w	$14(a3),d1				;Ypos
+	move.w	Ypos(a3),d1				;Ypos
 	cmp.w	#$AA,d1					;compare $AA to Ypos
 	bgt.w	.2
 	cmp.w	#$FF56,d1				;check -$AA to Ypos
@@ -508,56 +508,56 @@ assgoaliectrl						;asstab entry: the goalie of a pad.
 .2
 	sub.w	(Hpos).w,d0				;sub ice rink horiz position from Xpos
 	sub.w	(Vpos).w,d1				;sub ice rink vert position from Ypos
-	bclr	#pf3gctrl,$64(a3)		;clear goalie control bit?
+	bclr	#pf3gctrl,pflags3(a3)	;clear goalie control bit?
 	cmp.w	#$74,d0					;'t'   ; compare $74 to Xpos diff
 	blt.w	.3						;branch if less than
-	bset	#pf3gctrl,$64(a3)		;set goalie control bit?
+	bset	#pf3gctrl,pflags3(a3)	;set goalie control bit?
 	bra.w	.6
 .3
 	cmp.w	#$FF8C,d0				;compare -$74 to Xpos diff
 	bgt.w	.4						;branch if greater than
-	bset	#pf3gctrl,$64(a3)		;set goalie control bit?
+	bset	#pf3gctrl,pflags3(a3)	;set goalie control bit?
 	bra.w	.6
 .4
 	cmp.w	#$64,d1					;'d'   ; compare $64 to Ypos diff
 	blt.w	.5						;branch if less than
-	bset	#pf3gctrl,$64(a3)		;set goalie control bit?
+	bset	#pf3gctrl,pflags3(a3)	;set goalie control bit?
 	bra.w	.6
 .5
 	cmp.w	#$FF9C,d1				;compare -$64 to Ypos diff
 	bgt.w	.6						;branch if greater than
-	bset	#pf3gctrl,$64(a3)		;set goalie control bit?
+	bset	#pf3gctrl,pflags3(a3)	;set goalie control bit?
 .6
 	movem.w	(sp)+,d0-d1				;pop from stack
-	btst	#pf3gctrl,$64(a3)		;check goalie ctrl bit
+	btst	#pf3gctrl,pflags3(a3)	;check goalie ctrl bit
 	bne.w	assgoaliepuckx			;branch if set
 .7
-	btst	#pfalock,$62(a3)		;check if anim lock
+	btst	#pfalock,pflags(a3)		;check if anim lock
 	bne.w	.14						;exit if so
 	bsr.w	check4bench
-	bclr	#pfna,$62(a3)			;clear new assignment bit
+	bclr	#pfna,pflags(a3)		;clear new assignment bit
 	beq.w	.8						;branch if already cleared
-	clr.w	$40(a3)					;clear temp1
-	move.w	#8,$42(a3)				;move 8 into temp2
-	st	$46(a3)						;FFFF to temp4
+	clr.w	temp1(a3)				;clear temp1
+	move.w	#8,temp2(a3)			;move 8 into temp2
+	st	temp4(a3)					;FFFF to temp4
 .8
 	jsr	(GoalieInCrease).l
 	bne.w	.9
 	jsr	(TurnGoalieFromNet).l
 .9
-	btst	#pf2aip,$63(a3)			;check if anim in progress
+	btst	#pf2aip,pflags2(a3)		;check if anim in progress
 	bne.w	.14						;exit if so
 	btst	#gmclock,(gmode).w		;check if clock stopped
 	bne.w	.14						;exit if so
-	tst.w	$48(a3)					;test temp5
+	tst.w	temp5(a3)				;test temp5
 	bmi.w	.12						;branch if less than 0
-	move.w	$52(a3),d0				;move SCnum into d0
+	move.w	SCnum(a3),d0			;move SCnum into d0
 	cmp.w	(puckc).w,d0			;check if puckc is goalie
 	beq.w	.10						;branch if equal
-	st	$48(a3)						;set temp5 to -1
+	st	temp5(a3)					;set temp5 to -1
 	bra.w	.12
 .10
-	sub.w	d7,$48(a3)				;subtract d7(frames elapsed) from temp5
+	sub.w	d7,temp5(a3)			;subtract d7(frames elapsed) from temp5
 	bpl.w	.12						;branch if more than 0
 	btst	#2,(BA_PS_flags).w		;check bit 2
 	beq.w	.11						;branch if not set
@@ -567,17 +567,17 @@ assgoaliectrl						;asstab entry: the goalie of a pad.
 	moveq	#8,d0
 	jsr	(AddPenalty2).l
 .12
-	sub.b	d7,$40(a3)				;sub d7(frames elapsed) from temp1
+	sub.b	d7,temp1(a3)			;sub d7(frames elapsed) from temp1
 	bpl.w	.14						;branch if positive
-	move.b	$6C(a3),d0
+	move.b	shotspd(a3),d0
 	beq.w	.13						;branch if value was 0
 	btst	#6,(sflags7).w			;check if crowd meter broken
 	beq.w	.13						;jump if not
 	subq.b	#1,d0					;sub 1 from d0
 .13
 	lsr.b	#2,d0					;divide by 4
-	move.b	d0,$40(a3)				;move d0 into temp1
-	move.w	$52(a3),d0				;move SCnum into d0
+	move.b	d0,temp1(a3)			;move d0 into temp1
+	move.w	SCnum(a3),d0			;move SCnum into d0
 	cmp.w	(puckc).w,d0			;compare puckc to d0
 	beq.w	.14						;jump to assgoaliecpu if the same
 .14
@@ -590,15 +590,15 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	move.w	(puckx).w,(OptPad+4).w
 	btst	#0,(sflags4).w			;test bit 0
 	beq.w	.2
-	btst	#pf2aip,$63(a3)			;check if animation in progress
+	btst	#pf2aip,pflags2(a3)		;check if animation in progress
 	bne.w	.2						;branch if so
 	btst	#1,(sflags4).w			;test bit 1
 	beq.w	.1						;branch if 0
 	btst	#3,(sflags4).w			;test bit 3
 	bne.w	.2						;branch if set
-	cmpi.w	#$89,6(a3)				;compare to alice frame number
+	cmpi.w	#$89,frame(a3)			;compare to alice frame number
 	bne.w	.2						;branch if not equal
-	cmpi.w	#$8D,6(a3)				;compare to alice frame number
+	cmpi.w	#$8D,frame(a3)			;compare to alice frame number
 	bne.w	.2						;branch if not equal
 	bset	#3,(sflags4).w			;set bit 3
 	move.w	#SFXcheck,-(sp)			;SFX
@@ -610,30 +610,30 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	bne.w	.2
 	;slam animation set
 	bsr.w	SetSPA					;set animation of d1
-	bset	#pf2aip,$63(a3)			;set anim in progress
+	bset	#pf2aip,pflags2(a3)		;set anim in progress
 	;goalie assignment proper: bench check and new assignment setup
 .2
-	btst	#pfalock,$62(a3)		;check if locked in animation
+	btst	#pfalock,pflags(a3)		;check if locked in animation
 	bne.w	.loop					;exit if so
 	bsr.w	check4bench
-	bclr	#pfna,$62(a3)			;clear new assignment
+	bclr	#pfna,pflags(a3)		;clear new assignment
 	beq.w	.3						;jump if it was cleared already
-	clr.w	$40(a3)					;clear temp1
-	move.w	#8,$42(a3)				;move 8 into temp2
-	st	$46(a3)						;set temp5 (FFFF)
+	clr.w	temp1(a3)				;clear temp1
+	move.w	#8,temp2(a3)			;move 8 into temp2
+	st	temp4(a3)					;set temp5 (FFFF)
 	;count down the timer
 .3
 	cmpi.w	#$34,(a3)				;compare 34 hex with Xpos
 	bgt.w	.4						;branch if greater
 	cmpi.w	#$FFCC,(a3)				;compare -34 hex with Xpos
 	blt.w	.4						;branch if less than
-	cmpi.w	#$124,$14(a3)
+	cmpi.w	#$124,Ypos(a3)
 	bgt.w	.4
-	cmpi.w	#$FEDC,$14(a3)
+	cmpi.w	#$FEDC,Ypos(a3)
 	blt.w	.4
-	cmpi.w	#$E8,$14(a3)
+	cmpi.w	#$E8,Ypos(a3)
 	bgt.w	.6
-	cmpi.w	#$FF18,$14(a3)
+	cmpi.w	#$FF18,Ypos(a3)
 	blt.w	.6
 	;near the net: skate back to the middle of the crease
 .4
@@ -644,7 +644,7 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	neg.w	d0
 .5
 	move.w	#$FA,d1
-	btst	#pfgoal,$62(a3)			;check what goal shooting at
+	btst	#pfgoal,pflags(a3)		;check what goal shooting at
 	beq.w	skateto					;branch if bottom
 	neg.w	d1
 	bra.w	skateto
@@ -652,25 +652,25 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	rts
 	;in position: ready stance, facing up or down the ice
 .6
-	btst	#pf2aip,$63(a3)			;check if anim in progress
+	btst	#pf2aip,pflags2(a3)		;check if anim in progress
 	bne.s	.loop					;exit if so
 	btst	#0,(sflags4).w			;check bit 0
 	beq.w	.8						;branch if not set
-	cmpi.w	#$8A,6(a3)				;check alice frame
+	cmpi.w	#$8A,frame(a3)			;check alice frame
 	beq.w	.7						;branch if equal
-	cmpi.w	#$8E,6(a3)				;check alice frame
+	cmpi.w	#$8E,frame(a3)			;check alice frame
 	bne.w	.8						;branch if not equal
-	move.w	#4,$54(a3)				;set 4 to facedir - face down
+	move.w	#4,facedir(a3)			;set 4 to facedir - face down
 	bra.w	.8
 	;facing the top net
 .7
-	move.w	#0,$54(a3)				;set 0 to facedir - face up
+	move.w	#0,facedir(a3)			;set 0 to facedir - face up
 	;ready stance; a penalty shot keeps the goalie set
 .8
 	move.w	#SPAgready,d1
 	movem.w	d0,-(sp)
 	move.w	(pucky).w,d0
-	sub.w	$14(a3),d0
+	sub.w	Ypos(a3),d0
 	bpl.w	.9
 	neg.w	d0
 .9
@@ -693,16 +693,16 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	bne.w	.loop					;exit if clock stopped
 	;skate to the spot
 .13
-	tst.w	$48(a3)					;temp5
+	tst.w	temp5(a3)				;temp5
 	bmi.w	.16						;branch if minus
-	move.w	$52(a3),d0				;move SCnum to d0
+	move.w	SCnum(a3),d0			;move SCnum to d0
 	cmp.w	(puckc).w,d0			;check if puckc
 	beq.w	.14						;branch if so
-	st	$48(a3)						;set temp5 to FFFF
+	st	temp5(a3)					;set temp5 to FFFF
 	bra.w	.16
 	;d0 = puckc
 .14
-	sub.w	d7,$48(a3)				;subtract frames from temp5
+	sub.w	d7,temp5(a3)			;subtract frames from temp5
 	bpl.w	.16						;branch if positive
 	btst	#2,(BA_PS_flags).w		;check if bit 2 set
 	beq.w	.15						;branch if not
@@ -714,9 +714,9 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	jsr	(AddPenalty2).l				;blow whistle for FO
 	;no faceoff: count down the reaction timer
 .16
-	sub.b	d7,$40(a3)				;sub d7 from temp1
+	sub.b	d7,temp1(a3)			;sub d7 from temp1
 	bpl.w	.42						;branch if still positive
-	move.b	$6C(a3),d0
+	move.b	shotspd(a3),d0
 	beq.w	.17						;branch if 0
 	btst	#6,(sflags7).w			;check if crowd meter broken
 	beq.w	.17						;branch if not
@@ -724,49 +724,49 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	;faceoff odds
 .17
 	lsr.b	#2,d0					;divide by 4
-	move.b	d0,$40(a3)				;move d0 into temp1
-	btst	#pfjoycon,$62(a3)		;check if joy controlled
+	move.b	d0,temp1(a3)			;move d0 into temp1
+	btst	#pfjoycon,pflags(a3)	;check if joy controlled
 	beq.w	.18						;branch if not
-	btst	#pf3gctrl,$64(a3)		;check bit 2
+	btst	#pf3gctrl,pflags3(a3)	;check bit 2
 	bne.w	.18						;branch if set
 	moveq	#$1D,d0					;assignment assgoaliectrl
 	bra.w	assinsert
 	;pfjoycon clear or pf3gctrl set
 .18
 	move.w	(pucky).w,d0			;move pucky into d0
-	move.w	$14(a3),d1				;move Ypos into d1
+	move.w	Ypos(a3),d1				;move Ypos into d1
 	eor.w	d0,d1					;XOR
 	bpl.w	.19						;branch if positive
 	clr.w	d0
 	move.w	#$10A,d2
-	btst	#pfgoal,$62(a3)			;check which net shooting at
+	btst	#pfgoal,pflags(a3)		;check which net shooting at
 	beq.w	.loop3					;branch if bottom
 	neg.w	d2
 	bra.w	.loop3
 	;timer out: count temp4 down to -1
 .19
-	subq.w	#1,$46(a3)				;sub 1 from temp4
+	subq.w	#1,temp4(a3)			;sub 1 from temp4
 	bpl.w	.20						;branch if positive
-	move.w	#$FFFF,$46(a3)			;move -1 into temp4
+	move.w	#$FFFF,temp4(a3)		;move -1 into temp4
 	;is the goalie the puck carrier?
 .20
-	move.w	$52(a3),d0				;SCnum into d0
+	move.w	SCnum(a3),d0			;SCnum into d0
 	cmp.w	(puckc).w,d0			;check if puckc
 	bne.w	.23						;branch if not
-	tst.w	$48(a3)					;check temp5
+	tst.w	temp5(a3)				;check temp5
 	bpl.w	.21						;branch if positive
-	move.w	#$5A,$48(a3)			;move 5A into temp5
+	move.w	#$5A,temp5(a3)			;move 5A into temp5
 	;goalie holding the puck: freeze timer at 90, then pass or whistle
 .21
-	st	$46(a3)						;FFFF into temp4
-	cmpi.w	#$5A,$48(a3)			;compare to temp5
+	st	temp4(a3)					;FFFF into temp4
+	cmpi.w	#$5A,temp5(a3)			;compare to temp5
 	bgt.w	.26						;branch if greater
 	move.w	(HVcount).l,d0
 	andi.w	#3,d0					;pass first 2 bits
 	bne.w	.26						;branch if not 0
 	moveq	#5,d0
 	movea.w	#(SortCords-M68K_RAM),a0
-	btst	#pfteam,$62(a3)			;check home or away
+	btst	#pfteam,pflags(a3)		;check home or away
 	bne.w	.loop2					;branch if away
 	adda.w	#$300,a0
 	;each player of the other team
@@ -794,7 +794,7 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	bra.w	.26
 	;d0 <> puckc
 .23
-	tst.w	$46(a3)					;check temp4
+	tst.w	temp4(a3)				;check temp4
 	bne.w	.26						;branch if not 0
 	tst.w	(puckc).w				;check puckc
 	bpl.w	.26						;branch if there is a puckc
@@ -809,7 +809,7 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	bgt.w	.26						;branch if past goalline
 	cmp.w	#$FEE2,d1
 	blt.w	.26						;branch if past
-	sub.w	$14(a3),d1				;sub Ypos from d1
+	sub.w	Ypos(a3),d1				;sub Ypos from d1
 	cmp.w	#$1E,d1					;compare to 1E
 	bgt.w	.26						;branch if greater
 	cmp.w	#$FFE2,d1				;compare to -1E
@@ -830,25 +830,25 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	movem.w	(sp)+,d0-d1
 	bgt.w	.26						;branch if greater
 	bsr.w	vtoa
-	move.w	d0,$54(a3)				;d0 into facedir. Goalie will face puck
-	move.b	#8,$5E(a3)				;move 8 to nopuck collision
+	move.w	d0,facedir(a3)			;d0 into facedir. Goalie will face puck
+	move.b	#8,nopuck(a3)			;move 8 to nopuck collision
 	move.w	#SPAgdive,d1			;goalie dive anim.
 	bsr.w	SetSPA					;set animation
-	bset	#pf2aip,$63(a3)			;set anim in progress
+	bset	#pf2aip,pflags2(a3)		;set anim in progress
 	addi.w	#$96,(Crowdlevel).w
 	rts
 	;not holding the puck: play the shot (puckcross at the goal line)
 .26
 	movea.w	#(puckcross-M68K_RAM),a0	;puckcross = xcord/frames top to bottom for goalies to react to
 	move.w	#$11A,d3
-	btst	#pfgoal,$62(a3)			;check what net shooting at
+	btst	#pfgoal,pflags(a3)		;check what net shooting at
 	beq.w	.27						;branch if bottom
 	addq.w	#4,a0
 	neg.w	d3
 .27
-	cmpi.w	#$11A,$14(a3)
+	cmpi.w	#$11A,Ypos(a3)
 	bgt.w	.28
-	cmpi.w	#$FEE6,$14(a3)
+	cmpi.w	#$FEE6,Ypos(a3)
 	bgt.w	.29
 	;far from the goal line: stand in the crease middle
 .28
@@ -867,7 +867,7 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 .29
 	tst.w	(puckc).w
 	bmi.w	.30
-	move.w	$52(a3),d0
+	move.w	SCnum(a3),d0
 	cmp.w	(puckc).w,d0
 	beq.w	.30
 	move.l	a0,-(sp)
@@ -974,7 +974,7 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	bgt.w	.39
 	cmpi.w	#$FEE2,(pucky).w
 	blt.w	.39
-	bset	#pf2aip,$63(a3)
+	bset	#pf2aip,pflags2(a3)
 	bne.w	.39
 	jsr	(goaliesave).l
 	;follow the crossing x along the goal line
@@ -994,16 +994,16 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 .loop3
 	move.w	d2,d1
 	movem.w	d0-d1,-(sp)
-	move.b	$28(a3),d0
+	move.b	Xvel(a3),d0
 	ext.w	d0
 	neg.w	d0
 	add.w	(sp)+,d0
 	sub.w	(a3),d0
-	move.b	$2A(a3),d1
+	move.b	Yvel(a3),d1
 	ext.w	d1
 	neg.w	d1
 	add.w	(sp)+,d1
-	sub.w	$14(a3),d1
+	sub.w	Ypos(a3),d1
 	cmp.w	#4,d0
 	bgt.w	.41
 	cmp.w	#$FFFC,d0
@@ -1017,10 +1017,10 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	;direction to the spot (zero when close)
 .41
 	bsr.w	vtoa
-	move.b	d0,$43(a3)				;move d0 into temp2+1
+	move.b	d0,temp2+1(a3)			;move d0 into temp2+1
 	;d2 = wanted direction: accelerate (or stop for 8)
 .42
-	move.b	$43(a3),d2				;temp2+1
+	move.b	temp2+1(a3),d2			;temp2+1
 	ext.w	d2
 	cmp.w	#7,d2
 	ble.w	playeracc
@@ -1033,14 +1033,14 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	bne.s	.loop3
 	movea.w	#(tmstruct-M68K_RAM),a1
 	lea	$39E(a1),a2
-	btst	#pfteam,$62(a3)
+	btst	#pfteam,pflags(a3)
 	beq.w	.44
 	exg	a1,a2
 	;team structs chosen
 .44
 	cmpi.l	#$1324,$2A(a1)
 	blt.w	.loop3
-	cmpi.l	#$9C4,$2A(a2)
+	cmpi.l	#$9C4,tmnear(a2)
 	blt.w	.loop3
 	cmpi.w	#$F6,(pucky).w
 	bgt.w	.45
@@ -1049,7 +1049,7 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	;puck past the circles
 .45
 	tst.w	(puckvy).w
-	btst	#pfgoal,$62(a3)
+	btst	#pfgoal,pflags(a3)
 	beq.w	.46
 	eori.b	#8,ccr
 	;puck direction check
@@ -1071,7 +1071,7 @@ assgoaliepuckx	equ	*	;Goalie AI: use the puck x position (low confidence)
 	bra.w	assinsert
 ClampYPosition						;Clamp d1 to the goal line range ($FEE7..$119) and subtract d3
 	move.w	(puckc).w,d2
-	cmp.w	$52(a3),d2
+	cmp.w	SCnum(a3),d2
 	bne.w	.1
 	clr.w	d0
 .1

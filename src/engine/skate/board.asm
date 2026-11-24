@@ -1,15 +1,15 @@
 ;	Board fall placement.
 
 PlaceBoardFall						;places a player falling at the boards (tests the position word at $58)
-	cmpi.w	#SPAboardmidl,$58(a3)
+	cmpi.w	#SPAboardmidl,SPA(a3)
 	beq.w	.10
-	cmpi.w	#SPAboardmidr,$58(a3)
+	cmpi.w	#SPAboardmidr,SPA(a3)
 	beq.w	.8
-	cmpi.w	#SPAboardleft,$58(a3)
+	cmpi.w	#SPAboardleft,SPA(a3)
 	beq.w	.6
-	cmpi.w	#SPAboardtop,$58(a3)
+	cmpi.w	#SPAboardtop,SPA(a3)
 	beq.w	.0
-	cmpi.w	#SPAboardbot,$58(a3)
+	cmpi.w	#SPAboardbot,SPA(a3)
 	beq.w	.3
 	bra.w	.11
 .0
@@ -42,7 +42,7 @@ PlaceBoardFall						;places a player falling at the boards (tests the position w
 	bra.w	.11
 .6
 	move.w	#$90,d0
-	btst	#3,4(a3)
+	btst	#3,attribute(a3)
 	beq.w	.7
 	move.w	#$FF70,d0
 .7
@@ -51,7 +51,7 @@ PlaceBoardFall						;places a player falling at the boards (tests the position w
 	add.w	d0,(a3)
 	bra.w	.11
 	move.w	#$96,d0
-	btst	#3,4(a3)
+	btst	#3,attribute(a3)
 	beq.w	.12
 	move.w	#$FF6A,d0
 .12
@@ -61,7 +61,7 @@ PlaceBoardFall						;places a player falling at the boards (tests the position w
 	bra.w	PlaceBoardFallExit
 .8
 	move.w	#$FF70,d0
-	btst	#3,4(a3)
+	btst	#3,attribute(a3)
 	beq.w	.9
 	move.w	#$90,d0
 .9
@@ -71,7 +71,7 @@ PlaceBoardFall						;places a player falling at the boards (tests the position w
 	bra.w	.11
 .10
 	move.w	#$FF6A,d0
-	btst	#3,4(a3)
+	btst	#3,attribute(a3)
 	beq.w	*+4
 .13
 	sub.w	(a3),d0

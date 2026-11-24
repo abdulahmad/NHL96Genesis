@@ -10,7 +10,7 @@ LeadSong							;Not in a shootout (gmode2 bit 1) and one team has more players o
 	bne.w	LeadSongExit
 	movea.w	#(tmstruct-M68K_RAM),a2
 	lea	$39E(a2),a3
-	move.w	$24(a2),d0
+	move.w	tmap(a2),d0
 	sub.w	$24(a3),d0
 	beq.w	LeadSongExit
 	bpl.w	.1

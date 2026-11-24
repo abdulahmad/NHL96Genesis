@@ -2,7 +2,7 @@
 
 getFgtbyte							;d0 = $75(a2) / 4
 	clr.w	d0						;clear d0
-	move.b	$75(a2),d0				;move H/F bit into d0 (this is always even)
+	move.b	checking(a2),d0			;move H/F bit into d0 (this is always even)
 	lsr.w	#2,d0					;shift 2 right (divide by 4)
 	rts
 
@@ -41,13 +41,13 @@ chkFgtBit1ShotsLead	equ	*
 	movem.l	d0-d2/a0-a2,-(sp)
 	movea.l	#tmstruct,a0
 	movea.l	#AwShots,a1
-	move.w	$24(a0),d0				;home players on ice
-	sub.w	$24(a1),d0
+	move.w	tmap(a0),d0				;home players on ice
+	sub.w	tmap(a1),d0
 	beq.w	.4						;same number on the ice: done
 	bpl.w	.3						;home has more: test home
 	exg	a0,a1						;away has more: test the away team
 .3
-	cmpi.w	#6,$28(a0)
+	cmpi.w	#6,tmteam(a0)
 	bne.w	.4						;(the branch goes to the next line either way)
 	;exit: restore the registers
 .4

@@ -29,13 +29,13 @@ linebar								;Draw the energy bar of line d0 for team a2 at printx / printy
 
 getlinee							;d0 = line number, a2 = team struct. Return d0 = energy level of this line
 	movem.l	d1-d5/a0-a3,-(sp)
-	lea	$184(a2),a1
+	lea	tmlines(a2),a1
 	asl.w	#3,d0
 	adda.w	d0,a1
 	clr.l	d0
 	clr.w	d1
 	movea.l	#priolist,a0
-	move.w	$24(a2),d4
+	move.w	tmap(a2),d4
 	bra.w	.next
 .loop
 	clr.w	d5
@@ -129,13 +129,13 @@ ChkShotStat							;Determine if a shot was taken and add it to the stats (crowd,
 	beq.w	.8
 	btst	#sf2pwrtm,(sflags2).w
 	bne.w	.7
-	btst	#6,$62(a3)
+	btst	#6,pflags(a3)
 	bne.w	.8
 .6
 	addq.w	#1,$38E(a2)
 	bra.w	.8
 .7
-	btst	#6,$62(a3)
+	btst	#6,pflags(a3)
 	bne.s	.6
 .8
 	move.l	a2,-(sp)
@@ -145,7 +145,7 @@ ChkShotStat							;Determine if a shot was taken and add it to the stats (crowd,
 	addq.w	#1,$384(a2)
 	movea.l	(sp)+,a2
 	clr.w	d0
-	move.b	$67(a3),d0
+	move.b	weight(a3),d0
 	addi.w	#$F8,d0
 	addq.b	#1,(a2,d0.w)
 	move.w	$26(a1),d0
@@ -159,7 +159,7 @@ ChkShotStat							;Determine if a shot was taken and add it to the stats (crowd,
 loadTeamStruct						;a2 = the team struct of player a3
 	movea.w	#(tmstruct-M68K_RAM),a2
 	lea	$39E(a2),a1
-	btst	#6,$62(a3)
+	btst	#6,pflags(a3)
 	beq.w	rtss2
 	exg	a1,a2
 	rts

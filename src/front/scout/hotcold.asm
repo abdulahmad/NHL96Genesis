@@ -54,7 +54,7 @@ BuildTeamHotCold					;Hot and cold list of the team at a0 (GetTeamLines, one nib
 	movea.l	a0,a2
 	adda.l	#$1BC,a2
 	move.w	d7,-(sp)
-	move.w	$28(a0),d7
+	move.w	tmteam(a0),d7
 	jsr	(GetTeamLines).l
 	move.w	(sp)+,d7
 	movea.l	#TempLegSpd+2,a1

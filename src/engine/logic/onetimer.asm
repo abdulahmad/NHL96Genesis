@@ -18,7 +18,7 @@ PuckOnAttackHalf					;d0 = 1 when the puck is on the half of the goal player a3 
 	move.w	(passdir).w,d0
 	addq.w	#4,d0
 	andi.w	#7,d0
-	move.w	$54(a3),d1
+	move.w	facedir(a3),d1
 	cmp.w	d0,d1
 	bra.w	PuckOnAttackHalfYes
 	dc.w	$6700,$0038,$5241,$0241,$0007,$B240,$6700,$002C

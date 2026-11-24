@@ -402,7 +402,7 @@ clockcontPuckAssignments	equ	*
 	moveq	#8,d0
 	moveq	#$B,d2
 .4
-	bclr	#3,$62(a3)
+	bclr	#3,pflags(a3)
 	adda.w	#$80,a3
 	dbf	d2,.4
 	movea.w	#(SortCords-M68K_RAM),a3

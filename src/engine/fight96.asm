@@ -145,12 +145,12 @@ startfight							;Start the fight for player a3 against a2: AddPenalty2 $2E, set
 SetInst								;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 bit 0
 									;(fighting) on both;
 									;Z clear when a3 was already fighting
-	cmpi.b	#1,$75(a3)
+	cmpi.b	#1,checking(a3)
 	blt.w	rtsfight
-	cmpi.b	#1,$75(a2)
+	cmpi.b	#1,checking(a2)
 	blt.w	rtsfight
 	clr.w	d1
-	move.b	$67(a2),d1
+	move.b	weight(a2),d1
 	movea.w	#(tmstruct-M68K_RAM),a0
 	btst	#pfteam,pflags(a2)
 	beq.w	.tm
@@ -161,7 +161,7 @@ SetInst								;Both a3 and a2 need fight rating ($75) 1 or more: then pflags2 b
 	asl.b	#1,d1
 	neg.b	d1
 	addi.b	#$10,d1
-	cmp.b	$75(a2),d1
+	cmp.b	checking(a2),d1
 	bset	#pf2fight,pflags2(a2)
 	bset	#pf2fight,pflags2(a3)
 	bne.w	rtsfight

@@ -517,10 +517,10 @@ LoadTeamLine						;Line editor menu item Load Team Line
 SaveTeamLine						;Line editor menu item Save Team Line
 	movem.l	d0-d7/a0-a6,-(sp)
 	movea.l	#$200000,a0
-	move.w	Xvel(a2),d7
+	move.w	tmteam(a2),d7
 	addq.w	#1,d7
 	move.w	d7,(a0)+
-	lea	$184(a2),a1
+	lea	tmlines(a2),a1
 	move.b	(a1)+,1(a0)
 	move.b	(a1)+,3(a0)
 	move.b	(a1)+,5(a0)
@@ -530,7 +530,7 @@ SaveTeamLine						;Line editor menu item Save Team Line
 	move.b	(a1)+,$D(a0)
 	move.b	(a1)+,$F(a0)
 	adda.w	#$10,a0
-	lea	$184(a2),a1
+	lea	tmlines(a2),a1
 	move.w	#$D,d0
 .loop
 	move.b	(a1)+,1(a0)

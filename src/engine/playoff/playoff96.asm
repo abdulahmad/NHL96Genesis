@@ -727,7 +727,7 @@ AddPlayoffTeamStats					;Add the po team's game stats to its playoff totals in s
 	move.w	(potreeteam).w,d2
 	move.b	(a0,d2.w),d2
 	movea.w	#(tmstruct-M68K_RAM),a2
-	cmp.w	$28(a2),d2
+	cmp.w	tmteam(a2),d2
 	beq.w	.0
 	adda.w	#$39E,a2
 	cmp.w	$28(a2),d2

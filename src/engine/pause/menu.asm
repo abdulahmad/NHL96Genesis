@@ -14,7 +14,7 @@ PlayoffStatsMenu					;Pause menu Playoff Stats: with GameFlags bit 7 set jump to
 	move.w	(potreeteam).w,d0
 	move.b	(a0,d0.w),d0
 	movea.w	#(tmstruct-M68K_RAM),a2
-	cmp.w	$28(a2),d0
+	cmp.w	tmteam(a2),d0
 	beq.w	.1
 	adda.w	#$39E,a2
 .1

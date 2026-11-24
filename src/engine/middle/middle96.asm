@@ -16,7 +16,7 @@ GetPlayerName						;a1 = mesarea "NN First Last" (getname) for player TempPlOffs
 
 getname								;a1 = mesarea "NN First Last" for player d0 of team struct a2.
 	movem.l	d0-d3/d7-a0/a2-a3,-(sp)
-	move.w	$28(a2),d7
+	move.w	tmteam(a2),d7
 	jsr	(GetJerseyNumber).l
 	jsr	(GetPlayerNamePointer).l
 	move.l	a0,-(sp)

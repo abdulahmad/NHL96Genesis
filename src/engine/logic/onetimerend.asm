@@ -11,15 +11,15 @@ EndOneTimer							;End a one-timer for a3: the one-timer bits cleared, onetimerp
 	move.w	d1,-(sp)
 	move.w	#SPAglide,d1			;SPA
 	jsr	(SetSPA).l
-	tst.w	$34(a3)
+	tst.w	position(a3)
 	bpl.w	.0
 	jsr	(assexit).l
 	bra.w	.1
 .0
 	jsr	(AssignBySavedPos).l
 .1
-	clr.w	$5A(a3)
-	st	$5C(a3)
+	clr.w	SPAnum(a3)
+	st	SPAcnt(a3)
 	move.w	(sp)+,d1
 	movem.l	(sp)+,d0/a0
 	rts

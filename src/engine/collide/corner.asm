@@ -77,8 +77,8 @@ checkcornercoll						;Corner circles and side walls for object a3 at d2 / d3 (wc
 	bsr.w	cornercollb
 .2
 	movem.w	(sp)+,d2-d5
-	move.w	$4E(a3),d0
-	or.w	$50(a3),d0
+	move.w	Wallcos(a3),d0
+	or.w	Wallsin(a3),d0
 	bne.w	.rtss3
 	move.w	#$100,d0				;now check side walls
 	clr.w	d1

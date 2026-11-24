@@ -14,8 +14,8 @@ puckshadow							;asstab entry: the puck shadow.
 	beq.w	.2
 	cmpi.w	#$299,frame(a3)
 	bne.w	.3						;shadow turns into siren on goals
-	move.w	-$80(a3),(a3)			;Xpos-SCstruct, Xpos
-	move.w	-$6C(a3),Ypos(a3)		;Ypos-SCstruct, Ypos
+	move.w	-SCstruct(a3),(a3)		;Xpos-SCstruct, Xpos
+	move.w	-SCstruct+Ypos(a3),Ypos(a3)	;Ypos-SCstruct, Ypos
 	clr.w	Zpos(a3)				;Zpos
 	moveq	#Ypos,d0				;Ypos
 	btst	#sfhor,(sflags).w		;#sfhor - check if horizontal mode
@@ -33,7 +33,7 @@ puckshadow							;asstab entry: the puck shadow.
 	clr.w	(a3)					;Xpos
 	move.w	#$14B,Ypos(a3)
 	move.w	#$E,Zpos(a3)			;Zpos
-	tst.w	-$6C(a3)				;Ypos-SCstruct
+	tst.w	-SCstruct+Ypos(a3)		;Ypos-SCstruct
 	bpl.w	.5						;puck y >= 0: siren at the top, as set
 	move.w	#$8000,attribute(a3)	;attribute
 	btst	#0,(sflags14).w
@@ -97,21 +97,21 @@ PuckPathAtLine						;Where the puck path crosses the line d4 (uses the puck velo
 
 skateto								;Skate a3 to d0 / d1, a0 = an extra collision routine (EvadePC); every 12
 									;frames, then doplayeracc
-	sub.b	d7,$42(a3)				;sub d7 from temp2
+	sub.b	d7,temp2(a3)			;sub d7 from temp2
 	bpl.w	.4						;exit if not 0 or less
-	addi.b	#$C,$42(a3)				;add 12 - only execute every 12 frames
+	addi.b	#$C,temp2(a3)			;add 12 - only execute every 12 frames
 	bsr.w	avdgoal					;avoid the goal nets
 	movem.w	d0-d1,-(sp)
-	move.w	$28(a3),d0				;Xvel
+	move.w	Xvel(a3),d0				;Xvel
 	asr.w	#8,d0					;divide by 256
 	neg.w	d0						;make negative
 	add.w	(sp)+,d0				;add new x coord from stack
 	sub.w	(a3),d0					;sub Xpos
-	move.w	$2A(a3),d1				;Yvel
+	move.w	Yvel(a3),d1				;Yvel
 	asr.w	#8,d1					;divide by 256
 	neg.w	d1						;make negative
 	add.w	(sp)+,d1				;add new y coord from stack
-	sub.w	$14(a3),d1				;sub Ypos
+	sub.w	Ypos(a3),d1				;sub Ypos
 	cmp.w	#$C,d0					;compare 12 to d0
 	bgt.w	.1
 	cmp.w	#$FFF4,d0				;cmp -12
@@ -126,11 +126,11 @@ skateto								;Skate a3 to d0 / d1, a0 = an extra collision routine (EvadePC); 
 	bsr.w	vtoa
 .2
 	jsr	(a0)						;extra collision routine
-	move.b	d0,$43(a3)				;move d0 into temp2+1
+	move.b	d0,temp2+1(a3)			;move d0 into temp2+1
 	cmp.w	#7,d0					;compare to 7
 	ble.w	.4
-	move.w	$28(a3),d0				;Xvel
-	or.w	$2A(a3),d0				;Yvel
+	move.w	Xvel(a3),d0				;Xvel
+	or.w	Yvel(a3),d0				;Yvel
 	bne.w	.4
 	move.w	(puckx).w,d0			;move puckx into d0
 	move.w	(pucky).w,d1			;move pucky into d1
@@ -140,37 +140,37 @@ skateto								;Skate a3 to d0 / d1, a0 = an extra collision routine (EvadePC); 
 	move.w	(yc1).w,d1				;scroll lock y coord
 .3
 	sub.w	(a3),d0					;Xpos
-	sub.w	$14(a3),d1				;Ypos - face towards puck
+	sub.w	Ypos(a3),d1				;Ypos - face towards puck
 	bsr.w	vtoa
-	sub.w	$54(a3),d0				;facedir
+	sub.w	facedir(a3),d0			;facedir
 	beq.w	.4
 	neg.w	d0
 	andi.w	#4,d0
 	lsr.w	#1,d0					;divide by 2
 	subq.w	#1,d0
-	add.w	$54(a3),d0				;facedir
+	add.w	facedir(a3),d0			;facedir
 	andi.w	#7,d0
-	move.w	d0,$54(a3)				;facedir
+	move.w	d0,facedir(a3)			;facedir
 .4
 	clr.w	d0
-	move.b	$43(a3),d0				;temp2+1
+	move.b	temp2+1(a3),d0			;temp2+1
 	bra.w	doplayeracc
 avdgoal								;Skate target adjusted to stay out of the goalie crease (clears fodir2,
 									;steers around the goal)
 	clr.w	(fodir2+2).w
 	clr.w	(fodir2+4).w
-	tst.w	$34(a3)					;goalie? If so, quit
+	tst.w	position(a3)			;goalie? If so, quit
 	beq.w	rtss2
 	move.w	(a3),d2					;Xpos
 	eor.w	d0,d2
 	bpl.w	.6
 	move.w	d1,d2
-	sub.w	$14(a3),d2				;Ypos
+	sub.w	Ypos(a3),d2				;Ypos
 	move.w	(a3),d3					;Xpos
 	muls.w	d3,d2
 	sub.w	d0,d3
 	divs.w	d3,d2
-	add.w	$14(a3),d2				;Ypos
+	add.w	Ypos(a3),d2				;Ypos
 	cmp.w	#$137,d2
 	bgt.w	.6
 	cmp.w	#$F1,d2
@@ -179,7 +179,7 @@ avdgoal								;Skate target adjusted to stay out of the goalie crease (clears f
 	cmp.w	#$114,d2
 	bgt.w	.2
 	blt.w	.1
-	cmpi.w	#$114,$14(a3)
+	cmpi.w	#$114,Ypos(a3)
 	bgt.w	.2
 .1
 	move.w	#$CE,d3
@@ -196,7 +196,7 @@ avdgoal								;Skate target adjusted to stay out of the goalie crease (clears f
 	cmp.w	#$FEEC,d2
 	bgt.w	.5
 	blt.w	.4
-	cmpi.w	#$FEEC,$14(a3)
+	cmpi.w	#$FEEC,Ypos(a3)
 	bgt.w	.5
 .4
 	move.w	#$FEA6,d3
@@ -206,12 +206,12 @@ avdgoal								;Skate target adjusted to stay out of the goalie crease (clears f
 .6
 	move.w	d1,d3
 	subi.w	#$114,d3
-	move.w	$14(a3),d2
+	move.w	Ypos(a3),d2
 	subi.w	#$114,d2
 	bsr.w	avdgoalcrease
 	move.w	d1,d3
 	addi.w	#$114,d3
-	move.w	$14(a3),d2
+	move.w	Ypos(a3),d2
 	addi.w	#$114,d2
 	bsr.w	avdgoalcrease
 	add.w	(fodir2+2).w,d0
@@ -265,45 +265,45 @@ PuckLeadPosition					;d0/d1 = puck position plus its velocity (puck lead point f
 	add.w	(pucky).w,d1
 	rts
 skatetoIntercept	equ	*
-	tst.w	$34(a3)
+	tst.w	position(a3)
 	bne.w	.2
 	nop
 .2
 	bsr.s	PuckLeadPosition
-	sub.b	d7,$42(a3)				;temp2
+	sub.b	d7,temp2(a3)			;temp2
 	bpl.w	.7
-	addi.b	#$A,$42(a3)				;temp2
+	addi.b	#$A,temp2(a3)			;temp2
 	bsr.w	avdgoal
 	movem.w	d0-d1,-(sp)
 	move.l	a3,-(sp)
 	bsr.w	GetHot
 	neg.b	d0
 	neg.b	d1
-	sub.b	$28(a3),d0				;Xvel
+	sub.b	Xvel(a3),d0				;Xvel
 	ext.w	d0
 	add.w	(sp)+,d0
 	sub.w	(a3),d0					;Xpos
-	sub.b	$2A(a3),d1				;Yvel
+	sub.b	Yvel(a3),d1				;Yvel
 	ext.w	d1
 	add.w	(sp)+,d1
-	sub.w	$14(a3),d1				;Ypos
+	sub.w	Ypos(a3),d1				;Ypos
 	bsr.w	vtoa
-	move.b	d0,$43(a3)				;temp2 lower byte
-	tst.w	$34(a3)
+	move.b	d0,temp2+1(a3)			;temp2 lower byte
+	tst.w	position(a3)
 	beq.w	.7
 	move.w	(puckvx).w,d0
 	move.w	(puckvy).w,d1
 	bsr.w	vtoa
 	eori.w	#4,d0
-	cmp.w	$54(a3),d0				;facedir
+	cmp.w	facedir(a3),d0			;facedir
 	beq.w	.7
 	move.w	(puckx).w,d0
 	sub.w	(a3),d0					;Xpos
 	move.w	(pucky).w,d1
-	sub.w	$14(a3),d1				;Ypos
+	sub.w	Ypos(a3),d1				;Ypos
 	movem.w	d0-d1,-(sp)
 	bsr.w	vtoa
-	cmp.w	$54(a3),d0				;$54 = facedir
+	cmp.w	facedir(a3),d0			;$54 = facedir
 	movem.w	(sp)+,d0-d1
 	bne.w	.7
 	muls.w	d0,d0
@@ -311,17 +311,17 @@ skatetoIntercept	equ	*
 	add.l	d1,d0
 	cmp.l	#$400,d0
 	bls.w	.7
-	tst.w	$34(a3)
+	tst.w	position(a3)
 	beq.w	.6
 	movem.w	d0,-(sp)
-	move.w	$14(a3),d0
+	move.w	Ypos(a3),d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.3
 	neg.w	d0
 .3
 	cmp.w	#$76,d0
 	blt.w	.5
-	move.w	$2A(a3),d0
+	move.w	Yvel(a3),d0
 	btst	#pfgoal,pflags(a3)
 	beq.w	.4
 	neg.w	d0
@@ -345,13 +345,13 @@ skatetoIntercept	equ	*
 	cmp.l	#$5A4,d0
 	bls.w	Sweepcheck
 .7
-	move.b	$43(a3),d0
+	move.b	temp2+1(a3),d0
 	ext.w	d0
 	cmp.w	#7,d0
 	bgt.w	.8
-	cmp.w	$54(a3),d0
+	cmp.w	facedir(a3),d0
 	beq.w	.8
-	tst.w	$34(a3)
+	tst.w	position(a3)
 	beq.w	.8
 	bsr.w	FacePuck
 .8
@@ -378,20 +378,20 @@ FacePuck							;Turn a3's facedir one step toward the puck (vtoa); d0 / d1 kept 
 	rts
 
 assexit								;Exit the current assignment of player a3
-	addq.w	#1,$36(a3)				;add 1 to current assignment index
-	andi.w	#7,$36(a3)				;mask passing first 3 bits
-	bset	#1,$62(a3)				;signal next assignment
+	addq.w	#1,assnum(a3)			;add 1 to current assignment index
+	andi.w	#7,assnum(a3)			;mask passing first 3 bits
+	bset	#1,pflags(a3)			;signal next assignment
 	rts
 
 assinsert							;Insert assignment d0 on player a3
 	subq.w	#1,assnum(a3)			;$36 = assnum
-	andi.w	#7,$36(a3)
+	andi.w	#7,assnum(a3)
 
 assreplace							;Replace the current assignment of player a3 with d0
 	move.l	d1,-(sp)				;push on stack
 	move.w	assnum(a3),d1			;$36 = assnum
 	move.b	d0,asslist(a3,d1.w)		;replace current assignment with d0 on asslist
-	bset	#1,$62(a3)				;set flag to start new assignment
+	bset	#1,pflags(a3)			;set flag to start new assignment
 	move.l	(sp)+,d1				;pop on stack
 	rts
 

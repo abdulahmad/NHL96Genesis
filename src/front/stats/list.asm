@@ -137,7 +137,7 @@ PlayerStatsList						;Stats screen for team a2, d7 = 0 game / 1 playoff (plistpl
 .14
 	movea.l	#AwShots,a2
 .15
-	move.w	$28(a2),(setupvalues+2).w
+	move.w	tmteam(a2),(setupvalues+2).w
 	bra.w	.0
 .16
 	btst	#4,d1

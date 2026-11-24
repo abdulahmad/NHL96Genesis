@@ -178,7 +178,7 @@ lcfound								;Line choice d2 made: set the line, close the box
 	bset	#pfjoycon,pflags(a3)
 	jsr	(loadTeamStruct).l
 	bclr	#1,limpact(a2)
-	move.w	d0,$16(a2)
+	move.w	d0,Ypos+2(a2)
 	jsr	(setpersonel).l
 
 lcfound2							;line change choice found: sets the line change cords
