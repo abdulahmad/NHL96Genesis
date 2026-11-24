@@ -256,7 +256,7 @@ assfight							;Assignment $14: the fighter (a3 = player)
 	bne.w	.19
 	tst.w	SPA(a3)
 	bne.w	.6
-	move.w	#$30E6,d1
+	move.w	#SPAfightweave,d1
 	jsr	(SetSPA).l
 .6
 	move.w	(a3),d0					;computer punches only when in range
@@ -336,7 +336,7 @@ assfight							;Assignment $14: the fighter (a3 = player)
 	move.w	d1,Yvel(a3)				;store Yvel
 	tst.w	SPA(a3)
 	bne.w	.15
-	move.w	#$30E6,d1
+	move.w	#SPAfightweave,d1
 	jsr	(SetSPA).l
 .15
 	rts
@@ -344,7 +344,7 @@ assfight							;Assignment $14: the fighter (a3 = player)
 	bsr.w	.hold
 	tst.w	SPA(a3)
 	bne.w	.17
-	move.w	#$31BC,d1
+	move.w	#SPAfhigh,d1
 	jsr	(SetSPA).l
 .17
 	rts
@@ -473,9 +473,9 @@ chkhit								;Part of the fight that checks whether the punch of a3 hit the opp
 	move.w	(FightMasher).w,d0
 	cmp.w	SCnum(a3),d0
 	bne.w	.5
-	move.w	#$3666,d1
+	move.w	#SPAfwin,d1
 	jsr	(SetSPA).l
-	move.w	#$369C,d1
+	move.w	#SPAflose,d1
 	exg	a0,a3
 	jsr	(SetSPA).l
 	bsr.w	.fall
@@ -597,7 +597,7 @@ chkhit								;Part of the fight that checks whether the punch of a3 hit the opp
 	bset	#pfnc,pflags(a0)
 	exg	a0,a3
 	bset	#pf2aip,pflags2(a3)
-	move.w	#$31F6,d1
+	move.w	#SPAfheld,d1
 	jsr	(SetSPA).l
 	bra.w	.ex
 .hithigh
@@ -674,7 +674,7 @@ chkhit								;Part of the fight that checks whether the punch of a3 hit the opp
 	rts
 .lost
 	bsr.s	.fall
-	move.w	#$36D2,d1
+	move.w	#SPAffall,d1
 	jsr	(SetSPA).l
 .19
 	movea.w	#(tmstruct-M68K_RAM),a2

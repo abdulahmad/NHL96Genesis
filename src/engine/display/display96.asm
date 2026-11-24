@@ -504,7 +504,7 @@ showclockPrint	equ	*			;Print the clock digit string
 	rts
 
 .digits								;.digit: the digit chars
-	dc.w	$0004,$3000,$0004,$3100,$0004,$3200,$0004,SPAfpunchfinal
+	dc.w	$0004,$3000,$0004,$3100,$0004,$3200,$0004,$3300
 	dc.w	$0004,$3400,$0004,$3500,$0004,$3600,$0004,$3700
 	dc.w	$0004,$3800,$0004,$3900
 showclockVertical					;Draw the clock when the display flag is set
@@ -694,7 +694,7 @@ setsortcords						;Setup sort cord graphics: addframe for the 16 objects in OOli
 	move.b	attribute(a3),-(sp)
 	cmpi.w	#SPAboxwallleft,SPA(a3)
 	beq.w	.0
-	cmpi.w	#SPAboardmidl,SPA(a3)
+	cmpi.w	#SPAbenchcheckl,SPA(a3)
 	bne.w	.1
 .0
 	bclr	#3,attribute(a3)

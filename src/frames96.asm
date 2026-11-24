@@ -546,9 +546,10 @@ SPAskateback_table:
 .6	dc.w	483,5,484,5,485,5,486,5,487,5,488,5,489,5,490,-5
 .7	dc.w	491,5,492,5,493,5,494,5,495,5,496,5,497,5,498,-5
 
-;	Stick swing check: hook animation plus button 6 (doinput) (confidence low)
-SPAcheckswing	=	*-SPAlist
-SPAcheckswing_table:
+;	Shot block (95G SPAblock): down, hold 40, get up; doinput turns SPAhook into it on button 6, and the
+;	CanBlock path in puck.asm sets it for a joystick player (confidence high)
+SPAblock	=	*-SPAlist
+SPAblock_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -568,10 +569,10 @@ SPAcheckswing_table:
 .5	dc.w	515,5,516,5,517,5,518,40,1045,6,1046,6,1047,6,1048,-6
 .6	dc.w	519,5,520,5,521,5,522,40,1049,6,1050,6,1051,6,1052,-6
 
-;	Alternate pass animation used for forehand and backhand when GameFlags bit 1 is set (dopass)
+;	Drop pass (95G SPAdroppass): dopass uses it for forehand and backhand when GameFlags bit 1 is set
 ;	(confidence medium)
-SPApassalt	=	*-SPAlist
-SPApassalt_table:
+SPAdroppass	=	*-SPAlist
+SPAdroppass_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1064,9 +1065,10 @@ SPAcatch_table:
 .6	dc.w	929,6,930,-6
 .7	dc.w	931,6,932,-6
 
-;	Check right: CCStart picks by direction (checkinglist, indexes 1-4) (confidence medium)
-SPAcheckr	=	*-SPAlist
-SPAcheckr_table:
+;	Shoulder check right (95G SPAshoulderchkr): CCStart picks by direction (checkinglist, indexes 1-4)
+;	(confidence high)
+SPAshoulderchkr	=	*-SPAlist
+SPAshoulderchkr_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1087,9 +1089,10 @@ SPAcheckr_table:
 .6	dc.w	957,2,958,6,959,4,960,-2
 .7	dc.w	961,2,962,6,963,4,964,-2
 
-;	Check left: CCStart picks by direction (checkinglist, indexes 0 and 5-7) (confidence medium)
-SPAcheckl	=	*-SPAlist
-SPAcheckl_table:
+;	Shoulder check left (95G SPAshoulderchkl): CCStart picks by direction (checkinglist, indexes 0 and
+;	5-7) (confidence high)
+SPAshoulderchkl	=	*-SPAlist
+SPAshoulderchkl_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t
@@ -1422,8 +1425,9 @@ SPAturnr_table:
 .6	dc.w	1115,-8
 .7	dc.w	1116,-8
 
-SPAboardmidl	=	*-SPAlist
-SPAboardmidl_table:
+;	Bench check (95G SPAbenchcheckl): FallDown, a left-boards check near centre ice (confidence high)
+SPAbenchcheckl	=	*-SPAlist
+SPAbenchcheckl_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1521,8 +1525,9 @@ SPA221C_table:
 .6	dc.w	1193,4,1194,4,1195,4,1196,-4
 .7	dc.w	1197,4,1198,4,1199,4,1200,-4
 
-SPAboardtop	=	*-SPAlist
-SPAboardtop_table:
+;	Board check, top boards (95G SPAboardfront): FallDown board table, side 0 (confidence high)
+SPAboardfront	=	*-SPAlist
+SPAboardfront_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1543,8 +1548,9 @@ SPAboardtop_table:
 .6	dc.w	1219,4,1220,4,1221,4,1222,4,1223,4,1224,20,1041,4,1042,4
 	dc.w	1043,4,1044,-4
 
-SPAboardleft	=	*-SPAlist
-SPAboardleft_table:
+;	Board check, right boards (95G SPAboardright): FallDown board table, side 2 (confidence high)
+SPAboardright	=	*-SPAlist
+SPAboardright_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1565,8 +1571,9 @@ SPAboardleft_table:
 .6	dc.w	1243,4,1244,4,1245,4,1246,4,1247,4,1248,20,1041,4,1042,4
 	dc.w	1043,4,1044,-4
 
-SPAboardbot	=	*-SPAlist
-SPAboardbot_table:
+;	Board check, bottom boards (95G SPAboardback): FallDown board table, side 4 (confidence high)
+SPAboardback	=	*-SPAlist
+SPAboardback_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1587,8 +1594,9 @@ SPAboardbot_table:
 .6	dc.w	1267,4,1268,4,1269,4,1270,4,1271,4,1272,20,1049,4,1050,4
 	dc.w	1051,4,1052,-4
 
-SPAboardmidr	=	*-SPAlist
-SPAboardmidr_table:
+;	Board check, left boards (95G SPAboardleft): FallDown board table, side 6 (confidence high)
+SPAboardleft	=	*-SPAlist
+SPAboardleft_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.0-.t
@@ -1694,9 +1702,10 @@ SPAstop_table:
 .6	dc.w	1411,3,1412,3,1413,-3
 .7	dc.w	1414,3,1415,3,1416,-3
 
-;	Burst of fast skating when Start and the dpad are pressed (StartDpadBoost) (confidence low)
-SPAskatefast	=	*-SPAlist
-SPAskatefast_table:
+;	Spin-o-rama (the manual: hold the D-Pad the way you skate, tap START): dospinorama; one 6-frame turn
+;	for direction 0 and one for the rest (confidence high)
+SPAspinorama	=	*-SPAlist
+SPAspinorama_table:
 .t									;Offset to each direction of animation (0-7)
 	dc.w	.0-.t
 	dc.w	.1-.t

@@ -1,15 +1,15 @@
 ;	Board fall placement.
 
 PlaceBoardFall						;places a player falling at the boards (tests the position word at $58)
-	cmpi.w	#SPAboardmidl,SPA(a3)
+	cmpi.w	#SPAbenchcheckl,SPA(a3)
 	beq.w	.10
-	cmpi.w	#SPAboardmidr,SPA(a3)
-	beq.w	.8
 	cmpi.w	#SPAboardleft,SPA(a3)
+	beq.w	.8
+	cmpi.w	#SPAboardright,SPA(a3)
 	beq.w	.6
-	cmpi.w	#SPAboardtop,SPA(a3)
+	cmpi.w	#SPAboardfront,SPA(a3)
 	beq.w	.0
-	cmpi.w	#SPAboardbot,SPA(a3)
+	cmpi.w	#SPAboardback,SPA(a3)
 	beq.w	.3
 	bra.w	.11
 .0

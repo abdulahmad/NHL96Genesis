@@ -114,7 +114,7 @@ doinput								;Process controller input for player a3: d0 = dpad, d1 = new butt
 	andi.b	#$F,d3
 	movem.w	(sp)+,d3
 	beq.w	.8
-	jsr	(StartDpadBoost).l
+	jsr	(dospinorama).l
 	bra.w	.nostart
 .8
 	tst.w	d4
@@ -199,7 +199,7 @@ doinput								;Process controller input for player a3: d0 = dpad, d1 = new butt
 	tst.w	SPAnum(a3)
 	bne.w	.32
 	movem.w	d1,-(sp)
-	move.w	#SPAcheckswing,d1
+	move.w	#SPAblock,d1
 	jsr	(SetSPA).l
 	bset	#pfalock,pflags(a3)
 	movem.w	(sp)+,d1
@@ -803,14 +803,14 @@ JumpToDoplayeracc					;jmp doplayeracc, shared by doinput_chkanim,
 									;doinput_skater and doinput_islocked
 	jmp	doplayeracc
 
-StartDpadBoost						;Start with a dpad direction: SPAskatefast with pf2aip set and Xvel +
+dospinorama							;Spin-o-rama, Start with a dpad direction: SPAspinorama, pf2aip, Xvel +
 									;$64, not while pf2unav or gmclock is set
 	btst	#2,pflags2(a3)
 	bne.w	.0
 	btst	#gmclock,(gmode).w
 	bne.w	.0
 	movem.l	d0-d7/a0-a6,-(sp)
-	move.w	#SPAskatefast,d1
+	move.w	#SPAspinorama,d1
 	jsr	(SetSPA).l
 	bset	#pf2aip,pflags2(a3)
 	addi.w	#$64,Xvel(a3)

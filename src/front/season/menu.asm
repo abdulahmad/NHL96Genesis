@@ -161,7 +161,7 @@ PrintLeadersCategory	equ	*	;Print the category name of the leaders screen
 	rts
 	dc.w	$000A,$476F,$616C,$7320,$2000,$000A,$4173,$7369
 	dc.w	$7374,$7300,$000A,$506F,$696E,$7473,$2000,$000A
-	dc.w	SPAturnl,SPAturnl,$4741,$4100
+	dc.w	$2020,$2020,$4741,$4100
 LeadersReadPad	equ	*
 	dc.w	$2C3C,$0000,$5460,$3C3C,$0064,$3238,$B052,$9278
 	dc.w	$B054,$67F2,$31F8,$B052,$B054,$4EB9,$0001,$2640
@@ -176,9 +176,9 @@ ClearLeadersRows	equ	*	;Clear the leaders rows and print the headings again
 	dc.w	$48E7,$FFFE,$303C,$0024,$323C,$000D,$343C,$07FF
 	dc.w	$0042,$8000,$4EB9,$0001,$BB8E,$0006,$BF02,$0B00
 	dc.w	$4EB9,$0001,$B976,$4EB9,$0001,$BED6,$000E,$F804
-	dc.w	$011E,$0820,SPAturnl,SPAturnl,SPAturnl,$4EB9,$0001,$BED6
-	dc.w	$001E,$F804,$0109,$0520,SPAturnl,SPAturnl,SPAturnl,SPAturnl
-	dc.w	SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,SPAturnl,$2000,$4CDF
+	dc.w	$011E,$0820,$2020,$2020,$2020,$4EB9,$0001,$BED6
+	dc.w	$001E,$F804,$0109,$0520,$2020,$2020,$2020,$2020
+	dc.w	$2020,$2020,$2020,$2020,$2020,$2020,$2000,$4CDF
 	dc.w	$7FFF,$4E75
 
 BuildPlayerLeaders					;League leaders: build and sort the list of category pstatscat through

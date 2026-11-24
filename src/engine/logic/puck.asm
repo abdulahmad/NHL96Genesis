@@ -159,7 +159,7 @@ goaliesave							;The goalie a3 makes a save of the puck crossing at a0: the sav
 .3
 	bra.w	.8
 .5
-	cmp.w	#$1CA,d1
+	cmp.w	#SPAgglovel,d1
 	bne.w	.8
 	andi.w	#3,d3
 	beq.w	.8
@@ -1317,7 +1317,7 @@ check4check							;Check an opponent in front of a3.
 	bne.w	.2
 	jsr	(CanBlock).l
 	beq.w	.2
-	move.w	#$99A,d1
+	move.w	#SPAblock,d1
 	bset	#3,(sflags10).w
 	jsr	(SetSPA).l
 	bset	#pfalock,pflags(a3)		;lock the animation

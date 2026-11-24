@@ -563,14 +563,14 @@ dopass								;Pass the puck
 	move.w	#SPApassf,d1
 	btst	#1,(GameFlags).w
 	beq.w	.13
-	move.w	#SPApassalt,d1
+	move.w	#SPAdroppass,d1
 .13
 	jsr	(Findhittype).l
 	beq.w	.9
 	move.w	#SPApassb,d1
 	btst	#1,(GameFlags).w
 	beq.w	.9
-	move.w	#SPApassalt,d1
+	move.w	#SPAdroppass,d1
 .9
 	jsr	(SetSPA).l
 	bset	#pfalock,pflags(a3)

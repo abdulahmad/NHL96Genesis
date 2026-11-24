@@ -58,15 +58,15 @@ updateplayers						;This routine calls all collision/animation/assignment code f
 	jsr	(PlaceBoardFall).l
 	bra.w	.20
 .0
-	cmpi.w	#SPAboardmidl,SPA(a3)
+	cmpi.w	#SPAbenchcheckl,SPA(a3)
 	beq.w	.9
-	cmpi.w	#SPAboardmidr,SPA(a3)
-	beq.w	.8
 	cmpi.w	#SPAboardleft,SPA(a3)
+	beq.w	.8
+	cmpi.w	#SPAboardright,SPA(a3)
 	beq.w	.7
-	cmpi.w	#SPAboardtop,SPA(a3)
+	cmpi.w	#SPAboardfront,SPA(a3)
 	beq.w	.1
-	cmpi.w	#SPAboardbot,SPA(a3)
+	cmpi.w	#SPAboardback,SPA(a3)
 	beq.w	.4
 	bra.w	.20
 .1
