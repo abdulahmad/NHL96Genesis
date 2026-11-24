@@ -210,7 +210,7 @@ AddPenalty2							;Forced penalties like faceoff and game over. d0 = penalty num
 	move.b	d0,-(a1)
 	movea.l	#Penaltylist,a0
 	adda.w	(a0,d0.w),a0
-	tst.b	1(a0)					;penalty minutes
+	tst.b	penmins(a0)				;penalty minutes
 	beq.w	.noplayer
 	bmi.w	.noplayer
 	btst	#pfteam,pflags(a3)
@@ -293,7 +293,7 @@ chkprogress							;Control the progress of the ref and the game through penalty 
 	move.b	-2(a0),d0
 	movea.l	#Penaltylist,a1
 	adda.w	(a1,d0.w),a1
-	tst.b	1(a1)					;penalty minutes
+	tst.b	penmins(a1)				;penalty minutes
 	beq.s	.4
 	bmi.s	.4
 	bset	#sf2drec,(sflags2).w
@@ -445,7 +445,7 @@ InProgress							;Ref in progress: update the graphics, stats and penalty inform
 	adda.w	(a1,d0.w),a1
 	bclr	#5,(sflags5).w
 	clr.w	d2
-	move.b	1(a1),d2				;penalty minutes
+	move.b	penmins(a1),d2			;penalty minutes
 	beq.w	.10
 	bmi.w	.10
 	cmp.b	#5,d2
@@ -584,7 +584,7 @@ checkfornewpen						;Look for a new penalty (entered through AddPenalty / AddPen
 	move.b	-2(a0),d0
 	movea.l	#Penaltylist,a1
 	adda.w	(a1,d0.w),a1
-	tst.b	1(a1)					;time for penalty
+	tst.b	penmins(a1)				;time for penalty
 	beq.w	.callit
 	move.w	(puckc).w,d0
 	bmi.w	.3

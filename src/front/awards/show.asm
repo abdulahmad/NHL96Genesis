@@ -188,11 +188,11 @@ AwardsScreenSetup					;Awards screen setup: vram, fonts and the background bitma
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0
 	bset	#5,(disflags).w
 	jsr	(setVram).l
@@ -489,11 +489,11 @@ StanleyCupScreen					;The user's team won the Cup: a full screen picture with th
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0
 	bclr	#5,(disflags).w
 	jsr	(setVram).l

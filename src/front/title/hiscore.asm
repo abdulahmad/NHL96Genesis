@@ -4,11 +4,11 @@ HiScoreScreen						;vb2, the HiScoreBgMap and HiScoreImg bitmaps, then wait up t
 									;frames or a button (waitx)
 	move.l	#vb2,(VBint).w
 	bclr	#df32c,(disflags).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$A000,(VmMAP2).w
-	move.w	#7,(Map2col1).w
+	move.w	#7,(Map2col).w
 	move.w	#$C000,(VmMAP1).w
-	move.w	#7,(Map1col1).w
+	move.w	#7,(Map1col).w
 	move.w	#$F000,(VmMAP3).w
 	move.w	#$F800,(VSPRITES).w
 	move.w	#$FC00,(VSCRLPM).w

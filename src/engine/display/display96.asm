@@ -181,10 +181,10 @@ updatescroll						;Scroll the rink window: Hscroll / Vscroll from Hpos / Vpos
 	andi.w	#$1F,d0
 	asl.w	#7,d0
 	add.w	(VmMAP2).w,d0
-	move.w	d0,6(a5)
+	move.w	d0,dmavram(a5)
 	move.w	#$1E,d0
 	sub.w	d1,d0
-	move.w	(a0),4(a5)
+	move.w	(a0),dmalen(a5)
 	mulu.w	(a0),d0
 	add.w	d0,d0
 	lea	4(a0,d0.w),a1
@@ -201,10 +201,10 @@ updatescroll						;Scroll the rink window: Hscroll / Vscroll from Hpos / Vpos
 	andi.w	#$1F,d0
 	asl.w	#7,d0
 	add.w	(VmMAP2).w,d0
-	move.w	d0,6(a5)
+	move.w	d0,dmavram(a5)
 	move.w	#$3D,d0
 	sub.w	d1,d0
-	move.w	(a0),4(a5)
+	move.w	(a0),dmalen(a5)
 	mulu.w	(a0),d0
 	add.w	d0,d0
 	lea	4(a0,d0.w),a1
@@ -221,7 +221,7 @@ showref								;Ref window: when sflags2 bit 1 is set add the 8 RefRamMap rows t
 	beq.w	rtss2
 	movea.w	#(RefRamMap-M68K_RAM),a0
 	movea.w	#(VmMAP1-M68K_RAM),a1
-	move.w	2(a1),d2
+	move.w	Map1col-VmMAP1(a1),d2
 	moveq	#2,d0					;refy: Xpos on ice screen
 	asl.w	d2,d0
 	moveq	#2,d1
@@ -552,7 +552,7 @@ showclockVertical					;Draw the clock when the display flag is set
 	moveq	#5,d0
 	moveq	#$D,d2
 .next3
-	move.w	2(a1),d1
+	move.w	Map1col-VmMAP1(a1),d1
 	asl.w	d1,d0
 	add.w	d2,d0
 	asl.w	#1,d0
@@ -713,7 +713,7 @@ setffo								;Called from setvideo
 	bsr.w	addframe
 	cmpa.w	a6,a0
 	beq.w	.next
-	move.w	2(a3),d1
+	move.w	padxoff(a3),d1
 	add.w	d1,6(a0)
 	add.w	d1,$E(a0)
 .next
@@ -793,13 +793,13 @@ QueuePadLabel						;Queue the 3 character label of a pad object. d1 = label code
 									;pad object, a5 = dma list. Falls into RenderSmallFontChar for the last
 									;char
 	lea	ButtonLabelCharTable(pc),a4
-	clr.w	2(a0)					;x offset (setffo adds it to the sprites)
+	clr.w	padxoff(a0)				;x offset (setffo adds it to the sprites)
 	move.w	d1,d2
 	lsr.w	#4,d2
 	andi.w	#$F,d2
 	bne.w	.hi
 	move.w	#$FFF0,d2				;' '-'0': blank leading zero
-	subq.w	#4,2(a0)
+	subq.w	#4,padxoff(a0)
 .hi
 	addi.w	#$30,d2
 	clr.w	d0
@@ -821,7 +821,7 @@ QueuePadLabel						;Queue the 3 character label of a pad object. d1 = label code
 	lsr.w	#8,d2
 	andi.w	#7,d2
 	bne.w	.btn
-	addq.w	#4,2(a0)
+	addq.w	#4,padxoff(a0)
 .btn
 	move.b	(a4,d2.w),d2
 	moveq	#2,d0
@@ -1050,12 +1050,12 @@ setupice							;Set all variables, send non purgeable graphics, build sprite fra
 	movem.l	d0-d7/a0-a6,-(sp)
 	bset	#df32c,(disflags).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$DC00,(VSPRITES).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#$F000,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$FC00,(VSCRLPM).w
 	moveq	#0,d0
 	bsr.w	setVram

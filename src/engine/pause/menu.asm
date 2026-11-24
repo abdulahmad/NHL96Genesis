@@ -37,7 +37,7 @@ ExitStatsScreenReload	equ	*
 	lsr.b	#2,d0
 	move.w	d0,4(a0)
 	move.w	#VDPR_MODE4,4(a0)
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	(sp)+,(disflags).w
 	bset	#df32c,(disflags).w
 	move.w	(rinkvrcset).w,d4

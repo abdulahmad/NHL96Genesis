@@ -304,11 +304,11 @@ SetupRosterScreenVideo				;Set the VBint handler, scroll and map addresses for t
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0
 	bset	#5,(disflags).w
 	jsr	(setVram).l
@@ -554,11 +554,11 @@ GoalTypeScreenInit					;Set up the planes and VBlank handler of the goal types s
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0					;fade to color
 	bset	#5,(disflags).w
 	jsr	(setVram).l
@@ -691,11 +691,11 @@ SetupPenaltySummaryVideo			;Set the VBint handler, scroll and map addresses for 
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0					;fade to color
 	bset	#5,(disflags).w
 	jsr	(setVram).l
@@ -816,7 +816,7 @@ DrawPenaltyRows						;Print the rows of the penalty summary
 	movea.l	#Penaltylist,a3
 	adda.w	(a3,d0.w),a3
 	clr.w	d0
-	move.b	1(a3),d0
+	move.b	penmins(a3),d0
 	jsr	(PushNumber).l
 	move.w	#$23,(printx).w
 	jsr	(printcur).l
@@ -829,7 +829,7 @@ DrawPenaltyRows						;Print the rows of the penalty summary
 	move.w	#$13,(printx).w
 	jsr	(printsmallz).l
 	String	$FE,5
-	lea	2(a3),a1
+	lea	penname(a3),a1
 	jsr	(printcur).l
 	addq.w	#2,(printy).w
 	addq.w	#4,d3
@@ -966,11 +966,11 @@ SetupPeriodStatsVideo	equ	*	;Set the VBint handler, scroll and map addresses for
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0					;fade to color
 	bset	#5,(disflags).w
 	jsr	(setVram).l
@@ -1135,7 +1135,7 @@ DrawStatsReportHeader				;Print the heading of the stats report
 	move.w	#9,(printx).w
 	lea	$39E(a2),a2
 	bsr.w	PrintStatValue
-	lea	4(a0),a1
+	lea	tssize(a0),a1
 	addq.w	#2,(printy).w
 .loop3
 	dbf	d6,.loop2
@@ -1191,7 +1191,7 @@ PrintStatValue						;Print one value of the stats report (number, time or percen
 	bsr.w	StatsPushTime
 .6
 	jsr	(appstring).l
-	move.w	2(a0),d0
+	move.w	tsoff2(a0),d0
 	bmi.w	.7
 	jsr	(appendz).l
 	String	'/'
@@ -1252,11 +1252,11 @@ TeamStatScreenInit					;Set up the planes and VBlank handler of the team stats s
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0					;fade to color
 	bset	#5,(disflags).w
 	jsr	(setVram).l
@@ -1755,11 +1755,11 @@ SetupShootersVideo	equ	*	;Set the VBint handler, scroll and map addresses for th
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0					;fade to color
 	bset	#5,(disflags).w
 	jsr	(setVram).l
@@ -2272,11 +2272,11 @@ RecordsScreenInit					;Set up the planes and VBlank handler of the team records 
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0					;fade to color
 	bset	#5,(disflags).w
 	jsr	(setVram).l

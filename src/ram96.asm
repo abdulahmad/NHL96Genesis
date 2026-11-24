@@ -21,11 +21,11 @@ replayend			equ	$FFFFAF64	;End of the replay buffer from M68K_RAM: updatereplay 
 VSCRLPM				equ	$FFFFB000	; location in vram of scroll parameters
 VSPRITES			equ	$FFFFB002	; location in vram of sprite attributes
 VmMAP1				equ	$FFFFB004	; location in vram of playfield 1
-Map1col1			equ	$FFFFB006	; map 1 first column
+Map1col				equ	$FFFFB006	; 2 to this power = width in char of playfield 1 (92 name)
 VmMAP2				equ	$FFFFB008	; location in vram of playfield 2
-Map2col1			equ	$FFFFB00A	; map 2 first column
+Map2col				equ	$FFFFB00A	; 2 to this power = width in char of playfield 2 (92 name)
 VmMAP3				equ	$FFFFB00C	; location in vram of playfield 3
-Map3col1			equ	$FFFFB00E	; map 3 first column
+Map3col				equ	$FFFFB00E	; 2 to this power = width in char of playfield 3 (92 name)
 bigfontptr			equ	$FFFFB010	; Address of the big font map printbig uses
 printbigchars		equ	$FFFFB014	;The char base printbigtext adds: the font printbig1 / printbig2 chose
 bigfont1chars		equ	$FFFFB016	;Chars of BigFontMap (printbig1, the clock digits)

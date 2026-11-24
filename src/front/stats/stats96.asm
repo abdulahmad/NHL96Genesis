@@ -265,7 +265,7 @@ DrawLineIcon						;Draw the icon of line d5 at its LineIconPosTable position
 	jsr	(printz).l
 	String	-(TXPRI+TXMAP1),0,0
 	move.w	(a0),(printx).w
-	move.w	2(a0),(printy).w
+	move.w	lipy(a0),(printy).w
 	subq.w	#3,(printy).w
 	addq.w	#2,(printx).w
 	move.w	d5,d0
@@ -281,9 +281,9 @@ DrawLineIcon						;Draw the icon of line d5 at its LineIconPosTable position
 	move.w	d5,d4
 	asl.w	#3,d4
 	addq.w	#1,d4
-	move.w	2(a0),(printy).w
+	move.w	lipy(a0),(printy).w
 	subq.w	#1,(printy).w
-	move.w	4(a0),d3
+	move.w	lipslots(a0),d3
 	lea	$184(a2),a3
 .loop
 	move.w	(a0),(printx).w
@@ -315,7 +315,7 @@ DrawLineIconLabel					;Print the label under a line icon
 	jsr	(eraser).l
 	jsr	(printbigz).l
 	String	$F8,4,1,5,$F,'                                '
-	move.w	(LineIconPosTable+2).l,(printy).l
+	move.w	(LineIconPosTable+lipy).l,(printy).l
 	move.w	(LineIconPosTable).l,(printx).l
 	tst.w	(OptLine).w
 	beq.w	.1
@@ -556,11 +556,11 @@ SetupLineEditorVideo	equ	*	;Set the VBint handler, scroll and map addresses for 
 	move.w	#0,(VSCRLPM).w
 	move.w	#$B800,(VSPRITES).w
 	move.w	#$B800,(VmMAP3).w
-	move.w	#5,(Map3col1).w
+	move.w	#5,(Map3col).w
 	move.w	#$C000,(VmMAP2).w
-	move.w	#6,(Map2col1).w
+	move.w	#6,(Map2col).w
 	move.w	#$E000,(VmMAP1).w
-	move.w	#6,(Map1col1).w
+	move.w	#6,(Map1col).w
 	move.w	#0,d0					;fade to color
 	bset	#5,(disflags).w
 	jsr	(setVram).l
