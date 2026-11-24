@@ -745,7 +745,7 @@ ShootoutPath7						;ShootoutPaths path: x, y points; $80 in the high byte ends i
 	dc.w	$FFE6,$F8,0,$E0,$8020,2
 
 NextPathPoint						;Next point of shootout path sopath: sopathx / sopathy = x (turned by bit
-									;0 of $76(a3)) / y; at the end ($80)
+									;0 of handed(a3)) / y; at the end ($80)
 									;sflags7 bit 3, sopathend and sopathdir.
 	movem.l	d0-d7/a0-a6,-(sp)
 	cmpi.b	#$80,($FFFFD818).w
@@ -758,7 +758,7 @@ NextPathPoint						;Next point of shootout path sopath: sopathx / sopathy = x (t
 	asl.w	#2,d1
 	movea.l	(a0,d1.w),a0
 	move.w	(a0,d0.w),($FFFFD818).w
-	btst	#0,$77(a3)
+	btst	#0,handed(a3)
 	beq.w	.1
 	neg.w	($FFFFD818).w
 .1

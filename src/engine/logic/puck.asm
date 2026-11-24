@@ -104,7 +104,7 @@ goaliesave							;The goalie a3 makes a save of the puck crossing at a0: the sav
 	eori.w	#1,d0
 .13
 	add.w	d1,(a3)
-	btst	#0,$77(a3)				;check hand of goalie
+	btst	#0,handed(a3)			;check hand of goalie
 	beq.w	.14
 	eori.w	#1,d0
 .14
@@ -1142,7 +1142,7 @@ assnearest							;asstab entry: the player nearest the puck without it.
 	;d1 = shift for the check odds (penalty kill uses less)
 .20
 	move.w	#$28,d0					;move $28 into d0 (40 dec)
-	sub.b	$76(a3),d0
+	sub.b	checking(a3),d0
 	asl.w	d1,d0					;shift d0 by value of d1
 	bsr.w	randomd0				;RNG
 	cmp.w	#2,d0					;compare 2 to d0
@@ -1291,7 +1291,7 @@ assnearest							;asstab entry: the player nearest the puck without it.
 .39
 	btst	#5,(sflags6).w			;check if puckc is in the slot
 	beq.w	check4check				;branch if not in slot
-	move.b	$76(a3),d0
+	move.b	checking(a3),d0
 	ext.w	d0						;clear top byte of d0
 	movem.l	d0/a3,-(sp)				;push to stack
 	add.b	d0,d0					;add d0 to itself
@@ -1299,10 +1299,10 @@ assnearest							;asstab entry: the player nearest the puck without it.
 	blt.w	.40						;branch if less
 	move.b	#$1E,d0					;move 1E into d0
 .40
-	move.b	d0,$76(a3)
+	move.b	d0,checking(a3)
 	bsr.w	check4check
 	movem.l	(sp)+,d0/a3				;pop off stack
-	move.b	d0,$76(a3)
+	move.b	d0,checking(a3)
 	rts
 	;skate to the puck (falls into check4check)
 .41
@@ -1365,7 +1365,7 @@ check4check							;Check an opponent in front of a3.
 .7
 	move.w	#$28,d0					;'('   ; start with 28 hex (40 decimal)
 .8
-	sub.b	$76(a3),d0
+	sub.b	checking(a3),d0
 	tst.w	(OptPen).w				;check for penalties option
 	beq.w	.9						;branch if not on
 	asl.w	#1,d0					;mult by 2

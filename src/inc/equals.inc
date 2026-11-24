@@ -114,7 +114,7 @@ shotacc equ $6D
 passacc equ $6E
 stickhand equ $71
 endurance equ $72
-handed equ $76						;bit0 set is left handed
+handed equ $77						;bit0 set is left handed (96 setplayer, goaliesave; 95G: $76)
 ;player struct fields after handed's neighbours, not named in 93 (names from the 92/93/94 comments)
 pflags3 equ $64						;player flags 3 (92: not used)
 pf3oside equ 0						;offsides
@@ -125,7 +125,7 @@ pf3wall equ 4						;wall collision
 pf3fall equ 5						;falling down
 aggress equ $73						;aggression (Agr; goalie: glove left)
 fighting equ $74					;fighting (Fgt; from the Chk/Hnd byte, always even)
-checking equ $75					;checking (Chk)
+checking equ $76					;checking (Chk; 96 setplayer stores the Chk nibble here; 95G: $75)
 
 ;bit numbers in gmode
 gmclock equ 0						;game clock is stopped

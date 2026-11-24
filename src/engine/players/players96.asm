@@ -427,11 +427,11 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	jsr	(AttributeCalc).l
 	add.b	(PPBonus+2).w,d3
 	bsr.w	ClampNibble
-	move.b	d3,$76(a3)
+	move.b	d3,checking(a3)
 	bclr	#3,attribute(a3)
-	move.b	4(a0),$77(a3)
-	andi.b	#1,$77(a3)
-	eori.b	#1,$77(a3)
+	move.b	4(a0),handed(a3)
+	andi.b	#1,handed(a3)
+	eori.b	#1,handed(a3)
 	bne.w	.3
 	bset	#3,attribute(a3)
 .3
@@ -442,8 +442,8 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	lsr.b	#3,d3
 .4
 	andi.b	#$FE,d3
-	or.b	d3,$77(a3)
-	clr.b	checking(a3)
+	or.b	d3,handed(a3)
+	clr.b	$75(a3)
 	tst.w	position(a3)
 	beq.w	.5
 	move.b	7(a0),d3
@@ -451,7 +451,7 @@ setplayer							;Bring player onto the ice and set his attributes. d3 = offset o
 	cmp.b	#6,d3
 	ble.w	.5
 	subq.w	#6,d3
-	move.b	d3,checking(a3)
+	move.b	d3,$75(a3)
 .5
 	move.b	5(a0),d3				;move Pas/Agr byte into d3
 	lsr.b	#4,d3
