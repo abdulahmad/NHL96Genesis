@@ -1,5 +1,7 @@
 # Align 96G with 95G
 
+> Archived 2026-11-24: the split this plan describes is done. Paths below are as they were then (for example `engine/collide96.asm` is now `src/engine/collide/collide96.asm`).
+
 Audit only. No source bytes were moved in this commit. 95G was read on GitHub
 (`SEGMENT_AGENT.md`, `PROMPT.md`, `docs/HANDOFF.md`, `src/nhl95.asm`, the include lists,
 `docs/name_map.csv`, `tools/extractAssets95.js`). 95G has no `START_HERE.md`.

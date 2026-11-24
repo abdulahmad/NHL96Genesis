@@ -26,7 +26,7 @@ rule in the same commit as the fix that confirmed it, newest last: `- YYYY-MM-DD
 
 - 2026-11-03 names: the pause menu routines keep the 92G-95G names (Pausemode_pall, Pausemode_top, Pausemode_Pmenu), not new 96 names; the bodies match 95G line for line. (owner spotted SetupPauseScreen in the report)
 - 2026-11-04 contributing: CONTRIBUTING.md must not contradict History: lineage lives only in the name history file, never in source comments. (CONTRIBUTING rewrite vs RULES History row)
-- 2026-11-04 D6: remaining generic labels and role-only 95G matches stay on the Unsure list; 95G wins only when the body is the same. (align95_plan.md Unsure; leftovers D6 parked)
+- 2026-11-04 D6: remaining generic labels and role-only 95G matches stay on the Unsure list; 95G wins only when the body is the same. (docs/archive/align95_plan.md Unsure; leftovers D6 parked)
 - 2026-11-04 D6 names: same job + new body takes the 95G name; leftover sub_/loc_/unk_ are named from job, callers, SRAM or role. input96_shot: SetRoles / SetTeamRoles / ClearRolesIfGoalie (no 95G parent). (owner)
 - 2026-11-04 D6 names: input96 dospinorama, formerly StartDpadBoost, renamed 2026-11-24 in #65 after code tracing: the manual's Spin-o-Rama (start + dpad on a skater: SPAspinorama, formerly SPA288C, pf2aip, Xvel+$64). No 95G parent. (owner)
 - 2026-11-04 D6 names: fight96 EngageFight (A/B/C during SPAfight: SPA3128, second fighter SetFightingMajors). No 93G parent. (owner)
