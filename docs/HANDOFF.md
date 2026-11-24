@@ -105,8 +105,9 @@ No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
 - code96_03 converted: fighting, asstab and the penalty texts. MATCH (segment and ROM).
 - 96 brings fighting back from 93: the fight routines take the 93G names (checkfight in code96_02, startfight
   for 93's checkfight .sf, SetInst, fightinput, ClearMessageLine, assfight, assfwatch). 96's player struct is not 95's
-  past $60: SetInst reads the player number at $67 and the fight rating at $75 (95 / 93: $66 / $74), so the 95 names
-  in equals.inc for $66-$76 (pnum, weight, ... checking, handed) are not used until 96's layout is known.
+  past $60: SetInst reads the player number at $67 and the fight rating at $75 (95 / 93: $66 / $74). Since PR #63 the
+  96 layout is in equals.inc for the top of that range: handed is $77 and checking $76 (95G: $76 / $75), with their
+  18 sites named; $75 (the fight rating) is still written as a number.
 - About 11 KB of this segment is code the listing does not decode (the assignment routines behind asstab, assfight,
   assfwatch): bytes, with a label at every asstab entry (loc_<address> where nothing names the routine). Even with
   RAM addresses masked only a third of it matches 95: 96 rewrote the player AI. With the "do not disassemble" rule
