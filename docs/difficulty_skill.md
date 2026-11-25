@@ -173,7 +173,7 @@ The other `OptSkill` readers are `GetRoleAss`, `check4check` and the goalie reac
 | `$1E1ACE` | `SkillLevelPalTbl` | `unk_1E1ACE` | |
 | `$01D7F2` | `SkipStrings` | `sub_1D7F2` | Index into `SkillText` for menu display |
 
-Finish plan step 7 in `docs/align95_plan.md` may rename `word_FFD284` / `word_FFD286` once every use is converted to a shared equate.
+Finish plan step 7 in `docs/archive/align95_plan.md` may rename `word_FFD284` / `word_FFD286` once every use is converted to a shared equate.
 
 ## Quick contrast: skill vs playoff round
 

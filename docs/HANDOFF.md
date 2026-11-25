@@ -2,26 +2,24 @@
 
 ## Now
 
-- Stage / unit: rename CreditsList → CreditsPages (93G name; legal/credits pages after Credits).
-- Branch: `cursor/creditspages-399a`
-- Last check: `tools/verify_all.sh` ALL MATCH (2026-11-05).
-- Next: PR. Same rename in 94G / 95G / 95S.
+- Stage / unit: none open. The last unit (CreditsList renamed CreditsPages) is merged on `main` (#45); 94G and 95G use the same name.
+- Branch: none. New work is a short branch off the current `main` and one PR into `main`.
+- Last check: `tools/verify_all.sh` ALL MATCH.
+- Next: not set; see `TODO.md`.
 - Code as data: none left (2026-11-18). `tools/check_code_as_data.py` reports 0 candidates and `tools/verify_all.sh` says ALL MATCH. The last
   ~220 dc.b blocks were turned into instructions in one pass with `tools/decode_code.py` (names in `tools/decode_names.csv`,
   forced code starts and data pockets in `tools/decode_hints.csv`).
-- Open PRs: (this unit)
 
 ## Purpose
 A bit-perfect SNASM68k disassembly of NHL 96 (Sega Genesis) that reads like original source, named after
 the NHL95Genesis lineage. Code and data never change: every build must MATCH the retail ROM.
 
 ## Setup
-See START_HERE.md. ROM `lst/nhl96.bin` (SHA-1 7204633fbb9966ac637e7966d02ba15c5acdee6b, 2 MB) and the
-IDA listing `lst/nhl96.bin.lst` are in the repo for now (the listing is about 53 MB; GitHub warns above
-50 MB). If they are removed later, put them back at exactly those paths; the prebuild message names
-the path, SHA-1 and size.
+See the README. The retail ROM (SHA-1 7204633fbb9966ac637e7966d02ba15c5acdee6b, 2 MB; any file name in the repo folder) and
+the IDA listing `lst/nhl96.bin.lst` are local files, not in the repo (gitignored). The prebuild message names the path, SHA-1
+and size it needs.
 Windows: `npm run build:retail`. Linux (wine): `tools/build_rom.sh`,
-`tools/verify_segment.sh <name>`, `tools/verify_all.sh`. All logs go to `output/`.
+`tools/verify_all.sh`. All logs go to `output/`.
 
 ## Tools
 - `tools/prebuild.js [retail]`: ROM check, then runs `tools/extractAssets96.js` when `Extracted/` is missing or stale
@@ -41,7 +39,7 @@ Windows: `npm run build:retail`. Linux (wine): `tools/build_rom.sh`,
   When a segment's confirmed range differs, edit its entry in `tools/segmap96.json` and the neighbour's.
 - `tools/find95.py <segment | start-end> [--len N] [--min-distinct N] [--refresh]`: 95G labels found in a 96 range
   by their first bytes (95G ROM and name map downloaded from GitHub into `output/ref95/`). Log in `output/`.
-- `tools/fixopcodes.js`, `tools/verifyRom.js`, `tools/verifySegment.js`: as in 95G.
+- `tools/fixopcodes.js`, `tools/verifyRom.js`: as in 95G.
 - Code kept as data (dc.b) becomes real assembly with these (build first: `tools/verify_all.sh`, they read `output/obj/nhl96 .lst`):
   `tools/check_code_as_data.py` lists every labelled dc run that decodes as 68000 code (exit 1 when there is one; false
   positives go in `tools/code_as_data_ok.txt`); `tools/mark_code_as_data.py --apply` puts the "Code kept as bytes" marker
@@ -58,12 +56,12 @@ Windows: `npm run build:retail`. Linux (wine): `tools/build_rom.sh`,
   the other ports: a label in the data files that code calls or jumps to.
 
 ## Naming and comment rules
-In SEGMENT_AGENT.md, "Current rules". History (renames, IDA names) lives in `docs/name_map.csv`
+In `docs/RULES.md` and `AGENTS.md`. History (renames, IDA names) lives in `docs/name_map.csv`
 (address,name,ida_name,old_name,module).
 
 ## Conventions
-One concern per commit, MATCH before every push; `git pull --rebase origin main` then push to main.
-No force-push. Contributors: fork, branch, PR (START_HERE.md section 0).
+One concern per commit, MATCH before every push; a short branch off the current `main` and one PR into `main`.
+No force-push. Outside contributors: fork, branch, PR.
 
 ## Setup friction fixed
 - The main96 test needed the 95G ROM to find matching routines; tools/find95.py fetches it from the public repo.
